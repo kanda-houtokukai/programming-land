@@ -31,32 +31,46 @@ function stepLabel(b, maskCount = false) {
   return `${BLOCK_DEFS[b.type].emoji}${BLOCK_DEFS[b.type].label}`;
 }
 
-// 失敗回数に応じて 開示する手数を増やす（考える余地を残す段階開示）
-function rescueFor(failCount, stage, hasNext) {
+// つんだ プログラムと 最短解 sol を先頭から比べ、「つぎに おくべき ブロックの種類」を返す。
+// prog が sol の途中まで合っていれば その次、ちがえば さいしょのブロック（＝置き直しの目印）。
+function nextBlockType(prog, sol) {
+  if (!sol || !sol.length) return null;
+  let i = 0;
+  while (i < prog.length && i < sol.length && prog[i].type === sol[i].type) i++;
+  return sol[Math.min(i, sol.length - 1)].type;
+}
+
+/* 救済ヒントの3層化（A5）
+   第1層は面設計（1命令の導入面）。ここでは第2層・第3層を返す。
+   - 第2層（親切・早い・視覚的）: 1回失敗から やわらかく。つぎに置くブロックを パレットで光らせる（highlight）。
+     2回目からは 先頭の手を すこしずつ 文字でも見せる（考える余地を残す段階開示）。
+   - 第3層（最終手段）: 3回失敗すると「こたえをみる」ボタンが出る。押して初めて 全手順を表示する（自動では出さない）。 */
+function rescueFor(failCount, prog, stage, hasNext, showAnswer) {
   const sol = stage.sol;
-  if (failCount < 2 || !sol || !sol.length) return null;
-  if (failCount >= 4) {
+  if (failCount < 1 || !sol || !sol.length) return null;
+  const highlight = nextBlockType(prog, sol);
+  const canSeeAnswer = failCount >= 3;      // 一定回数 失敗するまで こたえボタンは出さない
+
+  // 第3層: こたえをみる を押した後は 全手順を出す
+  if (showAnswer && canSeeAnswer) {
     return {
-      strong: true,
+      strong: true, highlight, canSeeAnswer, mode: "answer",
       text: `こたえの てじゅん：${sol.map(b => stepLabel(b)).join(" → ")}`,
       sub: hasNext ? "むずかしかったら、つぎの ステージに すすんでも いいよ！あとで もどってこれるよ。" : null,
     };
   }
-  if (failCount === 3) {
+  // 第2層: 段階的な 文字ヒント（＋つねに パレット光らせ）
+  let text;
+  if (failCount === 1) {
+    text = "つぎに おく ブロックを ひからせたよ。「つぎ」の ブロックを おいてみよう！";
+  } else if (failCount === 2) {
+    const n = sol.length <= 2 ? 1 : 2;
+    text = `おたすけ：さいしょは ${sol.slice(0, n).map(b => stepLabel(b, true)).join(" → ")} から はじめてみよう。`;
+  } else {
     const n = Math.max(1, Math.ceil(sol.length / 2));
-    return {
-      strong: false,
-      text: `おたすけ：とちゅうまで みせるね。${sol.slice(0, n).map(b => stepLabel(b)).join(" → ")} …つづきは かんがえてみよう！`,
-      sub: null,
-    };
+    text = `おたすけ：とちゅうまで みせるね。${sol.slice(0, n).map(b => stepLabel(b)).join(" → ")} …つづきは かんがえてみよう！`;
   }
-  // failCount === 2: さいしょの1〜2手だけ。1手目がくりかえしなら 回数は かくして 考える余地を残す
-  const n = sol.length <= 2 ? 1 : 2;
-  return {
-    strong: false,
-    text: `おたすけ：さいしょは ${sol.slice(0, n).map(b => stepLabel(b, true)).join(" → ")} から はじめてみよう。`,
-    sub: null,
-  };
+  return { strong: false, highlight, canSeeAnswer, mode: "hint", text, sub: null };
 }
 
 function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
@@ -74,6 +88,7 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   const [result, setResult] = useState(null);
   const [hint, setHint] = useState(false);
   const [failCount, setFailCount] = useState(0); // この面で失敗した回数（救済ヒントの段階）
+  const [showAnswer, setShowAnswer] = useState(false); // 第3層「こたえをみる」を押したか
   const runIdRef = useRef(0);
   const uidRef = useRef(0);
 
@@ -92,7 +107,7 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   useEffect(() => { // ステージが かわったら リセット
     runIdRef.current++;
     setProg([]); setOpenRepeat(null); setBot(info.start); setCollected({});
-    setRunning(false); setActiveUid(null); setCrash(false); setMsg(null); setResult(null); setHint(false); setFailCount(0);
+    setRunning(false); setActiveUid(null); setCrash(false); setMsg(null); setResult(null); setHint(false); setFailCount(0); setShowAnswer(false);
   }, [stage.id]);
 
   const isWall = (x, y) => x < 0 || y < 0 || x >= info.w || y >= info.h || info.cells[y][x] === "#";
@@ -172,7 +187,7 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
     setActiveUid(null); setRunning(false);
     if (status === "win") {
       SFX.win(sound);
-      setFailCount(0); // クリアしたら救済カウントはリセット
+      setFailCount(0); setShowAnswer(false); // クリアしたら救済カウントはリセット
       const n = countBlocks(prog);
       const starN = n <= stage.par ? 3 : n <= stage.par + 2 ? 2 : 1;
       setResult({ stars: starN, n });
@@ -190,6 +205,9 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   }
 
   const cell = Math.min(56, Math.floor(320 / info.w));
+  // 救済（第2・3層）を1回だけ算出。パレットの「つぎ」光らせにも使う
+  const rescue = rescueFor(failCount, prog, stage, hasNext, showAnswer);
+  const rescueNext = rescue && !running ? rescue.highlight : null;
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 14px", paddingBottom: ctrlH + 16 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "10px 0", flexWrap: "wrap" }}>
@@ -238,17 +256,21 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
         </div>
       </div>
 
-      {/* 救済ヒント: 何回か失敗したら 自動で 手厚いヒントが でる（同じ面で 何度も つまずく前に助ける） */}
-      {(() => {
-        const r = rescueFor(failCount, stage, hasNext);
-        if (!r) return null;
-        return (
-          <div className="panel slide" style={{ padding: 12, marginTop: 10, background: r.strong ? "#FFF3D6" : "#FFF9E0", fontWeight: 800, fontSize: 14 }}>
-            <div>{r.strong ? "🆘 " : "💪 "}{r.text}</div>
-            {r.sub && <div style={{ fontWeight: 700, fontSize: 12, color: "#6B6265", marginTop: 6 }}>{r.sub}</div>}
-          </div>
-        );
-      })()}
+      {/* 救済（第2層＝親切・視覚的／第3層＝こたえをみる）。第1層は面設計側。 */}
+      {rescue && (
+        <div className="panel slide" style={{ padding: 12, marginTop: 10, background: rescue.strong ? "#FFF3D6" : "#FFF9E0", fontWeight: 800, fontSize: 14 }}>
+          <div>{rescue.strong ? "🆘 " : "💪 "}{rescue.text}</div>
+          {rescue.sub && <div style={{ fontWeight: 700, fontSize: 12, color: "#6B6265", marginTop: 6 }}>{rescue.sub}</div>}
+          {/* 第3層: 何回か 失敗したら「こたえをみる」ボタン。押して初めて 全手順を出す */}
+          {rescue.canSeeAnswer && !showAnswer && (
+            <button type="button" onClick={() => { setShowAnswer(true); SFX.tap(sound); }}
+              style={{ marginTop: 10, background: "#fff", border: `2px solid ${C.ink}`, borderRadius: 999,
+                padding: "6px 14px", fontSize: 13, fontWeight: 900, fontFamily: "inherit", cursor: "pointer" }}>
+              🔑 こたえを みる
+            </button>
+          )}
+        </div>
+      )}
 
       {/* おうちの方へ（保護者向け・折りたたみ）。プレイ画面内なので開いても解きかけは消えない */}
       <ParentGuide island={stage.island} />
@@ -277,6 +299,7 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
           {island.palette.map(t => (
             <PaletteBlock key={t} type={t}
               disabled={running || (t === "repeat" && openRepeat !== null)}
+              highlight={rescueNext === t}
               onClick={() => addBlock(t)} />
           ))}
           {openRepeat && <Btn bg="#fff" onClick={() => setOpenRepeat(null)} style={{ fontSize: 14 }}>✅ くりかえし おわり</Btn>}

@@ -26,12 +26,19 @@ function brickStyle(color, { active } = {}) {
 }
 
 // パレット用（タップで つむ）。末尾に ＋
-export function PaletteBlock({ type, disabled, onClick }) {
+export function PaletteBlock({ type, disabled, onClick, highlight }) {
   const d = BLOCK_DEFS[type];
   const repeat = type === "repeat";
   return (
     <button type="button" disabled={disabled} onClick={onClick}
-      style={{ ...brickStyle(d.color), opacity: disabled ? 0.4 : 1, cursor: disabled ? "not-allowed" : "pointer" }}>
+      className={highlight && !disabled ? "glow" : ""}
+      style={{ ...brickStyle(d.color), opacity: disabled ? 0.4 : 1, cursor: disabled ? "not-allowed" : "pointer",
+        position: "relative" }}>
+      {/* 救済中に「つぎに おく ブロック」を光らせて教える（第2層の視覚化） */}
+      {highlight && !disabled && (
+        <span style={{ position: "absolute", top: -10, right: -6, fontSize: 11, fontWeight: 900,
+          background: "#FFE066", border: "2px solid #3A3335", borderRadius: 999, padding: "0 6px" }}>つぎ</span>
+      )}
       <Nub color={d.color} />
       <span style={{ fontSize: repeat ? 17 : 15 }}>{d.emoji}</span>
       <span>{d.label}</span>
