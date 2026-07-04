@@ -4,12 +4,12 @@ import { C } from "../theme.js";
 import { Btn, Header, StarRow } from "./common.jsx";
 import { STAGES, stagesFor } from "../data/stages.js";
 import { ISLANDS, DIFFICULTIES } from "../data/islands.js";
-import { BLOCK_DEFS } from "../data/blocks.js";
 import { parseStage, countBlocks, DX, DY, MAX_BLOCKS } from "../engine.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
 import HowTo from "./HowTo.jsx";
+import { BlockChip, PaletteBlock } from "./blocks.jsx";
 import robotUrl from "../assets/robot.png";
 import worldmapDay from "../assets/worldmap.webp";
 import worldmapSunset from "../assets/worldmap-sunset.webp";
@@ -17,43 +17,6 @@ import worldmapNight from "../assets/worldmap-night.webp";
 
 // 難易度別のマップ背景（同一構図・時間帯違い。拠点座標 ISLAND_POS は3枚共通）
 const MAP_BG = { easy: worldmapDay, normal: worldmapSunset, hard: worldmapNight };
-
-function BlockChip({ b, activeUid, onRemove, onSelect, openRepeat, onCount }) {
-  const d = BLOCK_DEFS[b.type];
-  const active = activeUid === b.uid;
-  if (b.type === "repeat") {
-    const open = openRepeat === b.uid;
-    return (
-      <div className="panel" style={{
-        padding: 8, borderRadius: 14, background: open ? "#FFE9A8" : C.sun,
-        outline: active ? `4px solid ${C.sakura}` : "none", display: "inline-flex",
-        alignItems: "center", gap: 6, flexWrap: "wrap", maxWidth: "100%",
-      }}>
-        <button className="pbtn" style={{ padding: "4px 8px", background: "#fff", fontSize: 14 }}
-          onClick={() => onSelect(b.uid)}>🔁 {open ? "ここに いれてね▼" : "くりかえし"}</button>
-        <button className="pbtn" style={{ padding: "2px 8px", background: "#fff" }} onClick={() => onCount(b.uid, -1)}>−</button>
-        <b style={{ fontSize: 18 }}>{b.count}かい</b>
-        <button className="pbtn" style={{ padding: "2px 8px", background: "#fff" }} onClick={() => onCount(b.uid, 1)}>＋</button>
-        <span style={{ display: "inline-flex", gap: 4, flexWrap: "wrap" }}>
-          {b.children.map(c => (
-            <BlockChip key={c.uid} b={c} activeUid={activeUid} onRemove={onRemove} onSelect={onSelect} openRepeat={openRepeat} onCount={onCount} />
-          ))}
-          {b.children.length === 0 && <span style={{ fontSize: 12, fontWeight: 700, opacity: .6 }}>（からっぽ）</span>}
-        </span>
-        <button className="pbtn" aria-label="けす" style={{ padding: "2px 8px", background: "#FFB3B3" }} onClick={() => onRemove(b.uid)}>✖</button>
-      </div>
-    );
-  }
-  return (
-    <button className="pbtn" onClick={() => onRemove(b.uid)}
-      style={{
-        padding: "6px 10px", background: d.color, fontSize: 15, borderRadius: 12,
-        outline: active ? `4px solid ${C.sakura}` : "none",
-      }}>
-      {d.emoji} {d.label} <span style={{ opacity: .5, fontSize: 12 }}>✖</span>
-    </button>
-  );
-}
 
 function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   const info = parseStage(stage);
@@ -185,14 +148,18 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   const cell = Math.min(56, Math.floor(320 / info.w));
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 14px", paddingBottom: ctrlH + 16 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "10px 0", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "10px 0", flexWrap: "wrap" }}>
         <Btn bg="#fff" onClick={onBack}>◀ もどる</Btn>
-        <div className="pl-display" style={{ fontSize: 20, flex: 1 }}>{stage.name}</div>
+        <div className="pl-display" style={{ fontSize: 20, flex: 1, minWidth: 100 }}>{stage.name}</div>
         <StarRow n={save.puzzle.stars[stage.id] || 0} size={20} />
+        {/* ③ こまったら: ヒントは 操作ボタンから はずして ヘッダーに小さく置く */}
+        <Btn bg={hint ? C.sun : "#fff"} onClick={() => { setHint(h => !h); SFX.tap(sound); }} style={{ fontSize: 14, padding: "8px 12px" }}>💡 ヒント</Btn>
       </div>
       <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 8 }}>
         ⭐3つの めやす：ブロック {stage.par}こ いか（いま {countBlocks(prog)}こ）
       </div>
+
+      {hint && <div className="panel slide" style={{ padding: 12, marginBottom: 10, background: "#EAF7FF", fontWeight: 800, fontSize: 14 }}>💡 {island.hint}</div>}
 
       {/* ばんめん */}
       <div className="panel" style={{ padding: 14, display: "flex", justifyContent: "center", background: "#FBFDFF" }}>
@@ -227,45 +194,50 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
         </div>
       </div>
 
-      {/* プログラム */}
-      <div className="panel" style={{ padding: 12, marginTop: 12 }}>
-        <div style={{ fontWeight: 900, fontSize: 13, marginBottom: 6, display: "flex", justifyContent: "space-between" }}>
-          <span>📜 プログラム（タップで けせるよ）</span>
-          <span style={{ opacity: .55 }}>{countBlocks(prog)}こ</span>
+      {/* ① くみたてる ゾーン: 命令ブロックを つんで プログラムを つくる（積み木ブロック風・パレットと同じ見た目） */}
+      <div className="panel" style={{ padding: 12, marginTop: 12, background: "#FFFDF6" }}>
+        <div style={{ fontWeight: 900, fontSize: 14, marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 17 }}>🧩</span><span>くみたてる</span>
+          <span style={{ fontWeight: 700, fontSize: 12, opacity: .6 }}>— ブロックを タップして つもう</span>
         </div>
-        {/* 命令が増えても枠は広がらない: 最大高さ＋スクロール（タブレットで画面を圧迫しない） */}
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", minHeight: 40, maxHeight: 132, overflowY: "auto" }}>
-          {prog.length === 0 && <span style={{ fontWeight: 700, opacity: .5 }}>ここに めいれいが ならぶよ</span>}
+        {/* つんだ プログラム（タップで けせる）。増えても 枠は広がらない: 最大高さ＋スクロール */}
+        <div style={{
+          display: "flex", gap: 6, flexWrap: "wrap", alignItems: "flex-start",
+          minHeight: 48, maxHeight: 150, overflowY: "auto",
+          background: "#fff", border: `2px dashed rgba(58,51,53,.3)`, borderRadius: 12, padding: 10,
+        }}>
+          {prog.length === 0 && <span style={{ fontWeight: 700, opacity: .5, alignSelf: "center" }}>ここに ブロックが つみあがるよ</span>}
           {prog.map(b => (
             <BlockChip key={b.uid} b={b} activeUid={activeUid} onRemove={removeBlock}
               onSelect={selectRepeat} openRepeat={openRepeat} onCount={changeCount} />
           ))}
         </div>
+        {/* パレット（えらぶ側）。つんだ ブロックと 同じ見た目 */}
+        <div style={{ fontWeight: 800, fontSize: 12, opacity: .7, margin: "10px 0 6px" }}>したから えらぶ ▾</div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {island.palette.map(t => (
+            <PaletteBlock key={t} type={t}
+              disabled={running || (t === "repeat" && openRepeat !== null)}
+              onClick={() => addBlock(t)} />
+          ))}
+          {openRepeat && <Btn bg="#fff" onClick={() => setOpenRepeat(null)} style={{ fontSize: 14 }}>✅ くりかえし おわり</Btn>}
+        </div>
       </div>
 
-      {/* 下部固定コントローラー: 命令ブロック＋実行ボタンを 画面下に常時固定（いつも同じ場所で押せる） */}
+      {/* ② うごかす ゾーン（下部固定）: 実行系だけ。組み立てとは 色・場所で はっきり分ける */}
       <div ref={controllerRef} style={{
         position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 30,
         width: "100%", maxWidth: 640, margin: "0 auto",
         padding: "10px 14px calc(12px + env(safe-area-inset-bottom))",
-        background: "#FFF9EF", borderTop: `3px solid ${C.ink}`, borderRadius: "18px 18px 0 0",
+        background: "#E9F7E6", borderTop: `3px solid ${C.ink}`, borderRadius: "18px 18px 0 0",
         boxShadow: "0 -5px 14px rgba(58,51,53,.16)",
       }}>
         {msg && <div className="slide" style={{ padding: "8px 12px", marginBottom: 8, background: "#FFF1F4", border: `2px solid ${C.ink}`, borderRadius: 12, fontWeight: 800, fontSize: 14 }}>{msg}</div>}
-        {hint && <div className="slide" style={{ padding: "8px 12px", marginBottom: 8, background: "#EAF7FF", border: `2px solid ${C.ink}`, borderRadius: 12, fontWeight: 800, fontSize: 14 }}>💡 {island.hint}</div>}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
-          {island.palette.map(t => (
-            <Btn key={t} bg={BLOCK_DEFS[t].color} disabled={running || (t === "repeat" && openRepeat !== null)}
-              onClick={() => addBlock(t)} style={{ fontSize: 15 }}>
-              {BLOCK_DEFS[t].emoji} {BLOCK_DEFS[t].label}
-            </Btn>
-          ))}
-          {openRepeat && <Btn bg="#fff" onClick={() => setOpenRepeat(null)}>✅ くりかえし おわり</Btn>}
-        </div>
-        <div style={{ display: "flex", gap: 10, marginTop: 10, flexWrap: "wrap", justifyContent: "center" }}>
-          <Btn big bg={C.leaf} onClick={run} disabled={running}>▶️ うごかす！</Btn>
-          <Btn bg="#fff" onClick={resetBot}>🔄 さいしょから</Btn>
-          <Btn bg={C.sun} onClick={() => { setHint(h => !h); SFX.tap(sound); }}>💡 ヒント</Btn>
+        <div style={{ display: "flex", gap: 12, alignItems: "center", justifyContent: "center" }}>
+          <Btn big bg={C.leaf} onClick={run} disabled={running}
+            style={{ fontSize: 24, padding: "16px 34px", flex: "0 1 auto" }}>▶️ うごかす！</Btn>
+          <Btn bg="#fff" onClick={resetBot}
+            style={{ fontSize: 13, padding: "10px 14px" }}>🔄 さいしょ<br />から</Btn>
         </div>
       </div>
 
