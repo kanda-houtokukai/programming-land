@@ -8,8 +8,9 @@ import PartnerCard from "./PartnerCard.jsx";
 import iconPuzzle from "../assets/icon_puzzle.png";
 import iconQuiz from "../assets/icon_quiz.png";
 import iconArt from "../assets/icon_art.png";
+import iconTyping from "../assets/icon_typing.png";
 
-const MODE_ICON = { puzzle: iconPuzzle, quiz: iconQuiz, art: iconArt };
+const MODE_ICON = { puzzle: iconPuzzle, quiz: iconQuiz, art: iconArt, typing: iconTyping };
 
 export default function Home({ save, go, onSound, onSwitchProfile }) {
   const stars = puzzleStarsTotal(save);
