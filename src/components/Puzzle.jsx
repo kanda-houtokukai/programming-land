@@ -338,10 +338,10 @@ const ISLAND_POS = {
   6: { left: 79, top: 25.5 },
 };
 
-function IslandMap({ save, diff, onEnter }) {
+function IslandMap({ save, diff, onEnter, unlockAll }) {
   const clearedIn = i => stagesFor(i, diff).filter(s => (save.puzzle.stars[s.id] || 0) > 0).length;
   const starsIn = i => stagesFor(i, diff).reduce((a, s) => a + (save.puzzle.stars[s.id] || 0), 0);
-  const unlocked = i => i === 1 || clearedIn(i - 1) >= 3;
+  const unlocked = i => unlockAll || i === 1 || clearedIn(i - 1) >= 3;
   // SVGは％座標をそのまま使う（viewBox 100×56.25 = 16:9）
   const P = i => ({ x: ISLAND_POS[i].left, y: ISLAND_POS[i].top * 0.5625 });
   return (
@@ -407,15 +407,16 @@ function IslandMap({ save, diff, onEnter }) {
   );
 }
 
-export default function Puzzle({ save, update, go, onSound }) {
+export default function Puzzle({ save, update, go, onSound, unlockAll }) {
   const diff = save.puzzle.difficulty || "easy";
   const [island, setIsland] = useState(null);
   const [stageId, setStageId] = useState(null);
   const stages = island ? stagesFor(island, diff) : [];
   // 迂回できる解放: 1面 詰まっても となりの面に すすめる。
   // クリア数＋1 まで解放（＝つまずいた面を1つ飛ばして先へ／もどるのは自由）。
+  // 確認モード中は全面解放（App側のセッション限りフラグ）。
   const clearedInStages = stages.filter(s => (save.puzzle.stars[s.id] || 0) > 0).length;
-  const unlockedStage = i => i <= clearedInStages + 1;
+  const unlockedStage = i => unlockAll || i <= clearedInStages + 1;
   const stage = STAGES.find(s => s.id === stageId);
 
   function setDiff(d) {
@@ -450,8 +451,15 @@ export default function Puzzle({ save, update, go, onSound }) {
         ))}
       </div>
 
+      {unlockAll && (
+        <div style={{ margin: "8px 16px 0", padding: "5px 10px", borderRadius: 999,
+          background: "#FFF0D6", border: `2px dashed ${C.ink}`, fontWeight: 800, fontSize: 12,
+          display: "inline-flex", alignItems: "center", gap: 6 }}>
+          🔧 かくにんモード：ぜんステージ解放中（リロードで もどります）
+        </div>
+      )}
       {island === null ? (
-        <IslandMap save={save} diff={diff} onEnter={setIsland} />
+        <IslandMap save={save} diff={diff} onEnter={setIsland} unlockAll={unlockAll} />
       ) : (
         <div style={{ padding: "14px 16px", display: "grid", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

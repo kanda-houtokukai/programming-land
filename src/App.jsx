@@ -28,6 +28,9 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [evolution, setEvolution] = useState(null);
+  // 確認モード（開発・実機確認用の隠し機能）: 全パズル面を一時解放する。
+  // 保護者ゲートの中でだけ切り替えられ、localStorageには保存しない（リロードでオフに戻る＝子どもの記録に残らない）
+  const [unlockAll, setUnlockAll] = useState(false);
 
   const save = profiles.find(p => p.id === currentId) || null;
 
@@ -123,14 +126,15 @@ export default function App() {
       )}
       {save && screen === "home" && save.partner && <Home save={save} go={setScreen} onSound={onSound} onSwitchProfile={switchProfile} />}
       {save && screen === "dex" && <Dex save={save} go={setScreen} onSound={onSound} />}
-      {save && screen === "puzzle" && <Puzzle save={save} update={update} go={setScreen} onSound={onSound} />}
+      {save && screen === "puzzle" && <Puzzle save={save} update={update} go={setScreen} onSound={onSound} unlockAll={unlockAll} />}
       {save && screen === "quiz" && <Quiz save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "art" && <Art save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "typing" && <Typing save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "records" && (
         <Records save={save} go={setScreen} onSound={onSound}
           onExport={handleExport} onImportFile={handleImportFile}
-          onDeleteRequest={() => setConfirmDelete(true)} />
+          onDeleteRequest={() => setConfirmDelete(true)}
+          unlockAll={unlockAll} setUnlockAll={setUnlockAll} />
       )}
       <EvolutionOverlay evolution={evolution} onClose={() => setEvolution(null)} />
       {confirmDelete && save && (

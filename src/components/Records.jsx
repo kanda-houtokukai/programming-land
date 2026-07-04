@@ -29,7 +29,7 @@ function skillProgress(save) {
   ];
 }
 
-export default function Records({ save, go, onSound, onExport, onImportFile, onDeleteRequest }) {
+export default function Records({ save, go, onSound, onExport, onImportFile, onDeleteRequest, unlockAll, setUnlockAll }) {
   const [tab, setTab] = useState("kid");
   const [gate, setGate] = useState(false);
   const [ans, setAns] = useState("");
@@ -151,6 +151,17 @@ export default function Records({ save, go, onSound, onExport, onImportFile, onD
               <Btn bg="#FFB3B3" onClick={onDeleteRequest}>⚠️ このプロファイルを けす</Btn>
             </div>
             {ioMsg && <div className="panel slide" style={{ padding: 10, marginTop: 10, background: "#FFFBE0", fontWeight: 800, fontSize: 13 }}>{ioMsg}</div>}
+            {/* 確認モード（開発・実機確認用）: 全パズル面を一時解放。保存しないのでリロードでオフに戻る */}
+            <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${C.ink}55` }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+                <input type="checkbox" checked={!!unlockAll} onChange={e => setUnlockAll(e.target.checked)}
+                  style={{ width: 20, height: 20, accentColor: C.leaf }} />
+                <span style={{ fontWeight: 900, fontSize: 14 }}>🔧 かくにんモード（ぜんステージ解放）</span>
+              </label>
+              <p style={{ fontSize: 12, fontWeight: 700, margin: "6px 0 0", color: "#6B6265" }}>
+                実機確認用。オンにするとパズルの島・面がすべて開きます。<b>保存されません</b>（アプリを閉じる／リロードでオフに戻ります）。
+              </p>
+            </div>
             <div style={{ fontSize: 11, fontWeight: 700, opacity: .55, marginTop: 12 }}>{APP_VERSION}（{BUILD_DATE}）</div>
           </div>
         </div>
