@@ -9,6 +9,7 @@ import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
 import HowTo from "./HowTo.jsx";
+import ParentGuide from "./ParentGuide.jsx";
 import { BlockChip, PaletteBlock } from "./blocks.jsx";
 import robotUrl from "../assets/robot.png";
 import worldmapDay from "../assets/worldmap.webp";
@@ -193,6 +194,9 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
           </div>
         </div>
       </div>
+
+      {/* おうちの方へ（保護者向け・折りたたみ）。プレイ画面内なので開いても解きかけは消えない */}
+      <ParentGuide island={stage.island} />
 
       {/* ① くみたてる ゾーン: 命令ブロックを つんで プログラムを つくる（積み木ブロック風・パレットと同じ見た目） */}
       <div className="panel" style={{ padding: 12, marginTop: 12, background: "#FFFDF6" }}>
