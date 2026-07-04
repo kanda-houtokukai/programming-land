@@ -1,0 +1,155 @@
+// きろくの へや（v1から移植・保護者向けにプロファイル管理と書き出し/読み込みを追加）
+import { useState, useRef } from "react";
+import { C } from "../theme.js";
+import { Btn, Header } from "./common.jsx";
+import { STAGES } from "../data/stages.js";
+import { QUIZ_SETS } from "../data/quizzes.js";
+import { BADGES, puzzleStarsTotal, daysPlayed } from "../data/badges.js";
+import { lastNDays } from "../storage.js";
+import { APP_VERSION, BUILD_DATE } from "../version.js";
+
+function skillProgress(save) {
+  const w = wid => {
+    const st = STAGES.filter(s => s.world === wid);
+    const got = st.reduce((a, s) => a + (save.puzzle.stars[s.id] || 0), 0);
+    return Math.round(100 * got / (st.length * 3));
+  };
+  const quizTotal = QUIZ_SETS.reduce((a, q) => a + q.qs.length, 0);
+  const quizGot = QUIZ_SETS.reduce((a, q) => a + (save.quiz.best[q.id] || 0), 0);
+  return [
+    { name: "じゅんじょ（順次）", note: "めいれいを 正しい順番に組み立てる力", pct: w(1), color: C.leaf },
+    { name: "くりかえし（反復）", note: "同じ処理をまとめて考える力", pct: w(2), color: C.sky },
+    { name: "じょうけん（分岐）", note: "「もし〜なら」で場合分けする力", pct: w(3), color: C.grape },
+    { name: "よそうする力（クイズ）", note: "きまり発見・順序立て・分類", pct: Math.round(100 * quizGot / quizTotal), color: C.sun },
+    { name: "つくる力（創造）", note: "命令を組み合わせて作品を作る", pct: Math.min(100, save.art.gallery.length * 20), color: C.sakura },
+  ];
+}
+
+export default function Records({ save, go, onSound, onExport, onImportFile, onDeleteRequest }) {
+  const [tab, setTab] = useState("kid");
+  const [gate, setGate] = useState(false);
+  const [ans, setAns] = useState("");
+  const [ioMsg, setIoMsg] = useState(null);
+  const fileRef = useRef(null);
+  const skills = skillProgress(save);
+  const days = lastNDays(14);
+  const counts = days.map(d => {
+    const l = save.log[d]; return l ? (l.puzzle || 0) + (l.quiz || 0) + (l.art || 0) : 0;
+  });
+  const maxC = Math.max(1, ...counts);
+  return (
+    <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 40 }}>
+      <Header save={save} title="📖 きろくの へや" onHome={() => go("home")} onSound={onSound} />
+      <div style={{ display: "flex", gap: 10, padding: "0 16px", marginBottom: 14 }}>
+        <Btn bg={tab === "kid" ? C.sun : "#fff"} onClick={() => setTab("kid")}>🧒 わたしの きろく</Btn>
+        <Btn bg={tab === "parent" ? C.sun : "#fff"} onClick={() => { setTab("parent"); setGate(false); setAns(""); setIoMsg(null); }}>👪 おうちのひとへ</Btn>
+      </div>
+
+      {tab === "kid" && (
+        <div style={{ display: "grid", gap: 16, padding: "0 16px" }}>
+          <div className="panel slide" style={{ padding: 18, textAlign: "center" }}>
+            <span style={{ fontSize: 50 }}>{save.avatar}</span>
+            <div className="pl-display" style={{ fontSize: 24 }}>{save.name} の ぼうけん</div>
+            <div style={{ fontWeight: 800, marginTop: 6 }}>⭐ {puzzleStarsTotal(save)}こ ／ 🏅 バッジ {save.badges.length}こ ／ 🔥 {daysPlayed(save)}にち あそんだ</div>
+          </div>
+          <div className="panel" style={{ padding: 18 }}>
+            <div className="pl-display" style={{ fontSize: 20, marginBottom: 10 }}>🏅 バッジ コレクション</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(140px,1fr))", gap: 10 }}>
+              {BADGES.map(b => {
+                const got = save.badges.includes(b.id);
+                return (
+                  <div key={b.id} className="panel" style={{ padding: 10, textAlign: "center", borderRadius: 14, background: got ? C.sun : "#F1EDE4", opacity: got ? 1 : 0.55 }}>
+                    <div style={{ fontSize: 30, filter: got ? "none" : "grayscale(1)" }}>{got ? b.emoji : "❓"}</div>
+                    <div style={{ fontWeight: 900, fontSize: 13 }}>{b.name}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700 }}>{b.desc}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="panel" style={{ padding: 18 }}>
+            <div className="pl-display" style={{ fontSize: 20, marginBottom: 10 }}>💪 そだった ちから</div>
+            {skills.map(s => (
+              <div key={s.name} style={{ marginBottom: 10 }}>
+                <div style={{ fontWeight: 900, fontSize: 14 }}>{s.name} <span style={{ float: "right" }}>{s.pct}%</span></div>
+                <div style={{ height: 16, border: `3px solid ${C.ink}`, borderRadius: 999, overflow: "hidden", background: "#fff" }}>
+                  <div style={{ width: `${s.pct}%`, height: "100%", background: s.color, transition: "width .4s" }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {tab === "parent" && !gate && (
+        <div className="panel slide" style={{ margin: "0 16px", padding: 20, textAlign: "center" }}>
+          <div style={{ fontWeight: 900, fontSize: 17 }}>👪 おうちのひと むけの がめんです</div>
+          <div style={{ fontWeight: 700, margin: "8px 0" }}>「さん かける よん」の こたえを すうじで いれてください</div>
+          <input value={ans} inputMode="numeric" onChange={e => setAns(e.target.value)}
+            style={{ fontSize: 24, width: 90, textAlign: "center", padding: 8, border: `3px solid ${C.ink}`, borderRadius: 12, fontFamily: "inherit", fontWeight: 800 }} />
+          <div style={{ marginTop: 12 }}>
+            <Btn bg={C.leaf} onClick={() => { if (ans.trim() === "12") setGate(true); }}>ひらく</Btn>
+          </div>
+        </div>
+      )}
+
+      {tab === "parent" && gate && (
+        <div style={{ display: "grid", gap: 16, padding: "0 16px" }}>
+          <div className="panel" style={{ padding: 18 }}>
+            <div style={{ fontWeight: 900, fontSize: 18, marginBottom: 6 }}>学びの見える化（文部科学省「プログラミング的思考」対応）</div>
+            <p style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px" }}>
+              小学校で育成をめざす「順次・反復・分岐」の考え方を、3つの遊びに分解して練習しています。バーは到達度の目安です。
+            </p>
+            {skills.map(s => (
+              <div key={s.name} style={{ marginBottom: 12 }}>
+                <div style={{ fontWeight: 900, fontSize: 14 }}>{s.name} <span style={{ float: "right" }}>{s.pct}%</span></div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#6B6265" }}>{s.note}</div>
+                <div style={{ height: 12, border: `2px solid ${C.ink}`, borderRadius: 999, overflow: "hidden", background: "#fff", marginTop: 4 }}>
+                  <div style={{ width: `${s.pct}%`, height: "100%", background: s.color }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="panel" style={{ padding: 18 }}>
+            <div style={{ fontWeight: 900, fontSize: 18, marginBottom: 8 }}>直近14日の取り組み</div>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 110 }}>
+              {days.map((d, i) => (
+                <div key={d} style={{ flex: 1, textAlign: "center" }}>
+                  <div title={`${d}: ${counts[i]}回`} style={{
+                    height: `${(counts[i] / maxC) * 90}px`, minHeight: counts[i] ? 8 : 2,
+                    background: counts[i] ? C.sky : "#E8E2D6", border: counts[i] ? `2px solid ${C.ink}` : "none",
+                    borderRadius: 6,
+                  }} />
+                  <div style={{ fontSize: 9, fontWeight: 700, marginTop: 2 }}>{d.slice(8)}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize: 12, fontWeight: 700, marginTop: 6 }}>棒の高さ＝その日の活動回数（パズルクリア・クイズ・作品保存の合計）</div>
+          </div>
+          <div className="panel" style={{ padding: 18 }}>
+            <div style={{ fontWeight: 900, fontSize: 16, marginBottom: 6 }}>データの管理（{save.name} さんの記録）</div>
+            <p style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px" }}>
+              記録は<b>この端末のブラウザ内にのみ</b>保存されます。タブレットとPCの間で記録は共有されません。
+              端末の引き継ぎ・故障への備えとして、ときどき「書き出し」でファイルに保存してください（読み込みは新しいプロファイルとして追加されます）。
+            </p>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <Btn bg={C.sky} onClick={() => { onExport(); setIoMsg("💾 きろくファイルをダウンロードしました"); }}>⬇️ きろくの かきだし</Btn>
+              <Btn bg={C.leaf} onClick={() => fileRef.current && fileRef.current.click()}>⬆️ きろくの よみこみ</Btn>
+              <input ref={fileRef} type="file" accept=".json,application/json" style={{ display: "none" }}
+                onChange={async e => {
+                  const f = e.target.files && e.target.files[0];
+                  e.target.value = "";
+                  if (!f) return;
+                  const msg = await onImportFile(f);
+                  setIoMsg(msg);
+                }} />
+              <Btn bg="#FFB3B3" onClick={onDeleteRequest}>⚠️ このプロファイルを けす</Btn>
+            </div>
+            {ioMsg && <div className="panel slide" style={{ padding: 10, marginTop: 10, background: "#FFFBE0", fontWeight: 800, fontSize: 13 }}>{ioMsg}</div>}
+            <div style={{ fontSize: 11, fontWeight: 700, opacity: .55, marginTop: 12 }}>{APP_VERSION}（{BUILD_DATE}）</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

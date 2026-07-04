@@ -1,0 +1,50 @@
+// 共通の小さな部品（v1から移植）
+import { C } from "../theme.js";
+import { puzzleStarsTotal } from "../data/badges.js";
+
+export function Btn({ children, onClick, bg = C.sun, style = {}, className = "", disabled, big }) {
+  return (
+    <button className={"pbtn " + className} disabled={disabled}
+      style={{ background: bg, padding: big ? "16px 26px" : "10px 16px", fontSize: big ? 22 : 16, ...style }}
+      onClick={onClick}>{children}</button>
+  );
+}
+
+export function StarRow({ n, size = 26 }) {
+  return (
+    <span style={{ fontSize: size, letterSpacing: 2 }}>
+      {[1, 2, 3].map(i => <span key={i} style={{ opacity: i <= n ? 1 : 0.22 }}>⭐</span>)}
+    </span>
+  );
+}
+
+export function Toast({ toast }) {
+  if (!toast) return null;
+  return (
+    <div className="panel pop" style={{
+      position: "fixed", top: 18, left: "50%", transform: "translateX(-50%)",
+      zIndex: 90, padding: "12px 22px", background: C.sun, fontWeight: 900, fontSize: 18,
+      display: "flex", alignItems: "center", gap: 10, maxWidth: "90vw",
+    }}>
+      <span style={{ fontSize: 30 }}>{toast.emoji}</span>
+      <span>バッジ ゲット！「{toast.name}」</span>
+    </div>
+  );
+}
+
+export function Header({ save, onHome, onSound, title, onRecords }) {
+  const stars = puzzleStarsTotal(save);
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", flexWrap: "wrap" }}>
+      {onHome && <Btn bg={C.white} onClick={onHome} style={{ fontSize: 18 }}>🏠 ホーム</Btn>}
+      <div className="pl-display" style={{ fontSize: 20, fontWeight: 900, flex: 1, minWidth: 120 }}>{title}</div>
+      <div className="panel" style={{ padding: "6px 14px", display: "flex", gap: 8, alignItems: "center", borderRadius: 999 }}>
+        <span style={{ fontSize: 22 }}>{save.avatar}</span>
+        <b>{save.name}</b>
+        <span style={{ fontWeight: 900 }}>⭐{stars}</span>
+      </div>
+      {onRecords && <Btn bg={C.sakura} onClick={onRecords}>📖 きろく</Btn>}
+      <Btn bg={C.white} onClick={onSound} aria-label="おとの おんおふ">{save.settings.sound ? "🔊" : "🔇"}</Btn>
+    </div>
+  );
+}
