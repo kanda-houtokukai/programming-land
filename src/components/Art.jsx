@@ -8,6 +8,8 @@ import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
 import turtleUrl from "../assets/turtle.png";
 import HowTo from "./HowTo.jsx";
+import ParentGuide from "./ParentGuide.jsx";
+import { ART_GUIDE } from "../data/parent-guide.js";
 
 function turtleSegs(cmds) {
   let x = 160, y = 215, ang = -90, ci = 0;
@@ -142,6 +144,8 @@ export default function Art({ save, update, go, onSound }) {
             ))}
           </div>
         </div>
+        {/* おうちの方へ（モーダル）。開閉しても かきかけの作品は消えない */}
+        <ParentGuide guide={ART_GUIDE} />
         {save.art.gallery.length > 0 && (
           <div className="panel" style={{ padding: 14 }}>
             <div className="pl-display" style={{ fontSize: 18, marginBottom: 8 }}>🖼️ わたしの びじゅつかん</div>

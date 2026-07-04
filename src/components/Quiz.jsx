@@ -7,6 +7,8 @@ import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
 import HowTo from "./HowTo.jsx";
+import ParentGuide from "./ParentGuide.jsx";
+import { QUIZ_GUIDE } from "../data/parent-guide.js";
 
 function QuizPlay({ session, save, update, onBack }) {
   const sound = save.settings.sound;
@@ -89,6 +91,8 @@ function QuizPlay({ session, save, update, onBack }) {
           </div>
         )}
       </div>
+      {/* おうちの方へ（カテゴリ別・モーダル）。回答途中でも開閉で状態は消えない */}
+      <ParentGuide guide={QUIZ_GUIDE[session.catId]} />
     </div>
   );
 }

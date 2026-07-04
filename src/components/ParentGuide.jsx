@@ -1,7 +1,9 @@
-// 「おうちの方へ」保護者向けガイド。パズルのプレイ画面内に置く。
+// 「おうちの方へ」保護者向けガイド（全モード共通・A7で汎用化）。
 // トリガーはボタン1つ。押すと画面の上に別レイヤー（モーダル）で開く。
 // これなら下の操作ボタンを押し下げて隠さない／×で閉じれば元の画面（解きかけ）に戻る。
-// 中身（parent-guide.js の文章）はそのまま。表示方法だけモーダル化した。
+// 使い方: パズル= <ParentGuide island={n} />（島番号で引く・従来どおり）
+//         他モード= <ParentGuide guide={QUIZ_GUIDE[cat]} /> のようにガイドを直接渡す
+//         タイピング= extra に段階別の一言補足を渡すと本文の下に添える
 import { useState } from "react";
 import { PARENT_GUIDE } from "../data/parent-guide.js";
 
@@ -9,10 +11,10 @@ const INK = "#3A3335";
 const PANEL_BG = "#EEEAF5";   // 落ち着いた うすむらさき（子ども向けの青/黄と区別）
 const ACCENT = "#6B5B95";
 
-export default function ParentGuide({ island }) {
-  const g = PARENT_GUIDE[island];
+export default function ParentGuide({ island, guide, extra }) {
+  const g = guide || PARENT_GUIDE[island];
   const [open, setOpen] = useState(false);
-  if (!g) return null; // ガイドのある島（1〜3）だけ表示
+  if (!g) return null;
 
   return (
     <>
@@ -62,6 +64,13 @@ export default function ParentGuide({ island }) {
               {g.body.map((p, i) => (
                 <p key={i} style={{ fontSize: 13, lineHeight: 1.75, margin: "0 0 8px", fontWeight: 500, color: "#4A4446" }}>{p}</p>
               ))}
+              {/* 段階別の一言補足（タイピングの kotoba/tanbun/bunshou 等） */}
+              {extra && (
+                <div style={{ fontSize: 13, lineHeight: 1.75, fontWeight: 500, color: "#4A4446",
+                  background: "#F4F1FA", border: `2px solid ${ACCENT}`, borderRadius: 12, padding: "8px 12px", margin: "0 0 8px" }}>
+                  📍 {extra}
+                </div>
+              )}
               <div style={{ fontSize: 13, fontWeight: 700, background: "#FFF7E6", border: `2px solid ${INK}`, borderRadius: 12, padding: "8px 12px", marginTop: 4 }}>
                 💡 {g.tip}
               </div>

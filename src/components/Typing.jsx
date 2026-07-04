@@ -7,6 +7,8 @@ import { TYPING_STAGES, TYPING_WORDS, WORDS_PER_SESSION } from "../data/typing.j
 import { startWord, typeChar, hintRest, nextKey, currentUnitIndex, segment } from "../typing/romaji.js";
 import TypingKeyboard from "./TypingKeyboard.jsx";
 import HowTo from "./HowTo.jsx";
+import ParentGuide from "./ParentGuide.jsx";
+import { TYPING_GUIDE } from "../data/parent-guide.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
@@ -152,6 +154,8 @@ function TypingPlay({ stage, save, update, onBack }) {
       <div style={{ fontWeight: 700, fontSize: 12, color: "#6B6265", textAlign: "center", marginTop: 8 }}>
         キーボードで うってみよう！（がめんは さわらなくて いいよ）
       </div>
+      {/* おうちの方へ（共通ガイド＋今の段階の補足・モーダル）。入力途中でも開閉で状態は消えない */}
+      <ParentGuide guide={TYPING_GUIDE.common} extra={TYPING_GUIDE[stage.id]} />
     </div>
   );
 }
