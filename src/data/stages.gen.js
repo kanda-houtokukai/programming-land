@@ -12,6 +12,27 @@ export const GEN_STAGES = [
    "..*.",
    "....",
    "S..."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "right"
   ]
  },
  {
@@ -25,6 +46,21 @@ export const GEN_STAGES = [
    "....",
    ".S..",
    "..*."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "left"
   ]
  },
  {
@@ -38,6 +74,24 @@ export const GEN_STAGES = [
    "...*",
    "..S.",
    "...."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move"
   ]
  },
  {
@@ -51,6 +105,21 @@ export const GEN_STAGES = [
    "....",
    "..S.",
    "..*."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move"
   ]
  },
  {
@@ -64,6 +133,27 @@ export const GEN_STAGES = [
    ".*.S",
    ".*..",
    "...."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move"
   ]
  },
  {
@@ -77,6 +167,24 @@ export const GEN_STAGES = [
    ".*..",
    "S*..",
    "...."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move"
   ]
  },
  {
@@ -90,6 +198,24 @@ export const GEN_STAGES = [
    "..S.",
    "....",
    "...*"
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "left"
   ]
  },
  {
@@ -103,6 +229,24 @@ export const GEN_STAGES = [
    "....",
    "....",
    "*..S"
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move"
   ]
  },
  {
@@ -116,6 +260,21 @@ export const GEN_STAGES = [
    "S.*.",
    "....",
    "...."
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "right",
+   "move"
   ]
  },
  {
@@ -130,6 +289,33 @@ export const GEN_STAGES = [
    "*...#",
    ".....",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "right",
+   "move"
   ]
  },
  {
@@ -144,6 +330,34 @@ export const GEN_STAGES = [
    ".....",
    "...*.",
    ".*S.."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "right"
   ]
  },
  {
@@ -158,6 +372,27 @@ export const GEN_STAGES = [
    ".*...",
    ".....",
    "S*..."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move"
   ]
  },
  {
@@ -172,6 +407,36 @@ export const GEN_STAGES = [
    "S....",
    "...*.",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "right"
   ]
  },
  {
@@ -186,6 +451,36 @@ export const GEN_STAGES = [
    ".*...",
    "...S.",
    "*...#"
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "left"
   ]
  },
  {
@@ -200,6 +495,28 @@ export const GEN_STAGES = [
    "....*",
    "...S.",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "right",
+   "left"
   ]
  },
  {
@@ -214,6 +531,31 @@ export const GEN_STAGES = [
    "...*.",
    "....S",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "right"
   ]
  },
  {
@@ -228,6 +570,27 @@ export const GEN_STAGES = [
    "...*.",
    ".#.S*",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "left"
   ]
  },
  {
@@ -242,6 +605,36 @@ export const GEN_STAGES = [
    "....#",
    ".....",
    ".S.*."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "left"
   ]
  },
  {
@@ -257,6 +650,37 @@ export const GEN_STAGES = [
    "...*S.",
    "......",
    ".#...."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "right"
   ]
  },
  {
@@ -272,6 +696,43 @@ export const GEN_STAGES = [
    ".#.#..",
    "..#.*.",
    "......"
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "right"
   ]
  },
  {
@@ -287,6 +748,49 @@ export const GEN_STAGES = [
    "S.*..*",
    "......",
    ".*...#"
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "left",
+   "right"
   ]
  },
  {
@@ -302,6 +806,46 @@ export const GEN_STAGES = [
    ".*.*S#",
    "......",
    "....*."
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "right",
+   "move",
+   "left"
   ]
  },
  {
@@ -317,6 +861,39 @@ export const GEN_STAGES = [
    ".#...#",
    "......",
    ".*...#"
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "right"
   ]
  },
  {
@@ -332,6 +909,43 @@ export const GEN_STAGES = [
    ".*....",
    ".S#*..",
    ".....*"
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "right",
+   "left"
   ]
  },
  {
@@ -347,6 +961,43 @@ export const GEN_STAGES = [
    ".*.S..",
    ".#....",
    ".....#"
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "right"
   ]
  },
  {
@@ -362,6 +1013,49 @@ export const GEN_STAGES = [
    "#...*.",
    "......",
    "#..#.."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "left",
+   "right"
   ]
  },
  {
@@ -377,6 +1071,49 @@ export const GEN_STAGES = [
    "*...#.",
    "#.#.*.",
    ".#...."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "right"
   ]
  },
  {
@@ -391,6 +1128,28 @@ export const GEN_STAGES = [
    ".*...",
    ".....",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "right",
+   "repeat"
   ]
  },
  {
@@ -405,6 +1164,28 @@ export const GEN_STAGES = [
    "...*.",
    ".....",
    ".S..."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 2,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "move"
   ]
  },
  {
@@ -419,6 +1200,31 @@ export const GEN_STAGES = [
    ".*...",
    ".....",
    "...*."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "right"
   ]
  },
  {
@@ -433,6 +1239,31 @@ export const GEN_STAGES = [
    ".....",
    ".....",
    ".*..."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "move"
   ]
  },
  {
@@ -447,6 +1278,28 @@ export const GEN_STAGES = [
    "....*",
    "...S.",
    "...*."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "move"
   ]
  },
  {
@@ -461,6 +1314,31 @@ export const GEN_STAGES = [
    ".....",
    ".....",
    "....S"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "right"
   ]
  },
  {
@@ -475,6 +1353,31 @@ export const GEN_STAGES = [
    "....S",
    ".....",
    ".*..."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "repeat",
+    "count": 2,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "repeat",
+   "left"
   ]
  },
  {
@@ -489,6 +1392,28 @@ export const GEN_STAGES = [
    "..*..",
    "...*.",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "move"
   ]
  },
  {
@@ -503,6 +1428,32 @@ export const GEN_STAGES = [
    ".*...",
    "*....",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 2,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "left",
+   "right"
   ]
  },
  {
@@ -518,6 +1469,38 @@ export const GEN_STAGES = [
    ".....*",
    "...#..",
    "..*..*"
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "right",
+   "repeat",
+   "move",
+   "left"
   ]
  },
  {
@@ -533,6 +1516,32 @@ export const GEN_STAGES = [
    "...*..",
    "......",
    "*....#"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "move",
+   "left"
   ]
  },
  {
@@ -548,6 +1557,34 @@ export const GEN_STAGES = [
    "......",
    ".*....",
    "......"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "move"
   ]
  },
  {
@@ -563,6 +1600,31 @@ export const GEN_STAGES = [
    "#...S#",
    ".*..*.",
    "..*..."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "left"
   ]
  },
  {
@@ -578,6 +1640,34 @@ export const GEN_STAGES = [
    "....#.",
    ".#....",
    "......"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "left"
   ]
  },
  {
@@ -593,6 +1683,40 @@ export const GEN_STAGES = [
    ".*....",
    "*.....",
    "......"
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "repeat",
+    "count": 2,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "repeat",
+   "right"
   ]
  },
  {
@@ -608,6 +1732,37 @@ export const GEN_STAGES = [
    ".....*",
    "S.#.#.",
    "......"
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "move",
+   "right",
+   "repeat"
   ]
  },
  {
@@ -623,6 +1778,32 @@ export const GEN_STAGES = [
    "S.....",
    "..*...",
    "#....."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "move",
+   "right"
   ]
  },
  {
@@ -638,6 +1819,31 @@ export const GEN_STAGES = [
    "......",
    ".**...",
    "#....."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "repeat",
+    "count": 2,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "repeat",
+   "right"
   ]
  },
  {
@@ -654,6 +1860,44 @@ export const GEN_STAGES = [
    ".......",
    "....S#.",
    ".*....."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "move",
+   "right"
   ]
  },
  {
@@ -670,6 +1914,44 @@ export const GEN_STAGES = [
    ".......",
    "#..#S..",
    "..#...."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 2,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "left",
+   "right"
   ]
  },
  {
@@ -686,6 +1968,49 @@ export const GEN_STAGES = [
    "S......",
    ".......",
    ".....#."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 2,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "left"
   ]
  },
  {
@@ -702,6 +2027,47 @@ export const GEN_STAGES = [
    "#.*S*.#",
    ".#.....",
    ".....*#"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "left",
+   "right"
   ]
  },
  {
@@ -718,6 +2084,53 @@ export const GEN_STAGES = [
    ".......",
    ".*.*..S",
    "....#.*"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "left",
+   "right"
   ]
  },
  {
@@ -734,6 +2147,50 @@ export const GEN_STAGES = [
    ".......",
    ".*#*..*",
    "......."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "move",
+   "right"
   ]
  },
  {
@@ -750,6 +2207,43 @@ export const GEN_STAGES = [
    "*......",
    "...*.*.",
    "....#.."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "left",
+   "repeat"
   ]
  },
  {
@@ -766,6 +2260,47 @@ export const GEN_STAGES = [
    ".#.....",
    "....*.S",
    "....*.#"
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "right",
+   "repeat",
+   "move",
+   "left"
   ]
  },
  {
@@ -782,6 +2317,40 @@ export const GEN_STAGES = [
    "....#..",
    ".......",
    "..#...."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "left",
+   "repeat"
   ]
  },
  {
@@ -796,6 +2365,25 @@ export const GEN_STAGES = [
    "....#",
    "#*...",
    "....#"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "smartR"
   ]
  },
  {
@@ -810,6 +2398,25 @@ export const GEN_STAGES = [
    ".....",
    "S....",
    "....*"
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "smartL"
   ]
  },
  {
@@ -824,6 +2431,25 @@ export const GEN_STAGES = [
    ".....",
    "..*..",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartL"
   ]
  },
  {
@@ -838,6 +2464,29 @@ export const GEN_STAGES = [
    ".....",
    "#..#.",
    ".#*.."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "left",
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -852,6 +2501,25 @@ export const GEN_STAGES = [
    "...#.",
    "*.#..",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartL"
   ]
  },
  {
@@ -866,6 +2534,25 @@ export const GEN_STAGES = [
    ".....",
    ".*...",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "smartR"
   ]
  },
  {
@@ -880,6 +2567,28 @@ export const GEN_STAGES = [
    ".....",
    "..#.S",
    "..#.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "smartL"
   ]
  },
  {
@@ -894,6 +2603,28 @@ export const GEN_STAGES = [
    ".....",
    "....#",
    ".#..*"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartR"
   ]
  },
  {
@@ -908,6 +2639,25 @@ export const GEN_STAGES = [
    "*....",
    "....#",
    "....S"
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -923,6 +2673,32 @@ export const GEN_STAGES = [
    "#*#...",
    "....#.",
    ".#.#.."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "repeat",
+   "smartL",
+   "right"
   ]
  },
  {
@@ -938,6 +2714,31 @@ export const GEN_STAGES = [
    ".S##..",
    ".....#",
    "..##.*"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "smartL"
   ]
  },
  {
@@ -953,6 +2754,33 @@ export const GEN_STAGES = [
    "..#..S",
    ".*#.##",
    ".#...."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartR",
+   "right",
+   "smartL"
   ]
  },
  {
@@ -968,6 +2796,36 @@ export const GEN_STAGES = [
    "..S...",
    "#..#*.",
    "..#..."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartR",
+   "right",
+   "smartL"
   ]
  },
  {
@@ -983,6 +2841,32 @@ export const GEN_STAGES = [
    "......",
    "......",
    "S...#."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "repeat",
+   "smartR",
+   "right"
   ]
  },
  {
@@ -998,6 +2882,32 @@ export const GEN_STAGES = [
    "..#.#.",
    "..#.*#",
    "#....#"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR",
+   "left",
+   "smartL"
   ]
  },
  {
@@ -1013,6 +2923,35 @@ export const GEN_STAGES = [
    "......",
    "....#.",
    ".....#"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "move",
+   "smartL"
   ]
  },
  {
@@ -1028,6 +2967,32 @@ export const GEN_STAGES = [
    "..*...",
    ".....*",
    "....##"
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -1043,6 +3008,31 @@ export const GEN_STAGES = [
    "..#...",
    "..#.##",
    "..*..."
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "right",
+   "repeat",
+   "smartL"
   ]
  },
  {
@@ -1059,6 +3049,38 @@ export const GEN_STAGES = [
    "#.#..#.",
    "......#",
    ".#..###"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "smartL",
+   "smartR"
   ]
  },
  {
@@ -1075,6 +3097,37 @@ export const GEN_STAGES = [
    "#...#..",
    "..S....",
    ".##...."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR",
+   "left"
   ]
  },
  {
@@ -1091,6 +3144,42 @@ export const GEN_STAGES = [
    "#..#*..",
    "S.#.#.#",
    "......."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "smartL",
+   "smartR",
+   "right"
   ]
  },
  {
@@ -1107,6 +3196,39 @@ export const GEN_STAGES = [
    "S..#...",
    "#.##...",
    "..*.#.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartL",
+   "smartR",
+   "right"
   ]
  },
  {
@@ -1123,6 +3245,45 @@ export const GEN_STAGES = [
    ".###.##",
    ".*#..#.",
    ".#*.#.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "smartL",
+   "left",
+   "smartR"
   ]
  },
  {
@@ -1139,6 +3300,38 @@ export const GEN_STAGES = [
    "..#####",
    ".......",
    ".##.#*."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "smartR",
+   "move"
   ]
  },
  {
@@ -1155,6 +3348,38 @@ export const GEN_STAGES = [
    ".##...#",
    "S#...#.",
    "..#..*."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR",
+   "smartL",
+   "left"
   ]
  },
  {
@@ -1171,6 +3396,38 @@ export const GEN_STAGES = [
    ".......",
    "##.#.##",
    "S......"
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "smartL",
+   "smartR"
   ]
  },
  {
@@ -1187,6 +3444,41 @@ export const GEN_STAGES = [
    "......#",
    "...#.#.",
    "..#*.S."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "smartR",
+   "smartL"
   ]
  },
  {
@@ -1202,6 +3494,28 @@ export const GEN_STAGES = [
    "*.###",
    "..*.#",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR",
+   "left"
   ]
  },
  {
@@ -1217,6 +3531,28 @@ export const GEN_STAGES = [
    "*....",
    ".....",
    ".#*.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "smartR"
   ]
  },
  {
@@ -1232,6 +3568,29 @@ export const GEN_STAGES = [
    ".*#..",
    ".....",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "smartL",
+   "smartR"
   ]
  },
  {
@@ -1247,6 +3606,32 @@ export const GEN_STAGES = [
    "#....",
    "*....",
    ".#S.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR",
+   "right",
+   "move"
   ]
  },
  {
@@ -1262,6 +3647,28 @@ export const GEN_STAGES = [
    "#....",
    "#...#",
    "..S.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR",
+   "left"
   ]
  },
  {
@@ -1277,6 +3684,29 @@ export const GEN_STAGES = [
    ".#...",
    "..#..",
    "...*."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "left",
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -1292,6 +3722,28 @@ export const GEN_STAGES = [
    ".....",
    "..*#.",
    "..#.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartL",
+   "left"
   ]
  },
  {
@@ -1307,6 +3759,29 @@ export const GEN_STAGES = [
    "..*..",
    "...#.",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartL",
+   "smartR"
   ]
  },
  {
@@ -1322,6 +3797,29 @@ export const GEN_STAGES = [
    "#....",
    ".S...",
    "..#.*"
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "repeat",
+   "smartL",
+   "smartR"
   ]
  },
  {
@@ -1337,6 +3835,36 @@ export const GEN_STAGES = [
    ".##.*.",
    "....#.",
    "..#..."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartR",
+   "right",
+   "move"
   ]
  },
  {
@@ -1352,6 +3880,32 @@ export const GEN_STAGES = [
    "...##.",
    "##.##.",
    "...S.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartL",
+   "move"
   ]
  },
  {
@@ -1367,6 +3921,32 @@ export const GEN_STAGES = [
    "..#...",
    ".##..*",
    ".#..S#"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartL",
+   "right"
   ]
  },
  {
@@ -1382,6 +3962,36 @@ export const GEN_STAGES = [
    "..S...",
    ".#....",
    ".....#"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartL",
+   "left",
+   "smartR",
+   "right"
   ]
  },
  {
@@ -1397,6 +4007,32 @@ export const GEN_STAGES = [
    "#S.#..",
    "..##.#",
    "#..#*."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "smartL",
+   "smartR"
   ]
  },
  {
@@ -1412,6 +4048,33 @@ export const GEN_STAGES = [
    "...#S.",
    "...#..",
    "...*.."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "smartR",
+   "move",
+   "right"
   ]
  },
  {
@@ -1427,6 +4090,32 @@ export const GEN_STAGES = [
    "......",
    "......",
    "#...*."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartR",
+   "smartL"
   ]
  },
  {
@@ -1442,6 +4131,32 @@ export const GEN_STAGES = [
    "#*....",
    "......",
    ".....#"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "move",
+   "smartR"
   ]
  },
  {
@@ -1457,6 +4172,34 @@ export const GEN_STAGES = [
    "S.#...",
    "......",
    "...#*."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR",
+   "left"
   ]
  },
  {
@@ -1473,6 +4216,37 @@ export const GEN_STAGES = [
    ".#..#*.",
    ".#..#..",
    "S......"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "left",
+   "smartR",
+   "right",
+   "smartL"
   ]
  },
  {
@@ -1489,6 +4263,34 @@ export const GEN_STAGES = [
    ".....*.",
    "..#..S.",
    "..*#..."
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "right",
+   "repeat",
+   "smartL"
   ]
  },
  {
@@ -1505,6 +4307,34 @@ export const GEN_STAGES = [
    ".*.....",
    ".......",
    "##..#.S"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR",
+   "left"
   ]
  },
  {
@@ -1521,6 +4351,35 @@ export const GEN_STAGES = [
    ".......",
    "......*",
    "*##..#."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "smartR",
+   "smartL"
   ]
  },
  {
@@ -1537,6 +4396,35 @@ export const GEN_STAGES = [
    "....#.#",
    ".*.#.##",
    ".#....."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "repeat",
+   "smartL",
+   "right"
   ]
  },
  {
@@ -1553,6 +4441,35 @@ export const GEN_STAGES = [
    "....#..",
    ".#.....",
    "..*.S.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartL",
+   "smartR",
+   "left"
   ]
  },
  {
@@ -1569,6 +4486,35 @@ export const GEN_STAGES = [
    "....#..",
    ".*#*.#.",
    "#......"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "smartR",
+   "smartL"
   ]
  },
  {
@@ -1585,6 +4531,35 @@ export const GEN_STAGES = [
    ".......",
    "..*....",
    "#...#.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "right",
+   "smartL"
   ]
  },
  {
@@ -1601,6 +4576,38 @@ export const GEN_STAGES = [
    "S....*.",
    ".#....#",
    "..##..."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "smartR"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR",
+   "right",
+   "smartL"
   ]
  },
  {
@@ -1616,6 +4623,24 @@ export const GEN_STAGES = [
    "*S..#",
    ".....",
    "...*#"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -1631,6 +4656,25 @@ export const GEN_STAGES = [
    "*....",
    "S....",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartL",
+   "left"
   ]
  },
  {
@@ -1646,6 +4690,29 @@ export const GEN_STAGES = [
    ".....",
    "S...#",
    "*.#.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartR",
+   "smartL"
   ]
  },
  {
@@ -1661,6 +4728,24 @@ export const GEN_STAGES = [
    ".*#..",
    ".....",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -1676,6 +4761,25 @@ export const GEN_STAGES = [
    ".#...",
    "S....",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -1691,6 +4795,25 @@ export const GEN_STAGES = [
    "...*.",
    "....*",
    "...S."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -1706,6 +4829,28 @@ export const GEN_STAGES = [
    "..*..",
    "....#",
    ".S..#"
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "right",
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -1721,6 +4866,24 @@ export const GEN_STAGES = [
    ".....",
    ".S...",
    "...*."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -1736,6 +4899,29 @@ export const GEN_STAGES = [
    "*....",
    ".S...",
    "....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "smartL",
+   "left"
   ]
  },
  {
@@ -1752,6 +4938,31 @@ export const GEN_STAGES = [
    "S....*",
    "#..#..",
    "......"
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "smartL"
   ]
  },
  {
@@ -1768,6 +4979,29 @@ export const GEN_STAGES = [
    "......",
    "....#.",
    "#..#.."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "move",
+   "smartR"
   ]
  },
  {
@@ -1784,6 +5018,31 @@ export const GEN_STAGES = [
    "#.S...",
    ".....*",
    ".*...."
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "right",
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -1800,6 +5059,32 @@ export const GEN_STAGES = [
    "....##",
    "..*.#.",
    "*....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartL",
+   "right"
   ]
  },
  {
@@ -1816,6 +5101,29 @@ export const GEN_STAGES = [
    "..#...",
    "......",
    "......"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR",
+   "move",
+   "left"
   ]
  },
  {
@@ -1832,6 +5140,28 @@ export const GEN_STAGES = [
    "......",
    "..#...",
    "......"
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -1848,6 +5178,37 @@ export const GEN_STAGES = [
    ".#.#*.",
    "...S#.",
    "..#..."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartR"
   ]
  },
  {
@@ -1864,6 +5225,32 @@ export const GEN_STAGES = [
    "......",
    "....S.",
    "......"
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "repeat",
+   "smartL",
+   "right"
   ]
  },
  {
@@ -1880,6 +5267,35 @@ export const GEN_STAGES = [
    ".....*",
    "...#..",
    ".*...."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartR",
+   "smartL"
   ]
  },
  {
@@ -1897,6 +5313,32 @@ export const GEN_STAGES = [
    "*S.....",
    ".......",
    ".....#."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "smartL",
+   "left"
   ]
  },
  {
@@ -1914,6 +5356,35 @@ export const GEN_STAGES = [
    ".#.....",
    ".##...S",
    ".#....."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartR",
+   "smartL"
   ]
  },
  {
@@ -1931,6 +5402,33 @@ export const GEN_STAGES = [
    "#......",
    "#..*...",
    "..#.#.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartL",
+   "left",
+   "move",
+   "right"
   ]
  },
  {
@@ -1948,6 +5446,36 @@ export const GEN_STAGES = [
    "..S#..#",
    ".......",
    ".#...#."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "smartL",
+   "move",
+   "right"
   ]
  },
  {
@@ -1965,6 +5493,35 @@ export const GEN_STAGES = [
    "..#....",
    "*..*...",
    "......."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "right",
+   "smartR"
   ]
  },
  {
@@ -1982,6 +5539,34 @@ export const GEN_STAGES = [
    ".......",
    ".#..*..",
    "#....#."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 9,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "smartR"
   ]
  },
  {
@@ -1999,6 +5584,31 @@ export const GEN_STAGES = [
    "....#S#",
    ".*..#..",
    ".#....*"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "smartR",
+   "smartL"
   ]
  },
  {
@@ -2016,6 +5626,35 @@ export const GEN_STAGES = [
    ".*.#...",
    "....#..",
    "...S..."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 8,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartR"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "smartL",
+   "smartR"
   ]
  },
  {
@@ -2033,6 +5672,36 @@ export const GEN_STAGES = [
    "......#",
    "...#...",
    "...*.#."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 7,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "smartL"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "smartR"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "smartL",
+   "left",
+   "smartR"
   ]
  },
  {
@@ -2049,6 +5718,35 @@ export const GEN_STAGES = [
    ".....#",
    "...#*S",
    ".####."
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "right",
+   "repeat",
+   "move",
+   "left"
   ]
  },
  {
@@ -2065,6 +5763,41 @@ export const GEN_STAGES = [
    "....##",
    "......",
    "..S.*."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "left",
+   "repeat",
+   "right"
   ]
  },
  {
@@ -2081,6 +5814,31 @@ export const GEN_STAGES = [
    "....*.",
    "S..#.#",
    ".##.#."
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "right",
+   "move",
+   "repeat"
   ]
  },
  {
@@ -2097,6 +5855,31 @@ export const GEN_STAGES = [
    "..####",
    ".#....",
    "..S..."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "right"
   ]
  },
  {
@@ -2113,6 +5896,31 @@ export const GEN_STAGES = [
    "#.....",
    ".*...#",
    ".#...#"
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 2,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "move"
   ]
  },
  {
@@ -2129,6 +5937,38 @@ export const GEN_STAGES = [
    "#.....",
    "*#*..#",
    ".....#"
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "repeat",
+   "right"
   ]
  },
  {
@@ -2145,6 +5985,31 @@ export const GEN_STAGES = [
    ".#*..S",
    ".#....",
    "##..#."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "left"
   ]
  },
  {
@@ -2161,6 +6026,31 @@ export const GEN_STAGES = [
    "......",
    ".###..",
    "#...*."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "repeat"
   ]
  },
  {
@@ -2177,6 +6067,35 @@ export const GEN_STAGES = [
    "..*##.",
    "...##.",
    "....#S"
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "right",
+   "repeat",
+   "move",
+   "left"
   ]
  },
  {
@@ -2194,6 +6113,47 @@ export const GEN_STAGES = [
    "#.#.#*.",
    "#.#...#",
    ".#.##.."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "right",
+   "move",
+   "left"
   ]
  },
  {
@@ -2211,6 +6171,44 @@ export const GEN_STAGES = [
    "..##..#",
    "##.**..",
    "......."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "repeat",
+   "right"
   ]
  },
  {
@@ -2228,6 +6226,41 @@ export const GEN_STAGES = [
    ".##...#",
    "###..*.",
    "......."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "left",
+   "right"
   ]
  },
  {
@@ -2245,6 +6278,38 @@ export const GEN_STAGES = [
    "...#...",
    "...S...",
    "...#..."
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "right",
+   "move",
+   "left",
+   "repeat"
   ]
  },
  {
@@ -2262,6 +6327,38 @@ export const GEN_STAGES = [
    ".#.##..",
    "....#..",
    "S#...#."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "move",
+   "right"
   ]
  },
  {
@@ -2279,6 +6376,47 @@ export const GEN_STAGES = [
    "#.##..#",
    "*.#...#",
    "......."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 2,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "left",
+   "move",
+   "right"
   ]
  },
  {
@@ -2296,6 +6434,37 @@ export const GEN_STAGES = [
    "#......",
    "#..#...",
    "......#"
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "move"
   ]
  },
  {
@@ -2313,6 +6482,44 @@ export const GEN_STAGES = [
    "...S.*.",
    ".#.....",
    ".*..#.#"
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "left",
+   "repeat",
+   "right"
   ]
  },
  {
@@ -2330,6 +6537,44 @@ export const GEN_STAGES = [
    ".#.....",
    ".#.*#..",
    "....#.."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "right",
+   "repeat"
   ]
  },
  {
@@ -2348,6 +6593,56 @@ export const GEN_STAGES = [
    "...*....",
    "...#..##",
    "........"
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 2,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "move",
+   "right"
   ]
  },
  {
@@ -2366,6 +6661,59 @@ export const GEN_STAGES = [
    "#..S#.##",
    "#..*..*.",
    "##.##..."
+  ],
+  "sol": [
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "move",
+   "left",
+   "repeat",
+   "right"
   ]
  },
  {
@@ -2384,6 +6732,44 @@ export const GEN_STAGES = [
    "#...#...",
    ".#.##...",
    "..#..#.."
+  ],
+  "sol": [
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 2,
+    "children": [
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "right",
+   "repeat",
+   "move",
+   "left"
   ]
  },
  {
@@ -2402,6 +6788,56 @@ export const GEN_STAGES = [
    "..###...",
    "#.#..*.#",
    "#......."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "right"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 6,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "right",
+   "left"
   ]
  },
  {
@@ -2420,6 +6856,47 @@ export const GEN_STAGES = [
    ".##.#...",
    "...#...*",
    ".#....#."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "repeat",
+   "move",
+   "right"
   ]
  },
  {
@@ -2438,6 +6915,52 @@ export const GEN_STAGES = [
    "..*.#...",
    "..#####.",
    "#......."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "repeat"
   ]
  },
  {
@@ -2456,6 +6979,50 @@ export const GEN_STAGES = [
    "....##..",
    "*.....##",
    "...#...."
+  ],
+  "sol": [
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "repeat",
+   "move",
+   "right",
+   "left"
   ]
  },
  {
@@ -2474,6 +7041,43 @@ export const GEN_STAGES = [
    "#..#....",
    ".##...#.",
    "#...#..."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "repeat",
+    "count": 5,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   },
+   {
+    "type": "move"
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "repeat"
   ]
  },
  {
@@ -2492,6 +7096,56 @@ export const GEN_STAGES = [
    "#..#.#..",
    "...#*.#.",
    ".#...#.."
+  ],
+  "sol": [
+   {
+    "type": "left"
+   },
+   {
+    "type": "left"
+   },
+   {
+    "type": "move"
+   },
+   {
+    "type": "repeat",
+    "count": 4,
+    "children": [
+     {
+      "type": "move"
+     },
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "right"
+     }
+    ]
+   },
+   {
+    "type": "repeat",
+    "count": 3,
+    "children": [
+     {
+      "type": "left"
+     },
+     {
+      "type": "move"
+     },
+     {
+      "type": "move"
+     }
+    ]
+   }
+  ],
+  "kinds": [
+   "left",
+   "move",
+   "repeat",
+   "right"
   ]
  }
 ];

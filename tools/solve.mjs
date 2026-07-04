@@ -150,3 +150,74 @@ export function solveStage(stage, palette, cap = 16) {
   const prims = palette.filter(p => p !== "repeat").map(p => ACT[p]);
   return minBlocks(env, prims, palette.includes("repeat"), cap);
 }
+
+/* --- 最短解の「手順そのもの」も返す（救済ヒント・使用ブロック種の抽出用） --- */
+const ACT_NAME = ["move", "left", "right", "smartR", "smartL"];
+
+export function solveStageWithSolution(stage, palette, cap = 16) {
+  const env = compile(stage);
+  const prims = palette.filter(p => p !== "repeat").map(p => ACT[p]);
+  const useRepeat = palette.includes("repeat");
+  const min = minBlocks(env, prims, useRepeat, cap);
+  if (min === null) return null;
+  const sol = solProg(env, prims, useRepeat, env.startState, min, []);
+  return { min, sol };
+}
+
+// 最短ブロック数ちょうどの「勝ちプログラム」を1つ組み立てて返す。
+// くりかえしの本体は repeatStart（=repeatブロックが始まる状態）から count回まわす。
+// ※本体作成中に状態を進めない（進めると回数が1ずれる。旧実装のバグ）
+function solProg(env, prims, useRepeat, state, budget, prog) {
+  for (const a of prims) {
+    const t = step(env, state, a);
+    if (t === -1) continue;
+    const blk = { type: ACT_NAME[a] };
+    if (isWin(env, t)) { if (budget === 1) return [...prog, blk]; continue; }
+    if (budget >= 2) { const r = solProg(env, prims, useRepeat, t, budget - 1, [...prog, blk]); if (r) return r; }
+  }
+  if (useRepeat && budget >= 2) { const r = tryBody(env, prims, state, budget, prog, []); if (r) return r; }
+  return null;
+}
+function tryBody(env, prims, repeatStart, budget, prog, body) {
+  const L = body.length;
+  if (L >= 1) {
+    const cost = 1 + L;
+    if (cost <= budget) {
+      for (let c = 2; c <= 9; c++) {
+        let st = repeatStart, won = false, crashed = false;
+        outer:
+        for (let iter = 0; iter < c; iter++) for (const a of body) {
+          const t = step(env, st, a);
+          if (t === -1) { crashed = true; break outer; }
+          st = t;
+          if (isWin(env, st)) { won = true; break outer; }
+        }
+        if (crashed) break; // c回目で壊れる→以降のcも同じ
+        const repBlk = { type: "repeat", count: c, children: body.map(a => ({ type: ACT_NAME[a] })) };
+        if (won) { if (cost === budget) return [...prog, repBlk]; continue; } // 勝つが余りブロック→不採用
+        const r = solProg(env, prims, true, st, budget - cost, [...prog, repBlk]);
+        if (r) return r;
+      }
+    }
+  }
+  if (L < budget - 1) {
+    const last = body[L - 1], last2 = body[L - 2];
+    for (const a of prims) {
+      if (L >= 1 && ((a === 1 && last === 2) || (a === 2 && last === 1))) continue;
+      if (L >= 2 && (a === 1 || a === 2) && a === last && a === last2) continue;
+      body.push(a);
+      const r = tryBody(env, prims, repeatStart, budget, prog, body);
+      body.pop();
+      if (r) return r;
+    }
+  }
+  return null;
+}
+
+// 解に使われているブロック種（repeat含む）
+export function solutionKinds(sol) {
+  const kinds = new Set();
+  const walk = arr => arr.forEach(b => { kinds.add(b.type); if (b.children) walk(b.children); });
+  if (sol) walk(sol);
+  return kinds;
+}

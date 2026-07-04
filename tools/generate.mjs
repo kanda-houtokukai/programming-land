@@ -7,6 +7,7 @@
 import { writeFileSync } from "node:fs";
 import { ISLANDS } from "../src/data/islands.js";
 import { SPEC, accept } from "./criteria.mjs";
+import { solveStageWithSolution, solutionKinds } from "./solve.mjs";
 
 const SAMPLE = process.argv.includes("--sample");
 const WRITE = process.argv.includes("--write");
@@ -83,10 +84,13 @@ for (const island of [1, 2, 3, 4, 5, 6]) {
       seenGrids.add(key);
       got++;
       pars.push(par);
+      // 最短解の手順（救済ヒント用）と使用ブロック種（難易度カーブ用）を持たせる
+      const sv = solveStageWithSolution(cand, ISLANDS[island].palette, par);
       stages.push({
         id: `${diff[0]}${island}-${got}`, island, difficulty: diff,
         name: `${ISLANDS[island].emoji} ステージ ${got}`,
         dir: cand.dir, par, grid: cand.grid,
+        sol: sv.sol, kinds: [...solutionKinds(sv.sol)],
       });
     }
     console.log(`${String(island).padEnd(3)} ${diff.padEnd(7)} ${String(attempts).padStart(6)} ${String((Date.now() - t0) + "ms").padStart(8)}   ${pars.join(",")}`);

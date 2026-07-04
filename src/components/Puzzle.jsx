@@ -4,6 +4,7 @@ import { C } from "../theme.js";
 import { Btn, Header, StarRow } from "./common.jsx";
 import { STAGES, stagesFor } from "../data/stages.js";
 import { ISLANDS, DIFFICULTIES } from "../data/islands.js";
+import { BLOCK_DEFS } from "../data/blocks.js";
 import { parseStage, countBlocks, DX, DY, MAX_BLOCKS } from "../engine.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
@@ -19,6 +20,34 @@ import worldmapNight from "../assets/worldmap-night.webp";
 // 難易度別のマップ背景（同一構図・時間帯違い。拠点座標 ISLAND_POS は3枚共通）
 const MAP_BG = { easy: worldmapDay, normal: worldmapSunset, hard: worldmapNight };
 
+// 最短解の さいしょの n手 を ことばで（救済ヒント用）。repeatは「🔁くりかえし」とまとめる
+function describeFirstSteps(sol, n) {
+  if (!sol || !sol.length) return "";
+  const parts = [];
+  for (const b of sol) {
+    if (parts.length >= n) break;
+    if (b.type === "repeat") parts.push("🔁くりかえし");
+    else parts.push(BLOCK_DEFS[b.type] ? `${BLOCK_DEFS[b.type].emoji}${BLOCK_DEFS[b.type].label}` : b.type);
+  }
+  return parts.join(" → ");
+}
+
+// 失敗回数に応じた救済ヒント（段階的に手厚く）。方式: Code裁量
+function rescueFor(failCount, stage, island, hasNext) {
+  if (failCount >= 4) {
+    const usesRepeat = (stage.sol || []).some(b => b.type === "repeat");
+    return {
+      strong: true,
+      text: `おたすけ：さいしょは 「${describeFirstSteps(stage.sol, 2)}」から やってみよう。${usesRepeat ? "🔁くりかえしを つかうと みじかく できるよ。" : ""}`,
+      sub: hasNext ? "むずかしかったら、つぎの ステージに すすんでも いいよ！あとで もどってこれるよ。" : null,
+    };
+  }
+  if (failCount >= 2) {
+    return { strong: false, text: `💪 ${island.hint}`, sub: null };
+  }
+  return null;
+}
+
 function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   const info = parseStage(stage);
   const island = ISLANDS[stage.island];
@@ -33,6 +62,7 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   const [msg, setMsg] = useState(null);
   const [result, setResult] = useState(null);
   const [hint, setHint] = useState(false);
+  const [failCount, setFailCount] = useState(0); // この面で失敗した回数（救済ヒントの段階）
   const runIdRef = useRef(0);
   const uidRef = useRef(0);
 
@@ -51,7 +81,7 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   useEffect(() => { // ステージが かわったら リセット
     runIdRef.current++;
     setProg([]); setOpenRepeat(null); setBot(info.start); setCollected({});
-    setRunning(false); setActiveUid(null); setCrash(false); setMsg(null); setResult(null); setHint(false);
+    setRunning(false); setActiveUid(null); setCrash(false); setMsg(null); setResult(null); setHint(false); setFailCount(0);
   }, [stage.id]);
 
   const isWall = (x, y) => x < 0 || y < 0 || x >= info.w || y >= info.h || info.cells[y][x] === "#";
@@ -131,6 +161,7 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
     setActiveUid(null); setRunning(false);
     if (status === "win") {
       SFX.win(sound);
+      setFailCount(0); // クリアしたら救済カウントはリセット
       const n = countBlocks(prog);
       const starN = n <= stage.par ? 3 : n <= stage.par + 2 ? 2 : 1;
       setResult({ stars: starN, n });
@@ -140,9 +171,10 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
         applyXp(s, XP.puzzleWin(starN));
         return s;
       });
-    } else if (status === "ok") {
-      SFX.fail(sound);
-      setMsg("うごきは できたけど、ほしが のこっているよ。ブロックを たしてみよう！");
+    } else {
+      // かべ衝突(fail) or ほし残り(ok) → 失敗。何度も失敗したら救済ヒントを手厚くする
+      setFailCount(f => f + 1);
+      if (status === "ok") { SFX.fail(sound); setMsg("うごきは できたけど、ほしが のこっているよ。ブロックを たしてみよう！"); }
     }
   }
 
@@ -194,6 +226,18 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
           </div>
         </div>
       </div>
+
+      {/* 救済ヒント: 何回か失敗したら 自動で 手厚いヒントが でる（同じ面で 何度も つまずく前に助ける） */}
+      {(() => {
+        const r = rescueFor(failCount, stage, island, hasNext);
+        if (!r) return null;
+        return (
+          <div className="panel slide" style={{ padding: 12, marginTop: 10, background: r.strong ? "#FFF3D6" : "#EAF7FF", fontWeight: 800, fontSize: 14 }}>
+            <div>{r.strong ? "🆘 " : ""}{r.text}</div>
+            {r.sub && <div style={{ fontWeight: 700, fontSize: 12, color: "#6B6265", marginTop: 6 }}>{r.sub}</div>}
+          </div>
+        );
+      })()}
 
       {/* おうちの方へ（保護者向け・折りたたみ）。プレイ画面内なので開いても解きかけは消えない */}
       <ParentGuide island={stage.island} />
@@ -357,7 +401,10 @@ export default function Puzzle({ save, update, go, onSound }) {
   const [island, setIsland] = useState(null);
   const [stageId, setStageId] = useState(null);
   const stages = island ? stagesFor(island, diff) : [];
-  const unlockedStage = i => i === 0 || (save.puzzle.stars[stages[i - 1].id] || 0) > 0;
+  // 迂回できる解放: 1面 詰まっても となりの面に すすめる。
+  // クリア数＋1 まで解放（＝つまずいた面を1つ飛ばして先へ／もどるのは自由）。
+  const clearedInStages = stages.filter(s => (save.puzzle.stars[s.id] || 0) > 0).length;
+  const unlockedStage = i => i <= clearedInStages + 1;
   const stage = STAGES.find(s => s.id === stageId);
 
   function setDiff(d) {
