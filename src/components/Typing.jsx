@@ -6,6 +6,7 @@ import { Btn, Header } from "./common.jsx";
 import { TYPING_STAGES, TYPING_WORDS, WORDS_PER_SESSION } from "../data/typing.js";
 import { startWord, typeChar, hintRest, nextKey, currentUnitIndex, segment } from "../typing/romaji.js";
 import TypingKeyboard from "./TypingKeyboard.jsx";
+import HowTo from "./HowTo.jsx";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
@@ -117,6 +118,7 @@ function TypingPlay({ stage, save, update, onBack }) {
         <div style={{ fontWeight: 900 }}>{stage.emoji} {stage.name}　{wi + 1} / {words.length}こめ</div>
         <div style={{ marginLeft: "auto", fontWeight: 800, fontSize: 13 }}>ミス {miss}</div>
       </div>
+      <div style={{ marginBottom: 10 }}><HowTo id={`typing-${stage.id}`} /></div>
 
       {/* おだい */}
       <div className={"panel " + (flash ? "shake" : "")} style={{ padding: "18px 14px", textAlign: "center", background: flash ? "#FFF1F4" : "#fff" }}>

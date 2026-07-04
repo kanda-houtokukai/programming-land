@@ -12,9 +12,10 @@ export const C = {
   white: "#FFFFFF",
 };
 
+// 低学年の可読性を優先し、手書き風フォントは全廃。全画面を丸ゴシック(M PLUS Rounded 1c)に統一。
 // Googleフォントはオンライン時のみ読み込まれ、オフライン時はOS内蔵の丸ゴシックにフォールバックする
 export const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;900&family=Hachi+Maru+Pop&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;900&display=swap');
   .pl-root {
     font-family: 'M PLUS Rounded 1c','Hiragino Maru Gothic ProN','Yu Gothic',sans-serif;
     background:
@@ -24,7 +25,8 @@ export const CSS = `
     min-height: 100vh; color: ${C.ink};
     -webkit-user-select: none; user-select: none;
   }
-  .pl-display { font-family: 'Hachi Maru Pop','M PLUS Rounded 1c',sans-serif; }
+  /* 見出し用。本文と同じ丸ゴシックを最大ウェイトで（手書き風は廃止） */
+  .pl-display { font-family: inherit; font-weight: 900; letter-spacing: .01em; }
   .panel {
     background: #fff; border: 3px solid ${C.ink}; border-radius: 22px;
     box-shadow: 5px 5px 0 rgba(58,51,53,.9);

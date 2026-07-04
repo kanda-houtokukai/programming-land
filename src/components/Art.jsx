@@ -7,6 +7,7 @@ import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
 import turtleUrl from "../assets/turtle.png";
+import HowTo from "./HowTo.jsx";
 
 function turtleSegs(cmds) {
   let x = 160, y = 215, ang = -90, ci = 0;
@@ -106,7 +107,7 @@ export default function Art({ save, update, go, onSound }) {
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
       <Header save={save} title="🎨 おえかき コード" onHome={() => go("home")} onSound={onSound} />
       <div style={{ padding: "0 16px", display: "grid", gap: 14 }}>
-        <div style={{ fontWeight: 800, fontSize: 14 }}>めいれいを ならべて、カメさんに えを かかせよう！</div>
+        <HowTo id="art" />
         <div className="panel" style={{ padding: 10, display: "flex", justifyContent: "center" }}>
           <ArtSVG cmds={cmds} reveal={reveal === Infinity ? segsN : reveal} />
         </div>

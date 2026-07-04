@@ -6,6 +6,7 @@ import { QUIZ_CATEGORIES, QUIZ_DIFFS, SESSION_SIZE, buildSession, bestKey, poolF
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
+import HowTo from "./HowTo.jsx";
 
 function QuizPlay({ session, save, update, onBack }) {
   const sound = save.settings.sound;
@@ -54,6 +55,7 @@ function QuizPlay({ session, save, update, onBack }) {
         <Btn bg="#fff" onClick={onBack}>◀ もどる</Btn>
         <div style={{ fontWeight: 900 }}>{session.emoji} {session.name}　{i + 1} / {qs.length}もんめ</div>
       </div>
+      <div style={{ marginBottom: 12 }}><HowTo id={`quiz-${session.catId}`} /></div>
       <div style={{ display: "flex", gap: 4, marginBottom: 12 }}>
         {qs.map((_, k) => (
           <div key={k} style={{ flex: 1, height: 10, borderRadius: 999, border: `2px solid ${C.ink}`, background: k < i ? C.leaf : k === i ? C.sun : "#fff" }} />
@@ -103,7 +105,7 @@ export default function Quiz({ save, update, go, onSound }) {
   function start(cat) {
     SFX.tap(save.settings.sound);
     setSession({
-      key: bestKey(cat.id, diff), name: cat.name, emoji: cat.emoji, color: cat.color,
+      key: bestKey(cat.id, diff), catId: cat.id, name: cat.name, emoji: cat.emoji, color: cat.color,
       qs: buildSession(cat.id, diff),
     });
   }

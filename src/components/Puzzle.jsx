@@ -9,6 +9,7 @@ import { parseStage, countBlocks, DX, DY, MAX_BLOCKS } from "../engine.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
+import HowTo from "./HowTo.jsx";
 import robotUrl from "../assets/robot.png";
 import worldmapDay from "../assets/worldmap.webp";
 import worldmapSunset from "../assets/worldmap-sunset.webp";
@@ -218,9 +219,13 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
       {hint && <div className="panel slide" style={{ padding: 12, marginTop: 10, background: "#EAF7FF", fontWeight: 800 }}>💡 {island.hint}</div>}
 
       {/* プログラム */}
-      <div className="panel" style={{ padding: 12, marginTop: 12, minHeight: 58 }}>
-        <div style={{ fontWeight: 900, fontSize: 13, marginBottom: 6 }}>📜 プログラム（タップで けせるよ）</div>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+      <div className="panel" style={{ padding: 12, marginTop: 12 }}>
+        <div style={{ fontWeight: 900, fontSize: 13, marginBottom: 6, display: "flex", justifyContent: "space-between" }}>
+          <span>📜 プログラム（タップで けせるよ）</span>
+          <span style={{ opacity: .55 }}>{countBlocks(prog)}こ</span>
+        </div>
+        {/* 命令が増えても枠は広がらない: 最大高さ＋スクロール（タブレットで画面を圧迫しない） */}
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", minHeight: 40, maxHeight: 132, overflowY: "auto" }}>
           {prog.length === 0 && <span style={{ fontWeight: 700, opacity: .5 }}>ここに めいれいが ならぶよ</span>}
           {prog.map(b => (
             <BlockChip key={b.uid} b={b} activeUid={activeUid} onRemove={removeBlock}
@@ -395,11 +400,13 @@ export default function Puzzle({ save, update, go, onSound }) {
       {island === null ? (
         <IslandMap save={save} diff={diff} onEnter={setIsland} />
       ) : (
-        <div className="panel slide" style={{ margin: "14px 16px", padding: 16, background: "#fff" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+        <div style={{ padding: "14px 16px", display: "grid", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Btn bg="#fff" onClick={() => setIsland(null)} style={{ fontSize: 13, padding: "6px 10px" }}>🗺️ マップ</Btn>
             <div className="pl-display" style={{ fontSize: 21 }}>{ISLANDS[island].emoji} {ISLANDS[island].name}</div>
           </div>
+          <HowTo id={`island-${island}`} />
+          <div className="panel slide" style={{ padding: 16, background: "#fff" }}>
           <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 12 }}>みにつく ちから：{ISLANDS[island].skill}</div>
           <div style={{ display: "grid", gap: 10 }}>
             {stages.map((s, i) => {
@@ -414,6 +421,7 @@ export default function Puzzle({ save, update, go, onSound }) {
                 </button>
               );
             })}
+          </div>
           </div>
         </div>
       )}
