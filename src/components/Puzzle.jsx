@@ -72,6 +72,18 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   const runIdRef = useRef(0);
   const uidRef = useRef(0);
 
+  // 下部固定コントローラーの高さを実測し、その分だけ本文に余白を空ける（内容が隠れない）
+  const controllerRef = useRef(null);
+  const [ctrlH, setCtrlH] = useState(150);
+  useEffect(() => {
+    const el = controllerRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setCtrlH(el.offsetHeight));
+    ro.observe(el);
+    setCtrlH(el.offsetHeight);
+    return () => ro.disconnect();
+  }, []);
+
   useEffect(() => { // ステージが かわったら リセット
     runIdRef.current++;
     setProg([]); setOpenRepeat(null); setBot(info.start); setCollected({});
@@ -172,7 +184,7 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
 
   const cell = Math.min(56, Math.floor(320 / info.w));
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 14px 30px" }}>
+    <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 14px", paddingBottom: ctrlH + 16 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "10px 0", flexWrap: "wrap" }}>
         <Btn bg="#fff" onClick={onBack}>◀ もどる</Btn>
         <div className="pl-display" style={{ fontSize: 20, flex: 1 }}>{stage.name}</div>
@@ -215,9 +227,6 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
         </div>
       </div>
 
-      {msg && <div className="panel slide" style={{ padding: 12, marginTop: 10, background: "#FFF1F4", fontWeight: 800 }}>{msg}</div>}
-      {hint && <div className="panel slide" style={{ padding: 12, marginTop: 10, background: "#EAF7FF", fontWeight: 800 }}>💡 {island.hint}</div>}
-
       {/* プログラム */}
       <div className="panel" style={{ padding: 12, marginTop: 12 }}>
         <div style={{ fontWeight: 900, fontSize: 13, marginBottom: 6, display: "flex", justifyContent: "space-between" }}>
@@ -234,20 +243,30 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
         </div>
       </div>
 
-      {/* パレット */}
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
-        {island.palette.map(t => (
-          <Btn key={t} bg={BLOCK_DEFS[t].color} disabled={running || (t === "repeat" && openRepeat !== null)}
-            onClick={() => addBlock(t)} style={{ fontSize: 15 }}>
-            {BLOCK_DEFS[t].emoji} {BLOCK_DEFS[t].label}
-          </Btn>
-        ))}
-        {openRepeat && <Btn bg="#fff" onClick={() => setOpenRepeat(null)}>✅ くりかえし おわり</Btn>}
-      </div>
-      <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
-        <Btn big bg={C.leaf} onClick={run} disabled={running}>▶️ うごかす！</Btn>
-        <Btn bg="#fff" onClick={resetBot}>🔄 さいしょから</Btn>
-        <Btn bg={C.sun} onClick={() => { setHint(h => !h); SFX.tap(sound); }}>💡 ヒント</Btn>
+      {/* 下部固定コントローラー: 命令ブロック＋実行ボタンを 画面下に常時固定（いつも同じ場所で押せる） */}
+      <div ref={controllerRef} style={{
+        position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 30,
+        width: "100%", maxWidth: 640, margin: "0 auto",
+        padding: "10px 14px calc(12px + env(safe-area-inset-bottom))",
+        background: "#FFF9EF", borderTop: `3px solid ${C.ink}`, borderRadius: "18px 18px 0 0",
+        boxShadow: "0 -5px 14px rgba(58,51,53,.16)",
+      }}>
+        {msg && <div className="slide" style={{ padding: "8px 12px", marginBottom: 8, background: "#FFF1F4", border: `2px solid ${C.ink}`, borderRadius: 12, fontWeight: 800, fontSize: 14 }}>{msg}</div>}
+        {hint && <div className="slide" style={{ padding: "8px 12px", marginBottom: 8, background: "#EAF7FF", border: `2px solid ${C.ink}`, borderRadius: 12, fontWeight: 800, fontSize: 14 }}>💡 {island.hint}</div>}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
+          {island.palette.map(t => (
+            <Btn key={t} bg={BLOCK_DEFS[t].color} disabled={running || (t === "repeat" && openRepeat !== null)}
+              onClick={() => addBlock(t)} style={{ fontSize: 15 }}>
+              {BLOCK_DEFS[t].emoji} {BLOCK_DEFS[t].label}
+            </Btn>
+          ))}
+          {openRepeat && <Btn bg="#fff" onClick={() => setOpenRepeat(null)}>✅ くりかえし おわり</Btn>}
+        </div>
+        <div style={{ display: "flex", gap: 10, marginTop: 10, flexWrap: "wrap", justifyContent: "center" }}>
+          <Btn big bg={C.leaf} onClick={run} disabled={running}>▶️ うごかす！</Btn>
+          <Btn bg="#fff" onClick={resetBot}>🔄 さいしょから</Btn>
+          <Btn bg={C.sun} onClick={() => { setHint(h => !h); SFX.tap(sound); }}>💡 ヒント</Btn>
+        </div>
       </div>
 
       {/* クリアがめん */}
