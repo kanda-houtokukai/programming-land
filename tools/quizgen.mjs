@@ -266,7 +266,7 @@ for (const cat of ["kimari", "robot", "yomitori"]) {
     while (made < N[cat]) {
       const q = GENS[cat](diff, i++);
       if (i > 2000) throw new Error(`${cat} ${diff}: 重複回避が収束しない`);
-      const key = q.q + "|" + q.opts.join("|");
+      const key = q.q + "|" + [...q.opts].sort().join("|"); // 並び順ちがいも同一問題とみなす（verifyと同じ基準）
       if (seen.has(key)) continue; // 同一問題の重複を禁止
       seen.add(key);
       q.id = `${cat}-${diff[0]}-${made + 1}`;

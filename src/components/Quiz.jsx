@@ -1,19 +1,20 @@
-// かんがえるクイズ（v1から移植）
+// かんがえるクイズ（P3: 5カテゴリ×3難易度・5問シャッフル出題）
 import { useState } from "react";
 import { C } from "../theme.js";
 import { Btn, Header } from "./common.jsx";
-import { QUIZ_SETS } from "../data/quizzes.js";
+import { QUIZ_CATEGORIES, QUIZ_DIFFS, SESSION_SIZE, buildSession, bestKey, poolFor } from "../data/quizzes.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
 
-function QuizPlay({ set, save, update, onBack }) {
+function QuizPlay({ session, save, update, onBack }) {
   const sound = save.settings.sound;
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
-  const q = set.qs[i];
+  const qs = session.qs;
+  const q = qs[i];
   function pick(idx) {
     if (picked !== null) return;
     setPicked(idx);
@@ -22,12 +23,12 @@ function QuizPlay({ set, save, update, onBack }) {
   }
   function next() {
     SFX.tap(sound);
-    if (i + 1 < set.qs.length) { setI(i + 1); setPicked(null); }
+    if (i + 1 < qs.length) { setI(i + 1); setPicked(null); }
     else {
       const final = score;
       setDone(true); SFX.win(sound);
       update(s => {
-        s.quiz.best[set.id] = Math.max(s.quiz.best[set.id] || 0, final);
+        s.quiz.best[session.key] = Math.max(s.quiz.best[session.key] || 0, final);
         const d = today(); s.log[d] = s.log[d] || {}; s.log[d].quiz = (s.log[d].quiz || 0) + 1;
         applyXp(s, XP.quizSet(final));
         return s;
@@ -35,13 +36,13 @@ function QuizPlay({ set, save, update, onBack }) {
     }
   }
   if (done) {
-    const perfect = score === set.qs.length;
+    const perfect = score === qs.length;
     return (
       <div className="panel pop" style={{ margin: "20px 16px", padding: 26, textAlign: "center" }}>
         <div style={{ fontSize: 54 }}>{perfect ? "🏆" : "🎉"}</div>
-        <div className="pl-display" style={{ fontSize: 26 }}>{set.qs.length}もん中 {score}もん せいかい！</div>
+        <div className="pl-display" style={{ fontSize: 26 }}>{qs.length}もん中 {score}もん せいかい！</div>
         <div style={{ fontWeight: 800, margin: "8px 0" }}>
-          {perfect ? "まんてん！すごい！！" : "また ちょうせんすると まんてんに なれるよ！"}
+          {perfect ? "まんてん！すごい！！" : "もんだいは まいかい かわるよ。また ちょうせんしてね！"}
         </div>
         <Btn big bg={C.leaf} onClick={onBack}>クイズの へやへ もどる</Btn>
       </div>
@@ -51,10 +52,10 @@ function QuizPlay({ set, save, update, onBack }) {
     <div style={{ maxWidth: 560, margin: "0 auto", padding: "0 16px 30px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "8px 0" }}>
         <Btn bg="#fff" onClick={onBack}>◀ もどる</Btn>
-        <div style={{ fontWeight: 900 }}>{set.emoji} {set.name}　{i + 1} / {set.qs.length}もんめ</div>
+        <div style={{ fontWeight: 900 }}>{session.emoji} {session.name}　{i + 1} / {qs.length}もんめ</div>
       </div>
       <div style={{ display: "flex", gap: 4, marginBottom: 12 }}>
-        {set.qs.map((_, k) => (
+        {qs.map((_, k) => (
           <div key={k} style={{ flex: 1, height: 10, borderRadius: 999, border: `2px solid ${C.ink}`, background: k < i ? C.leaf : k === i ? C.sun : "#fff" }} />
         ))}
       </div>
@@ -81,7 +82,7 @@ function QuizPlay({ set, save, update, onBack }) {
               {picked === q.a ? "🎉 せいかい！" : "💪 おしい！"} {q.why}
             </div>
             <div style={{ textAlign: "center", marginTop: 12 }}>
-              <Btn big bg={C.leaf} onClick={next}>{i + 1 < set.qs.length ? "つぎの もんだい ▶" : "けっかを みる 🏁"}</Btn>
+              <Btn big bg={C.leaf} onClick={next}>{i + 1 < qs.length ? "つぎの もんだい ▶" : "けっかを みる 🏁"}</Btn>
             </div>
           </div>
         )}
@@ -91,32 +92,56 @@ function QuizPlay({ set, save, update, onBack }) {
 }
 
 export default function Quiz({ save, update, go, onSound }) {
-  const [setId, setSetId] = useState(null);
-  const set = QUIZ_SETS.find(s => s.id === setId);
+  const diff = save.quiz.difficulty || "easy";
+  const [session, setSession] = useState(null);
+
+  function setDiff(d) {
+    SFX.tap(save.settings.sound);
+    setSession(null);
+    update(s => { s.quiz.difficulty = d; return s; });
+  }
+  function start(cat) {
+    SFX.tap(save.settings.sound);
+    setSession({
+      key: bestKey(cat.id, diff), name: cat.name, emoji: cat.emoji, color: cat.color,
+      qs: buildSession(cat.id, diff),
+    });
+  }
+
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
       <Header save={save} title="💡 かんがえる クイズ" onHome={() => go("home")} onSound={onSound} />
-      {set
-        ? <QuizPlay key={set.id} set={set} save={save} update={update} onBack={() => setSetId(null)} />
+      {session
+        ? <QuizPlay key={session.key + session.qs[0].id} session={session} save={save} update={update} onBack={() => setSession(null)} />
         : (
-          <div style={{ display: "grid", gap: 14, padding: "0 16px" }}>
-            {QUIZ_SETS.map((s, i) => {
-              const best = save.quiz.best[s.id];
-              return (
-                <button key={s.id} className="pbtn slide" onClick={() => setSetId(s.id)}
-                  style={{ background: "#fff", padding: 16, display: "flex", gap: 14, alignItems: "center", textAlign: "left", animationDelay: `${i * 0.05}s` }}>
-                  <span style={{ fontSize: 38, background: s.color, border: `3px solid ${C.ink}`, borderRadius: 16, padding: "6px 10px" }}>{s.emoji}</span>
-                  <span style={{ flex: 1 }}>
-                    <span className="pl-display" style={{ fontSize: 19, display: "block" }}>{s.name}</span>
-                    <span style={{ fontWeight: 700, fontSize: 13 }}>{s.desc}</span>
-                  </span>
-                  <span className="panel" style={{ padding: "6px 10px", borderRadius: 12, fontWeight: 900, fontSize: 13, background: best === s.qs.length ? C.sun : "#fff" }}>
-                    {best === undefined ? "はじめて" : best === s.qs.length ? "🏆 まんてん" : `ベスト ${best}/${s.qs.length}`}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          <>
+            <div style={{ display: "flex", gap: 8, padding: "0 16px", flexWrap: "wrap", marginBottom: 4 }}>
+              {QUIZ_DIFFS.map(d => (
+                <Btn key={d.id} bg={diff === d.id ? C.sun : "#fff"} onClick={() => setDiff(d.id)} style={{ fontSize: 14 }}>
+                  {d.label}
+                </Btn>
+              ))}
+            </div>
+            <div style={{ display: "grid", gap: 14, padding: "10px 16px 0" }}>
+              {QUIZ_CATEGORIES.map((cat, i) => {
+                const best = save.quiz.best[bestKey(cat.id, diff)];
+                const n = poolFor(cat.id, diff).length;
+                return (
+                  <button key={cat.id} className="pbtn slide" onClick={() => start(cat)}
+                    style={{ background: "#fff", padding: 16, display: "flex", gap: 14, alignItems: "center", textAlign: "left", animationDelay: `${i * 0.05}s` }}>
+                    <span style={{ fontSize: 38, background: cat.color, border: `3px solid ${C.ink}`, borderRadius: 16, padding: "6px 10px" }}>{cat.emoji}</span>
+                    <span style={{ flex: 1 }}>
+                      <span className="pl-display" style={{ fontSize: 19, display: "block" }}>{cat.name}</span>
+                      <span style={{ fontWeight: 700, fontSize: 13 }}>{cat.desc}（もんだい {n}こ から {SESSION_SIZE}もん）</span>
+                    </span>
+                    <span className="panel" style={{ padding: "6px 10px", borderRadius: 12, fontWeight: 900, fontSize: 13, background: best === SESSION_SIZE ? C.sun : "#fff" }}>
+                      {best === undefined ? "はじめて" : best === SESSION_SIZE ? "🏆 まんてん" : `ベスト ${best}/${SESSION_SIZE}`}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </>
         )}
     </div>
   );

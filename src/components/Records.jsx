@@ -3,7 +3,7 @@ import { useState, useRef } from "react";
 import { C } from "../theme.js";
 import { Btn, Header } from "./common.jsx";
 import { STAGES } from "../data/stages.js";
-import { QUIZ_SETS } from "../data/quizzes.js";
+import { QUIZ_CATEGORIES, QUIZ_DIFFS, SESSION_SIZE } from "../data/quizzes.js";
 import { BADGES, puzzleStarsTotal, daysPlayed } from "../data/badges.js";
 import { lastNDays } from "../storage.js";
 import { APP_VERSION, BUILD_DATE } from "../version.js";
@@ -15,8 +15,10 @@ function skillProgress(save) {
     const got = st.reduce((a, s) => a + (save.puzzle.stars[s.id] || 0), 0);
     return Math.round(100 * got / (st.length * 3));
   };
-  const quizTotal = QUIZ_SETS.reduce((a, q) => a + q.qs.length, 0);
-  const quizGot = QUIZ_SETS.reduce((a, q) => a + (save.quiz.best[q.id] || 0), 0);
+  const quizTotal = QUIZ_CATEGORIES.length * QUIZ_DIFFS.length * SESSION_SIZE;
+  const quizGot = Object.entries(save.quiz.best)
+    .filter(([k]) => k.includes(":")) // 新形式のキーのみ（v1のq1〜q4は集計外）
+    .reduce((a, [, v]) => a + v, 0);
   return [
     { name: "じゅんじょ（順次）", note: "めいれいを 正しい順番に組み立てる力", pct: w(1), color: C.leaf },
     { name: "くりかえし（反復）", note: "同じ処理をまとめて考える力", pct: w(2), color: C.sky },

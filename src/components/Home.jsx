@@ -1,18 +1,19 @@
 // ホーム画面（v1から移植・星の合計はデータから自動計算・プロファイル交代を追加）
 import { C } from "../theme.js";
 import { Btn, Header } from "./common.jsx";
-import { QUIZ_SETS } from "../data/quizzes.js";
+import { QUIZ_CATEGORIES, QUIZ_DIFFS } from "../data/quizzes.js";
 import { TOTAL_STARS } from "../data/stages.js";
 import { BADGES, puzzleStarsTotal } from "../data/badges.js";
 import PartnerCard from "./PartnerCard.jsx";
 
 export default function Home({ save, go, onSound, onSwitchProfile }) {
   const stars = puzzleStarsTotal(save);
-  const quizDone = Object.keys(save.quiz.best).length;
+  const quizDone = Object.keys(save.quiz.best).filter(k => k.includes(":")).length;
+  const quizTotal = QUIZ_CATEGORIES.length * QUIZ_DIFFS.length;
   const badges = save.badges.length;
   const modes = [
     { key: "puzzle", emoji: "🤖", name: "ロボット パズル", desc: "ブロックで ロボットを うごかそう", color: C.leaf, sub: `⭐ ${stars} / ${TOTAL_STARS}` },
-    { key: "quiz", emoji: "💡", name: "かんがえる クイズ", desc: "プログラミングの あたまで こたえよう", color: C.sky, sub: `${quizDone} / ${QUIZ_SETS.length} セット` },
+    { key: "quiz", emoji: "💡", name: "かんがえる クイズ", desc: "プログラミングの あたまで こたえよう", color: C.sky, sub: `${quizDone} / ${quizTotal} セット` },
     { key: "art", emoji: "🎨", name: "おえかき コード", desc: "めいれいで えを かこう", color: C.sakura, sub: `さくひん ${save.art.gallery.length} こ` },
   ];
   return (

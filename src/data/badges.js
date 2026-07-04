@@ -1,6 +1,6 @@
 // バッジ定義（P2: 島×難易度構造に対応。本格増補はP5で行う）
 import { STAGES, stagesFor } from "./stages.js";
-import { QUIZ_SETS } from "./quizzes.js";
+import { QUIZ_CATEGORIES, QUIZ_DIFFS, SESSION_SIZE, bestKey } from "./quizzes.js";
 import { DIFFICULTIES } from "./islands.js";
 
 export function puzzleStarsTotal(s) { return Object.values(s.puzzle.stars).reduce((a, b) => a + b, 0); }
@@ -22,7 +22,7 @@ export const BADGES = [
   { id: "star10", emoji: "🌟", name: "きらきら コレクター", desc: "ほしを 10こ あつめた", check: s => puzzleStarsTotal(s) >= 10 },
   { id: "starAll", emoji: "👑", name: "スター おうさま", desc: "ほしを 100こ あつめた", check: s => puzzleStarsTotal(s) >= 100 },
   { id: "quiz1", emoji: "💡", name: "クイズ ちょうせんしゃ", desc: "クイズを 1セット やった", check: s => Object.keys(s.quiz.best).length >= 1 },
-  { id: "quizAll", emoji: "🎓", name: "クイズ はかせ", desc: "ぜんぶの クイズで まんてん", check: s => QUIZ_SETS.every(q => (s.quiz.best[q.id] || 0) >= q.qs.length) },
+  { id: "quizAll", emoji: "🎓", name: "クイズ はかせ", desc: "5しゅるいの クイズ ぜんぶで まんてん", check: s => QUIZ_CATEGORIES.every(c => QUIZ_DIFFS.some(d => (s.quiz.best[bestKey(c.id, d.id)] || 0) >= SESSION_SIZE)) },
   { id: "art1", emoji: "🎨", name: "みならい アーティスト", desc: "さくひんを 1つ ほぞんした", check: s => s.art.gallery.length >= 1 },
   { id: "art5", emoji: "🖼️", name: "びじゅつかんの たつじん", desc: "さくひんを 5つ ほぞんした", check: s => s.art.gallery.length >= 5 },
   { id: "days3", emoji: "🔥", name: "こつこつさん", desc: "3にち あそんだ", check: s => daysPlayed(s) >= 3 },

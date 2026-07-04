@@ -34,7 +34,7 @@ export function newProfileData(name = "", avatar = "") {
     createdAt: today(),
     settings: { sound: true },
     puzzle: { stars: {}, difficulty: "easy" },
-    quiz: { best: {} },
+    quiz: { best: {}, difficulty: "easy" },
     art: { gallery: [] },
     badges: [],
     log: {},

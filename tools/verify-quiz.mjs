@@ -9,11 +9,21 @@
 import { checkQuestion, CATEGORIES, DIFFS } from "./quiz-criteria.mjs";
 
 const fileArg = process.argv.indexOf("--file");
-const path = fileArg >= 0 ? process.argv[fileArg + 1] : "../src/data/quizzes.gen.js";
-
-const mod = await import(path.startsWith("/") || path.startsWith("../") ? path : `../${path}`);
-const questions = mod.GEN_QUIZZES || mod.default || mod.QUESTIONS;
+let questions;
+if (fileArg >= 0) {
+  const p = process.argv[fileArg + 1];
+  const mod = await import(p.startsWith("/") || p.startsWith("../") ? p : `../${p}`);
+  questions = mod.GEN_QUIZZES || mod.default || mod.QUESTIONS;
+} else {
+  // 既定: 生成分＋書き起こし分の全問
+  const gen = await import("../src/data/quizzes.gen.js");
+  const fixed = await import("../src/data/quizzes-fixed.js");
+  questions = [...gen.GEN_QUIZZES, ...fixed.FIXED_QUIZZES];
+}
 if (!Array.isArray(questions)) { console.error("問題配列が読めません"); process.exit(1); }
+
+// 総数と各セルの最低問数（P3完了条件: 200問以上・5カテゴリ×3難易度が成立）
+const MIN_PER_CELL = 10, MIN_TOTAL = 200;
 
 let fail = 0;
 const ids = new Set(), bodies = new Set();
@@ -34,5 +44,11 @@ for (const q of questions) {
   counts[k] = (counts[k] || 0) + 1;
 }
 console.log("分布:", Object.entries(counts).map(([k, v]) => `${k}:${v}`).join(" "));
+if (fileArg < 0) {
+  for (const cat of CATEGORIES) for (const d of DIFFS) {
+    if ((counts[`${cat}/${d}`] || 0) < MIN_PER_CELL) { console.log(`FAIL 分布: ${cat}/${d} が${MIN_PER_CELL}問未満`); fail++; }
+  }
+  if (questions.length < MIN_TOTAL) { console.log(`FAIL 総数: ${questions.length} < ${MIN_TOTAL}`); fail++; }
+}
 console.log(fail === 0 ? `全${questions.length}問 PASS` : `FAIL ${fail}件`);
 process.exit(fail === 0 ? 0 : 1);

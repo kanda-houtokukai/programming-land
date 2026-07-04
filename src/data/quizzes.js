@@ -1,40 +1,46 @@
-/* クイズ定義（v1から移植）
-   q: 問題文 / opts: 選択肢 / a: 正解の番号 / why: 解説 */
-export const QUIZ_SETS = [
-  { id: "q1", name: "じゅんばん クイズ", emoji: "🍛", color: "#6BCB77",
-    desc: "ただしい じゅんばんを かんがえよう",
-    qs: [
-      { q: "カレーを つくるよ。さいしょに することは？", opts: ["🔪 やさいを きる", "🍽️ たべる", "🍛 おさらに もる"], a: 0, why: "たべるまえに、まず ざいりょうを きるんだね" },
-      { q: "はを みがくよ。さいごに することは？", opts: ["🪥 はブラシを もつ", "💧 うがいを する", "🦷 ゴシゴシ みがく"], a: 1, why: "みがいたあとに うがいを するよ" },
-      { q: "がっこうに いくよ。いちばん さいしょは？", opts: ["🚪 いえを でる", "⏰ おきる", "👟 くつを はく"], a: 1, why: "おきないと なにも はじまらないね" },
-      { q: "おにぎりを つくるよ。2ばんめに することは？\n① ごはんを たく → ② ？ → ③ のりを まく", opts: ["🍙 ぎゅっと にぎる", "🍚 ごはんを たく", "😋 たべる"], a: 0, why: "たいた ごはんを にぎってから のりを まくよ" },
-      { q: "おふろに はいるよ。さいしょに することは？", opts: ["🛁 おゆに つかる", "👕 ふくを ぬぐ", "🧴 かみを あらう"], a: 1, why: "ふくを きたまま おふろは はいれないね" },
-    ] },
-  { id: "q2", name: "きまり みつけ", emoji: "🔍", color: "#7FC8F8",
-    desc: "ならびかたの きまりを みつけよう",
-    qs: [
-      { q: "つぎに くるのは？\n🍎 🍌 🍎 🍌 ❓", opts: ["🍎", "🍌", "🍇"], a: 0, why: "りんご→バナナの くりかえしだね" },
-      { q: "つぎに くるのは？\n🔴 🔴 🔵 🔴 🔴 🔵 🔴 🔴 ❓", opts: ["🔴", "🔵", "🟡"], a: 1, why: "あか・あか・あお の くりかえしだよ" },
-      { q: "つぎに くるのは？\n⭐ ⭐ 🌙 ⭐ ⭐ 🌙 ⭐ ❓", opts: ["🌙", "⭐", "☀️"], a: 1, why: "ほし・ほし・つき の くりかえし。ほしは まだ 1こめだね" },
-      { q: "つぎに くるのは？\n🐜 🐘 🐜 🐘 🐜 ❓", opts: ["🐜", "🐘", "🐟"], a: 1, why: "ちいさい→おおきいの くりかえしだね" },
-      { q: "きまりが ちがうのは どれ？", opts: ["🍓🍈🍓🍈🍓🍈", "🍓🍈🍓🍈🍈🍓", "🍈🍓🍈🍓🍈🍓"], a: 1, why: "まんなかだけ とちゅうで じゅんばんが くずれているよ" },
-    ] },
-  { id: "q3", name: "なかまわけ クイズ", emoji: "📦", color: "#FFD447",
-    desc: "なかまはずれを みつけよう",
-    qs: [
-      { q: "なかまはずれは どれ？", opts: ["🐶 いぬ", "🐱 ねこ", "🚗 くるま"], a: 2, why: "くるまだけ いきものじゃ ないね" },
-      { q: "なかまはずれは どれ？", opts: ["🍎 りんご", "⚽ ボール", "🍌 バナナ"], a: 1, why: "ボールだけ たべものじゃ ないよ" },
-      { q: "なかまはずれは どれ？", opts: ["✈️ ひこうき", "🐦 とり", "🐢 かめ"], a: 2, why: "かめだけ そらを とばないね" },
-      { q: "なかまはずれは どれ？", opts: ["🔺 さんかく", "🟦 しかく", "🍩 ドーナツ"], a: 2, why: "ドーナツだけ かたちの なまえじゃ ないよ" },
-      { q: "なかまはずれは どれ？", opts: ["☀️ たいよう", "🔦 かいちゅうでんとう", "🌑 よるの そら"], a: 2, why: "よるの そらだけ ひかって いないね" },
-    ] },
-  { id: "q4", name: "ロボット めいれい", emoji: "🤖", color: "#9D7BD8",
-    desc: "ロボットの うごきを よそうしよう",
-    qs: [
-      { q: "みぎを むいている ロボットに「まえへ 1ぽ」。どっちに すすむ？", opts: ["➡️ みぎ", "⬅️ ひだり", "⬆️ うえ"], a: 0, why: "むいている ほうこうに すすむよ" },
-      { q: "うえを むいている ロボットが「みぎを むく」。どっちを むく？", opts: ["⬅️ ひだり", "➡️ みぎ", "⬇️ した"], a: 1, why: "うえから みぎに くるっと まわるね" },
-      { q: "「まえへ」を 3かい。なんマス すすむ？", opts: ["1マス", "2マス", "3マス"], a: 2, why: "1かいで 1マス。3かいなら 3マスだね" },
-      { q: "「🔁3かい くりかえし［まえへ・まえへ］」。ぜんぶで なんぽ あるく？", opts: ["3ぽ", "6ぽ", "2ほ"], a: 1, why: "2ほ×3かい＝6ぽ。くりかえしは べんりだね" },
-      { q: "「もしも まえが かべなら みぎを むく」。まえに かべが ないときは？", opts: ["みぎを むく", "とまる", "むきを かえない"], a: 2, why: "かべが あるときだけ みぎを むくんだね" },
-    ] },
+// クイズの正本（P3: 5カテゴリ×3難易度・204問）
+// 生成分: quizzes.gen.js（node tools/quizgen.mjs --write で再生成）
+// 書き起こし分: quizzes-fixed.js（quiz-書き起こし基準.md に準拠）
+import { GEN_QUIZZES } from "./quizzes.gen.js";
+import { FIXED_QUIZZES } from "./quizzes-fixed.js";
+
+export const QUIZ_CATEGORIES = [
+  { id: "junban", name: "じゅんばん クイズ", emoji: "🍛", color: "#6BCB77", desc: "ただしい じゅんばんを かんがえよう" },
+  { id: "kimari", name: "きまり みつけ", emoji: "🔍", color: "#7FC8F8", desc: "ならびかたの きまりを みつけよう" },
+  { id: "nakama", name: "なかまわけ クイズ", emoji: "📦", color: "#FFD447", desc: "なかまはずれを みつけよう" },
+  { id: "robot", name: "ロボット めいれい", emoji: "🤖", color: "#9D7BD8", desc: "ロボットの うごきを よそうしよう" },
+  { id: "yomitori", name: "ずの よみとり", emoji: "🔀", color: "#FF9F43", desc: "フローチャートを よんで こたえよう" },
 ];
+
+export const QUIZ_DIFFS = [
+  { id: "easy", label: "⭐ やさしい" },
+  { id: "normal", label: "⭐⭐ ふつう" },
+  { id: "hard", label: "⭐⭐⭐ むずかしい" },
+];
+
+export const ALL_QUESTIONS = [...GEN_QUIZZES, ...FIXED_QUIZZES];
+export const SESSION_SIZE = 5;
+
+export function poolFor(category, difficulty) {
+  return ALL_QUESTIONS.filter(q => q.category === category && q.difficulty === difficulty);
+}
+
+// ベスト記録のキー（既存の q1〜q4 キーはv1の名残として保存内に残るが参照しない）
+export function bestKey(category, difficulty) { return `${category}:${difficulty}`; }
+
+/* 1回分の出題（プールから5問シャッフル・選択肢の順もシャッフル） */
+export function buildSession(category, difficulty) {
+  const pool = [...poolFor(category, difficulty)];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, SESSION_SIZE).map(q => {
+    const order = q.opts.map((_, i) => i);
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    return { ...q, opts: order.map(i => q.opts[i]), a: order.indexOf(q.a) };
+  });
+}
