@@ -1,38 +1,10 @@
-/* パズル ステージ定義（v1から移植）
-   grid: '.'=ゆか '#'=きのかべ '*'=ほし 'S'=スタート
-   dir: 0=→ 1=↓ 2=← 3=↑   par: ★3の ブロックすう（ソルバー検証済みであること） */
-export const STAGES = [
-  { id: "1-1", world: 1, name: "はじめの いっぽ", dir: 0, par: 3,
-    grid: ["S..*", "....", "...."] },
-  { id: "1-2", world: 1, name: "まがりかど", dir: 0, par: 5,
-    grid: ["S...", "....", "..*."] },
-  { id: "1-3", world: 1, name: "ほしを ふたつ", dir: 0, par: 3,
-    grid: [".....", "S*.*.", "....."] },
-  { id: "1-4", world: 1, name: "ジグザグ", dir: 0, par: 8,
-    grid: ["S.*..", ".....", "..*.*"] },
-  { id: "1-5", world: 1, name: "かべを よけて", dir: 0, par: 11,
-    grid: ["S.#.*", "..#..", "....."] },
-  { id: "2-1", world: 2, name: "くりかえしの ちから", dir: 0, par: 2,
-    grid: ["......", "S....*", "......"] },
-  { id: "2-2", world: 2, name: "かいだん", dir: 0, par: 5,
-    grid: [".....", "...*.", "..*..", ".*...", "S...."] },
-  { id: "2-3", world: 2, name: "しかくの みち", dir: 0, par: 5,
-    grid: ["S..*", "....", "....", "*..*"] },
-  { id: "2-4", world: 2, name: "ななめの ほしぞら", dir: 0, par: 5,
-    grid: ["S.....", ".*....", "..*...", "...*..", "....*.", ".....*"] },
-  { id: "2-5", world: 2, name: "おおきな しかく", dir: 0, par: 6,
-    grid: ["S.*.*", "....*", "....*", "*....", "..*.*"] },
-  { id: "3-1", world: 3, name: "かしこい ブロック", dir: 0, par: 2,
-    grid: ["S....", ".....", ".....", "....*"] },
-  { id: "3-2", world: 3, name: "ふたつの かど", dir: 0, par: 3,
-    grid: ["S....", ".....", ".....", ".....", "*...."] },
-  { id: "3-3", world: 3, name: "ひだりまわり", dir: 2, par: 3,
-    grid: ["....S", ".....", ".....", ".....", "....*"] },
-  { id: "3-4", world: 3, name: "こうさてん", dir: 0, par: 4,
-    grid: ["S....", ".....", "..*..", ".....", "....."] },
-  { id: "3-5", world: 3, name: "だいめいろ", dir: 0, par: 3,
-    grid: ["S....", "#....", "..*..", ".....", "....."] },
-];
+// ステージの正本（P2から自動生成データに一本化。v1の15面は引退）
+// 再生成: node tools/generate.mjs --write → npm run verify
+import { GEN_STAGES } from "./stages.gen.js";
 
-// ステージ数から自動計算（v1は「45」直書きだった。増量しても壊れないように）
+export const STAGES = GEN_STAGES;
 export const TOTAL_STARS = STAGES.length * 3;
+
+export function stagesFor(island, difficulty) {
+  return STAGES.filter(s => s.island === island && s.difficulty === difficulty);
+}

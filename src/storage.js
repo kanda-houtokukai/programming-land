@@ -33,7 +33,7 @@ export function newProfileData(name = "", avatar = "") {
     name, avatar,
     createdAt: today(),
     settings: { sound: true },
-    puzzle: { stars: {} },
+    puzzle: { stars: {}, difficulty: "easy" },
     quiz: { best: {} },
     art: { gallery: [] },
     badges: [],

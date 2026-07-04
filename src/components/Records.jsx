@@ -10,8 +10,8 @@ import { APP_VERSION, BUILD_DATE } from "../version.js";
 import PartnerCard from "./PartnerCard.jsx";
 
 function skillProgress(save) {
-  const w = wid => {
-    const st = STAGES.filter(s => s.world === wid);
+  const w = islandId => {
+    const st = STAGES.filter(s => s.island === islandId);
     const got = st.reduce((a, s) => a + (save.puzzle.stars[s.id] || 0), 0);
     return Math.round(100 * got / (st.length * 3));
   };

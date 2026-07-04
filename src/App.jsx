@@ -40,7 +40,8 @@ export default function App() {
       const next = fn(JSON.parse(JSON.stringify(p)));
       const earned = BADGES.filter(b => { try { return b.check(next); } catch (e) { return false; } }).map(b => b.id);
       const news = earned.filter(id => !p.badges.includes(id));
-      next.badges = earned;
+      // 一度とったバッジは、ステージ構成が変わっても失わない（P2でデータ構造が変わったため和集合に変更）
+      next.badges = Array.from(new Set([...p.badges, ...earned]));
       if (news.length > 0) {
         const b = BADGES.find(x => x.id === news[0]);
         SFX.badge(next.settings.sound);

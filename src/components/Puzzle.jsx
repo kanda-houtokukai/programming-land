@@ -1,9 +1,10 @@
-// ロボットパズル（v1から移植。盤面ルールは engine.js と共通）
+// ロボットパズル（P2: 6つの島マップ＋難易度3段階）。盤面ルールは engine.js と共通
 import { useState, useEffect, useRef } from "react";
 import { C } from "../theme.js";
 import { Btn, Header, StarRow } from "./common.jsx";
-import { STAGES } from "../data/stages.js";
-import { WORLD_META, WORLD_PALETTE, WORLD_HINTS, BLOCK_DEFS } from "../data/worlds.js";
+import { STAGES, stagesFor } from "../data/stages.js";
+import { ISLANDS, DIFFICULTIES } from "../data/islands.js";
+import { BLOCK_DEFS } from "../data/blocks.js";
 import { parseStage, countBlocks, DX, DY, MAX_BLOCKS } from "../engine.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
@@ -48,6 +49,7 @@ function BlockChip({ b, activeUid, onRemove, onSelect, openRepeat, onCount }) {
 
 function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   const info = parseStage(stage);
+  const island = ISLANDS[stage.island];
   const sound = save.settings.sound;
   const [prog, setProg] = useState([]);
   const [openRepeat, setOpenRepeat] = useState(null);
@@ -161,12 +163,11 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   }
 
   const cell = Math.min(56, Math.floor(320 / info.w));
-  const world = WORLD_META[stage.world];
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 14px 30px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "10px 0", flexWrap: "wrap" }}>
         <Btn bg="#fff" onClick={onBack}>◀ もどる</Btn>
-        <div className="pl-display" style={{ fontSize: 20, flex: 1 }}>{world.emoji} {stage.name}</div>
+        <div className="pl-display" style={{ fontSize: 20, flex: 1 }}>{stage.name}</div>
         <StarRow n={save.puzzle.stars[stage.id] || 0} size={20} />
       </div>
       <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 8 }}>
@@ -203,7 +204,7 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
       </div>
 
       {msg && <div className="panel slide" style={{ padding: 12, marginTop: 10, background: "#FFF1F4", fontWeight: 800 }}>{msg}</div>}
-      {hint && <div className="panel slide" style={{ padding: 12, marginTop: 10, background: "#EAF7FF", fontWeight: 800 }}>💡 {WORLD_HINTS[stage.world]}</div>}
+      {hint && <div className="panel slide" style={{ padding: 12, marginTop: 10, background: "#EAF7FF", fontWeight: 800 }}>💡 {island.hint}</div>}
 
       {/* プログラム */}
       <div className="panel" style={{ padding: 12, marginTop: 12, minHeight: 58 }}>
@@ -219,7 +220,7 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
 
       {/* パレット */}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
-        {WORLD_PALETTE[stage.world].map(t => (
+        {island.palette.map(t => (
           <Btn key={t} bg={BLOCK_DEFS[t].color} disabled={running || (t === "repeat" && openRepeat !== null)}
             onClick={() => addBlock(t)} style={{ fontSize: 15 }}>
             {BLOCK_DEFS[t].emoji} {BLOCK_DEFS[t].label}
@@ -257,14 +258,74 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   );
 }
 
+/* 島マップ。クリアで つぎの島への みちが ひらく */
+function IslandMap({ save, diff, onEnter }) {
+  const clearedIn = i => stagesFor(i, diff).filter(s => (save.puzzle.stars[s.id] || 0) > 0).length;
+  const unlocked = i => i === 1 || clearedIn(i - 1) >= 3;
+  const ROW = 108, TOP = 62;
+  const pos = i => ({ x: i % 2 === 1 ? 27 : 73, y: TOP + (i - 1) * ROW });
+  const H = TOP + 5 * ROW + 66;
+  return (
+    <div className="panel slide" style={{ margin: "14px 16px", padding: "8px 0", background: "#F3FAFF", position: "relative", height: H, overflow: "hidden" }}>
+      <svg width="100%" height={H} viewBox={`0 0 100 ${H}`} preserveAspectRatio="none"
+        style={{ position: "absolute", inset: 0 }}>
+        {[1, 2, 3, 4, 5].map(i => {
+          const a = pos(i), b = pos(i + 1);
+          const open = unlocked(i + 1);
+          return (
+            <path key={i}
+              d={`M ${a.x} ${a.y} C ${a.x} ${a.y + ROW * 0.6}, ${b.x} ${b.y - ROW * 0.6}, ${b.x} ${b.y}`}
+              fill="none"
+              stroke={open ? ISLANDS[i + 1].color : "#D8D2C6"}
+              strokeWidth={open ? 3.4 : 2.2}
+              strokeDasharray={open ? "none" : "1.6 3"}
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke" />
+          );
+        })}
+      </svg>
+      {[1, 2, 3, 4, 5, 6].map(i => {
+        const p = pos(i);
+        const un = unlocked(i);
+        const cleared = clearedIn(i);
+        const total = stagesFor(i, diff).length;
+        const done = cleared === total;
+        return (
+          <button key={i} className="pbtn" disabled={!un} onClick={() => onEnter(i)}
+            style={{
+              position: "absolute", left: `${p.x}%`, top: p.y, transform: "translate(-50%,-50%)",
+              width: 148, padding: "10px 6px", borderRadius: 18, textAlign: "center",
+              background: un ? "#fff" : "#EFEAE0",
+            }}>
+            <span style={{
+              fontSize: 34, display: "inline-block", background: un ? ISLANDS[i].color : "#CFC8BA",
+              border: `3px solid ${C.ink}`, borderRadius: 999, width: 56, height: 56, lineHeight: "50px",
+              filter: un ? "none" : "grayscale(1)",
+            }}>{un ? ISLANDS[i].emoji : "🔒"}</span>
+            <span style={{ display: "block", fontWeight: 900, fontSize: 13, marginTop: 4 }}>{ISLANDS[i].name}</span>
+            <span style={{ display: "block", fontWeight: 800, fontSize: 11, opacity: .75 }}>
+              {un ? (done ? "🏆 ぜんぶクリア！" : `✅ ${cleared} / ${total}`) : `まえの しまを 3つ クリア`}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function Puzzle({ save, update, go, onSound }) {
-  const [world, setWorld] = useState(1);
+  const diff = save.puzzle.difficulty || "easy";
+  const [island, setIsland] = useState(null);
   const [stageId, setStageId] = useState(null);
-  const stages = STAGES.filter(s => s.world === world);
-  const clearedIn = w => STAGES.filter(s => s.world === w && (save.puzzle.stars[s.id] || 0) > 0).length;
-  const unlockedWorld = w => w === 1 || clearedIn(w - 1) >= 3;
+  const stages = island ? stagesFor(island, diff) : [];
   const unlockedStage = i => i === 0 || (save.puzzle.stars[stages[i - 1].id] || 0) > 0;
   const stage = STAGES.find(s => s.id === stageId);
+
+  function setDiff(d) {
+    SFX.tap(save.settings.sound);
+    setIsland(null); setStageId(null);
+    update(s => { s.puzzle.difficulty = d; return s; });
+  }
 
   if (stage) {
     const idx = stages.findIndex(s => s.id === stage.id);
@@ -279,43 +340,44 @@ export default function Puzzle({ save, update, go, onSound }) {
       </div>
     );
   }
+
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
       <Header save={save} title="🤖 ロボット パズル" onHome={() => go("home")} onSound={onSound} />
+      {/* むずかしさ えらび */}
       <div style={{ display: "flex", gap: 8, padding: "0 16px", flexWrap: "wrap" }}>
-        {Object.keys(WORLD_META).map(Number).map(w => {
-          const un = unlockedWorld(w);
-          return (
-            <Btn key={w} bg={world === w ? WORLD_META[w].color : "#fff"} disabled={!un}
-              onClick={() => setWorld(w)} style={{ fontSize: 14 }}>
-              {un ? WORLD_META[w].emoji : "🔒"} ワールド{w}
-            </Btn>
-          );
-        })}
+        {DIFFICULTIES.map(d => (
+          <Btn key={d.id} bg={diff === d.id ? C.sun : "#fff"} onClick={() => setDiff(d.id)} style={{ fontSize: 14 }}>
+            {d.label}
+          </Btn>
+        ))}
       </div>
-      <div className="panel slide" style={{ margin: "14px 16px", padding: 16, background: "#fff" }}>
-        <div className="pl-display" style={{ fontSize: 22 }}>{WORLD_META[world].emoji} {WORLD_META[world].name}</div>
-        <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 12 }}>みにつく ちから：{WORLD_META[world].skill}</div>
-        <div style={{ display: "grid", gap: 10 }}>
-          {stages.map((s, i) => {
-            const st = save.puzzle.stars[s.id] || 0;
-            const un = unlockedStage(i);
-            return (
-              <button key={s.id} className="pbtn" disabled={!un} onClick={() => setStageId(s.id)}
-                style={{ background: st > 0 ? "#F1FFF0" : "#fff", padding: "12px 14px", display: "flex", alignItems: "center", gap: 12, textAlign: "left" }}>
-                <span style={{ fontSize: 26 }}>{un ? (st > 0 ? "✅" : "🎯") : "🔒"}</span>
-                <span style={{ flex: 1, fontWeight: 900, fontSize: 16 }}>ステージ {s.id}　{s.name}</span>
-                <StarRow n={st} size={18} />
-              </button>
-            );
-          })}
-        </div>
-        {world < Object.keys(WORLD_META).length && clearedIn(world) < 3 && (
-          <div style={{ fontWeight: 800, fontSize: 13, marginTop: 10 }}>
-            🔓 つぎの ワールドは、この ワールドを 3ステージ クリアすると ひらくよ！（いま {clearedIn(world)}こ）
+
+      {island === null ? (
+        <IslandMap save={save} diff={diff} onEnter={setIsland} />
+      ) : (
+        <div className="panel slide" style={{ margin: "14px 16px", padding: 16, background: "#fff" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+            <Btn bg="#fff" onClick={() => setIsland(null)} style={{ fontSize: 13, padding: "6px 10px" }}>🗺️ マップ</Btn>
+            <div className="pl-display" style={{ fontSize: 21 }}>{ISLANDS[island].emoji} {ISLANDS[island].name}</div>
           </div>
-        )}
-      </div>
+          <div style={{ fontWeight: 800, fontSize: 13, marginBottom: 12 }}>みにつく ちから：{ISLANDS[island].skill}</div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {stages.map((s, i) => {
+              const st = save.puzzle.stars[s.id] || 0;
+              const un = unlockedStage(i);
+              return (
+                <button key={s.id} className="pbtn" disabled={!un} onClick={() => setStageId(s.id)}
+                  style={{ background: st > 0 ? "#F1FFF0" : "#fff", padding: "12px 14px", display: "flex", alignItems: "center", gap: 12, textAlign: "left" }}>
+                  <span style={{ fontSize: 26 }}>{un ? (st > 0 ? "✅" : "🎯") : "🔒"}</span>
+                  <span style={{ flex: 1, fontWeight: 900, fontSize: 16 }}>ステージ {i + 1}</span>
+                  <StarRow n={st} size={18} />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
