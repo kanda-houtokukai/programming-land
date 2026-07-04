@@ -99,8 +99,9 @@ try {
   const { TYPING_WORDS } = await import("../src/data/typing.js");
   for (const level of Object.keys(TYPING_WORDS)) {
     for (const w of TYPING_WORDS[level]) {
-      const rep = representative(w);
-      ok(rep.length > 0 && accepts(w, rep), `語彙「${w}」(${level}) が rep=${rep} で完走`);
+      const t = w.replace(/\s+/g, ""); // 表示用スペースは打たない
+      const rep = representative(t);
+      ok(rep.length > 0 && accepts(t, rep), `語彙「${w}」(${level}) が rep=${rep} で完走`);
     }
   }
 } catch (e) {

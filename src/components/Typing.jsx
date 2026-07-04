@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { C } from "../theme.js";
 import { Btn, Header } from "./common.jsx";
 import { TYPING_STAGES, TYPING_WORDS, WORDS_PER_SESSION } from "../data/typing.js";
-import { startWord, typeChar, hintRest, nextKey, currentUnitIndex } from "../typing/romaji.js";
+import { startWord, typeChar, hintRest, nextKey, currentUnitIndex, segment } from "../typing/romaji.js";
 import TypingKeyboard from "./TypingKeyboard.jsx";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
@@ -16,14 +16,17 @@ function pickWords(list, n) {
   return a.slice(0, n);
 }
 
+const strip = w => w.replace(/\s+/g, "");
+
 function TypingPlay({ stage, save, update, onBack }) {
   const sound = save.settings.sound;
   const [words] = useState(() => pickWords(TYPING_WORDS[stage.id], WORDS_PER_SESSION));
   const [wi, setWi] = useState(0);
-  const [st, setSt] = useState(() => startWord(words[0]));
+  const [st, setSt] = useState(() => startWord(strip(words[0])));
   const [miss, setMiss] = useState(0);
   const [good, setGood] = useState(0);
   const [flash, setFlash] = useState(false);
+  const [helpShown, setHelpShown] = useState(false); // 段階3: まちがえたら その語だけヒント表示
   const [result, setResult] = useState(null);
   const startRef = useRef(null);
   const stRef = useRef(st); stRef.current = st;
@@ -38,6 +41,7 @@ function TypingPlay({ stage, save, update, onBack }) {
     const r = typeChar(stRef.current, ch);
     if (!r.ok) {
       setMiss(m => m + 1); setFlash(true); setTimeout(() => setFlash(false), 180);
+      setHelpShown(true);
       SFX.fail(sound);
       return;
     }
@@ -46,7 +50,7 @@ function TypingPlay({ stage, save, update, onBack }) {
       SFX.star(sound);
       const nextWi = wi + 1;
       if (nextWi < words.length) {
-        setWi(nextWi); setSt(startWord(words[nextWi]));
+        setWi(nextWi); setSt(startWord(strip(words[nextWi]))); setHelpShown(false);
       } else {
         // けっか: 正確率と 1分あたりの文字数
         const totalGood = good + 1;
@@ -91,12 +95,20 @@ function TypingPlay({ stage, save, update, onBack }) {
   }
 
   const word = words[wi];
-  const units = st.units;
   const cur = currentUnitIndex(st);
   const rest = hintRest(st);
   const key = nextKey(st);
-  const showSpell = stage.hint === "full" || stage.hint === "spell";
+  const showSpell = stage.hint === "full" || stage.hint === "spell" || (stage.hint === "none" && helpShown);
   const showKey = stage.hint === "full";
+  const isSentence = stage.id !== "kotoba";
+
+  // 分かち書き表示: トークンごとに単位へ分け、通し番号で進捗ハイライト
+  let unitOffset = 0;
+  const tokens = word.split(/\s+/).filter(Boolean).map(tk => {
+    const us = segment(tk);
+    const start = unitOffset; unitOffset += us.length;
+    return { us, start };
+  });
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 16px 30px" }}>
@@ -108,21 +120,26 @@ function TypingPlay({ stage, save, update, onBack }) {
 
       {/* おだい */}
       <div className={"panel " + (flash ? "shake" : "")} style={{ padding: "18px 14px", textAlign: "center", background: flash ? "#FFF1F4" : "#fff" }}>
-        <div style={{ fontSize: 40, fontWeight: 900, letterSpacing: 6 }}>
-          {units.map((u, i) => (
-            <span key={i} style={{
-              color: i < cur ? "#B9B0A6" : C.ink,
-              background: i === cur ? "#FFF3C4" : "none",
-              borderRadius: 8, padding: "0 2px",
-            }}>{u}</span>
+        <div style={{ fontSize: isSentence ? 26 : 40, fontWeight: 900, letterSpacing: isSentence ? 2 : 6, lineHeight: 1.6 }}>
+          {tokens.map((tk, ti) => (
+            <span key={ti} style={{ display: "inline-block", marginRight: isSentence ? 12 : 0 }}>
+              {tk.us.map((u, i) => {
+                const gi = tk.start + i;
+                return (
+                  <span key={i} style={{
+                    color: gi < cur ? "#B9B0A6" : C.ink,
+                    background: gi === cur ? "#FFF3C4" : "none",
+                    borderRadius: 8, padding: "0 2px",
+                  }}>{u}</span>
+                );
+              })}
+            </span>
           ))}
         </div>
-        {showSpell && (
-          <div style={{ fontWeight: 900, fontSize: 24, letterSpacing: 3, marginTop: 6, fontFamily: "ui-monospace, monospace" }}>
-            <span style={{ color: C.leaf }}>{"".padStart(0)}</span>
-            <span style={{ color: "#B9B0A6" }}>{/* 打った分は でない（のこりだけ） */}</span>
-            <span>{rest}</span>
-          </div>
+        {showSpell ? (
+          <div style={{ fontWeight: 900, fontSize: 22, letterSpacing: 3, marginTop: 6, fontFamily: "ui-monospace, monospace" }}>{rest}</div>
+        ) : (
+          <div style={{ fontWeight: 700, fontSize: 12, color: "#B9B0A6", marginTop: 6 }}>ノーヒントで ちょうせんちゅう（まちがえると ヒントが でるよ）</div>
         )}
       </div>
 

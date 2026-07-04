@@ -25,6 +25,7 @@ function skillProgress(save) {
     { name: "じょうけん（分岐）", note: "「もし〜なら」で場合分けする力", pct: w(3), color: C.grape },
     { name: "よそうする力（クイズ）", note: "きまり発見・順序立て・分類", pct: Math.round(100 * quizGot / quizTotal), color: C.sun },
     { name: "つくる力（創造）", note: "命令を組み合わせて作品を作る", pct: Math.min(100, save.art.gallery.length * 20), color: C.sakura },
+    { name: "キーボード入力", note: "ローマ字タイピングの速さ（60もじ/分で100%）", pct: Math.min(100, Math.round(100 * Math.max(0, ...Object.values(save.typing.best).map(b => b.kpm || 0)) / 60)), color: "#FF9F43" },
   ];
 }
 
