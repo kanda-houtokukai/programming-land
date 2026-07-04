@@ -5,6 +5,7 @@ import { Btn, Header } from "./common.jsx";
 import { QUIZ_SETS } from "../data/quizzes.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
+import { XP, applyXp } from "../growth.js";
 
 function QuizPlay({ set, save, update, onBack }) {
   const sound = save.settings.sound;
@@ -28,6 +29,7 @@ function QuizPlay({ set, save, update, onBack }) {
       update(s => {
         s.quiz.best[set.id] = Math.max(s.quiz.best[set.id] || 0, final);
         const d = today(); s.log[d] = s.log[d] || {}; s.log[d].quiz = (s.log[d].quiz || 0) + 1;
+        applyXp(s, XP.quizSet(final));
         return s;
       });
     }

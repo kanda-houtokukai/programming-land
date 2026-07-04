@@ -15,6 +15,10 @@ import Puzzle from "./components/Puzzle.jsx";
 import Quiz from "./components/Quiz.jsx";
 import Art from "./components/Art.jsx";
 import Records from "./components/Records.jsx";
+import PartnerSelect from "./components/PartnerSelect.jsx";
+import Dex from "./components/Dex.jsx";
+import EvolutionOverlay from "./components/EvolutionOverlay.jsx";
+import { stageForLevel } from "./data/monsters.js";
 
 export default function App() {
   const [profiles, setProfiles] = useState(() => listProfiles());
@@ -22,8 +26,13 @@ export default function App() {
   const [screen, setScreen] = useState("select");
   const [toast, setToast] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [evolution, setEvolution] = useState(null);
 
   const save = profiles.find(p => p.id === currentId) || null;
+
+  function showToast(emoji, text) {
+    setToast({ emoji, text }); setTimeout(() => setToast(null), 2800);
+  }
 
   function update(fn) {
     setProfiles(prev => prev.map(p => {
@@ -35,7 +44,19 @@ export default function App() {
       if (news.length > 0) {
         const b = BADGES.find(x => x.id === news[0]);
         SFX.badge(next.settings.sound);
-        setToast(b); setTimeout(() => setToast(null), 2800);
+        showToast(b.emoji, `バッジ ゲット！「${b.name}」`);
+      }
+      // 相棒のレベルアップ・進化を検知（経験値の加算は各モードの applyXp が行う）
+      if (p.partner && next.partner) {
+        const fromStage = stageForLevel(p.partner.level);
+        const toStage = stageForLevel(next.partner.level);
+        if (toStage > fromStage) {
+          SFX.evolve(next.settings.sound);
+          setEvolution({ species: next.partner.species, from: fromStage, to: toStage });
+        } else if (next.partner.level > p.partner.level) {
+          SFX.levelup(next.settings.sound);
+          showToast("⬆️", `レベルアップ！ Lv.${next.partner.level} に なった！`);
+        }
       }
       saveProfile(next);
       return next;
@@ -90,7 +111,16 @@ export default function App() {
       {screen === "create" && (
         <ProfileCreate onDone={handleCreate} onCancel={() => setScreen("select")} />
       )}
-      {save && screen === "home" && <Home save={save} go={setScreen} onSound={onSound} onSwitchProfile={switchProfile} />}
+      {save && screen === "home" && !save.partner && (
+        <PartnerSelect profileName={save.name} onPick={sp => update(s => {
+          s.partner = { species: sp, xp: 0, level: 1 };
+          const key = `${sp}-1`;
+          if (!s.dex.includes(key)) s.dex.push(key);
+          return s;
+        })} />
+      )}
+      {save && screen === "home" && save.partner && <Home save={save} go={setScreen} onSound={onSound} onSwitchProfile={switchProfile} />}
+      {save && screen === "dex" && <Dex save={save} go={setScreen} onSound={onSound} />}
       {save && screen === "puzzle" && <Puzzle save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "quiz" && <Quiz save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "art" && <Art save={save} update={update} go={setScreen} onSound={onSound} />}
@@ -99,6 +129,7 @@ export default function App() {
           onExport={handleExport} onImportFile={handleImportFile}
           onDeleteRequest={() => setConfirmDelete(true)} />
       )}
+      <EvolutionOverlay evolution={evolution} onClose={() => setEvolution(null)} />
       {confirmDelete && save && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(58,51,53,.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div className="panel pop" style={{ padding: 24, maxWidth: 360, textAlign: "center" }}>

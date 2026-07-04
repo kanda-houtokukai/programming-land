@@ -7,6 +7,7 @@ import { WORLD_META, WORLD_PALETTE, WORLD_HINTS, BLOCK_DEFS } from "../data/worl
 import { parseStage, countBlocks, DX, DY, MAX_BLOCKS } from "../engine.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
+import { XP, applyXp } from "../growth.js";
 
 function BlockChip({ b, activeUid, onRemove, onSelect, openRepeat, onCount }) {
   const d = BLOCK_DEFS[b.type];
@@ -150,6 +151,7 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
       update(s => {
         s.puzzle.stars[stage.id] = Math.max(s.puzzle.stars[stage.id] || 0, starN);
         const d = today(); s.log[d] = s.log[d] || {}; s.log[d].puzzle = (s.log[d].puzzle || 0) + 1;
+        applyXp(s, XP.puzzleWin(starN));
         return s;
       });
     } else if (status === "ok") {

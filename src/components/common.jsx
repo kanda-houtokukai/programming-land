@@ -27,7 +27,7 @@ export function Toast({ toast }) {
       display: "flex", alignItems: "center", gap: 10, maxWidth: "90vw",
     }}>
       <span style={{ fontSize: 30 }}>{toast.emoji}</span>
-      <span>バッジ ゲット！「{toast.name}」</span>
+      <span>{toast.text}</span>
     </div>
   );
 }

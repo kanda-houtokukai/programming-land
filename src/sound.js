@@ -17,4 +17,6 @@ export const SFX = {
   win: on => on && [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.18, i * 0.13)),
   fail: on => on && (tone(300, 0.18), tone(220, 0.25, 0.15)),
   badge: on => on && [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.2, i * 0.11, "sine", 0.14)),
+  levelup: on => on && [660, 880, 1100].forEach((f, i) => tone(f, 0.12, i * 0.09)),
+  evolve: on => on && [392, 523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.22, i * 0.14, "sine", 0.15)),
 };

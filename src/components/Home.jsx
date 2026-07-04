@@ -4,6 +4,7 @@ import { Btn, Header } from "./common.jsx";
 import { QUIZ_SETS } from "../data/quizzes.js";
 import { TOTAL_STARS } from "../data/stages.js";
 import { BADGES, puzzleStarsTotal } from "../data/badges.js";
+import PartnerCard from "./PartnerCard.jsx";
 
 export default function Home({ save, go, onSound, onSwitchProfile }) {
   const stars = puzzleStarsTotal(save);
@@ -22,6 +23,7 @@ export default function Home({ save, go, onSound, onSwitchProfile }) {
         <div style={{ fontWeight: 700 }}>きょうは どこで あそぶ？</div>
       </div>
       <div style={{ display: "grid", gap: 16, padding: "0 16px" }}>
+        <PartnerCard partner={save.partner} onOpenDex={() => go("dex")} />
         {modes.map((m, i) => (
           <button key={m.key} className="pbtn slide" onClick={() => go(m.key)}
             style={{ background: "#fff", textAlign: "left", padding: 18, display: "flex", gap: 16, alignItems: "center", animationDelay: `${i * 0.06}s` }}>

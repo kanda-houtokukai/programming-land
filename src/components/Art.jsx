@@ -5,6 +5,7 @@ import { Btn, Header } from "./common.jsx";
 import { ART_COLORS, ART_CMDS, ART_CHALLENGES } from "../data/art.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
+import { XP, applyXp } from "../growth.js";
 
 function turtleSegs(cmds) {
   let x = 160, y = 215, ang = -90, ci = 0;
@@ -73,6 +74,7 @@ export default function Art({ save, update, go, onSound }) {
     update(s => {
       s.art.gallery.push({ id: Date.now(), date: today(), cmds: [...cmds], name: `さくひん ${s.art.gallery.length + 1}` });
       const d = today(); s.log[d] = s.log[d] || {}; s.log[d].art = (s.log[d].art || 0) + 1;
+      applyXp(s, XP.artSave());
       return s;
     });
     setSavedMsg("🖼️ びじゅつかんに ほぞんしたよ！");
