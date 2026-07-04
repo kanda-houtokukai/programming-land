@@ -15,7 +15,8 @@ import { ISLANDS } from "../src/data/islands.js";
 
 let fail = 0;
 const note = (id, msg) => { console.log(`FAIL ${id}: ${msg}`); fail++; };
-const usesSmart = sol => { const k = solutionKinds(sol); return k.has("smartR") || k.has("smartL"); };
+// 導入面（teach）の手本解が使うべき「島の新概念」: smart = smartR/smartL のどちらか
+const TEACH_NEED = { 2: ["repeat"], 3: ["smart"], 4: ["repeat", "smart"], 5: ["repeat"], 6: ["repeat"] };
 
 const ids = new Set();
 const grids = new Set();
@@ -48,10 +49,15 @@ for (const st of GEN_STAGES) {
   }
 
   if (st.teach) {
-    // 導入面: 🧠必須検定は課さない。代わりに「★3の最短=par（素直な解が報われる）」「🧠を使う」を確認
+    // 導入面: 島の概念必須検定は課さない。代わりに「★3の最短=par（素直な解が報われる）」
+    // 「島の新概念ブロックを手本解が使う」「入口は1〜2手」を検定する
     const min = solveStage({ grid: st.grid, dir: st.dir }, ISLANDS[st.island].palette, 14);
     if (min !== st.par) note(st.id, `導入面: 最短=${min} が par=${st.par} と不一致（★3が素直に取れない）`);
-    if (!usesSmart(st.sol || [])) note(st.id, "導入面なのに手本解が🧠を使っていない");
+    const kinds = solutionKinds(st.sol || []);
+    for (const need of TEACH_NEED[st.island] || []) {
+      const ok = need === "smart" ? (kinds.has("smartR") || kinds.has("smartL")) : kinds.has(need);
+      if (!ok) note(st.id, `導入面なのに手本解が ${need} を使っていない`);
+    }
     if (st.par > 2) note(st.id, `導入面の par=${st.par} が大きすぎ（入口は1〜2手）`);
   } else {
     const par = accept(st.island, spec, { grid: st.grid, dir: st.dir });
