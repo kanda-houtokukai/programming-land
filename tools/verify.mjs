@@ -8,6 +8,7 @@
 
 import { GEN_STAGES } from "../src/data/stages.gen.js";
 import { SPEC, accept } from "./criteria.mjs";
+import { checkAllCurves } from "./curve.mjs";
 
 let fail = 0;
 const note = (id, msg) => { console.log(`FAIL ${id}: ${msg}`); fail++; };
@@ -42,7 +43,11 @@ for (const st of GEN_STAGES) {
 const expected = 6 * 3 * 9;
 if (GEN_STAGES.length !== expected) note("全体", `面数が${GEN_STAGES.length}（期待 ${expected}）`);
 
+// 難易度カーブ検証（道A: なだらかでなければFAIL）
+const { errs: curveErrs } = checkAllCurves(GEN_STAGES);
+curveErrs.forEach(e => note("カーブ", e));
+
 console.log(fail === 0
-  ? `全${GEN_STAGES.length}面 PASS（${Date.now() - t0}ms）`
+  ? `全${GEN_STAGES.length}面 PASS（★3最短＋難易度カーブ・${Date.now() - t0}ms）`
   : `FAIL ${fail}件`);
 process.exit(fail === 0 ? 0 : 1);

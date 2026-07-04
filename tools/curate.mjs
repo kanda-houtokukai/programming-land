@@ -10,7 +10,7 @@
 
 import { ISLANDS } from "../src/data/islands.js";
 import { SPEC, accept } from "./criteria.mjs";
-import { solveStageWithSolution, solutionKinds } from "./solve.mjs";
+import { compile, bfsMin, minBlocks, ACT, solveStageWithSolution, solutionKinds } from "./solve.mjs";
 
 export function mulberry32(seed) {
   let a = seed >>> 0;
@@ -50,18 +50,31 @@ export function makeCandidate(spec, rnd) {
   return { grid: cells.map(r => r.join("")), dir };
 }
 
-// 概念タグ: この面の解が必須とする新概念
-function conceptTag(kinds) {
-  const set = new Set(kinds);
-  const rep = set.has("repeat");
-  const br = set.has("smartR") || set.has("smartL");
-  if (rep && br) return "both";
-  if (rep) return "repeat";
-  if (br) return "branch";
+/* 概念タグを「軽量に」判定（プール全部の解抽出は重いので避ける）。
+   par=最短(全ブロック)。制限パレットでの最短と比べて、必須の新概念を見分ける。 */
+function conceptTag(island, cand, par) {
+  const palette = ISLANDS[island].palette;
+  const env = compile(cand);
+  const allPrims = palette.filter(p => p !== "repeat").map(p => ACT[p]);
+  const noSmart = allPrims.filter(a => a !== ACT.smartR && a !== ACT.smartL);
+  const useRepeat = palette.includes("repeat");
+  const hasSmart = palette.includes("smartR") || palette.includes("smartL");
+  // repeat無しの最短（BFS）
+  const noRepeatMin = bfsMin(env, allPrims);
+  const needsRepeat = useRepeat && (noRepeatMin === null || noRepeatMin > par);
+  // smart無しの最短
+  let needsBranch = false;
+  if (hasSmart) {
+    const noBranchMin = minBlocks(env, noSmart, useRepeat, par + 3);
+    needsBranch = (noBranchMin === null || noBranchMin > par);
+  }
+  if (needsRepeat && needsBranch) return "both";
+  if (needsBranch) return "branch";
+  if (needsRepeat) return "repeat";
   return "basic";
 }
 
-/* プールを作る（accept を通った候補を targetPool 個ためる） */
+/* プールを作る（accept を通った候補を targetPool 個ためる。概念は軽量判定・解抽出はしない） */
 export function buildPool(island, diff, rnd, targetPool = 60, maxAttempts = 40000) {
   const spec = SPEC[island][diff];
   const pool = [];
@@ -76,10 +89,17 @@ export function buildPool(island, diff, rnd, targetPool = 60, maxAttempts = 4000
     const par = accept(island, spec, cand);
     if (par === null) continue;
     seen.add(key);
-    const sv = solveStageWithSolution(cand, ISLANDS[island].palette, par);
-    pool.push({ ...cand, par, sol: sv.sol, kinds: [...solutionKinds(sv.sol)], concept: conceptTag(sv.kinds ? sv.kinds : [...solutionKinds(sv.sol)]) });
+    pool.push({ ...cand, par, concept: conceptTag(island, cand, par) });
   }
   return pool;
+}
+
+/* 選抜した面にだけ 最短解(sol)と使用ブロック種(kinds)を付ける（重い処理は最小限に） */
+export function attachSolutions(island, picked) {
+  return picked.map(s => {
+    const sv = solveStageWithSolution(s, ISLANDS[island].palette, s.par);
+    return { ...s, sol: sv.sol, kinds: [...solutionKinds(sv.sol)] };
+  });
 }
 
 /* プールから N 面を「なだらかに上がる並び」で選抜する。
@@ -95,33 +115,21 @@ const CONCEPT_ORDER = {
 };
 
 export function curate(pool, island, diff, N) {
-  const [lo, hi] = SPEC[island][diff].par;
-  const order = CONCEPT_ORDER[island] || ["basic", "repeat", "branch", "both"];
-  const rank = c => { const i = order.indexOf(c); return i < 0 ? order.length : i; };
-  // 概念段階→par昇順で全体を並べ、目標parランプに沿って拾う
-  const sorted = [...pool].sort((a, b) => (rank(a.concept) - rank(b.concept)) || (a.par - b.par));
-  // 目標par: lo から hi へ N 段でゆるやかに
-  const targets = [];
-  for (let i = 0; i < N; i++) targets.push(Math.round(lo + (hi - lo) * i / (N - 1)));
-  const used = new Set();
+  if (pool.length < N) return null;
+  // par昇順に並べる。概念導入順は「トラックを島1→6と進む」時点で自然に守られる
+  // （repeatは島2・branchは島3で必ず先に出る）ので、島内は par だけでよい。
+  const sorted = [...pool].sort((a, b) => a.par - b.par);
+  // プールの実分布に沿って N 個を均等間隔で拾う。
+  // → 非減少・段差は par範囲に収まる・存在しない難易度を要求しない（＝破綻しない）。
   const picked = [];
-  let lastPar = -Infinity, lastRank = -1;
-  for (const tgt of targets) {
-    // 「まだ使っていない・par>=lastPar・par を tgt に最も近く・概念段階が後戻りしない」候補
-    let best = null, bestScore = Infinity;
-    for (let i = 0; i < sorted.length; i++) {
-      if (used.has(i)) continue;
-      const c = sorted[i];
-      if (c.par < lastPar) continue;                 // 非減少
-      if (rank(c.concept) < lastRank) continue;      // 概念は後戻りしない
-      const score = Math.abs(c.par - tgt) * 10 + (rank(c.concept) - lastRank);
-      if (score < bestScore) { bestScore = score; best = i; }
-    }
-    if (best === null) return null; // プール不足
-    used.add(best);
-    picked.push(sorted[best]);
-    lastPar = sorted[best].par;
-    lastRank = Math.max(lastRank, rank(sorted[best].concept));
+  const usedIdx = new Set();
+  for (let i = 0; i < N; i++) {
+    let idx = Math.round(i * (sorted.length - 1) / (N - 1));
+    while (usedIdx.has(idx) && idx < sorted.length - 1) idx++;
+    while (usedIdx.has(idx) && idx > 0) idx--;
+    usedIdx.add(idx);
+    picked.push(sorted[idx]);
   }
+  picked.sort((a, b) => a.par - b.par); // 非減少に整える
   return picked;
 }

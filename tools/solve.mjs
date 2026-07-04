@@ -160,25 +160,29 @@ export function solveStageWithSolution(stage, palette, cap = 16) {
   const useRepeat = palette.includes("repeat");
   const min = minBlocks(env, prims, useRepeat, cap);
   if (min === null) return null;
-  const sol = solProg(env, prims, useRepeat, env.startState, min, []);
+  const sol = solProg(env, prims, useRepeat, env.startState, min, [], new Set());
   return { min, sol };
 }
 
 // 最短ブロック数ちょうどの「勝ちプログラム」を1つ組み立てて返す。
 // くりかえしの本体は repeatStart（=repeatブロックが始まる状態）から count回まわす。
 // ※本体作成中に状態を進めない（進めると回数が1ずれる。旧実装のバグ）
-function solProg(env, prims, useRepeat, state, budget, prog) {
+// memo: (state,budget) で解が無いと分かった組み合わせを記録して枝刈り（minBlocks同等の速さに）
+function solProg(env, prims, useRepeat, state, budget, prog, memo) {
+  const key = state * 32 + budget;
+  if (memo.has(key)) return null;
   for (const a of prims) {
     const t = step(env, state, a);
     if (t === -1) continue;
     const blk = { type: ACT_NAME[a] };
     if (isWin(env, t)) { if (budget === 1) return [...prog, blk]; continue; }
-    if (budget >= 2) { const r = solProg(env, prims, useRepeat, t, budget - 1, [...prog, blk]); if (r) return r; }
+    if (budget >= 2) { const r = solProg(env, prims, useRepeat, t, budget - 1, [...prog, blk], memo); if (r) return r; }
   }
-  if (useRepeat && budget >= 2) { const r = tryBody(env, prims, state, budget, prog, []); if (r) return r; }
+  if (useRepeat && budget >= 2) { const r = tryBody(env, prims, state, budget, prog, [], memo); if (r) return r; }
+  memo.add(key);
   return null;
 }
-function tryBody(env, prims, repeatStart, budget, prog, body) {
+function tryBody(env, prims, repeatStart, budget, prog, body, memo) {
   const L = body.length;
   if (L >= 1) {
     const cost = 1 + L;
@@ -195,7 +199,7 @@ function tryBody(env, prims, repeatStart, budget, prog, body) {
         if (crashed) break; // c回目で壊れる→以降のcも同じ
         const repBlk = { type: "repeat", count: c, children: body.map(a => ({ type: ACT_NAME[a] })) };
         if (won) { if (cost === budget) return [...prog, repBlk]; continue; } // 勝つが余りブロック→不採用
-        const r = solProg(env, prims, true, st, budget - cost, [...prog, repBlk]);
+        const r = solProg(env, prims, true, st, budget - cost, [...prog, repBlk], memo);
         if (r) return r;
       }
     }
@@ -206,7 +210,7 @@ function tryBody(env, prims, repeatStart, budget, prog, body) {
       if (L >= 1 && ((a === 1 && last === 2) || (a === 2 && last === 1))) continue;
       if (L >= 2 && (a === 1 || a === 2) && a === last && a === last2) continue;
       body.push(a);
-      const r = tryBody(env, prims, repeatStart, budget, prog, body);
+      const r = tryBody(env, prims, repeatStart, budget, prog, body, memo);
       body.pop();
       if (r) return r;
     }
