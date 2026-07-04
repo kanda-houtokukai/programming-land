@@ -73,7 +73,7 @@
 ### P0で得た教訓
 
 - ★ 保存済みGitHubトークンには workflow 権限がない → Actions のワークフローファイルは push できない。デプロイは mainの docs/ フォルダ配信方式（`npm run deploy`）に決定
-- ★ GitHub Pages の新規サイトは、有効化直後のデプロイが「Deployment failed, try again later」で失敗することがある（2回失敗）。原因はプロビジョニング待ち。数分待って空コミットpushで解決
+- ★ GitHub Pages のデプロイは「Deployment failed, try again later」でときどき失敗する（新規サイト直後に2回・運用中のP2.2でも1回発生）。対処は毎回同じ: **空コミットをpushして再デプロイ**。verify・ビルドは無関係（ローカルのdocs/が正しければ再pushだけでよい）
 - ★ v1のpar値は6面で最短解より甘かった（ソルバー検証で発見・修正済み: 1-3, 2-4, 3-2, 3-3, 3-4, 3-5）。以後ステージ追加は必ず `npm run verify` を通す
 - ★ ローカルのUIテストで「ブロック追加と実行を同一イベント内で行うとReactのstate反映前に実行される」現象はテスト手順の問題で、実操作では起こらない（バグではない）
 
