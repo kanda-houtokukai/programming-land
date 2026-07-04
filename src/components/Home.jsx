@@ -5,6 +5,11 @@ import { QUIZ_CATEGORIES, QUIZ_DIFFS } from "../data/quizzes.js";
 import { TOTAL_STARS } from "../data/stages.js";
 import { BADGES, puzzleStarsTotal } from "../data/badges.js";
 import PartnerCard from "./PartnerCard.jsx";
+import iconPuzzle from "../assets/icon_puzzle.png";
+import iconQuiz from "../assets/icon_quiz.png";
+import iconArt from "../assets/icon_art.png";
+
+const MODE_ICON = { puzzle: iconPuzzle, quiz: iconQuiz, art: iconArt };
 
 export default function Home({ save, go, onSound, onSwitchProfile }) {
   const stars = puzzleStarsTotal(save);
@@ -28,7 +33,10 @@ export default function Home({ save, go, onSound, onSwitchProfile }) {
         {modes.map((m, i) => (
           <button key={m.key} className="pbtn slide" onClick={() => go(m.key)}
             style={{ background: "#fff", textAlign: "left", padding: 18, display: "flex", gap: 16, alignItems: "center", animationDelay: `${i * 0.06}s` }}>
-            <span style={{ fontSize: 46, background: m.color, border: `3px solid ${C.ink}`, borderRadius: 18, padding: "8px 12px" }}>{m.emoji}</span>
+            {/* 3Dルックの看板アイコン。白地の角丸わくに収めて絵柄を活かす（既存レイアウト流用） */}
+            <span style={{ background: "#fff", border: `3px solid ${C.ink}`, borderRadius: 18, padding: 6, lineHeight: 0 }}>
+              <img src={MODE_ICON[m.key]} alt={m.name} draggable="false" style={{ width: 54, height: 54, display: "block" }} />
+            </span>
             <span style={{ flex: 1 }}>
               <span className="pl-display" style={{ fontSize: 22, display: "block" }}>{m.name}</span>
               <span style={{ fontWeight: 700, fontSize: 14 }}>{m.desc}</span>

@@ -9,6 +9,7 @@ import { parseStage, countBlocks, DX, DY, MAX_BLOCKS } from "../engine.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
+import robotUrl from "../assets/robot.png";
 import worldmapDay from "../assets/worldmap.webp";
 import worldmapSunset from "../assets/worldmap-sunset.webp";
 import worldmapNight from "../assets/worldmap-night.webp";
@@ -198,11 +199,15 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
             display: "flex", alignItems: "center", justifyContent: "center",
             transition: "left .3s, top .3s", zIndex: 5,
           }}>
-            <span style={{ fontSize: cell * 0.6, position: "relative" }}>
-              🤖
+            <span style={{ position: "relative", display: "inline-flex" }}>
+              {/* ロボットは正面固定。向きは まわりの ▶矢印で しめす（robot.pngはドット絵＝pixelated） */}
+              <img src={robotUrl} alt="ロボット" draggable="false" style={{
+                width: cell * 0.78, height: cell * 0.78, display: "block",
+                imageRendering: "pixelated",
+              }} />
               <span style={{
                 position: "absolute", top: "50%", left: "50%", fontSize: cell * 0.3, color: C.sakura,
-                transform: `translate(-50%,-50%) rotate(${bot.dir * 90}deg) translateX(${cell * 0.42}px)`,
+                transform: `translate(-50%,-50%) rotate(${bot.dir * 90}deg) translateX(${cell * 0.5}px)`,
               }}>▶</span>
             </span>
           </div>

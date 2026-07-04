@@ -6,6 +6,7 @@ import { ART_COLORS, ART_CMDS, ART_CHALLENGES } from "../data/art.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
+import turtleUrl from "../assets/turtle.png";
 
 function turtleSegs(cmds) {
   let x = 160, y = 215, ang = -90, ci = 0;
@@ -35,8 +36,26 @@ function ArtSVG({ cmds, size = 320, reveal = Infinity, showTurtle = true }) {
       {shown.map((s, i) => (
         <line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke={s.c} strokeWidth="7" strokeLinecap="round" />
       ))}
-      {showTurtle && <text x={tx} y={ty + 8} fontSize="26" textAnchor="middle">🐢</text>}
+      {showTurtle && <TurtleSprite cur={cur} tx={tx} ty={ty} />}
     </svg>
+  );
+}
+
+/* カメ（右向きドット絵）。進む向きに合わせて 左右はミラー・上下は回転（指示書どおり簡易表現） */
+function TurtleSprite({ cur, tx, ty }) {
+  const deg = cur
+    ? Math.round(Math.atan2(cur.y2 - cur.y1, cur.x2 - cur.x1) * 180 / Math.PI / 90) * 90
+    : -90; // まだ描いていない=初期は うえむき
+  const a = ((deg % 360) + 360) % 360; // 0=右 90=下 180=左 270=上
+  const half = 18;
+  let tf = "";
+  if (a === 180) tf = `translate(${tx} ${ty}) scale(-1 1) translate(${-tx} ${-ty})`; // 左は反転で 逆さにしない
+  else if (a !== 0) tf = `rotate(${a} ${tx} ${ty})`;
+  return (
+    <g transform={tf}>
+      <image href={turtleUrl} x={tx - half} y={ty - half} width={half * 2} height={half * 2}
+        style={{ imageRendering: "pixelated" }} />
+    </g>
   );
 }
 
