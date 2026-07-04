@@ -8,7 +8,8 @@
 
 ### 今どこか
 
-- **フェーズ: P2完了＋追補（島マップ1枚絵化 v2.0-P2.2）公開済み。ユーザーのタブレット実機確認（拠点位置）待ち。次は P3（クイズ200問）。**
+- **フェーズ: P2完了＋追補2（難易度別マップ背景 v2.0-P2.3）公開済み。ユーザーのタブレット実機確認待ち。次は P3（クイズ200問）。**
+- P2.3: マップ背景を難易度で切替（やさしい=昼 worldmap.webp／ふつう=夕 worldmap-sunset.webp／むずかしい=夜 worldmap-night.webp）。3枚は同一構図のため ISLAND_POS は共通。切替は `Puzzle.jsx` の `MAP_BG` 定数。
 - P2.2: worldmap-指示.md に従い、島マップを1枚絵ワールド（worldmap.webp・16:9・％座標）に刷新。拠点座標は `Puzzle.jsx` の `ISLAND_POS` 定数1箇所に集約。ブラウザ照合で6拠点を絵の丸い空き地の中心に配置済み（開始値の②③は上下逆と判断し道順どおりに再割当・コメント記録あり）。
 - 公開URL: **https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land)
 - 2026-07-04: P0 → P1（相棒・3Dルック9体承認済み）→ P2 まで同日完了。
@@ -29,6 +30,7 @@
 |---|---|
 | `progland-実装指示書.md` | **指示書の正本（第2版・2026-07-04改訂）**。第1版はgit履歴。承認なしに編集しない |
 | `worldmap-指示.md` | P2追補: 島マップ1枚絵化の指示（親: 実装指示書） |
+| `worldmap-難易度別-指示.md` | P2追補2: 難易度別マップ背景（昼/夕/夜）の指示 |
 | `project-charter.md` | 設計書: 案件憲章（Chat側作成） |
 | `education-curriculum.md` | 設計書: 学習カリキュラム設計（Chat側作成） |
 | `roadmap.md` | 設計書: ロードマップ（Chat側作成） |

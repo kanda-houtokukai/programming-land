@@ -9,7 +9,12 @@ import { parseStage, countBlocks, DX, DY, MAX_BLOCKS } from "../engine.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
-import worldmapUrl from "../assets/worldmap.webp";
+import worldmapDay from "../assets/worldmap.webp";
+import worldmapSunset from "../assets/worldmap-sunset.webp";
+import worldmapNight from "../assets/worldmap-night.webp";
+
+// 難易度別のマップ背景（同一構図・時間帯違い。拠点座標 ISLAND_POS は3枚共通）
+const MAP_BG = { easy: worldmapDay, normal: worldmapSunset, hard: worldmapNight };
 
 function BlockChip({ b, activeUid, onRemove, onSelect, openRepeat, onCount }) {
   const d = BLOCK_DEFS[b.type];
@@ -283,7 +288,7 @@ function IslandMap({ save, diff, onEnter }) {
     <div style={{ margin: "14px 16px", position: "relative", aspectRatio: "16 / 9",
       border: `3px solid ${C.ink}`, borderRadius: 22, boxShadow: "5px 5px 0 rgba(58,51,53,.9)",
       overflow: "hidden", background: "#7FC8F8" }}>
-      <img src={worldmapUrl} alt="ワールドマップ" draggable="false"
+      <img src={MAP_BG[diff] || worldmapDay} alt="ワールドマップ" draggable="false"
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
       {/* みち: 解放済み区間は明るく、未解放区間は暗く */}
       <svg viewBox="0 0 100 56.25" preserveAspectRatio="none"
