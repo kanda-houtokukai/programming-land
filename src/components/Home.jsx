@@ -20,6 +20,7 @@ export default function Home({ save, go, onSound, onSwitchProfile }) {
     { key: "puzzle", emoji: "🤖", name: "ロボット パズル", desc: "ブロックで ロボットを うごかそう", color: C.leaf, sub: `⭐ ${stars} / ${TOTAL_STARS}` },
     { key: "quiz", emoji: "💡", name: "かんがえる クイズ", desc: "プログラミングの あたまで こたえよう", color: C.sky, sub: `${quizDone} / ${quizTotal} セット` },
     { key: "art", emoji: "🎨", name: "おえかき コード", desc: "めいれいで えを かこう", color: C.sakura, sub: `さくひん ${save.art.gallery.length} こ` },
+    { key: "typing", emoji: "⌨️", name: "タイピング", desc: "キーボードで もじを うとう", color: C.grape, sub: save.typing.best.kotoba ? `ベスト ${save.typing.best.kotoba.kpm}もじ/ぷん` : "はじめて" },
   ];
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
@@ -33,10 +34,14 @@ export default function Home({ save, go, onSound, onSwitchProfile }) {
         {modes.map((m, i) => (
           <button key={m.key} className="pbtn slide" onClick={() => go(m.key)}
             style={{ background: "#fff", textAlign: "left", padding: 18, display: "flex", gap: 16, alignItems: "center", animationDelay: `${i * 0.06}s` }}>
-            {/* 3Dルックの看板アイコン。白地の角丸わくに収めて絵柄を活かす（既存レイアウト流用） */}
-            <span style={{ background: "#fff", border: `3px solid ${C.ink}`, borderRadius: 18, padding: 6, lineHeight: 0 }}>
-              <img src={MODE_ICON[m.key]} alt={m.name} draggable="false" style={{ width: 54, height: 54, display: "block" }} />
-            </span>
+            {/* 3Dルックの看板アイコン（画像がないモードは絵文字のまま） */}
+            {MODE_ICON[m.key] ? (
+              <span style={{ background: "#fff", border: `3px solid ${C.ink}`, borderRadius: 18, padding: 6, lineHeight: 0 }}>
+                <img src={MODE_ICON[m.key]} alt={m.name} draggable="false" style={{ width: 54, height: 54, display: "block" }} />
+              </span>
+            ) : (
+              <span style={{ fontSize: 46, background: m.color, border: `3px solid ${C.ink}`, borderRadius: 18, padding: "8px 12px" }}>{m.emoji}</span>
+            )}
             <span style={{ flex: 1 }}>
               <span className="pl-display" style={{ fontSize: 22, display: "block" }}>{m.name}</span>
               <span style={{ fontWeight: 700, fontSize: 14 }}>{m.desc}</span>

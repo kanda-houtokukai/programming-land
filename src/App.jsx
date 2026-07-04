@@ -14,6 +14,7 @@ import Home from "./components/Home.jsx";
 import Puzzle from "./components/Puzzle.jsx";
 import Quiz from "./components/Quiz.jsx";
 import Art from "./components/Art.jsx";
+import Typing from "./components/Typing.jsx";
 import Records from "./components/Records.jsx";
 import PartnerSelect from "./components/PartnerSelect.jsx";
 import Dex from "./components/Dex.jsx";
@@ -125,6 +126,7 @@ export default function App() {
       {save && screen === "puzzle" && <Puzzle save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "quiz" && <Quiz save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "art" && <Art save={save} update={update} go={setScreen} onSound={onSound} />}
+      {save && screen === "typing" && <Typing save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "records" && (
         <Records save={save} go={setScreen} onSound={onSound}
           onExport={handleExport} onImportFile={handleImportFile}
