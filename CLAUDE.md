@@ -16,7 +16,9 @@
 
 ## このリポジトリ固有の注意
 
-- デプロイ方法: git push → GitHub Actions → GitHub Pages（アカウント kanda-houtokukai）。push後1〜2分で反映、確認はシークレットウィンドウ＋アプリ内バージョン表示で行う。サーバ・DB・外部アカウント・課金は作らない。
+- デプロイ方法: `npm run deploy`（verify→build→docs/コピー→commit→push。mainの docs/ から GitHub Pages 配信、アカウント kanda-houtokukai）。push後1〜2分で反映、確認はシークレットウィンドウ＋アプリ内バージョン表示で行う。サーバ・DB・外部アカウント・課金は作らない。
+- 公開URL: https://kanda-houtokukai.github.io/programming-land/
+- ⚠️ GitHub Actions のワークフローファイルは push できない（保存済みトークンに workflow 権限がない）。CI化したくなったらまずトークンの権限を確認すること。
 - 触ってはいけない場所: `progland-実装指示書.md` は正本の指示書（第2版）。承認なしに編集しない。`programming-land.jsx`（v1・動作確認済み）は移植元の参照専用。編集しない。
 - dev サーバ稼働中に `npm run build` を実行しない（ビルド破損の既知事故と同型。dev停止→build）。
 - ステージ・クイズ・タイピング課題はデータファイルに分離。本体コードに問題をハードコードしない。
