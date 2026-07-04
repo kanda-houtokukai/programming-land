@@ -131,7 +131,7 @@ export default function App() {
       {save && screen === "art" && <Art save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "typing" && <Typing save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "records" && (
-        <Records save={save} go={setScreen} onSound={onSound}
+        <Records save={save} profiles={profiles} go={setScreen} onSound={onSound}
           onExport={handleExport} onImportFile={handleImportFile}
           onDeleteRequest={() => setConfirmDelete(true)}
           unlockAll={unlockAll} setUnlockAll={setUnlockAll} />

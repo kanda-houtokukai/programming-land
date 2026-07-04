@@ -4,7 +4,8 @@ import { C } from "../theme.js";
 import { Btn, Header } from "./common.jsx";
 import { STAGES } from "../data/stages.js";
 import { QUIZ_CATEGORIES, QUIZ_DIFFS, SESSION_SIZE } from "../data/quizzes.js";
-import { BADGES, puzzleStarsTotal, daysPlayed } from "../data/badges.js";
+import { DIFFICULTIES } from "../data/islands.js";
+import { BADGES, puzzleStarsTotal, daysPlayed, clearedInDiff, star3InDiff } from "../data/badges.js";
 import { lastNDays } from "../storage.js";
 import { APP_VERSION, BUILD_DATE } from "../version.js";
 import PartnerCard from "./PartnerCard.jsx";
@@ -29,7 +30,17 @@ function skillProgress(save) {
   ];
 }
 
-export default function Records({ save, go, onSound, onExport, onImportFile, onDeleteRequest, unlockAll, setUnlockAll }) {
+// 難易度別の到達度（各難易度=全54面）。クリア面数・★3面数・獲得スター率
+function diffBreakdown(save) {
+  return DIFFICULTIES.map(d => {
+    const total = STAGES.filter(s => s.difficulty === d.id).length;
+    const cleared = clearedInDiff(save, d.id);
+    const star3 = star3InDiff(save, d.id);
+    return { id: d.id, label: d.short, total, cleared, star3, pct: Math.round(100 * cleared / total) };
+  });
+}
+
+export default function Records({ save, profiles = [], go, onSound, onExport, onImportFile, onDeleteRequest, unlockAll, setUnlockAll }) {
   const [tab, setTab] = useState("kid");
   const [gate, setGate] = useState(false);
   const [ans, setAns] = useState("");
@@ -41,6 +52,7 @@ export default function Records({ save, go, onSound, onExport, onImportFile, onD
     const l = save.log[d]; return l ? (l.puzzle || 0) + (l.quiz || 0) + (l.art || 0) : 0;
   });
   const maxC = Math.max(1, ...counts);
+  const diffs = diffBreakdown(save);
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 40 }}>
       <Header save={save} title="📖 きろくの へや" onHome={() => go("home")} onSound={onSound} />
@@ -115,6 +127,26 @@ export default function Records({ save, go, onSound, onExport, onImportFile, onD
               </div>
             ))}
           </div>
+
+          {/* 難易度別の到達度（やさしい/ふつう/むずかしい） */}
+          <div className="panel" style={{ padding: 18 }}>
+            <div style={{ fontWeight: 900, fontSize: 18, marginBottom: 6 }}>難易度べつの ようす</div>
+            <p style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px" }}>
+              パズルは同じ「順次・反復・分岐」を3つの難しさで用意しています。まずは「やさしい」で成功体験を、慣れたら少しずつ上へ——という順で大丈夫です。
+            </p>
+            {diffs.map(d => (
+              <div key={d.id} style={{ marginBottom: 12 }}>
+                <div style={{ fontWeight: 900, fontSize: 14 }}>
+                  ⭐{"⭐".repeat(DIFFICULTIES.findIndex(x => x.id === d.id))} {d.label}
+                  <span style={{ float: "right" }}>{d.cleared}/{d.total}面（★3が {d.star3}面）</span>
+                </div>
+                <div style={{ height: 12, border: `2px solid ${C.ink}`, borderRadius: 999, overflow: "hidden", background: "#fff", marginTop: 4 }}>
+                  <div style={{ width: `${d.pct}%`, height: "100%", background: d.id === "easy" ? C.leaf : d.id === "normal" ? C.sky : C.grape }} />
+                </div>
+              </div>
+            ))}
+          </div>
+
           <div className="panel" style={{ padding: 18 }}>
             <div style={{ fontWeight: 900, fontSize: 18, marginBottom: 8 }}>直近14日の取り組み</div>
             <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 110 }}>
@@ -131,6 +163,34 @@ export default function Records({ save, go, onSound, onExport, onImportFile, onD
             </div>
             <div style={{ fontSize: 12, fontWeight: 700, marginTop: 6 }}>棒の高さ＝その日の活動回数（パズルクリア・クイズ・作品保存の合計）</div>
           </div>
+
+          {/* プロファイル別（お子さんが複数いる場合。それぞれの進み具合） */}
+          {profiles.length > 1 && (
+            <div className="panel" style={{ padding: 18 }}>
+              <div style={{ fontWeight: 900, fontSize: 18, marginBottom: 6 }}>お子さんべつの ようす</div>
+              <p style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px" }}>
+                このタブレットで あそんでいる お子さんごとの進み具合です。比べるためではなく、それぞれのペースを見守る目安にしてください。
+              </p>
+              <div style={{ display: "grid", gap: 8 }}>
+                {profiles.map(p => {
+                  const isMe = p.id === save.id;
+                  const cleared = STAGES.filter(s => (p.puzzle.stars[s.id] || 0) > 0).length;
+                  return (
+                    <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px",
+                      border: `2px solid ${C.ink}`, borderRadius: 12, background: isMe ? "#FFF7E6" : "#fff" }}>
+                      <span style={{ fontSize: 26 }}>{p.avatar}</span>
+                      <span style={{ flex: 1, fontWeight: 900, fontSize: 14 }}>{p.name}{isMe && <span style={{ fontSize: 11, color: "#6B6265" }}>（いま えらんでいる子）</span>}</span>
+                      <span style={{ fontWeight: 800, fontSize: 12, textAlign: "right", lineHeight: 1.5 }}>
+                        パズル {cleared}面 ・ ⭐{puzzleStarsTotal(p)}<br />
+                        🏅{p.badges.length} ・ 🔥{daysPlayed(p)}日
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="panel" style={{ padding: 18 }}>
             <div style={{ fontWeight: 900, fontSize: 16, marginBottom: 6 }}>データの管理（{save.name} さんの記録）</div>
             <p style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px" }}>
