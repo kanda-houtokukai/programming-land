@@ -20,32 +20,43 @@ import worldmapNight from "../assets/worldmap-night.webp";
 // 難易度別のマップ背景（同一構図・時間帯違い。拠点座標 ISLAND_POS は3枚共通）
 const MAP_BG = { easy: worldmapDay, normal: worldmapSunset, hard: worldmapNight };
 
-// 最短解の さいしょの n手 を ことばで（救済ヒント用）。repeatは「🔁くりかえし」とまとめる
-function describeFirstSteps(sol, n) {
-  if (!sol || !sol.length) return "";
-  const parts = [];
-  for (const b of sol) {
-    if (parts.length >= n) break;
-    if (b.type === "repeat") parts.push("🔁くりかえし");
-    else parts.push(BLOCK_DEFS[b.type] ? `${BLOCK_DEFS[b.type].emoji}${BLOCK_DEFS[b.type].label}` : b.type);
+/* 救済ヒント＝「その面の こたえ（最短解 sol）」の段階開示。
+   💡ヒント（自分で押す・島の一般論）とは役割を分け、一般論は絶対に出さない。
+   1手 = 上位ブロック1つ。くりかえしは「🔁3かい［⬆️まえへ→↪️みぎをむく］」の形で1手として見せる */
+function stepLabel(b, maskCount = false) {
+  if (b.type === "repeat") {
+    const inner = b.children.map(c => `${BLOCK_DEFS[c.type].emoji}${BLOCK_DEFS[c.type].label}`).join("→");
+    return `🔁${maskCount ? "なんかいか" : `${b.count}かい`}［${inner}］`;
   }
-  return parts.join(" → ");
+  return `${BLOCK_DEFS[b.type].emoji}${BLOCK_DEFS[b.type].label}`;
 }
 
-// 失敗回数に応じた救済ヒント（段階的に手厚く）。方式: Code裁量
-function rescueFor(failCount, stage, island, hasNext) {
+// 失敗回数に応じて 開示する手数を増やす（考える余地を残す段階開示）
+function rescueFor(failCount, stage, hasNext) {
+  const sol = stage.sol;
+  if (failCount < 2 || !sol || !sol.length) return null;
   if (failCount >= 4) {
-    const usesRepeat = (stage.sol || []).some(b => b.type === "repeat");
     return {
       strong: true,
-      text: `おたすけ：さいしょは 「${describeFirstSteps(stage.sol, 2)}」から やってみよう。${usesRepeat ? "🔁くりかえしを つかうと みじかく できるよ。" : ""}`,
+      text: `こたえの てじゅん：${sol.map(b => stepLabel(b)).join(" → ")}`,
       sub: hasNext ? "むずかしかったら、つぎの ステージに すすんでも いいよ！あとで もどってこれるよ。" : null,
     };
   }
-  if (failCount >= 2) {
-    return { strong: false, text: `💪 ${island.hint}`, sub: null };
+  if (failCount === 3) {
+    const n = Math.max(1, Math.ceil(sol.length / 2));
+    return {
+      strong: false,
+      text: `おたすけ：とちゅうまで みせるね。${sol.slice(0, n).map(b => stepLabel(b)).join(" → ")} …つづきは かんがえてみよう！`,
+      sub: null,
+    };
   }
-  return null;
+  // failCount === 2: さいしょの1〜2手だけ。1手目がくりかえしなら 回数は かくして 考える余地を残す
+  const n = sol.length <= 2 ? 1 : 2;
+  return {
+    strong: false,
+    text: `おたすけ：さいしょは ${sol.slice(0, n).map(b => stepLabel(b, true)).join(" → ")} から はじめてみよう。`,
+    sub: null,
+  };
 }
 
 function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
@@ -229,11 +240,11 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
 
       {/* 救済ヒント: 何回か失敗したら 自動で 手厚いヒントが でる（同じ面で 何度も つまずく前に助ける） */}
       {(() => {
-        const r = rescueFor(failCount, stage, island, hasNext);
+        const r = rescueFor(failCount, stage, hasNext);
         if (!r) return null;
         return (
-          <div className="panel slide" style={{ padding: 12, marginTop: 10, background: r.strong ? "#FFF3D6" : "#EAF7FF", fontWeight: 800, fontSize: 14 }}>
-            <div>{r.strong ? "🆘 " : ""}{r.text}</div>
+          <div className="panel slide" style={{ padding: 12, marginTop: 10, background: r.strong ? "#FFF3D6" : "#FFF9E0", fontWeight: 800, fontSize: 14 }}>
+            <div>{r.strong ? "🆘 " : "💪 "}{r.text}</div>
             {r.sub && <div style={{ fontWeight: 700, fontSize: 12, color: "#6B6265", marginTop: 6 }}>{r.sub}</div>}
           </div>
         );
