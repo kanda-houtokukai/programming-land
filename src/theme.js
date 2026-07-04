@@ -46,8 +46,13 @@ export const CSS = `
   .shake { animation: pl-shake .3s ease 2; }
   .bounce { animation: pl-bounce 1.2s ease infinite; }
   .slide { animation: pl-slide .3s ease; }
+  @keyframes pl-glow {
+    0%,100% { box-shadow: 0 0 0 3px #fff, 0 0 12px 5px rgba(255,212,71,.95); }
+    50% { box-shadow: 0 0 0 3px #fff, 0 0 20px 9px rgba(255,212,71,.45); }
+  }
+  .glow { box-shadow: 0 0 0 3px #fff, 0 0 12px 5px rgba(255,212,71,.9); animation: pl-glow 1.6s ease infinite; }
   @media (prefers-reduced-motion: reduce) {
-    .pop,.shake,.bounce,.slide { animation: none; }
+    .pop,.shake,.bounce,.slide,.glow { animation: none; }
     .pbtn { transition: none; }
   }
 `;

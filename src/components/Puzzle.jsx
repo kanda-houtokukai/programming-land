@@ -9,6 +9,7 @@ import { parseStage, countBlocks, DX, DY, MAX_BLOCKS } from "../engine.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
 import { XP, applyXp } from "../growth.js";
+import worldmapUrl from "../assets/worldmap.webp";
 
 function BlockChip({ b, activeUid, onRemove, onSelect, openRepeat, onCount }) {
   const d = BLOCK_DEFS[b.type];
@@ -258,53 +259,81 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   );
 }
 
-/* 島マップ。クリアで つぎの島への みちが ひらく */
+/* 1枚絵ワールドマップ。クリアで つぎの拠点への みちが ともる（worldmap-指示.md 準拠） */
+// 拠点の座標（背景画像に対する％）。実機で微調整する時はここだけ触る
+// 2026-07-04 実装時にブラウザで背景と照合して補正:
+//   絵の丸い空き地は道順に (14.4,77.5)→(28,65.5)→(32.8,49.5)→(58.6,40)→(75.3,45.3)→(78,26)。
+//   開始値の②③は上下が逆で、③(36,60)は水辺に乗るため、道順どおり②=下・③=上に割り当て直した
+const ISLAND_POS = {
+  1: { left: 14.4, top: 77.5 },
+  2: { left: 28, top: 65.5 },
+  3: { left: 34, top: 47.5 },
+  4: { left: 58.7, top: 39.5 },
+  5: { left: 76, top: 44.8 },
+  6: { left: 79, top: 25.5 },
+};
+
 function IslandMap({ save, diff, onEnter }) {
   const clearedIn = i => stagesFor(i, diff).filter(s => (save.puzzle.stars[s.id] || 0) > 0).length;
+  const starsIn = i => stagesFor(i, diff).reduce((a, s) => a + (save.puzzle.stars[s.id] || 0), 0);
   const unlocked = i => i === 1 || clearedIn(i - 1) >= 3;
-  const ROW = 108, TOP = 62;
-  const pos = i => ({ x: i % 2 === 1 ? 27 : 73, y: TOP + (i - 1) * ROW });
-  const H = TOP + 5 * ROW + 66;
+  // SVGは％座標をそのまま使う（viewBox 100×56.25 = 16:9）
+  const P = i => ({ x: ISLAND_POS[i].left, y: ISLAND_POS[i].top * 0.5625 });
   return (
-    <div className="panel slide" style={{ margin: "14px 16px", padding: "8px 0", background: "#F3FAFF", position: "relative", height: H, overflow: "hidden" }}>
-      <svg width="100%" height={H} viewBox={`0 0 100 ${H}`} preserveAspectRatio="none"
-        style={{ position: "absolute", inset: 0 }}>
+    <div style={{ margin: "14px 16px", position: "relative", aspectRatio: "16 / 9",
+      border: `3px solid ${C.ink}`, borderRadius: 22, boxShadow: "5px 5px 0 rgba(58,51,53,.9)",
+      overflow: "hidden", background: "#7FC8F8" }}>
+      <img src={worldmapUrl} alt="ワールドマップ" draggable="false"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      {/* みち: 解放済み区間は明るく、未解放区間は暗く */}
+      <svg viewBox="0 0 100 56.25" preserveAspectRatio="none"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
         {[1, 2, 3, 4, 5].map(i => {
-          const a = pos(i), b = pos(i + 1);
+          const a = P(i), b = P(i + 1);
           const open = unlocked(i + 1);
+          const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2 - 3;
           return (
-            <path key={i}
-              d={`M ${a.x} ${a.y} C ${a.x} ${a.y + ROW * 0.6}, ${b.x} ${b.y - ROW * 0.6}, ${b.x} ${b.y}`}
+            <path key={i} d={`M ${a.x} ${a.y} Q ${mx} ${my} ${b.x} ${b.y}`}
               fill="none"
-              stroke={open ? ISLANDS[i + 1].color : "#D8D2C6"}
-              strokeWidth={open ? 3.4 : 2.2}
-              strokeDasharray={open ? "none" : "1.6 3"}
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke" />
+              stroke={open ? "rgba(255,236,160,.95)" : "rgba(40,34,36,.38)"}
+              strokeWidth={open ? 1.1 : 0.8}
+              strokeDasharray={open ? "0.3 1.7" : "0.2 1.9"}
+              strokeLinecap="round" />
           );
         })}
       </svg>
       {[1, 2, 3, 4, 5, 6].map(i => {
-        const p = pos(i);
         const un = unlocked(i);
         const cleared = clearedIn(i);
         const total = stagesFor(i, diff).length;
-        const done = cleared === total;
+        const done = un && cleared === total;
+        const glowing = un && !done;
         return (
-          <button key={i} className="pbtn" disabled={!un} onClick={() => onEnter(i)}
+          <button key={i} disabled={!un} onClick={() => onEnter(i)}
+            className={glowing ? "glow" : ""}
+            aria-label={ISLANDS[i].name}
             style={{
-              position: "absolute", left: `${p.x}%`, top: p.y, transform: "translate(-50%,-50%)",
-              width: 148, padding: "10px 6px", borderRadius: 18, textAlign: "center",
-              background: un ? "#fff" : "#EFEAE0",
-            }}>
-            <span style={{
-              fontSize: 34, display: "inline-block", background: un ? ISLANDS[i].color : "#CFC8BA",
-              border: `3px solid ${C.ink}`, borderRadius: 999, width: 56, height: 56, lineHeight: "50px",
+              position: "absolute", left: `${ISLAND_POS[i].left}%`, top: `${ISLAND_POS[i].top}%`,
+              transform: "translate(-50%,-50%)",
+              width: "11%", aspectRatio: "1", borderRadius: "50%",
+              border: `3px solid ${C.ink}`, cursor: un ? "pointer" : "not-allowed",
+              background: un ? "rgba(255,253,245,.92)" : "rgba(210,204,192,.72)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "clamp(16px, 4.6vw, 30px)", padding: 0,
               filter: un ? "none" : "grayscale(1)",
-            }}>{un ? ISLANDS[i].emoji : "🔒"}</span>
-            <span style={{ display: "block", fontWeight: 900, fontSize: 13, marginTop: 4 }}>{ISLANDS[i].name}</span>
-            <span style={{ display: "block", fontWeight: 800, fontSize: 11, opacity: .75 }}>
-              {un ? (done ? "🏆 ぜんぶクリア！" : `✅ ${cleared} / ${total}`) : `まえの しまを 3つ クリア`}
+            }}>
+            {un ? ISLANDS[i].emoji : "🔒"}
+            {done && <span style={{ position: "absolute", top: "-12%", right: "-12%", fontSize: "clamp(11px,2.6vw,16px)" }}>✅</span>}
+            {/* 島名ラベル */}
+            <span style={{
+              position: "absolute", top: "104%", left: "50%", transform: "translateX(-50%)",
+              whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(8px, 1.9vw, 12px)",
+              background: "rgba(255,255,255,.92)", border: `2px solid ${C.ink}`, borderRadius: 999,
+              padding: "1px 7px", color: C.ink, lineHeight: 1.5,
+            }}>
+              {un
+                ? `${ISLANDS[i].name.replace("の しま", "")}${done ? ` ⭐${starsIn(i)}` : ` ${cleared}/${total}`}`
+                : ISLANDS[i].name.replace("の しま", "")}
             </span>
           </button>
         );
