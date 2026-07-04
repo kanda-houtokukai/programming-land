@@ -65,6 +65,19 @@ export function checkQuestion(q) {
   }
   if (errs.length) return errs;
 
+  // 【全問共通】くりかえしの「中身」に回数表記を書いてはいけない。
+  // 外側の「Nかい くりかえす」と二重になり、図から答えが一意に読めなくなるため。
+  // 中身は1回分の動作だけを書き、複数回やらせたいなら動作の行/要素を並べる。
+  const countRe = /（[^）]*かい[^）]*）|[0-9０-９]+\s*かい/;
+  for (const line of q.q.split("\n")) {
+    if (/^\s*[│|]/.test(line) && countRe.test(line)) { // フローチャートのループ本体行
+      errs.push(`くりかえしの中身に回数表記あり: 「${line.trim()}」`);
+    }
+  }
+  const bracket = q.q.match(/くりかえし［([^］]*)］/); // ロボットのインライン表記
+  if (bracket && countRe.test(bracket[1])) errs.push(`くりかえし［…］の中に回数表記あり: 「${bracket[1]}」`);
+  if (errs.length) return errs;
+
   const m = q.meta;
   if (!m) return errs; // 書き起こし問題（人手レビュー・構造チェックのみ）
 

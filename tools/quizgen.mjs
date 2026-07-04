@@ -150,8 +150,10 @@ function genRobot(diff, idx) {
         const total = n * k;
         const o = options(`${total}マス`, [`${n + k}マス`, `${total + k}マス`]);
         if (new Set(o.opts).size !== 3) continue;
-        q = { q: `「🔁${n}かい くりかえし［まえへを ${k}かい］」。ぜんぶで なんマス すすむ？`,
-          opts: o.opts, a: o.a, why: `${k}マス×${n}かい＝${total}マス。かけ算と おなじだね`,
+        // くりかえしの中身は「まえへ」を k個ならべる（回数表記を中に書かない）
+        const body = Array(k).fill("まえへ").join("・");
+        q = { q: `「🔁${n}かい くりかえし［${body}］」。ぜんぶで なんマス すすむ？`,
+          opts: o.opts, a: o.a, why: `1かいで ${k}マス。${n}かい くりかえすと ${total}マスだね`,
           meta: { kind: "robot-steps", repeat: n, body: k } };
       } else if (idx % 3 === 1) { // 回転のくりかえし
         const start = ri(4), n = 2 + ri(3), side = pick(["right", "left"]);
@@ -244,9 +246,11 @@ function genYomitori(diff, idx) {
       const total = count * per;
       const o = options(`${total}かい`, [`${count + per}かい`, `${total + count}かい`]);
       if (new Set(o.opts).size !== 3) continue;
-      const inner = per === 1 ? act.text : `${act.text}（${per}かい）`;
-      q = { q: `フローチャートを よもう。\n\nはじめ\n ↓\n🔁 ${count}かい くりかえす\n │ ${inner}\n ↓\nおわり\n\n${act.noun}は ぜんぶで なんかい？`,
-        opts: o.opts, a: o.a, why: `${per}かい×${count}しゅう＝${total}かいだね`,
+      // くりかえしの中身は「1回分の動作」だけ。per回やらせたいなら 動作の行を per回ならべる
+      const bodyLines = Array(per).fill(` │ ${act.text}`).join("\n");
+      const whyBody = per === 1 ? `${count}かい くりかえすと ${total}かい` : `1しゅうで ${per}かい。${count}しゅうで ${total}かい`;
+      q = { q: `フローチャートを よもう。\n\nはじめ\n ↓\n🔁 ${count}かい くりかえす\n${bodyLines}\n ↓\nおわり\n\n${act.noun}は ぜんぶで なんかい？`,
+        opts: o.opts, a: o.a, why: `${whyBody}だね`,
         meta: { kind: "yomitori-loop", count, per } };
     }
     if (!q) continue;
