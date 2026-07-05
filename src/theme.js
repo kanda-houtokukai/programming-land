@@ -38,6 +38,9 @@ export const CSS = `
     font-family: inherit; font-weight: 800; color: ${C.ink};
   }
   .pbtn:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 rgba(58,51,53,.9); }
+  /* ワールドマップの台紙なしアイコン: 押すと少し縮む（centeringのtranslateを保つため!important） */
+  .mapicon { transition: transform .08s; }
+  .mapicon:active { transform: translate(-50%,-50%) scale(.9) !important; }
   .pbtn:focus-visible { outline: 4px solid ${C.sakura}; outline-offset: 2px; }
   .pbtn:disabled { opacity: .4; cursor: not-allowed; }
   @keyframes pl-pop { 0%{transform:scale(0)} 70%{transform:scale(1.2)} 100%{transform:scale(1)} }

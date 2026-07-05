@@ -54,24 +54,27 @@ export default function WorldMap({ save, go, onSound }) {
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
         {AREAS.map(a => {
           const locked = areaLocked(a);
+          // 台紙なし＝透過イラストを島に直接置く。ボタン自体が四角い透明タップ範囲
+          // （イラスト周囲の透明部分もタップ可能）。接地影で風景に馴染ませる。
           return (
-            <button key={a.key} onClick={() => { SFX.tap(sound); setPopup(a.key); }}
+            <button key={a.key} className="mapicon" onClick={() => { SFX.tap(sound); setPopup(a.key); }}
               aria-label={a.full}
               style={{ position: "absolute", left: `${a.left}%`, top: `${a.top}%`,
-                transform: "translate(-50%,-50%)", width: "10.5%", aspectRatio: "1",
-                borderRadius: "50%", border: `3px solid ${C.ink}`, cursor: "pointer", padding: 0,
-                background: locked ? "rgba(210,204,192,.85)" : "rgba(255,253,245,.94)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                filter: locked ? "grayscale(1)" : "none" }}>
+                transform: "translate(-50%,-50%)", width: "15%", aspectRatio: "1",
+                border: "none", background: "transparent", cursor: "pointer", padding: 0,
+                display: "flex", alignItems: "center", justifyContent: "center" }}>
               {a.img
-                ? <img src={a.img} alt="" draggable="false" style={{ width: "76%", height: "76%", objectFit: "contain", display: "block", opacity: locked ? 0.55 : 1 }} />
-                : <span style={{ fontSize: "clamp(15px,4.4vw,29px)", lineHeight: 1 }}>{a.emoji}</span>}
-              {locked && <span style={{ position: "absolute", top: "-14%", right: "-14%", fontSize: "clamp(11px,2.6vw,17px)" }}>🔒</span>}
-              {/* 短い名前（フル名前はポップアップで） */}
-              <span style={{ position: "absolute", top: "102%", left: "50%", transform: "translateX(-50%)",
-                whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(7px,1.8vw,11px)",
-                background: "rgba(255,255,255,.92)", border: `2px solid ${C.ink}`, borderRadius: 999,
-                padding: "0 6px", color: C.ink, lineHeight: 1.6 }}>{a.short}</span>
+                ? <img src={a.img} alt="" draggable="false"
+                    style={{ width: "88%", height: "88%", objectFit: "contain", display: "block",
+                      filter: locked ? "grayscale(1) brightness(.75) drop-shadow(1px 3px 2px rgba(20,15,25,.45))" : "drop-shadow(1px 3px 2px rgba(20,15,25,.45))",
+                      opacity: locked ? 0.7 : 1 }} />
+                : <span style={{ fontSize: "clamp(24px,7vw,46px)", lineHeight: 1,
+                    filter: "drop-shadow(1px 3px 2px rgba(20,15,25,.45))" }}>{a.emoji}</span>}
+              {locked && <span style={{ position: "absolute", top: "2%", right: "8%", fontSize: "clamp(13px,3.2vw,22px)" }}>🔒</span>}
+              {/* 短い名前: 下地チップなし・白フチ文字で どの背景でも読める */}
+              <span style={{ position: "absolute", top: "86%", left: "50%", transform: "translateX(-50%)",
+                whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(9px,2.2vw,13px)", color: C.ink,
+                textShadow: "0 0 3px #fff,1.5px 1.5px 0 #fff,-1.5px 1.5px 0 #fff,1.5px -1.5px 0 #fff,-1.5px -1.5px 0 #fff,0 2px 3px rgba(0,0,0,.3)" }}>{a.short}</span>
             </button>
           );
         })}
