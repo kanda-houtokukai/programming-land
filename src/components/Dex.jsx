@@ -49,9 +49,11 @@ export default function Dex({ save, go, onSound }) {
             {BADGES.map(b => {
               const got = save.badges.includes(b.id);
               return (
-                <div key={b.id} className="panel" style={{ padding: 8, borderRadius: 14, textAlign: "center", background: got ? "#FFE9A8" : "#F1EDE4", opacity: got ? 1 : 0.6 }}>
+                <div key={b.id} className="panel" style={{ padding: 8, borderRadius: 14, textAlign: "center", background: got ? "#FFE9A8" : "#F5F2EC", opacity: got ? 1 : 0.85 }}>
                   <div style={{ fontSize: 30, filter: got ? "none" : "grayscale(1)", opacity: got ? 1 : 0.5 }}>{got ? b.emoji : "❔"}</div>
-                  <div style={{ fontWeight: 900, fontSize: 11, lineHeight: 1.3, marginTop: 2 }}>{got ? b.name : "？？？"}</div>
+                  {got
+                    ? <div style={{ fontWeight: 900, fontSize: 11, lineHeight: 1.3, marginTop: 2 }}>{b.name}</div>
+                    : <div style={{ fontWeight: 700, fontSize: 9.5, lineHeight: 1.3, marginTop: 2, color: "#A49E95" }}>{b.desc}</div>}
                 </div>
               );
             })}

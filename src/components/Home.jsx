@@ -4,7 +4,7 @@ import { Btn, Header } from "./common.jsx";
 import { QUIZ_CATEGORIES, QUIZ_DIFFS } from "../data/quizzes.js";
 import { TOTAL_STARS } from "../data/stages.js";
 import { BADGES, puzzleStarsTotal } from "../data/badges.js";
-import { ENEMIES, equippedDeco } from "../data/battle.js";
+import { ENEMIES, equippedDeco, battleUnlocked, BATTLE_UNLOCK_LEVEL } from "../data/battle.js";
 import PartnerCard from "./PartnerCard.jsx";
 import iconPuzzle from "../assets/icon_puzzle.png";
 import iconQuiz from "../assets/icon_quiz.png";
@@ -25,7 +25,9 @@ export default function Home({ save, go, onSound, onSwitchProfile }) {
     { key: "quiz", emoji: "💡", name: "かんがえる クイズ", desc: "プログラミングの あたまで こたえよう", color: C.sky, sub: `${quizDone} / ${quizTotal} セット` },
     { key: "art", emoji: "🎨", name: "おえかき コード", desc: "めいれいで えを かこう", color: C.sakura, sub: `さくひん ${save.art.gallery.length} こ` },
     { key: "typing", emoji: "⌨️", name: "タイピング", desc: "キーボードで もじを うとう", color: C.grape, sub: save.typing.best.kotoba ? `ベスト ${save.typing.best.kotoba.kpm}もじ/ぷん` : "はじめて" },
-    { key: "battle", emoji: "⚔️", name: "クイズ バトル", desc: "クイズに こたえて てきを たおそう", color: "#FF8FAB", sub: `たおした ${((save.battle && save.battle.defeated) || []).length} / ${ENEMIES.length}` },
+    battleUnlocked(save)
+      ? { key: "battle", emoji: "⚔️", name: "クイズ バトル", desc: "クイズに こたえて てきを たおそう", color: "#FF8FAB", sub: `たおした ${((save.battle && save.battle.defeated) || []).length} / ${ENEMIES.length}` }
+      : { key: "battle", emoji: "⚔️", name: "クイズ バトル", desc: `あいぼうが Lv${BATTLE_UNLOCK_LEVEL}に なると あそべるよ`, color: "#FF8FAB", locked: true, sub: `🔒 いまLv${save.partner ? save.partner.level : 1}` },
   ];
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
@@ -37,21 +39,24 @@ export default function Home({ save, go, onSound, onSwitchProfile }) {
       <div style={{ display: "grid", gap: 16, padding: "0 16px" }}>
         <PartnerCard partner={save.partner} deco={equippedDeco(save)} onOpenDex={() => go("dex")} />
         {modes.map((m, i) => (
-          <button key={m.key} className="pbtn slide" onClick={() => go(m.key)}
-            style={{ background: "#fff", textAlign: "left", padding: 18, display: "flex", gap: 16, alignItems: "center", animationDelay: `${i * 0.06}s` }}>
-            {/* 3Dルックの看板アイコン（画像がないモードは絵文字のまま） */}
-            {MODE_ICON[m.key] ? (
-              <span style={{ background: "#fff", border: `3px solid ${C.ink}`, borderRadius: 18, padding: 6, lineHeight: 0 }}>
-                <img src={MODE_ICON[m.key]} alt={m.name} draggable="false" style={{ width: 54, height: 54, display: "block" }} />
-              </span>
-            ) : (
-              <span style={{ fontSize: 46, background: m.color, border: `3px solid ${C.ink}`, borderRadius: 18, padding: "8px 12px" }}>{m.emoji}</span>
-            )}
+          <button key={m.key} className="pbtn slide" disabled={m.locked} onClick={() => !m.locked && go(m.key)}
+            style={{ background: m.locked ? "#F1EDE4" : "#fff", textAlign: "left", padding: 18, display: "flex", gap: 16, alignItems: "center", animationDelay: `${i * 0.06}s`, opacity: m.locked ? 0.75 : 1 }}>
+            {/* 3Dルックの看板アイコン（画像がないモードは絵文字のまま）。ロック中は 🔒 を重ねる */}
+            <span style={{ position: "relative", display: "inline-flex", lineHeight: 0 }}>
+              {MODE_ICON[m.key] ? (
+                <span style={{ background: "#fff", border: `3px solid ${C.ink}`, borderRadius: 18, padding: 6, lineHeight: 0, filter: m.locked ? "grayscale(1)" : "none" }}>
+                  <img src={MODE_ICON[m.key]} alt={m.name} draggable="false" style={{ width: 54, height: 54, display: "block", opacity: m.locked ? 0.6 : 1 }} />
+                </span>
+              ) : (
+                <span style={{ fontSize: 46, background: m.color, border: `3px solid ${C.ink}`, borderRadius: 18, padding: "8px 12px", filter: m.locked ? "grayscale(1)" : "none", opacity: m.locked ? 0.6 : 1 }}>{m.emoji}</span>
+              )}
+              {m.locked && <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>🔒</span>}
+            </span>
             <span style={{ flex: 1 }}>
               <span className="pl-display" style={{ fontSize: 22, display: "block" }}>{m.name}</span>
               <span style={{ fontWeight: 700, fontSize: 14 }}>{m.desc}</span>
             </span>
-            <span className="panel" style={{ padding: "6px 10px", fontWeight: 900, fontSize: 13, borderRadius: 12, background: m.color }}>{m.sub}</span>
+            <span className="panel" style={{ padding: "6px 10px", fontWeight: 900, fontSize: 13, borderRadius: 12, background: m.locked ? "#D2CCC0" : m.color }}>{m.sub}</span>
           </button>
         ))}
         {/* おみせ（モードカードより小さめの入口） */}

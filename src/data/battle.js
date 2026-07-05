@@ -5,6 +5,13 @@
 // プレイヤー（相棒）のハート数
 export const PLAYER_HEARTS = 3;
 
+// バトルの解放レベル。まず学んで相棒を育ててからバトルデビュー（バトルばかり防止）。
+// 既にLv3以上のプロファイルは最初から解放。学習を少しすればすぐ届く。
+export const BATTLE_UNLOCK_LEVEL = 3;
+export function battleUnlocked(save) {
+  return !!(save.partner && save.partner.level >= BATTLE_UNLOCK_LEVEL);
+}
+
 // 難易度ごとの 敵HP（＝そのHP問正解で1体たおせる）
 export const HP_BY_DIFF = { easy: 3, normal: 4, hard: 5 };
 

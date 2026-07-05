@@ -23,6 +23,7 @@ import Dex from "./components/Dex.jsx";
 import EvolutionOverlay from "./components/EvolutionOverlay.jsx";
 import { stageForLevel } from "./data/monsters.js";
 import { grantLegacyCoins } from "./growth.js";
+import { battleUnlocked, BATTLE_UNLOCK_LEVEL } from "./data/battle.js";
 
 export default function App() {
   const [profiles, setProfiles] = useState(() => listProfiles());
@@ -64,7 +65,12 @@ export default function App() {
           setEvolution({ species: next.partner.species, from: fromStage, to: toStage });
         } else if (next.partner.level > p.partner.level) {
           SFX.levelup(next.settings.sound);
-          showToast("⬆️", `レベルアップ！ Lv.${next.partner.level} に なった！`);
+          // Lv3到達＝バトル解放の通知（レベルアップより うれしいお知らせ）
+          if (p.partner.level < BATTLE_UNLOCK_LEVEL && next.partner.level >= BATTLE_UNLOCK_LEVEL) {
+            showToast("⚔️", "バトルが あそべるように なったよ！");
+          } else {
+            showToast("⬆️", `レベルアップ！ Lv.${next.partner.level} に なった！`);
+          }
         }
       }
       saveProfile(next);
@@ -144,7 +150,7 @@ export default function App() {
       {save && screen === "quiz" && <Quiz save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "art" && <Art save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "typing" && <Typing save={save} update={update} go={setScreen} onSound={onSound} />}
-      {save && screen === "battle" && <Battle save={save} update={update} go={setScreen} onSound={onSound} />}
+      {save && screen === "battle" && battleUnlocked(save) && <Battle save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "shop" && <Shop save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "records" && (
         <Records save={save} profiles={profiles} go={setScreen} onSound={onSound}

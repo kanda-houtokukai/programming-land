@@ -76,10 +76,12 @@ export default function Records({ save, profiles = [], go, onSound, onExport, on
               {BADGES.map(b => {
                 const got = save.badges.includes(b.id);
                 return (
-                  <div key={b.id} className="panel" style={{ padding: 10, textAlign: "center", borderRadius: 14, background: got ? C.sun : "#F1EDE4", opacity: got ? 1 : 0.55 }}>
-                    <div style={{ fontSize: 30, filter: got ? "none" : "grayscale(1)" }}>{got ? b.emoji : "❓"}</div>
-                    <div style={{ fontWeight: 900, fontSize: 13 }}>{b.name}</div>
-                    <div style={{ fontSize: 11, fontWeight: 700 }}>{b.desc}</div>
+                  <div key={b.id} className="panel" style={{ padding: 10, textAlign: "center", borderRadius: 14, background: got ? C.sun : "#F5F2EC", opacity: got ? 1 : 0.85 }}>
+                    <div style={{ fontSize: 30, filter: got ? "none" : "grayscale(1)", opacity: got ? 1 : 0.5 }}>{got ? b.emoji : "❔"}</div>
+                    {got
+                      ? <><div style={{ fontWeight: 900, fontSize: 13 }}>{b.name}</div>
+                        <div style={{ fontSize: 11, fontWeight: 700 }}>{b.desc}</div></>
+                      : <div style={{ fontSize: 11, fontWeight: 700, color: "#A49E95" }}>{b.desc}</div>}
                   </div>
                 );
               })}

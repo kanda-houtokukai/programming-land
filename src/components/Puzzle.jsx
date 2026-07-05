@@ -414,16 +414,24 @@ function IslandMap({ save, diff, onEnter, unlockAll }) {
             }}>
             {un ? ISLANDS[i].emoji : "🔒"}
             {done && <span style={{ position: "absolute", top: "-12%", right: "-12%", fontSize: "clamp(11px,2.6vw,16px)" }}>✅</span>}
-            {/* 島名ラベル */}
+            {/* 島名ラベル＋学年の目安（さりげなく・ロックはしない） */}
             <span style={{
               position: "absolute", top: "104%", left: "50%", transform: "translateX(-50%)",
-              whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(8px, 1.9vw, 12px)",
-              background: "rgba(255,255,255,.92)", border: `2px solid ${C.ink}`, borderRadius: 999,
-              padding: "1px 7px", color: C.ink, lineHeight: 1.5,
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 1,
             }}>
-              {un
-                ? `${ISLANDS[i].name.replace("の しま", "")}${done ? ` ⭐${starsIn(i)}` : ` ${cleared}/${total}`}`
-                : ISLANDS[i].name.replace("の しま", "")}
+              <span style={{
+                whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(8px, 1.9vw, 12px)",
+                background: "rgba(255,255,255,.92)", border: `2px solid ${C.ink}`, borderRadius: 999,
+                padding: "1px 7px", color: C.ink, lineHeight: 1.5,
+              }}>
+                {un
+                  ? `${ISLANDS[i].name.replace("の しま", "")}${done ? ` ⭐${starsIn(i)}` : ` ${cleared}/${total}`}`
+                  : ISLANDS[i].name.replace("の しま", "")}
+              </span>
+              <span style={{
+                whiteSpace: "nowrap", fontWeight: 800, fontSize: "clamp(7px, 1.5vw, 10px)",
+                color: "#6B6265", background: "rgba(255,255,255,.75)", borderRadius: 999, padding: "0 5px",
+              }}>🎓 {ISLANDS[i].grade}</span>
             </span>
           </button>
         );
@@ -487,9 +495,12 @@ export default function Puzzle({ save, update, go, onSound, unlockAll }) {
         <IslandMap save={save} diff={diff} onEnter={setIsland} unlockAll={unlockAll} />
       ) : (
         <div style={{ padding: "14px 16px", display: "grid", gap: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             <Btn bg="#fff" onClick={() => setIsland(null)} style={{ fontSize: 13, padding: "6px 10px" }}>🗺️ マップ</Btn>
             <div className="pl-display" style={{ fontSize: 21 }}>{ISLANDS[island].emoji} {ISLANDS[island].name}</div>
+            <span style={{ fontWeight: 800, fontSize: 12, color: "#6B6265", background: "#F1EDE4",
+              border: `2px solid ${C.ink}22`, borderRadius: 999, padding: "3px 10px" }}>
+              🎓 {ISLANDS[island].grade}<span style={{ opacity: .7 }}>（めやす）</span></span>
           </div>
           <HowTo id={`island-${island}`} />
           <div className="panel slide" style={{ padding: 16, background: "#fff" }}>
