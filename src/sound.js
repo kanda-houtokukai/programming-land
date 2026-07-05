@@ -25,6 +25,9 @@ export const SFX = {
   shield: on => on && (tone(220, 0.2, 0, "square", 0.08), tone(520, 0.25, 0.08, "sine", 0.12)),    // たてで防いだ
   power: on => on && [330, 440, 587].forEach((f, i) => tone(f, 0.12, i * 0.08, "square", 0.08)),   // パワーアップ
   hint: on => on && tone(988, 0.09, 0, "sine", 0.12),                                              // 選択肢が消える
+  charge: on => on && [330, 392, 494, 587, 698].forEach((f, i) => tone(f, 0.1, i * 0.11, "square", 0.07)), // 予兆の溜め（上昇）
+  fanfare: on => on && [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => tone(f, i >= 5 ? 0.34 : 0.16, i * 0.13, "sine", 0.15)), // しんかの祝福
+
 
 
   evolve: on => on && [392, 523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.22, i * 0.14, "sine", 0.15)),

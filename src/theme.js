@@ -61,8 +61,8 @@ export const CSS = `
   .idle2 { animation: pl-idle 2.4s ease-in-out -1.2s infinite; }
   /* 突進（--dx/--dy で方向指定・45〜60%で命中位置に滞留→戻る） */
   @keyframes pl-lunge {
-    0%{ transform: translate(0,0) } 45%{ transform: translate(var(--dx), var(--dy)) scale(1.06) }
-    60%{ transform: translate(var(--dx), var(--dy)) scale(1.06) } 100%{ transform: translate(0,0) }
+    0%{ transform: translate(0,0) } 45%{ transform: translate(var(--dx), var(--dy)) scale(var(--lsc,1.06)) }
+    60%{ transform: translate(var(--dx), var(--dy)) scale(var(--lsc,1.06)) } 100%{ transform: translate(0,0) }
   }
   .lunge { animation: pl-lunge .7s cubic-bezier(.3,.7,.4,1); }
   /* 被弾: 白フラッシュ＋小刻み振動 */
@@ -109,9 +109,48 @@ export const CSS = `
   .healglow { animation: pl-healglow .9s ease; }
   /* ヒントメガネ: 選択肢がふっと消える（動きなし・opacityのみ） */
   .fadeopt { opacity: .12 !important; pointer-events: none; transition: opacity .5s ease; }
+  /* ---- 予兆・進化演出（P6b）。かいしんの溜めと進化の溜めで共用（durationは style で上書き） ---- */
+  /* 溜め: だんだん強く光る＋わずかに震えて構える（「何か来るぞ」の期待） */
+  @keyframes pl-charge {
+    0%{ filter: drop-shadow(0 0 2px rgba(255,230,120,.5)); transform: scale(1) }
+    30%{ filter: drop-shadow(0 0 8px rgba(255,220,90,.8)); transform: scale(1.03) translateX(-2px) }
+    55%{ filter: drop-shadow(0 0 14px rgba(255,190,60,.9)); transform: scale(1.05) translateX(2px) }
+    80%{ filter: drop-shadow(0 0 20px rgba(255,160,40,.95)); transform: scale(1.08) translateX(-2px) }
+    100%{ filter: drop-shadow(0 0 26px rgba(255,140,30,1)); transform: scale(1.1) }
+  }
+  .charge { animation: pl-charge .65s ease-in forwards; }
+  /* 変身: 光の渦（回転する光の円盤） */
+  @keyframes pl-spin { to { transform: rotate(360deg) } }
+  .spinlight { animation: pl-spin 1s linear infinite; border-radius: 50%;
+    background: conic-gradient(rgba(255,255,210,0) 0deg, rgba(255,250,180,.95) 70deg, rgba(255,255,210,0) 140deg,
+      rgba(255,250,180,.75) 210deg, rgba(255,255,210,0) 280deg, rgba(255,250,180,.9) 350deg); }
+  /* 変身中のシルエット: ゆらゆら形が変わっていく */
+  @keyframes pl-morph { 0%{ transform: scale(.92) rotate(-6deg) } 50%{ transform: scale(1.08) rotate(6deg) } 100%{ transform: scale(.95) rotate(-4deg) } }
+  .morph { animation: pl-morph .7s ease-in-out infinite alternate; }
+  /* 登場: 「ドン」（大→バウンド→定位置・最初は白く光る） */
+  @keyframes pl-slam {
+    0%{ transform: scale(2.4); opacity: 0; filter: brightness(3) }
+    40%{ transform: scale(.9); opacity: 1; filter: brightness(1.7) }
+    65%{ transform: scale(1.14); filter: none }
+    82%{ transform: scale(.97) }
+    100%{ transform: scale(1) }
+  }
+  .slam { animation: pl-slam .75s cubic-bezier(.2,.8,.3,1.2) forwards; }
+  /* 画面全体の白フラッシュ（登場の瞬間） */
+  @keyframes pl-whiteflash { 0%{ opacity: .95 } 100%{ opacity: 0 } }
+  .whiteflash { animation: pl-whiteflash .55s ease-out forwards; pointer-events: none; }
+  /* 紙吹雪（ひらひら落ちる） */
+  @keyframes pl-confetti {
+    0%{ transform: translateY(-30px) rotate(0deg); opacity: 0 }
+    12%{ opacity: 1 }
+    100%{ transform: translateY(260px) rotate(560deg); opacity: 0 }
+  }
+  .confetti { animation: pl-confetti 1.9s ease-in forwards; display: inline-block; }
   @media (prefers-reduced-motion: reduce) {
     .pop,.shake,.bounce,.slide,.glow { animation: none; }
     .idle,.idle2,.lunge,.hitflash,.shake2,.hitfx,.critpop,.heartbreak,.fall,.victory,.droop,.riseup,.aura,.shieldpop,.healglow { animation: none; }
+    .charge,.spinlight,.morph,.slam,.whiteflash,.confetti { animation: none; }
+    .whiteflash { opacity: 0; }
     .pbtn { transition: none; }
   }
 `;

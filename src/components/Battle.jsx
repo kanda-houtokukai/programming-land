@@ -53,7 +53,7 @@ function HudPill({ children, style }) {
 
 /* ---- バトル本体 ---- */
 
-const T = { impact: 320, atkEnd: 780, fxClear: 980, heartGone: 900, downEnd: 950, overlay: 2150 };
+const T = { windup: 680, impact: 320, atkEnd: 780, fxClear: 980, heartGone: 900, downEnd: 950, overlay: 2150 };
 
 function BattleFight({ enemy, diff, save, update, go, onBack }) {
   const sound = save.settings.sound;
@@ -69,6 +69,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack }) {
   const [shakeCls, setShakeCls] = useState("");
   const [breakingIdx, setBreakingIdx] = useState(null);
   const [buffs, setBuffs] = useState({ power: false, shield: false });
+  const [critAtk, setCritAtk] = useState(false); // かいしん確定（予兆〜突進〜命中まで演出を派手に）
   const [heal, setHeal] = useState(false);
   const [fadedIdx, setFadedIdx] = useState(null);
   const [itemUsed, setItemUsed] = useState(false);
@@ -108,12 +109,23 @@ function BattleFight({ enemy, diff, save, update, go, onBack }) {
     if (picked !== null || phase !== "idle") return;
     setPicked(idx);
     if (idx === q.a) {
+      // かいしんは正解確定の時点で事前判定し、突進の前に「予兆」から演出を分岐する（推奨A）。
+      // 予兆=相棒が光って構える(charge)→期待が高まってから 大きい突進→派手なヒット。
       const isCrit = Math.random() < critChance(save.partner.level);
       const dmg = (isCrit ? CRIT_DAMAGE : NORMAL_DAMAGE) * (buffs.power ? 2 : 1);
       const powered = buffs.power;
       const nhp = Math.max(0, enemyHp - dmg);
-      setPhase("atk");
-      later(T.impact, () => {
+      const delay = isCrit ? T.windup : 0; // かいしんだけ 溜めのぶん 後ろへずれる
+      setCritAtk(isCrit);
+      if (isCrit) {
+        setPhase("windup");
+        SFX.charge(sound);
+        setMsg("⚡ なにか くるぞ…！");
+        later(T.windup, () => setPhase("atk"));
+      } else {
+        setPhase("atk");
+      }
+      later(delay + T.impact, () => {
         (isCrit ? SFX.crit : SFX.star)(sound);
         setFx({ hit: "enemy", crit: isCrit, critPop: isCrit });
         setShakeCls(isCrit || dmg >= 2 ? "shake2" : "shake");
@@ -121,8 +133,8 @@ function BattleFight({ enemy, diff, save, update, go, onBack }) {
         if (powered) setBuffs(b => ({ ...b, power: false }));
         setMsg(`${isCrit ? "⚡ かいしんの いちげき！" : "こうげき せいこう！"}${powered ? "（💪 2ばい）" : ""} ${dmg}ダメージ！`);
       });
-      later(T.atkEnd, () => { if (nhp <= 0) startWin(); else setPhase("fb"); });
-      later(T.fxClear, () => { setFx(f => ({ ...f, hit: null })); setShakeCls(""); });
+      later(delay + T.atkEnd, () => { if (nhp <= 0) startWin(); else setPhase("fb"); });
+      later(delay + T.fxClear, () => { setFx(f => ({ ...f, hit: null })); setShakeCls(""); setCritAtk(false); });
     } else if (buffs.shield) {
       setPhase("eatk");
       later(T.impact, () => {
@@ -153,7 +165,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack }) {
 
   function next() {
     SFX.tap(sound); clearTimers();
-    setPicked(null); setMsg(null); setFx({}); setShakeCls("");
+    setPicked(null); setMsg(null); setFx({}); setShakeCls(""); setCritAtk(false);
     setFadedIdx(null); setItemUsed(false); setQi(v => v + 1); setPhase("idle");
   }
 
@@ -223,15 +235,17 @@ function BattleFight({ enemy, diff, save, update, go, onBack }) {
             </span>
           </HudPill>
 
-          {/* 相棒（左下寄り） */}
+          {/* 相棒（左下寄り）。かいしん時は 溜め(charge)→大きい突進(--lsc) */}
           <div style={{ position: "absolute", left: "5%", bottom: "4%", width: "24%", zIndex: 4 }}>
-            <div className={phase === "atk" ? "lunge" : ""} style={{ "--dx": "44vw", "--dy": "-10vw", maxWidth: "100%" }}>
+            <div className={phase === "atk" ? "lunge" : ""}
+              style={{ "--dx": critAtk ? "48vw" : "44vw", "--dy": critAtk ? "-12vw" : "-10vw", "--lsc": critAtk ? 1.22 : 1.06, maxWidth: "100%" }}>
               <div className={[
+                phase === "windup" ? "charge" : "",
                 fx.hit === "partner" ? "hitflash" : "",
                 phase === "victory" ? "victory" : "",
                 phase === "lose" ? "droop" : "",
                 heal ? "healglow" : "",
-                buffs.power ? "aura" : "",
+                buffs.power && phase !== "windup" ? "aura" : "",
               ].filter(Boolean).join(" ")}>
                 <div className={overlay || phase === "lose" ? "" : "idle2"}>
                   <div className="fitArt"><MonsterArt species={save.partner.species} stage={pstage} size={200} /></div>
@@ -241,8 +255,16 @@ function BattleFight({ enemy, diff, save, update, go, onBack }) {
             <GroundShadow w="70%" />
           </div>
 
-          {/* 命中エフェクト💥 */}
-          {fx.hit === "enemy" && <div className="hitfx" style={{ position: "absolute", right: "16%", top: "26%", fontSize: "min(9vw,56px)", zIndex: 5 }}>💥</div>}
+          {/* かいしんの予兆⚡（溜め中、相棒の頭上に立ちのぼる） */}
+          {phase === "windup" && (
+            <>
+              <span className="riseup" style={{ position: "absolute", left: "10%", bottom: "34%", fontSize: 30, zIndex: 5 }}>⚡</span>
+              <span className="riseup" style={{ position: "absolute", left: "20%", bottom: "30%", fontSize: 24, animationDelay: ".22s", zIndex: 5 }}>⚡</span>
+              <span className="riseup" style={{ position: "absolute", left: "15%", bottom: "38%", fontSize: 20, animationDelay: ".44s", zIndex: 5 }}>✨</span>
+            </>
+          )}
+          {/* 命中エフェクト💥（かいしんは大きく） */}
+          {fx.hit === "enemy" && <div className="hitfx" style={{ position: "absolute", right: "16%", top: "26%", fontSize: fx.crit ? "min(14vw,84px)" : "min(9vw,56px)", zIndex: 5 }}>💥</div>}
           {fx.hit === "partner" && <div className="hitfx" style={{ position: "absolute", left: "12%", bottom: "24%", fontSize: "min(9vw,56px)", zIndex: 5 }}>💥</div>}
           {/* まもりのたてバリア */}
           {fx.shield && <div className="shieldpop" style={{ position: "absolute", left: "10%", bottom: "18%", fontSize: "min(11vw,64px)", zIndex: 5 }}>🛡️</div>}
