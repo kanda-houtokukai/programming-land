@@ -18,5 +18,14 @@ export const SFX = {
   fail: on => on && (tone(300, 0.18), tone(220, 0.25, 0.15)),
   badge: on => on && [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.2, i * 0.11, "sine", 0.14)),
   levelup: on => on && [660, 880, 1100].forEach((f, i) => tone(f, 0.12, i * 0.09)),
+  crit: on => on && [1046, 1318, 1568].forEach((f, i) => tone(f, 0.1, i * 0.05, "square", 0.1)), // かいしんのいちげき
+  // バトル演出（P6・フェーズ1.5）
+  down: on => on && [392, 294, 196].forEach((f, i) => tone(f, 0.22, i * 0.14)),                    // 敵ダウン（下降）
+  heal: on => on && [660, 880, 1100].forEach((f, i) => tone(f, 0.14, i * 0.1, "sine", 0.12)),      // かいふく
+  shield: on => on && (tone(220, 0.2, 0, "square", 0.08), tone(520, 0.25, 0.08, "sine", 0.12)),    // たてで防いだ
+  power: on => on && [330, 440, 587].forEach((f, i) => tone(f, 0.12, i * 0.08, "square", 0.08)),   // パワーアップ
+  hint: on => on && tone(988, 0.09, 0, "sine", 0.12),                                              // 選択肢が消える
+
+
   evolve: on => on && [392, 523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.22, i * 0.14, "sine", 0.15)),
 };

@@ -4,13 +4,15 @@ import { Btn, Header } from "./common.jsx";
 import { QUIZ_CATEGORIES, QUIZ_DIFFS } from "../data/quizzes.js";
 import { TOTAL_STARS } from "../data/stages.js";
 import { BADGES, puzzleStarsTotal } from "../data/badges.js";
+import { ENEMIES } from "../data/battle.js";
 import PartnerCard from "./PartnerCard.jsx";
 import iconPuzzle from "../assets/icon_puzzle.png";
 import iconQuiz from "../assets/icon_quiz.png";
 import iconArt from "../assets/icon_art.png";
 import iconTyping from "../assets/icon_typing.png";
+import iconBattle from "../assets/icon_battle.png";
 
-const MODE_ICON = { puzzle: iconPuzzle, quiz: iconQuiz, art: iconArt, typing: iconTyping };
+const MODE_ICON = { puzzle: iconPuzzle, quiz: iconQuiz, art: iconArt, typing: iconTyping, battle: iconBattle };
 
 export default function Home({ save, go, onSound, onSwitchProfile }) {
   const stars = puzzleStarsTotal(save);
@@ -22,6 +24,7 @@ export default function Home({ save, go, onSound, onSwitchProfile }) {
     { key: "quiz", emoji: "💡", name: "かんがえる クイズ", desc: "プログラミングの あたまで こたえよう", color: C.sky, sub: `${quizDone} / ${quizTotal} セット` },
     { key: "art", emoji: "🎨", name: "おえかき コード", desc: "めいれいで えを かこう", color: C.sakura, sub: `さくひん ${save.art.gallery.length} こ` },
     { key: "typing", emoji: "⌨️", name: "タイピング", desc: "キーボードで もじを うとう", color: C.grape, sub: save.typing.best.kotoba ? `ベスト ${save.typing.best.kotoba.kpm}もじ/ぷん` : "はじめて" },
+    { key: "battle", emoji: "⚔️", name: "クイズ バトル", desc: "クイズに こたえて てきを たおそう", color: "#FF8FAB", sub: `たおした ${((save.battle && save.battle.defeated) || []).length} / ${ENEMIES.length}` },
   ];
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>

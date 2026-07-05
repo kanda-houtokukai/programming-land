@@ -49,7 +49,7 @@ export default function Records({ save, profiles = [], go, onSound, onExport, on
   const skills = skillProgress(save);
   const days = lastNDays(14);
   const counts = days.map(d => {
-    const l = save.log[d]; return l ? (l.puzzle || 0) + (l.quiz || 0) + (l.art || 0) : 0;
+    const l = save.log[d]; return l ? (l.puzzle || 0) + (l.quiz || 0) + (l.art || 0) + (l.battle || 0) : 0;
   });
   const maxC = Math.max(1, ...counts);
   const diffs = diffBreakdown(save);
@@ -161,7 +161,7 @@ export default function Records({ save, profiles = [], go, onSound, onExport, on
                 </div>
               ))}
             </div>
-            <div style={{ fontSize: 12, fontWeight: 700, marginTop: 6 }}>棒の高さ＝その日の活動回数（パズルクリア・クイズ・作品保存の合計）</div>
+            <div style={{ fontSize: 12, fontWeight: 700, marginTop: 6 }}>棒の高さ＝その日の活動回数（パズルクリア・クイズ・作品保存・バトルの合計）</div>
           </div>
 
           {/* プロファイル別（お子さんが複数いる場合。それぞれの進み具合） */}

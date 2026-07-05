@@ -28,19 +28,27 @@ export function poolFor(category, difficulty) {
 // ベスト記録のキー（既存の q1〜q4 キーはv1の名残として保存内に残るが参照しない）
 export function bestKey(category, difficulty) { return `${category}:${difficulty}`; }
 
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+// 選択肢の順もシャッフルして返す（正解インデックスを付け替える）
+function shuffleOpts(q) {
+  const order = shuffle(q.opts.map((_, i) => i));
+  return { ...q, opts: order.map(i => q.opts[i]), a: order.indexOf(q.a) };
+}
+
 /* 1回分の出題（プールから5問シャッフル・選択肢の順もシャッフル） */
 export function buildSession(category, difficulty) {
-  const pool = [...poolFor(category, difficulty)];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  return pool.slice(0, SESSION_SIZE).map(q => {
-    const order = q.opts.map((_, i) => i);
-    for (let i = order.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [order[i], order[j]] = [order[j], order[i]];
-    }
-    return { ...q, opts: order.map(i => q.opts[i]), a: order.indexOf(q.a) };
-  });
+  return shuffle(poolFor(category, difficulty)).slice(0, SESSION_SIZE).map(shuffleOpts);
+}
+
+/* バトル用: その難易度の全カテゴリを混ぜてシャッフルした出題キュー。
+   先頭から順に引けば直近の重複は自然に避けられる（バトルの問数はプールより十分少ない）。 */
+export function battlePool(difficulty) {
+  return shuffle(ALL_QUESTIONS.filter(q => q.difficulty === difficulty)).map(shuffleOpts);
 }

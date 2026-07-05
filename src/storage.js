@@ -41,7 +41,8 @@ export function newProfileData(name = "", avatar = "") {
     partner: null,
     dex: [],
     typing: { best: {} },
-    battle: {},
+    battle: { defeated: [], best: {} },  // defeated=たおした敵ID / best=難易度別の勝利数
+    items: {},                            // バトルアイテム { id: 個数 }（購入はP6フェーズ2のショップ）
   };
 }
 
