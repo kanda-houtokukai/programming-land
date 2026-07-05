@@ -24,12 +24,12 @@ import buildingHome from "../assets/building_home.png";
 // 座標=各エリアが乗る「空き地の円」の中心（%）。ブラウザにグリッドを重ねて実測して合わせた。
 // tall=縦長の建物イラスト（円に収めるため表示サイズを別扱い）
 export const AREAS = [
-  { key: "quiz", short: "クイズ", full: "クイズの ひろば", img: buildingQuiz, tall: true, left: 27, top: 26 },
+  { key: "quiz", short: "クイズ", full: "クイズの ひろば", img: buildingQuiz, tall: true, left: 27, top: 24 },
   { key: "art", short: "おえかき", full: "おえかき コード", img: iconArt, left: 18, top: 43 },
   { key: "powers", short: "ちから", full: "そだった ちから", img: iconFlower, left: 19, top: 64 },
   { key: "shop", short: "おみせ", full: "おみせ", img: iconShop, left: 35, top: 72 },
   { key: "myhome", short: "おうち", full: "わたしの おうち", img: buildingHome, tall: true, left: 58, top: 66 },
-  { key: "typing", short: "タイピング", full: "タイピングの とう", img: buildingTyping, tall: true, left: 48, top: 44 },
+  { key: "typing", short: "タイピング", full: "タイピングの とう", img: buildingTyping, tall: true, left: 48, top: 51 },
   { key: "puzzle", short: "パズル", full: "パズルの もり", img: iconPuzzle, left: 85, top: 72 },
   { key: "battle", short: "バトル", full: "クイズバトル", img: iconBattle, left: 88, top: 26 },
 ];
