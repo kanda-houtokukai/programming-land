@@ -15,17 +15,21 @@ import iconTyping from "../assets/icon_typing.png";
 import iconPuzzle from "../assets/icon_puzzle.png";
 import iconBattle from "../assets/icon_battle.png";
 import iconFlower from "../assets/grow_4_flower.png";
+import buildingQuiz from "../assets/building_quiz.png";
+import buildingTyping from "../assets/building_typing.png";
+import buildingHome from "../assets/building_home.png";
 
 // 8エリアの%座標（1600×900の背景に対して）。ブラウザで背景に照らして微調整する。
 // 拡張用の空き地（今回は何も置かない・将来の新エリア用）: 中央上(46,30)・北(58,16)・右中(70,36)
 // 座標=各エリアが乗る「空き地の円」の中心（%）。ブラウザにグリッドを重ねて実測して合わせた。
+// tall=縦長の建物イラスト（円に収めるため表示サイズを別扱い）
 export const AREAS = [
-  { key: "quiz", short: "クイズ", full: "クイズの ひろば", img: iconQuiz, left: 29, top: 30 },
-  { key: "art", short: "おえかき", full: "おえかき コード", img: iconArt, left: 18, top: 45 },
-  { key: "powers", short: "ちから", full: "そだった ちから", img: iconFlower, left: 19, top: 66 },
+  { key: "quiz", short: "クイズ", full: "クイズの ひろば", img: buildingQuiz, tall: true, left: 27, top: 28 },
+  { key: "art", short: "おえかき", full: "おえかき コード", img: iconArt, left: 18, top: 43 },
+  { key: "powers", short: "ちから", full: "そだった ちから", img: iconFlower, left: 19, top: 64 },
   { key: "shop", short: "おみせ", full: "おみせ", img: iconShop, left: 35, top: 72 },
-  { key: "myhome", short: "おうち", full: "わたしの おうち", emoji: "🏠", left: 56, top: 66 },
-  { key: "typing", short: "タイピング", full: "タイピングの とう", img: iconTyping, left: 48, top: 39 },
+  { key: "myhome", short: "おうち", full: "わたしの おうち", img: buildingHome, tall: true, left: 58, top: 66 },
+  { key: "typing", short: "タイピング", full: "タイピングの とう", img: buildingTyping, tall: true, left: 48, top: 37 },
   { key: "puzzle", short: "パズル", full: "パズルの もり", img: iconPuzzle, left: 85, top: 72 },
   { key: "battle", short: "バトル", full: "クイズバトル", img: iconBattle, left: 88, top: 26 },
 ];
@@ -63,10 +67,11 @@ export default function WorldMap({ save, go, onSound }) {
                 transform: "translate(-50%,-50%)", width: "13%", aspectRatio: "1",
                 border: "none", background: "transparent", cursor: "pointer", padding: 0,
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 0 }}>
-              {/* イラスト＋ラベルを1つのまとまりにして、空き地の円の中に収める */}
+              {/* イラスト＋ラベルを1つのまとまりにして、空き地の円の中に収める。
+                  建物(tall)は縦長なので大きめに（objectFit containで高さ基準に収まる）。*/}
               {a.img
                 ? <img src={a.img} alt="" draggable="false"
-                    style={{ width: "62%", height: "62%", objectFit: "contain", display: "block",
+                    style={{ width: a.tall ? "82%" : "62%", height: a.tall ? "82%" : "62%", objectFit: "contain", display: "block",
                       filter: locked ? "grayscale(1) brightness(.75) drop-shadow(1px 2px 2px rgba(20,15,25,.45))" : "drop-shadow(1px 2px 2px rgba(20,15,25,.45))",
                       opacity: locked ? 0.7 : 1 }} />
                 : <span style={{ fontSize: "clamp(18px,5vw,34px)", lineHeight: 1,
