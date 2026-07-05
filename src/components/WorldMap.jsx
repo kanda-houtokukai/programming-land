@@ -20,12 +20,12 @@ import iconFlower from "../assets/grow_4_flower.png";
 // 拡張用の空き地（今回は何も置かない・将来の新エリア用）: 中央上(46,30)・北(58,16)・右中(70,36)
 // 座標=各エリアが乗る「空き地の円」の中心（%）。ブラウザにグリッドを重ねて実測して合わせた。
 export const AREAS = [
-  { key: "quiz", short: "クイズ", full: "クイズの ひろば", img: iconQuiz, left: 33, top: 34 },
-  { key: "art", short: "おえかき", full: "おえかき コード", img: iconArt, left: 20, top: 47 },
-  { key: "powers", short: "ちから", full: "そだった ちから", img: iconFlower, left: 19, top: 68 },
-  { key: "shop", short: "おみせ", full: "おみせ", img: iconShop, left: 33, top: 72 },
-  { key: "myhome", short: "おうち", full: "わたしの おうち", emoji: "🏠", left: 54, top: 66 },
-  { key: "typing", short: "タイピング", full: "タイピングの とう", img: iconTyping, left: 48, top: 41 },
+  { key: "quiz", short: "クイズ", full: "クイズの ひろば", img: iconQuiz, left: 29, top: 30 },
+  { key: "art", short: "おえかき", full: "おえかき コード", img: iconArt, left: 18, top: 45 },
+  { key: "powers", short: "ちから", full: "そだった ちから", img: iconFlower, left: 19, top: 66 },
+  { key: "shop", short: "おみせ", full: "おみせ", img: iconShop, left: 35, top: 72 },
+  { key: "myhome", short: "おうち", full: "わたしの おうち", emoji: "🏠", left: 56, top: 66 },
+  { key: "typing", short: "タイピング", full: "タイピングの とう", img: iconTyping, left: 48, top: 39 },
   { key: "puzzle", short: "パズル", full: "パズルの もり", img: iconPuzzle, left: 85, top: 72 },
   { key: "battle", short: "バトル", full: "クイズバトル", img: iconBattle, left: 88, top: 26 },
 ];
