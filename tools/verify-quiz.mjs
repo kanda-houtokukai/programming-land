@@ -1,9 +1,8 @@
-/* クイズ全数検証（P3）
-   - 構造チェック: カテゴリ・難易度・選択肢3つ重複なし・正解番号・解説・ID一意・同一問題なし
-   - テンプレート生成分: meta から答えを再導出し「正解が1つに定まる」ことを確認
+/* クイズ全数検証（P6e: 5カテゴリ全数メタ付き）
+   - 構造チェック: カテゴリ・難易度・選択肢3〜4重複なし・正解番号・解説・ID一意・同一問題なし
+   - 全問: meta から答えを再導出し「正解が1つに定まる」ことを確認
+     ＋ 難易度タグ＝実難易度（構造特徴からの機械判定）を照合
      （基準は tools/quiz-criteria.mjs＝生成時と同一の正本）
-   - 書き起こし分（metaなし）: 構造チェックのみ機械で行い、内容は quiz-書き起こし基準.md の
-     チェックリストで人手レビュー（作成時に適用）
    使い方: node tools/verify-quiz.mjs [--file <path>]   … 省略時 src/data/quizzes.gen.js */
 
 import { checkQuestion, CATEGORIES, DIFFS } from "./quiz-criteria.mjs";
@@ -15,15 +14,13 @@ if (fileArg >= 0) {
   const mod = await import(p.startsWith("/") || p.startsWith("../") ? p : `../${p}`);
   questions = mod.GEN_QUIZZES || mod.default || mod.QUESTIONS;
 } else {
-  // 既定: 生成分＋書き起こし分の全問
   const gen = await import("../src/data/quizzes.gen.js");
-  const fixed = await import("../src/data/quizzes-fixed.js");
-  questions = [...gen.GEN_QUIZZES, ...fixed.FIXED_QUIZZES];
+  questions = gen.GEN_QUIZZES;
 }
 if (!Array.isArray(questions)) { console.error("問題配列が読めません"); process.exit(1); }
 
-// 総数と各セルの最低問数（P3完了条件: 200問以上・5カテゴリ×3難易度が成立）
-const MIN_PER_CELL = 10, MIN_TOTAL = 200;
+// 総数と各セルの最低問数（P6e完了条件: 300問以上・各セル18問以上＝5問セッションの3倍超）
+const MIN_PER_CELL = 18, MIN_TOTAL = 300;
 
 let fail = 0;
 const ids = new Set(), bodies = new Set();

@@ -1,8 +1,8 @@
-// クイズの正本（P3: 5カテゴリ×3難易度・204問）
-// 生成分: quizzes.gen.js（node tools/quizgen.mjs --write で再生成）
-// 書き起こし分: quizzes-fixed.js（quiz-書き起こし基準.md に準拠）
+// クイズの正本（P6e: 5カテゴリ×3難易度・全336問をメタ付きテンプレート生成に統一）
+// 生成: quizzes.gen.js（node tools/quizgen.mjs --write で再生成・難易度タグも機械検証）
+// 素材データ（因果チェーン・タグ辞書）: tools/quiz-data.mjs ＝ 人手で品質保証する場所
+// ※旧・書き起こし分(quizzes-fixed.js 84問)はP6eで引退（素材は quiz-data.mjs に取り込み済み）
 import { GEN_QUIZZES } from "./quizzes.gen.js";
-import { FIXED_QUIZZES } from "./quizzes-fixed.js";
 
 export const QUIZ_CATEGORIES = [
   { id: "junban", name: "じゅんばん クイズ", emoji: "🍛", color: "#6BCB77", desc: "ただしい じゅんばんを かんがえよう" },
@@ -18,7 +18,7 @@ export const QUIZ_DIFFS = [
   { id: "hard", label: "⭐⭐⭐ むずかしい" },
 ];
 
-export const ALL_QUESTIONS = [...GEN_QUIZZES, ...FIXED_QUIZZES];
+export const ALL_QUESTIONS = GEN_QUIZZES;
 export const SESSION_SIZE = 5;
 
 export function poolFor(category, difficulty) {
