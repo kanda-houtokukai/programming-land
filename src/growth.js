@@ -12,7 +12,9 @@ export const XP = {
 };
 
 // つぎのレベルまでに必要な経験値（レベルが上がるほど少しずつ増える）
-export function xpToNext(level) { return 12 + 4 * (level - 1); }
+// P6bでバトル勝利がXP源に加わったぶん、全域を約25%引き上げて進化(Lv5/Lv12)をゆっくりに
+// （旧: 12+4*(level-1)。Lv5到達 72→90 XP／Lv12到達 352→440 XP＝ちょうど+25%）
+export function xpToNext(level) { return 15 + 5 * (level - 1); }
 
 /* profile.partner に経験値を加算し、レベルアップ・進化を処理する（profileを直接書き換える）。
    返り値: { levelsGained, evolvedTo } evolvedTo は進化した場合の新しいすがた番号 */

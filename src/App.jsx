@@ -57,7 +57,7 @@ export default function App() {
         const fromStage = stageForLevel(p.partner.level);
         const toStage = stageForLevel(next.partner.level);
         if (toStage > fromStage) {
-          SFX.evolve(next.settings.sound);
+          // 進化の音は EvolutionOverlay が段階演出（溜め→渦→登場→ファンファーレ）に合わせて鳴らす
           setEvolution({ species: next.partner.species, from: fromStage, to: toStage });
         } else if (next.partner.level > p.partner.level) {
           SFX.levelup(next.settings.sound);
@@ -138,7 +138,7 @@ export default function App() {
           onDeleteRequest={() => setConfirmDelete(true)}
           unlockAll={unlockAll} setUnlockAll={setUnlockAll} />
       )}
-      <EvolutionOverlay evolution={evolution} onClose={() => setEvolution(null)} />
+      <EvolutionOverlay evolution={evolution} sound={save ? save.settings.sound : false} onClose={() => setEvolution(null)} />
       {confirmDelete && save && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(58,51,53,.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div className="panel pop" style={{ padding: 24, maxWidth: 360, textAlign: "center" }}>
