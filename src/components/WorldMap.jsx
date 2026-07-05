@@ -18,16 +18,16 @@ import iconFlower from "../assets/grow_4_flower.png";
 
 // 8エリアの%座標（1600×900の背景に対して）。ブラウザで背景に照らして微調整する。
 // 拡張用の空き地（今回は何も置かない・将来の新エリア用）: 中央上(46,30)・北(58,16)・右中(70,36)
+// 座標=各エリアが乗る「空き地の円」の中心（%）。ブラウザにグリッドを重ねて実測して合わせた。
 export const AREAS = [
-  { key: "quiz", short: "クイズ", full: "クイズの ひろば", img: iconQuiz, left: 27, top: 24 },
-  // おえかき/ちから: 初期値(13,41)/(16,61)はラベルと円が重なったため上下に離した（ブラウザ照合済み）
-  { key: "art", short: "おえかき", full: "おえかき コード", img: iconArt, left: 15.5, top: 37 },
-  { key: "powers", short: "ちから", full: "そだった ちから", img: iconFlower, left: 13.5, top: 66 },
-  { key: "shop", short: "おみせ", full: "おみせ", img: iconShop, left: 36, top: 70 },
-  { key: "myhome", short: "おうち", full: "わたしの おうち", emoji: "🏠", left: 56, top: 62 },
-  { key: "typing", short: "タイピング", full: "タイピングの とう", img: iconTyping, left: 46, top: 47 },
-  { key: "puzzle", short: "パズル", full: "パズルの もり", img: iconPuzzle, left: 83, top: 71 },
-  { key: "battle", short: "バトル", full: "クイズバトル", img: iconBattle, left: 89, top: 20 },
+  { key: "quiz", short: "クイズ", full: "クイズの ひろば", img: iconQuiz, left: 33, top: 34 },
+  { key: "art", short: "おえかき", full: "おえかき コード", img: iconArt, left: 20, top: 47 },
+  { key: "powers", short: "ちから", full: "そだった ちから", img: iconFlower, left: 19, top: 68 },
+  { key: "shop", short: "おみせ", full: "おみせ", img: iconShop, left: 33, top: 72 },
+  { key: "myhome", short: "おうち", full: "わたしの おうち", emoji: "🏠", left: 54, top: 66 },
+  { key: "typing", short: "タイピング", full: "タイピングの とう", img: iconTyping, left: 48, top: 41 },
+  { key: "puzzle", short: "パズル", full: "パズルの もり", img: iconPuzzle, left: 85, top: 72 },
+  { key: "battle", short: "バトル", full: "クイズバトル", img: iconBattle, left: 88, top: 26 },
 ];
 
 export default function WorldMap({ save, go, onSound }) {
@@ -60,20 +60,20 @@ export default function WorldMap({ save, go, onSound }) {
             <button key={a.key} className="mapicon" onClick={() => { SFX.tap(sound); setPopup(a.key); }}
               aria-label={a.full}
               style={{ position: "absolute", left: `${a.left}%`, top: `${a.top}%`,
-                transform: "translate(-50%,-50%)", width: "15%", aspectRatio: "1",
+                transform: "translate(-50%,-50%)", width: "13%", aspectRatio: "1",
                 border: "none", background: "transparent", cursor: "pointer", padding: 0,
-                display: "flex", alignItems: "center", justifyContent: "center" }}>
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 0 }}>
+              {/* イラスト＋ラベルを1つのまとまりにして、空き地の円の中に収める */}
               {a.img
                 ? <img src={a.img} alt="" draggable="false"
-                    style={{ width: "88%", height: "88%", objectFit: "contain", display: "block",
-                      filter: locked ? "grayscale(1) brightness(.75) drop-shadow(1px 3px 2px rgba(20,15,25,.45))" : "drop-shadow(1px 3px 2px rgba(20,15,25,.45))",
+                    style={{ width: "62%", height: "62%", objectFit: "contain", display: "block",
+                      filter: locked ? "grayscale(1) brightness(.75) drop-shadow(1px 2px 2px rgba(20,15,25,.45))" : "drop-shadow(1px 2px 2px rgba(20,15,25,.45))",
                       opacity: locked ? 0.7 : 1 }} />
-                : <span style={{ fontSize: "clamp(24px,7vw,46px)", lineHeight: 1,
-                    filter: "drop-shadow(1px 3px 2px rgba(20,15,25,.45))" }}>{a.emoji}</span>}
-              {locked && <span style={{ position: "absolute", top: "2%", right: "8%", fontSize: "clamp(13px,3.2vw,22px)" }}>🔒</span>}
+                : <span style={{ fontSize: "clamp(18px,5vw,34px)", lineHeight: 1,
+                    filter: "drop-shadow(1px 2px 2px rgba(20,15,25,.45))" }}>{a.emoji}</span>}
+              {locked && <span style={{ position: "absolute", top: "8%", right: "16%", fontSize: "clamp(11px,2.8vw,18px)" }}>🔒</span>}
               {/* 短い名前: 下地チップなし・白フチ文字で どの背景でも読める */}
-              <span style={{ position: "absolute", top: "86%", left: "50%", transform: "translateX(-50%)",
-                whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(9px,2.2vw,13px)", color: C.ink,
+              <span style={{ whiteSpace: "nowrap", marginTop: 1, fontWeight: 900, fontSize: "clamp(8px,2vw,12px)", color: C.ink,
                 textShadow: "0 0 3px #fff,1.5px 1.5px 0 #fff,-1.5px 1.5px 0 #fff,1.5px -1.5px 0 #fff,-1.5px -1.5px 0 #fff,0 2px 3px rgba(0,0,0,.3)" }}>{a.short}</span>
             </button>
           );
