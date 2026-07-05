@@ -5,7 +5,7 @@ import { Btn, Header } from "./common.jsx";
 import { QUIZ_CATEGORIES, QUIZ_DIFFS, SESSION_SIZE, buildSession, bestKey, poolFor } from "../data/quizzes.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
-import { XP, applyXp } from "../growth.js";
+import { XP, applyXp, addCoins, COIN } from "../growth.js";
 import HowTo from "./HowTo.jsx";
 import ParentGuide from "./ParentGuide.jsx";
 import { QUIZ_GUIDE } from "../data/parent-guide.js";
@@ -33,6 +33,7 @@ function QuizPlay({ session, save, update, onBack }) {
       update(s => {
         s.quiz.best[session.key] = Math.max(s.quiz.best[session.key] || 0, final);
         const d = today(); s.log[d] = s.log[d] || {}; s.log[d].quiz = (s.log[d].quiz || 0) + 1;
+        addCoins(s, final * COIN.quizCorrect); // 正解した問数ぶん
         applyXp(s, XP.quizSet(final));
         return s;
       });

@@ -5,6 +5,7 @@ import { STAGES, stagesFor } from "./stages.js";
 import { QUIZ_CATEGORIES, QUIZ_DIFFS, SESSION_SIZE, bestKey } from "./quizzes.js";
 import { DIFFICULTIES } from "./islands.js";
 import { TYPING_STAGES } from "./typing.js";
+import { ENEMIES } from "./battle.js";
 
 export function puzzleStarsTotal(s) { return Object.values(s.puzzle.stars).reduce((a, b) => a + b, 0); }
 export function daysPlayed(s) { return Object.keys(s.log).length; }
@@ -73,6 +74,10 @@ export const BADGES = [
   { id: "art1", emoji: "🎨", name: "みならい アーティスト", desc: "さくひんを 1つ ほぞんした", check: s => s.art.gallery.length >= 1 },
   { id: "art5", emoji: "🖼️", name: "びじゅつかんの たつじん", desc: "さくひんを 5つ ほぞんした", check: s => s.art.gallery.length >= 5 },
   { id: "art10", emoji: "🏛️", name: "だい げいじゅつか", desc: "さくひんを 10こ ほぞんした", check: s => s.art.gallery.length >= 10 },
+  // ── クイズバトル・ショップ（P6）──
+  { id: "battle1", emoji: "⚔️", name: "はじめての しょうり", desc: "バトルに 1かい かった", check: s => ((s.battle && s.battle.defeated) || []).length >= 1 },
+  { id: "battleMaster", emoji: "🏟️", name: "バトルマスター", desc: "てき 9たいを ぜんぶ たおした", check: s => ((s.battle && s.battle.defeated) || []).length >= ENEMIES.length },
+  { id: "shopper", emoji: "🛍️", name: "おかいもの デビュー", desc: "おみせで はじめて かった", check: s => !!s.shopUsed },
   // ── 習慣・総合 ──
   { id: "days3", emoji: "🔥", name: "こつこつさん", desc: "3にち あそんだ", check: s => daysPlayed(s) >= 3 },
   { id: "days7", emoji: "🏆", name: "まいにち チャンピオン", desc: "7にち あそんだ", check: s => daysPlayed(s) >= 7 },

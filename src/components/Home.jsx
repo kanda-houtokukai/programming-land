@@ -4,13 +4,14 @@ import { Btn, Header } from "./common.jsx";
 import { QUIZ_CATEGORIES, QUIZ_DIFFS } from "../data/quizzes.js";
 import { TOTAL_STARS } from "../data/stages.js";
 import { BADGES, puzzleStarsTotal } from "../data/badges.js";
-import { ENEMIES } from "../data/battle.js";
+import { ENEMIES, equippedDeco } from "../data/battle.js";
 import PartnerCard from "./PartnerCard.jsx";
 import iconPuzzle from "../assets/icon_puzzle.png";
 import iconQuiz from "../assets/icon_quiz.png";
 import iconArt from "../assets/icon_art.png";
 import iconTyping from "../assets/icon_typing.png";
 import iconBattle from "../assets/icon_battle.png";
+import iconShop from "../assets/icon_shop.png";
 
 const MODE_ICON = { puzzle: iconPuzzle, quiz: iconQuiz, art: iconArt, typing: iconTyping, battle: iconBattle };
 
@@ -34,7 +35,7 @@ export default function Home({ save, go, onSound, onSwitchProfile }) {
         <div style={{ fontWeight: 700 }}>きょうは どこで あそぶ？</div>
       </div>
       <div style={{ display: "grid", gap: 16, padding: "0 16px" }}>
-        <PartnerCard partner={save.partner} onOpenDex={() => go("dex")} />
+        <PartnerCard partner={save.partner} deco={equippedDeco(save)} onOpenDex={() => go("dex")} />
         {modes.map((m, i) => (
           <button key={m.key} className="pbtn slide" onClick={() => go(m.key)}
             style={{ background: "#fff", textAlign: "left", padding: 18, display: "flex", gap: 16, alignItems: "center", animationDelay: `${i * 0.06}s` }}>
@@ -53,6 +54,15 @@ export default function Home({ save, go, onSound, onSwitchProfile }) {
             <span className="panel" style={{ padding: "6px 10px", fontWeight: 900, fontSize: 13, borderRadius: 12, background: m.color }}>{m.sub}</span>
           </button>
         ))}
+        {/* おみせ（モードカードより小さめの入口） */}
+        <button className="pbtn slide" onClick={() => go("shop")}
+          style={{ background: "#FFF3D6", padding: "10px 16px", fontSize: 16, display: "flex", gap: 12, alignItems: "center", textAlign: "left" }}>
+          <span style={{ background: "#fff", border: `3px solid ${C.ink}`, borderRadius: 14, padding: 4, lineHeight: 0 }}>
+            <img src={iconShop} alt="おみせ" draggable="false" style={{ width: 38, height: 38, display: "block" }} />
+          </span>
+          <span style={{ flex: 1, fontWeight: 900 }}>🪙 おみせ <span style={{ fontWeight: 700, fontSize: 13 }}>— コインで どうぐや おしゃれを かおう</span></span>
+          <span className="panel" style={{ padding: "6px 10px", fontWeight: 900, fontSize: 13, borderRadius: 12, background: C.sun }}>🪙 {save.coins || 0}</span>
+        </button>
         <button className="pbtn" onClick={() => go("records")}
           style={{ background: C.sun, padding: 14, fontSize: 17 }}>
           🏅 バッジ {badges} / {BADGES.length} こ ・ きろくを みる

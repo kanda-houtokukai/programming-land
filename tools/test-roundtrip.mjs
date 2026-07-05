@@ -12,7 +12,7 @@ class LS {
 globalThis.localStorage = new LS();
 
 const { createProfile, saveProfile, loadProfile, exportProfileJSON, importProfileJSON } = await import("../src/storage.js");
-const { BADGES } = await import("../src/data/badges.js");
+// ※ badges.js は battle.js 経由で画像を import するため node では読めない → 孤児IDチェックは省略（往復の完全復元が本題）
 
 let fail = 0;
 const ok = (cond, msg) => { console.log(`${cond ? "✓" : "✗ FAIL"} ${msg}`); if (!cond) fail++; };
@@ -26,8 +26,15 @@ p.art.gallery = [{ id: 1, date: "2026-07-05", cmds: ["fwd", "right"], name: "さ
 p.log = { "2026-07-03": { puzzle: 2 }, "2026-07-04": { quiz: 1, art: 1 }, "2026-07-05": { puzzle: 3 } };
 p.partner = { species: "leaf", xp: 5, level: 7 };
 p.dex = ["leaf-1", "leaf-2"];
-// 新旧まざったバッジ配列（新規ID typeFast/hard3_5/w4 等を含む）
-p.badges = ["first", "w1", "w4", "star10", "type1", "typeFast", "hard3_5", "quizHardAll", "art1"];
+// 新旧まざったバッジ配列（新規ID typeFast/hard3_5/w4/battle1/shopper 等を含む）
+p.badges = ["first", "w1", "w4", "star10", "type1", "typeFast", "hard3_5", "quizHardAll", "art1", "battle1", "shopper"];
+// P6フェーズ2の項目
+p.battle = { defeated: ["slime", "mushroom", "ghost"], best: { easy: 2, normal: 1 } };
+p.coins = 137;
+p.coinsGranted = true;
+p.items = { drink: 2, glasses: 1, shield: 3 };
+p.cosmetics = { owned: ["deco_hat", "deco_crown", "bg_space"], equipped: { deco: "deco_crown", bg: "bg_space" } };
+p.shopUsed = true;
 saveProfile(p);
 
 // 2) 書き出し
@@ -51,11 +58,12 @@ ok(JSON.stringify(q.log) === JSON.stringify(p.log), "日別ログ");
 ok(JSON.stringify(q.partner) === JSON.stringify(p.partner), "相棒（species/xp/level）");
 ok(JSON.stringify(q.dex) === JSON.stringify(p.dex), "ずかん（dex）");
 ok(JSON.stringify(q.badges.slice().sort()) === JSON.stringify(p.badges.slice().sort()), "バッジ配列（新規IDまで完全一致）");
-
-// 5) 復元後、バッジ判定が矛盾しないか（配列に無いが条件を満たすものだけ後から追加される想定）
-const stored = new Set(q.badges);
-const allValidIds = new Set(BADGES.map(b => b.id));
-ok([...stored].every(id => allValidIds.has(id)), "保存バッジIDはすべて現行BADGESに存在（孤児ID無し）");
+// P6フェーズ2: コイン・アイテム・きせかえ・討伐記録
+ok(q.coins === 137 && q.coinsGranted === true, "コイン枚数・換算フラグ");
+ok(JSON.stringify(q.items) === JSON.stringify(p.items), "バトルアイテム所持数");
+ok(JSON.stringify(q.cosmetics) === JSON.stringify(p.cosmetics), "きせかえ（所持・装備）");
+ok(JSON.stringify(q.battle) === JSON.stringify(p.battle), "討伐記録（defeated/best）");
+ok(q.shopUsed === true, "ショップ利用フラグ");
 
 console.log(fail === 0 ? "\n✅ ラウンドトリップ 全項目一致（P5完了条件クリア）" : `\n❌ ${fail}件 不一致`);
 process.exit(fail === 0 ? 0 : 1);

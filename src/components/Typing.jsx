@@ -11,7 +11,7 @@ import ParentGuide from "./ParentGuide.jsx";
 import { TYPING_GUIDE } from "../data/parent-guide.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
-import { XP, applyXp } from "../growth.js";
+import { XP, applyXp, addCoins, COIN } from "../growth.js";
 
 function pickWords(list, n) {
   const a = [...list];
@@ -64,8 +64,10 @@ function TypingPlay({ stage, save, update, onBack }) {
         SFX.win(sound);
         update(s => {
           const b = s.typing.best[stage.id] || {};
+          const isBest = kpm > (b.kpm || 0) || acc > (b.acc || 0); // 自己ベスト更新か
           s.typing.best[stage.id] = { acc: Math.max(b.acc || 0, acc), kpm: Math.max(b.kpm || 0, kpm) };
           const d = today(); s.log[d] = s.log[d] || {}; s.log[d].typing = (s.log[d].typing || 0) + 1;
+          addCoins(s, COIN.typingClear + (isBest ? COIN.typingBest : 0));
           applyXp(s, XP.typing());
           return s;
         });

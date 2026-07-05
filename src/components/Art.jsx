@@ -5,7 +5,7 @@ import { Btn, Header } from "./common.jsx";
 import { ART_COLORS, ART_CMDS, ART_CHALLENGES } from "../data/art.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
-import { XP, applyXp } from "../growth.js";
+import { XP, applyXp, awardArtCoins } from "../growth.js";
 import turtleUrl from "../assets/turtle.png";
 import HowTo from "./HowTo.jsx";
 import ParentGuide from "./ParentGuide.jsx";
@@ -94,8 +94,10 @@ export default function Art({ save, update, go, onSound }) {
     if (save.art.gallery.length >= 12) { setSavedMsg("びじゅつかんが いっぱい！ふるい さくひんを けしてから ほぞんしてね"); return; }
     SFX.badge(sound);
     update(s => {
-      s.art.gallery.push({ id: Date.now(), date: today(), cmds: [...cmds], name: `さくひん ${s.art.gallery.length + 1}` });
-      const d = today(); s.log[d] = s.log[d] || {}; s.log[d].art = (s.log[d].art || 0) + 1;
+      const d = today();
+      s.art.gallery.push({ id: Date.now(), date: d, cmds: [...cmds], name: `さくひん ${s.art.gallery.length + 1}` });
+      s.log[d] = s.log[d] || {}; s.log[d].art = (s.log[d].art || 0) + 1;
+      awardArtCoins(s, d); // 1日の上限内でコイン付与
       applyXp(s, XP.artSave());
       return s;
     });

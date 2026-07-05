@@ -42,7 +42,11 @@ export function newProfileData(name = "", avatar = "") {
     dex: [],
     typing: { best: {} },
     battle: { defeated: [], best: {} },  // defeated=たおした敵ID / best=難易度別の勝利数
-    items: {},                            // バトルアイテム { id: 個数 }（購入はP6フェーズ2のショップ）
+    items: {},                            // バトルアイテム { id: 個数 }
+    coins: 0,                             // 🪙コイン（学習で貯まる）
+    coinsGranted: false,                  // 導入時の「いままでのがんばり」換算を済ませたか
+    cosmetics: { owned: [], equipped: { deco: null, bg: null } }, // きせかえ（所持ID・装備中）
+    shopUsed: false,                      // ショップで一度でも買ったか（バッジ判定用）
   };
 }
 

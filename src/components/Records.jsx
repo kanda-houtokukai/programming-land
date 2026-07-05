@@ -9,6 +9,7 @@ import { BADGES, puzzleStarsTotal, daysPlayed, clearedInDiff, star3InDiff } from
 import { lastNDays } from "../storage.js";
 import { APP_VERSION, BUILD_DATE } from "../version.js";
 import PartnerCard from "./PartnerCard.jsx";
+import { equippedDeco } from "../data/battle.js";
 
 function skillProgress(save) {
   const w = islandId => {
@@ -68,7 +69,7 @@ export default function Records({ save, profiles = [], go, onSound, onExport, on
             <div className="pl-display" style={{ fontSize: 24 }}>{save.name} の ぼうけん</div>
             <div style={{ fontWeight: 800, marginTop: 6 }}>⭐ {puzzleStarsTotal(save)}こ ／ 🏅 バッジ {save.badges.length}こ ／ 🔥 {daysPlayed(save)}にち あそんだ</div>
           </div>
-          <PartnerCard partner={save.partner} size={80} />
+          <PartnerCard partner={save.partner} size={80} deco={equippedDeco(save)} />
           <div className="panel" style={{ padding: 18 }}>
             <div className="pl-display" style={{ fontSize: 20, marginBottom: 10 }}>🏅 バッジ コレクション</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(140px,1fr))", gap: 10 }}>

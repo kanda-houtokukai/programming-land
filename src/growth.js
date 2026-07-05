@@ -43,3 +43,44 @@ export function applyXp(profile, amount) {
 export function partnerDisplayName(partner) {
   return monsterName(partner.species, stageForLevel(partner.level));
 }
+
+/* ===== コイン（P6フェーズ2）。★入手レートはここに集約★（設計書§4） =====
+   コインは学習行動からのみ。時間配布・ログインボーナスは無し。 */
+export const COIN = {
+  puzzleStar: 2,          // パズルで「新しく」得た★1つにつき
+  quizCorrect: 1,         // クイズ1問正解（セッション精算）
+  typingClear: 3, typingBest: 5, // タイピングクリア（自己ベスト更新は+5）
+  artSave: 2, artDailyCap: 6,    // おえかき保存（1日の上限6枚＝乱発防止）
+  battle: { easy: 5, normal: 8, hard: 12 }, // バトル勝利（難易度別）
+};
+
+// コイン加算（負や0は無視）。返り値=実際に足した枚数
+export function addCoins(profile, n) {
+  if (n > 0) profile.coins = (profile.coins || 0) + n;
+  return n > 0 ? n : 0;
+}
+// おえかき保存のコイン（その日の上限内でのみ付与）。log[date].artCoins で当日分を管理
+export function awardArtCoins(profile, dateStr) {
+  const l = profile.log[dateStr] || (profile.log[dateStr] = {});
+  const give = Math.min(COIN.artSave, Math.max(0, COIN.artDailyCap - (l.artCoins || 0)));
+  l.artCoins = (l.artCoins || 0) + give;
+  return addCoins(profile, give);
+}
+
+// 導入時の初回換算: 既存の実績からコインをまとめて付与（1プロファイル1回だけ）。
+// 返り値=付与額（0なら「いままでのがんばり」演出は不要）。profile を直接書き換える。
+export function grantLegacyCoins(profile) {
+  if (profile.coinsGranted) return 0;
+  const sum = o => Object.values(o || {}).reduce((a, b) => a + (b || 0), 0);
+  let total = 0;
+  total += sum(profile.puzzle && profile.puzzle.stars) * COIN.puzzleStar;
+  total += Object.entries((profile.quiz && profile.quiz.best) || {})
+    .filter(([k]) => k.includes(":")).reduce((a, [, v]) => a + (v || 0), 0) * COIN.quizCorrect;
+  total += Object.keys((profile.typing && profile.typing.best) || {}).length * COIN.typingClear;
+  total += (((profile.art && profile.art.gallery) || []).length) * COIN.artSave;
+  const best = (profile.battle && profile.battle.best) || {};
+  for (const d of ["easy", "normal", "hard"]) total += (best[d] || 0) * COIN.battle[d];
+  profile.coins = (profile.coins || 0) + total;
+  profile.coinsGranted = true;
+  return total;
+}

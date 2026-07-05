@@ -8,7 +8,7 @@ import { BLOCK_DEFS } from "../data/blocks.js";
 import { parseStage, countBlocks, DX, DY, MAX_BLOCKS } from "../engine.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
-import { XP, applyXp } from "../growth.js";
+import { XP, applyXp, addCoins, COIN } from "../growth.js";
 import HowTo from "./HowTo.jsx";
 import ParentGuide from "./ParentGuide.jsx";
 import { BlockChip, PaletteBlock } from "./blocks.jsx";
@@ -192,8 +192,10 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
       const starN = n <= stage.par ? 3 : n <= stage.par + 2 ? 2 : 1;
       setResult({ stars: starN, n });
       update(s => {
-        s.puzzle.stars[stage.id] = Math.max(s.puzzle.stars[stage.id] || 0, starN);
+        const prevStars = s.puzzle.stars[stage.id] || 0;
+        s.puzzle.stars[stage.id] = Math.max(prevStars, starN);
         const d = today(); s.log[d] = s.log[d] || {}; s.log[d].puzzle = (s.log[d].puzzle || 0) + 1;
+        addCoins(s, Math.max(0, starN - prevStars) * COIN.puzzleStar); // 新しく増えた★のぶんだけ
         applyXp(s, XP.puzzleWin(starN));
         return s;
       });

@@ -4,7 +4,7 @@ import { speciesById, stageForLevel } from "../data/monsters.js";
 import { xpToNext, partnerDisplayName, MAX_LEVEL } from "../growth.js";
 import MonsterArt from "./MonsterArt.jsx";
 
-export default function PartnerCard({ partner, size = 92, onOpenDex }) {
+export default function PartnerCard({ partner, size = 92, onOpenDex, deco }) {
   if (!partner) return null;
   const sp = speciesById(partner.species);
   const stage = stageForLevel(partner.level);
@@ -12,7 +12,10 @@ export default function PartnerCard({ partner, size = 92, onOpenDex }) {
   const pct = partner.level >= MAX_LEVEL ? 100 : Math.min(100, Math.round(100 * partner.xp / need));
   return (
     <div className="panel" style={{ padding: 12, display: "flex", gap: 12, alignItems: "center", textAlign: "left" }}>
-      <MonsterArt species={partner.species} stage={stage} size={size} />
+      <span style={{ position: "relative", display: "inline-flex", lineHeight: 0 }}>
+        <MonsterArt species={partner.species} stage={stage} size={size} />
+        {deco && <span style={{ position: "absolute", top: -4, right: -4, fontSize: size * 0.38 }}>{deco}</span>}
+      </span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 900, fontSize: 12, opacity: .7 }}>{sp.typeEmoji} あいぼう</div>
         <div className="pl-display" style={{ fontSize: 20 }}>{partnerDisplayName(partner)}　<span style={{ fontSize: 15 }}>Lv.{partner.level}</span></div>

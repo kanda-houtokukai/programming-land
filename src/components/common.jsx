@@ -42,6 +42,7 @@ export function Header({ save, onHome, onSound, title, onRecords }) {
         <span style={{ fontSize: 22 }}>{save.avatar}</span>
         <b>{save.name}</b>
         <span style={{ fontWeight: 900 }}>⭐{stars}</span>
+        <span style={{ fontWeight: 900 }}>🪙{save.coins || 0}</span>
       </div>
       {onRecords && <Btn bg={C.sakura} onClick={onRecords}>📖 きろく</Btn>}
       <Btn bg={C.white} onClick={onSound} aria-label="おとの おんおふ">{save.settings.sound ? "🔊" : "🔇"}</Btn>

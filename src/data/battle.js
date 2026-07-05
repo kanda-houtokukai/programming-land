@@ -22,8 +22,7 @@ export function critChance(level) {
 // 勝利でもらえるXP（既存 applyXp に渡す。難易度別）
 export const BATTLE_XP = { easy: 12, normal: 16, hard: 22 };
 
-// 勝利でもらえるコイン（フェーズ2で使用・ここに集約しておく）
-export const BATTLE_COINS = { easy: 5, normal: 8, hard: 12 };
+// 勝利でもらえるコインは growth.js の COIN.battle に集約（学習全体のレートと同じ場所で管理）。
 
 // バトルアイテム（消耗品・各所持上限3・価格は設計書 §5A）。
 // 演出はフェーズ1.5で実装済み。購入はフェーズ2のショップから（それまで所持0＝バトルに出ない）。
@@ -34,6 +33,32 @@ export const ITEMS = [
   { id: "shield", emoji: "🛡️", name: "まもりのたて", desc: "つぎの ミスの ダメージを ふせぐ", price: 15, max: 3 },
 ];
 export function itemById(id) { return ITEMS.find(i => i.id === id); }
+
+// きせかえ（非消耗・全品定価・ガチャなし・設計書§5B）。
+// deco=相棒カード/バトルの相棒につく飾り（絵文字）／ bg=バトル背景（自作CSSグラデ）。
+export const COSMETICS = [
+  { id: "deco_hat", type: "deco", emoji: "🎩", name: "シルクハット", price: 30 },
+  { id: "deco_ribbon", type: "deco", emoji: "🎀", name: "あかい リボン", price: 40 },
+  { id: "deco_shades", type: "deco", emoji: "🕶️", name: "サングラス", price: 50 },
+  { id: "deco_wand", type: "deco", emoji: "✨", name: "きらきら", price: 60 },
+  { id: "deco_crown", type: "deco", emoji: "👑", name: "おうかん", price: 80 },
+  { id: "bg_rainbow", type: "bg", emoji: "🌈", name: "にじの ぶたい", price: 50,
+    css: "linear-gradient(180deg,#FFD1E8 0%,#FFE9B0 30%,#C9F5C0 55%,#B7E4FF 80%,#D8C9FF 100%)" },
+  { id: "bg_space", type: "bg", emoji: "🌌", name: "うちゅうの ぶたい", price: 50,
+    css: "radial-gradient(circle at 30% 20%, #3a2a6b 0%, #1b1440 45%, #0a0820 100%)" },
+];
+export function cosmeticById(id) { return COSMETICS.find(c => c.id === id); }
+// 装備中のきせかえを取り出す（未装備は null）
+export function equippedDeco(save) {
+  const id = save.cosmetics && save.cosmetics.equipped && save.cosmetics.equipped.deco;
+  const c = id && cosmeticById(id);
+  return c ? c.emoji : null;
+}
+export function equippedBgCss(save) {
+  const id = save.cosmetics && save.cosmetics.equipped && save.cosmetics.equipped.bg;
+  const c = id && cosmeticById(id);
+  return c ? c.css : null;
+}
 
 // 敵モンスター9体（各難易度3体・順に解放）。絵は生成画像（透過PNG・画像対応.md準拠）。
 // emoji は画像が出ないときのフォールバック。id はファイル名と対応（king=ラスボス）。
