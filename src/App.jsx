@@ -10,7 +10,9 @@ import {
 import { Btn, Toast } from "./components/common.jsx";
 import ProfileSelect from "./components/ProfileSelect.jsx";
 import ProfileCreate from "./components/ProfileCreate.jsx";
-import Home from "./components/Home.jsx";
+import WorldMap from "./components/WorldMap.jsx";
+import MyHome from "./components/MyHome.jsx";
+import Powers from "./components/Powers.jsx";
 import Puzzle from "./components/Puzzle.jsx";
 import Quiz from "./components/Quiz.jsx";
 import Art from "./components/Art.jsx";
@@ -144,7 +146,10 @@ export default function App() {
           return s;
         })} />
       )}
-      {save && screen === "home" && save.partner && <Home save={save} go={setScreen} onSound={onSound} onSwitchProfile={switchProfile} />}
+      {/* ホーム＝ワールドマップ（worldmap-home フェーズ1）。screen名"home"を維持＝各モードの go("home") が自動でここへ戻る */}
+      {save && screen === "home" && save.partner && <WorldMap save={save} go={setScreen} onSound={onSound} />}
+      {save && screen === "myhome" && <MyHome save={save} go={setScreen} onSound={onSound} onSwitchProfile={switchProfile} />}
+      {save && screen === "powers" && <Powers save={save} go={setScreen} onSound={onSound} />}
       {save && screen === "dex" && <Dex save={save} go={setScreen} onSound={onSound} />}
       {save && screen === "puzzle" && <Puzzle save={save} update={update} go={setScreen} onSound={onSound} unlockAll={unlockAll} />}
       {save && screen === "quiz" && <Quiz save={save} update={update} go={setScreen} onSound={onSound} />}
