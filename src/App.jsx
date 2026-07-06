@@ -20,6 +20,7 @@ import Typing from "./components/Typing.jsx";
 import Battle from "./components/Battle.jsx";
 import Shop from "./components/Shop.jsx";
 import Records from "./components/Records.jsx";
+import ParentHub from "./components/ParentHub.jsx";
 import PartnerSelect from "./components/PartnerSelect.jsx";
 import Dex from "./components/Dex.jsx";
 import EvolutionOverlay from "./components/EvolutionOverlay.jsx";
@@ -167,8 +168,12 @@ export default function App() {
       {save && screen === "typing" && <Typing save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
       {save && screen === "battle" && battleUnlocked(save) && <Battle save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
       {save && screen === "shop" && <Shop save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
+      {/* きろく=子ども向けの日記（机から）。保護者向けは parenthub（マップ最下部→ゲート奥）に分離（段階③） */}
       {save && screen === "records" && (
-        <Records save={save} profiles={profiles} go={setScreen} onSound={onSound} onBack={funcBack} openHome={openHome}
+        <Records save={save} go={setScreen} onSound={onSound} onBack={funcBack} openHome={openHome} />
+      )}
+      {save && screen === "parenthub" && (
+        <ParentHub save={save} profiles={profiles} go={setScreen} onSound={onSound}
           onExport={handleExport} onImportFile={handleImportFile}
           onDeleteRequest={() => setConfirmDelete(true)}
           unlockAll={unlockAll} setUnlockAll={setUnlockAll} />

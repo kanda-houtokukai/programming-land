@@ -32,12 +32,12 @@ import iconHarbor from "../assets/icon_harbor.png";
 //   第3層（中のゲーム名・画面タイトル。例: ロボット パズル / クイズバトル / そだった ちから）は
 //   各画面側が持つ＝ここには書かない・変えない。
 export const AREAS = [
-  { key: "quiz", short: "クイズ", place: "クイズのひろば", img: buildingQuiz, tall: true, left: 27, top: 24 },
-  { key: "art", short: "おえかき", place: "おえかきのへや", img: iconArt, left: 18, top: 43 },
-  { key: "powers", short: "ちから", place: "そだちのもり", img: iconFlower, left: 19, top: 64 },
+  { key: "quiz", short: "クイズ", place: "クイズのひろば", img: buildingQuiz, tall: true, left: 27, top: 23 },
+  { key: "art", short: "おえかき", place: "おえかきのへや", img: iconArt, left: 18, top: 42 },
+  { key: "powers", short: "ちから", place: "そだちのもり", img: iconFlower, left: 19, top: 63 },
   { key: "shop", short: "おみせ", place: "おみせ", img: iconShop, left: 35, top: 72 },
   { key: "myhome", short: "おうち", place: "おうち", img: buildingHome, tall: true, left: 58, top: 66 },
-  { key: "typing", short: "タイピング", place: "タイピングタワー", img: buildingTyping, tall: true, left: 46, top: 51 },
+  { key: "typing", short: "タイピング", place: "タイピングタワー", img: buildingTyping, tall: true, left: 47, top: 51 },
   { key: "puzzle", short: "パズル", place: "パズルのしま", img: iconPuzzle, left: 85, top: 72 },
   { key: "battle", short: "バトル", place: "バトルのアリーナ", img: iconBattle, left: 88, top: 26 },
   // みなと（第2波 段階②）: プロファイル交代の一本化された入口。海側・島の端（拡張用の空き地3つは温存）。
@@ -54,8 +54,8 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
-      {/* ヘッダーは従来どおり（相棒・⭐・🪙・きろく・音）をマップの上にそのまま維持 */}
-      <Header save={save} title="" onSound={onSound} onRecords={() => go("records")} onOpenHome={onOpenHome} />
+      {/* ヘッダー（相棒・⭐・🪙・音）。「きろく」ボタンは段階③で削除＝子どもの記録はおうちの机の日記へ一本化 */}
+      <Header save={save} title="" onSound={onSound} onOpenHome={onOpenHome} />
       <div style={{ textAlign: "center", margin: "0 0 10px" }}>
         <h1 className="pl-display" style={{ fontSize: 26, margin: 0 }}>🗺️ プログラミングランド</h1>
         <div style={{ fontWeight: 700, fontSize: 13 }}>いきたい ばしょを タップしてね</div>
@@ -100,6 +100,19 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
           );
         })}
       </div>
+
+      {/* マップ最下部「おうちのひとへ」（段階③・メモ09）: 保護者向けの入口。
+          子どもの遊び導線（マップ内の9アイコン）とは視覚的に区別＝マップの外の帯・
+          保護者トーン（うすむらさき・ParentGuideと同じ作法・保護者むけチップ）。ゲートは先の画面（ParentHub）にある */}
+      <button type="button" onClick={() => { SFX.tap(sound); go("parenthub"); }}
+        style={{ display: "flex", alignItems: "center", gap: 8, width: "calc(100% - 28px)", margin: "12px 14px 0",
+          background: "#fff", border: "2px solid #3A3335", borderRadius: 16, cursor: "pointer",
+          padding: "9px 14px", textAlign: "left", fontFamily: "inherit", color: "#3A3335" }}>
+        <span style={{ fontSize: 17 }}>👨‍👩‍👧</span>
+        <span style={{ flex: 1, fontWeight: 900, fontSize: 14 }}>おうちのひとへ</span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#6B5B95", border: "1.5px solid #6B5B95", borderRadius: 999, padding: "1px 8px" }}>保護者むけ</span>
+        <span style={{ fontSize: 13, opacity: .6 }}>›</span>
+      </button>
 
       {/* タップ時ポップアップ: 場所名＋「へ いく」（ロック中は案内のみ）。
           背景ふわっと(fadein)＋パネル やさしくスケールイン(softpop)。文言はメモ02で確定＝変えない。 */}

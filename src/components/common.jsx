@@ -35,7 +35,7 @@ export function Toast({ toast }) {
 // 戻る導線は「◀ もどる」1つ＝1階層だけ戻る（メモ03で全画面統一。🏠ホーム等の二重ボタンは廃止）。
 // onBack には「1つ前の画面」に戻す関数を渡す。プレイ中など画面内に自前の◀もどるがある場合は渡さない。
 // onOpenHome を渡すと、名前パネル（相棒アバター＋名前）タップで おうちモーダルが開く（第2波 メモ01）。
-export function Header({ save, onBack, onSound, title, onRecords, onOpenHome }) {
+export function Header({ save, onBack, onSound, title, onOpenHome }) {
   const stars = puzzleStarsTotal(save);
   // 名前パネル: onOpenHome があれば button（タップでおうち）、なければ従来の表示用 div
   const profileInner = (
@@ -50,13 +50,16 @@ export function Header({ save, onBack, onSound, title, onRecords, onOpenHome }) 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", flexWrap: "wrap" }}>
       {onBack && <Btn bg={C.white} onClick={onBack} style={{ fontSize: 16 }}>◀ もどる</Btn>}
-      <div className="pl-display" style={{ fontSize: 20, fontWeight: 900, flex: 1, minWidth: 120 }}>{title}</div>
-      {onOpenHome
-        ? <button className="pbtn" onClick={onOpenHome} aria-label={`${save.name}の おうちを ひらく`}
-            style={{ ...panelStyle, background: "#fff" }}>{profileInner}</button>
-        : <div className="panel" style={panelStyle}>{profileInner}</div>}
-      {onRecords && <Btn bg={C.sakura} onClick={onRecords}>📖 きろく</Btn>}
-      <Btn bg={C.white} onClick={onSound} aria-label="おとの おんおふ">{save.settings.sound ? "🔊" : "🔇"}</Btn>
+      {/* タイトルが空（マップ等）のときは minWidth を持たせない＝右側グループを押し出して折り返させない */}
+      <div className="pl-display" style={{ fontSize: 20, fontWeight: 900, flex: 1, minWidth: title ? 120 : 0 }}>{title}</div>
+      {/* 名前ピル＋音量は1グループ＝折り返すときも一緒に動く（音量だけ孤立して落ちない） */}
+      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+        {onOpenHome
+          ? <button className="pbtn" onClick={onOpenHome} aria-label={`${save.name}の おうちを ひらく`}
+              style={{ ...panelStyle, background: "#fff" }}>{profileInner}</button>
+          : <div className="panel" style={panelStyle}>{profileInner}</div>}
+        <Btn bg={C.white} onClick={onSound} aria-label="おとの おんおふ">{save.settings.sound ? "🔊" : "🔇"}</Btn>
+      </div>
     </div>
   );
 }

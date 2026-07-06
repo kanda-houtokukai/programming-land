@@ -155,8 +155,9 @@ export const CSS = `
   .fadein { animation: pl-fadein .2s ease; }
   @keyframes pl-softpop { 0% { transform: scale(.86); opacity: 0 } 100% { transform: scale(1); opacity: 1 } }
   .softpop { animation: pl-softpop .26s cubic-bezier(.2,.8,.3,1.1); }
-  /* マップアイコンのふわふわ（生きている世界感）。数pxを ゆっくり・位相はインラインのdelay/durでばらす＝同位相で酔うのを防ぐ */
-  @keyframes pl-mapfloat { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
+  /* マップアイコンのふわふわ（生きている世界感）。数pxを ゆっくり・位相はインラインのdelay/durでばらす＝同位相で酔うのを防ぐ
+     振れ幅は実機確認で -5px→-3px に縮小（2026-07-07・大きく感じるとのFB） */
+  @keyframes pl-mapfloat { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
   .mapfloat { animation: pl-mapfloat 3s ease-in-out infinite; will-change: transform; }
   /* ---- そだったちから フェーズ2（育った瞬間の やさしい祝い・1-3と同じトーン） ---- */
   /* 植物が「にゅっ」と育つ（下から伸びる＝根が張る向き）。段階アップは強め版で上書き */
