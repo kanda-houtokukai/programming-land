@@ -1,7 +1,8 @@
 // おうち（RPGの子供部屋・第2波 段階①）。メモ01=モーダルで開く／メモ04=部屋の家具で機能へ。
 // App レベルのモーダルオーバーレイ。呼び出し元は App が保持し、閉じると呼び出し元に戻る。
 // 本棚=ずかん・机=きろく は全画面（onEnter で App が画面遷移）。額縁=プロフィール・相棒詳細は
-// 部屋内のネストモーダル（画面遷移なし）。宝箱=将来枠（座標だけ確保）。こうたいは段階①では残す（段階②で港へ）。
+// 部屋内のネストモーダル（画面遷移なし）。宝箱=将来枠（座標だけ確保）。
+// プロファイル交代はマップの「みなと」に一本化（段階②）＝この部屋には置かない。
 import { useState } from "react";
 import { C } from "../theme.js";
 import { Btn } from "./common.jsx";
@@ -21,7 +22,7 @@ const FURNITURE = [
   { key: "chest", label: "たからばこ", left: 90, top: 80, w: 14, h: 22 },   // 右下の宝箱（将来用）
 ];
 
-export default function HomeRoom({ save, onClose, onEnter, onSwitchProfile }) {
+export default function HomeRoom({ save, onClose, onEnter }) {
   const [nested, setNested] = useState(null); // "profile" | "partner" | null（部屋内のネストモーダル）
   const [chestMsg, setChestMsg] = useState(false);
   const sound = save.settings.sound;
@@ -89,11 +90,6 @@ export default function HomeRoom({ save, onClose, onEnter, onSwitchProfile }) {
               background: "#FFFDF5", border: `2px solid ${C.ink}`, borderRadius: 12, padding: "6px 12px",
               fontWeight: 800, fontSize: "clamp(9px,2vw,13px)", whiteSpace: "nowrap" }}>まだ なにも ないよ</div>
           )}
-        </div>
-
-        {/* こうたい（段階①では残す・段階②でマップの港へ移す） */}
-        <div style={{ textAlign: "center", marginTop: 10 }}>
-          <Btn bg="#fff" onClick={onSwitchProfile} style={{ fontSize: 13 }}>👥 じぶんを こうたいする</Btn>
         </div>
       </div>
 

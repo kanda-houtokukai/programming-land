@@ -158,7 +158,7 @@ export default function App() {
       )}
       {/* ホーム＝ワールドマップ（worldmap-home フェーズ1）。screen名"home"を維持＝各モードの go("home") が自動でここへ戻る。
           おうちはモーダル（下の HomeRoom）で開くため screen "myhome" は廃止。マップの家・各ヘッダー名タップ→openHome */}
-      {save && screen === "home" && save.partner && <WorldMap save={save} go={setScreen} onSound={onSound} onOpenHome={openHome} />}
+      {save && screen === "home" && save.partner && <WorldMap save={save} go={setScreen} onSound={onSound} onOpenHome={openHome} onSwitchProfile={switchProfile} />}
       {save && screen === "powers" && <Powers save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
       {save && screen === "dex" && <Dex save={save} go={setScreen} onSound={onSound} onBack={funcBack} openHome={openHome} />}
       {save && screen === "puzzle" && <Puzzle save={save} update={update} go={setScreen} onSound={onSound} unlockAll={unlockAll} openHome={openHome} />}
@@ -173,9 +173,9 @@ export default function App() {
           onDeleteRequest={() => setConfirmDelete(true)}
           unlockAll={unlockAll} setUnlockAll={setUnlockAll} />
       )}
-      {/* おうち（RPG部屋・モーダル）: 呼び出し元の画面の上に開く。閉じたら from へ戻る（メモ01+04） */}
+      {/* おうち（RPG部屋・モーダル）: 呼び出し元の画面の上に開く。閉じたら from へ戻る（メモ01+04）。交代はマップの「みなと」へ一本化（段階②） */}
       {save && home && home.open && (
-        <HomeRoom save={save} onClose={closeHome} onEnter={enterFromHome} onSwitchProfile={switchProfile} />
+        <HomeRoom save={save} onClose={closeHome} onEnter={enterFromHome} />
       )}
       <EvolutionOverlay evolution={evolution} sound={save ? save.settings.sound : false} onClose={() => setEvolution(null)} />
       {legacyCoins > 0 && (

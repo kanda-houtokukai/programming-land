@@ -18,6 +18,7 @@ import iconFlower from "../assets/grow_4_flower.png";
 import buildingQuiz from "../assets/building_quiz.png";
 import buildingTyping from "../assets/building_typing.png";
 import buildingHome from "../assets/building_home.png";
+import iconHarbor from "../assets/icon_harbor.png";
 
 // 8エリアの%座標（1600×900の背景に対して）。ブラウザで背景に照らして微調整する。
 // 拡張用の空き地（今回は何も置かない・将来の新エリア用）: 中央上(46,30)・北(58,16)・右中(70,36)
@@ -39,9 +40,12 @@ export const AREAS = [
   { key: "typing", short: "タイピング", place: "タイピングタワー", img: buildingTyping, tall: true, left: 46, top: 51 },
   { key: "puzzle", short: "パズル", place: "パズルのしま", img: iconPuzzle, left: 85, top: 72 },
   { key: "battle", short: "バトル", place: "バトルのアリーナ", img: iconBattle, left: 88, top: 26 },
+  // みなと（第2波 段階②）: プロファイル交代の一本化された入口。海側・島の端（拡張用の空き地3つは温存）。
+  // 毎回使う場所ではないので small=やや控えめサイズ。「▶いく！」で起動時の選択画面へ（switchProfile経路）
+  { key: "harbor", short: "みなと", place: "みなと", img: iconHarbor, small: true, left: 9, top: 86 },
 ];
 
-export default function WorldMap({ save, go, onSound, onOpenHome }) {
+export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfile }) {
   const [popup, setPopup] = useState(null); // タップ中のエリア（場所名＋「へ いく」）
   const battleOk = battleUnlocked(save);
   const sound = save.settings.sound;
@@ -82,7 +86,7 @@ export default function WorldMap({ save, go, onSound, onOpenHome }) {
                   ふわふわは img だけに掛ける（ボタンの centering transform と衝突しない）。*/}
               {a.img
                 ? <img src={a.img} alt="" draggable="false" className={locked ? "" : "mapfloat"}
-                    style={{ width: a.tall ? "82%" : "62%", height: a.tall ? "82%" : "62%", objectFit: "contain", display: "block",
+                    style={{ width: a.tall ? "82%" : a.small ? "50%" : "62%", height: a.tall ? "82%" : a.small ? "50%" : "62%", objectFit: "contain", display: "block",
                       animationDelay: floatDelay, animationDuration: floatDur,
                       filter: locked ? "grayscale(1) brightness(.75) drop-shadow(1px 2px 2px rgba(20,15,25,.45))" : "drop-shadow(1px 2px 2px rgba(20,15,25,.45))",
                       opacity: locked ? 0.7 : 1 }} />
@@ -121,7 +125,9 @@ export default function WorldMap({ save, go, onSound, onOpenHome }) {
               </>
             ) : (
               <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 12 }}>
-                <Btn big bg={C.leaf} onClick={() => { SFX.tap(sound); setPopup(null); area.key === "myhome" ? onOpenHome() : go(area.key); }}>▶ いく！</Btn>
+                <Btn big bg={C.leaf} onClick={() => { SFX.tap(sound); setPopup(null);
+                  // みなと=交代（既存switchProfile経路・段階①のsetHome(null)込み）／おうち=モーダル／他=画面遷移
+                  area.key === "harbor" ? onSwitchProfile() : area.key === "myhome" ? onOpenHome() : go(area.key); }}>▶ いく！</Btn>
                 <Btn bg="#fff" onClick={() => setPopup(null)}>とじる</Btn>
               </div>
             )}
