@@ -41,7 +41,7 @@ function diffBreakdown(save) {
   });
 }
 
-export default function Records({ save, profiles = [], go, onSound, onExport, onImportFile, onDeleteRequest, unlockAll, setUnlockAll }) {
+export default function Records({ save, profiles = [], go, onSound, onBack, openHome, onExport, onImportFile, onDeleteRequest, unlockAll, setUnlockAll }) {
   const [tab, setTab] = useState("kid");
   const [gate, setGate] = useState(false);
   const [ans, setAns] = useState("");
@@ -56,7 +56,8 @@ export default function Records({ save, profiles = [], go, onSound, onExport, on
   const diffs = diffBreakdown(save);
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 40 }}>
-      <Header save={save} title="📖 きろくの へや" onBack={() => go("home")} onSound={onSound} />
+      {/* ◀もどる: おうち経由なら部屋へ、ヘッダーきろく経由ならマップへ（App の funcBack が判定） */}
+      <Header save={save} title="📖 きろくの へや" onBack={onBack} onSound={onSound} onOpenHome={openHome} />
       <div style={{ display: "flex", gap: 10, padding: "0 16px", marginBottom: 14 }}>
         <Btn bg={tab === "kid" ? C.sun : "#fff"} onClick={() => setTab("kid")}>🧒 わたしの きろく</Btn>
         <Btn bg={tab === "parent" ? C.sun : "#fff"} onClick={() => { setTab("parent"); setGate(false); setAns(""); setIoMsg(null); }}>👪 おうちのひとへ</Btn>

@@ -11,7 +11,7 @@ import { Btn, Toast } from "./components/common.jsx";
 import ProfileSelect from "./components/ProfileSelect.jsx";
 import ProfileCreate from "./components/ProfileCreate.jsx";
 import WorldMap from "./components/WorldMap.jsx";
-import MyHome from "./components/MyHome.jsx";
+import HomeRoom from "./components/HomeRoom.jsx";
 import Powers from "./components/Powers.jsx";
 import Puzzle from "./components/Puzzle.jsx";
 import Quiz from "./components/Quiz.jsx";
@@ -38,8 +38,18 @@ export default function App() {
   // 確認モード（開発・実機確認用の隠し機能）: 全パズル面を一時解放する。
   // 保護者ゲートの中でだけ切り替えられ、localStorageには保存しない（リロードでオフに戻る＝子どもの記録に残らない）
   const [unlockAll, setUnlockAll] = useState(false);
+  // おうち（第2波 段階①）: モーダルで開く。home={from,open}。from=呼び出し元の画面（閉じたらここへ戻る）。
+  // open=false は「部屋から全画面機能(ずかん/きろく)へ潜っている」状態＝機能の◀もどるで部屋を再オープン。
+  const [home, setHome] = useState(null);
 
   const save = profiles.find(p => p.id === currentId) || null;
+
+  // どの画面からでも呼べる（ヘッダーの名前タップ／マップの家）。現在画面を from に覚えて開く（画面は変えない＝呼び出し元の状態は保持）
+  const openHome = () => setHome({ from: screen, open: true });
+  const closeHome = () => { if (home) { setScreen(home.from); setHome(null); } };
+  const enterFromHome = target => { setScreen(target); setHome(h => (h ? { ...h, open: false } : h)); }; // 本棚/机→全画面
+  // ずかん・きろくの◀もどる: おうち経由なら部屋を再オープン、そうでなければ（ヘッダーきろく等）ワールドマップへ
+  const funcBack = () => { if (home) setHome(h => ({ ...h, open: true })); else setScreen("home"); };
 
   function showToast(emoji, text) {
     setToast({ emoji, text }); setTimeout(() => setToast(null), 2800);
@@ -92,16 +102,16 @@ export default function App() {
       setProfiles(prev => prev.map(x => x.id === id ? clone : x));
       if (gained > 0) setLegacyCoins(gained);
     }
-    setCurrentId(id); setScreen("home");
+    setCurrentId(id); setScreen("home"); setHome(null);
   }
   function handleCreate(name, avatar) {
     const p = createProfile(name, avatar);
     if (!p) return; // 上限（選択画面側でボタンを出さないので通常来ない）
     setProfiles(listProfiles());
-    setCurrentId(p.id); setScreen("home");
+    setCurrentId(p.id); setScreen("home"); setHome(null);
   }
   function switchProfile() {
-    setCurrentId(null); setScreen("select");
+    setCurrentId(null); setScreen("select"); setHome(null); // おうちモーダルの状態も必ずクリア（残存すると次プロファイルに漏れる）
   }
 
   function handleExport() {
@@ -124,7 +134,7 @@ export default function App() {
     deleteProfile(currentId);
     setProfiles(listProfiles());
     setConfirmDelete(false);
-    setCurrentId(null); setScreen("select");
+    setCurrentId(null); setScreen("select"); setHome(null);
   }
 
   const noProfiles = profiles.length === 0;
@@ -146,22 +156,26 @@ export default function App() {
           return s;
         })} />
       )}
-      {/* ホーム＝ワールドマップ（worldmap-home フェーズ1）。screen名"home"を維持＝各モードの go("home") が自動でここへ戻る */}
-      {save && screen === "home" && save.partner && <WorldMap save={save} go={setScreen} onSound={onSound} />}
-      {save && screen === "myhome" && <MyHome save={save} go={setScreen} onSound={onSound} onSwitchProfile={switchProfile} />}
-      {save && screen === "powers" && <Powers save={save} update={update} go={setScreen} onSound={onSound} />}
-      {save && screen === "dex" && <Dex save={save} go={setScreen} onSound={onSound} />}
-      {save && screen === "puzzle" && <Puzzle save={save} update={update} go={setScreen} onSound={onSound} unlockAll={unlockAll} />}
-      {save && screen === "quiz" && <Quiz save={save} update={update} go={setScreen} onSound={onSound} />}
-      {save && screen === "art" && <Art save={save} update={update} go={setScreen} onSound={onSound} />}
-      {save && screen === "typing" && <Typing save={save} update={update} go={setScreen} onSound={onSound} />}
-      {save && screen === "battle" && battleUnlocked(save) && <Battle save={save} update={update} go={setScreen} onSound={onSound} />}
-      {save && screen === "shop" && <Shop save={save} update={update} go={setScreen} onSound={onSound} />}
+      {/* ホーム＝ワールドマップ（worldmap-home フェーズ1）。screen名"home"を維持＝各モードの go("home") が自動でここへ戻る。
+          おうちはモーダル（下の HomeRoom）で開くため screen "myhome" は廃止。マップの家・各ヘッダー名タップ→openHome */}
+      {save && screen === "home" && save.partner && <WorldMap save={save} go={setScreen} onSound={onSound} onOpenHome={openHome} />}
+      {save && screen === "powers" && <Powers save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
+      {save && screen === "dex" && <Dex save={save} go={setScreen} onSound={onSound} onBack={funcBack} openHome={openHome} />}
+      {save && screen === "puzzle" && <Puzzle save={save} update={update} go={setScreen} onSound={onSound} unlockAll={unlockAll} openHome={openHome} />}
+      {save && screen === "quiz" && <Quiz save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
+      {save && screen === "art" && <Art save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
+      {save && screen === "typing" && <Typing save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
+      {save && screen === "battle" && battleUnlocked(save) && <Battle save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
+      {save && screen === "shop" && <Shop save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
       {save && screen === "records" && (
-        <Records save={save} profiles={profiles} go={setScreen} onSound={onSound}
+        <Records save={save} profiles={profiles} go={setScreen} onSound={onSound} onBack={funcBack} openHome={openHome}
           onExport={handleExport} onImportFile={handleImportFile}
           onDeleteRequest={() => setConfirmDelete(true)}
           unlockAll={unlockAll} setUnlockAll={setUnlockAll} />
+      )}
+      {/* おうち（RPG部屋・モーダル）: 呼び出し元の画面の上に開く。閉じたら from へ戻る（メモ01+04） */}
+      {save && home && home.open && (
+        <HomeRoom save={save} onClose={closeHome} onEnter={enterFromHome} onSwitchProfile={switchProfile} />
       )}
       <EvolutionOverlay evolution={evolution} sound={save ? save.settings.sound : false} onClose={() => setEvolution(null)} />
       {legacyCoins > 0 && (

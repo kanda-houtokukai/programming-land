@@ -162,13 +162,13 @@ function TypingPlay({ stage, save, update, onBack }) {
   );
 }
 
-export default function Typing({ save, update, go, onSound }) {
+export default function Typing({ save, update, go, onSound, openHome }) {
   const [stageId, setStageId] = useState(null);
   const stage = TYPING_STAGES.find(s => s.id === stageId);
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
       {/* プレイ中の戻りは TypingPlay 内の「◀ もどる」1つ。一覧では ◀もどる=ワールドマップへ（1階層） */}
-      <Header save={save} title="⌨️ タイピング" onBack={stage ? undefined : () => go("home")} onSound={onSound} />
+      <Header save={save} title="⌨️ タイピング" onBack={stage ? undefined : () => go("home")} onSound={onSound} onOpenHome={openHome} />
       {stage
         ? <TypingPlay key={stage.id} stage={stage} save={save} update={update} onBack={() => setStageId(null)} />
         : (

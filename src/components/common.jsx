@@ -34,18 +34,27 @@ export function Toast({ toast }) {
 
 // 戻る導線は「◀ もどる」1つ＝1階層だけ戻る（メモ03で全画面統一。🏠ホーム等の二重ボタンは廃止）。
 // onBack には「1つ前の画面」に戻す関数を渡す。プレイ中など画面内に自前の◀もどるがある場合は渡さない。
-export function Header({ save, onBack, onSound, title, onRecords }) {
+// onOpenHome を渡すと、名前パネル（相棒アバター＋名前）タップで おうちモーダルが開く（第2波 メモ01）。
+export function Header({ save, onBack, onSound, title, onRecords, onOpenHome }) {
   const stars = puzzleStarsTotal(save);
+  // 名前パネル: onOpenHome があれば button（タップでおうち）、なければ従来の表示用 div
+  const profileInner = (
+    <>
+      <span style={{ fontSize: 22 }}>{save.avatar}</span>
+      <b>{save.name}</b>
+      <span style={{ fontWeight: 900 }}>⭐{stars}</span>
+      <span style={{ fontWeight: 900 }}>🪙{save.coins || 0}</span>
+    </>
+  );
+  const panelStyle = { padding: "6px 14px", display: "flex", gap: 8, alignItems: "center", borderRadius: 999 };
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", flexWrap: "wrap" }}>
       {onBack && <Btn bg={C.white} onClick={onBack} style={{ fontSize: 16 }}>◀ もどる</Btn>}
       <div className="pl-display" style={{ fontSize: 20, fontWeight: 900, flex: 1, minWidth: 120 }}>{title}</div>
-      <div className="panel" style={{ padding: "6px 14px", display: "flex", gap: 8, alignItems: "center", borderRadius: 999 }}>
-        <span style={{ fontSize: 22 }}>{save.avatar}</span>
-        <b>{save.name}</b>
-        <span style={{ fontWeight: 900 }}>⭐{stars}</span>
-        <span style={{ fontWeight: 900 }}>🪙{save.coins || 0}</span>
-      </div>
+      {onOpenHome
+        ? <button className="pbtn" onClick={onOpenHome} aria-label={`${save.name}の おうちを ひらく`}
+            style={{ ...panelStyle, background: "#fff" }}>{profileInner}</button>
+        : <div className="panel" style={panelStyle}>{profileInner}</div>}
       {onRecords && <Btn bg={C.sakura} onClick={onRecords}>📖 きろく</Btn>}
       <Btn bg={C.white} onClick={onSound} aria-label="おとの おんおふ">{save.settings.sound ? "🔊" : "🔇"}</Btn>
     </div>

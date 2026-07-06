@@ -9,15 +9,15 @@ import MonsterArt from "./MonsterArt.jsx";
 
 const STAGE_LABEL = { 1: "たまご", 2: "こども", 3: "せいちょう" };
 
-export default function Dex({ save, go, onSound }) {
+export default function Dex({ save, go, onSound, onBack, openHome }) {
   const found = save.dex.length;
   const total = SPECIES.length * 3;
   const badgeGot = BADGES.filter(b => save.badges.includes(b.id)).length;
   const defeated = (save.battle && save.battle.defeated) || [];
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
-      {/* ずかんの入口は「わたしのおうち」のみ → 1階層もどる＝おうち（go("home")だと2階層飛びだった） */}
-      <Header save={save} title="📔 なかまずかん" onBack={() => go("myhome")} onSound={onSound} />
+      {/* ずかんの入口はおうちの部屋（本棚/相棒）→ ◀もどるは App の funcBack で部屋を再オープン（メモ01+03） */}
+      <Header save={save} title="📔 なかまずかん" onBack={onBack} onSound={onSound} onOpenHome={openHome} />
       <div style={{ padding: "0 16px", display: "grid", gap: 14 }}>
         <div className="panel slide" style={{ padding: "10px 16px", textAlign: "center", fontWeight: 900 }}>
           みつけた すがた: {found} / {total}

@@ -98,7 +98,7 @@ function QuizPlay({ session, save, update, onBack }) {
   );
 }
 
-export default function Quiz({ save, update, go, onSound }) {
+export default function Quiz({ save, update, go, onSound, openHome }) {
   const diff = save.quiz.difficulty || "easy";
   const [session, setSession] = useState(null);
 
@@ -118,7 +118,7 @@ export default function Quiz({ save, update, go, onSound }) {
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
       {/* プレイ中の戻りは QuizPlay 内の「◀ もどる」1つ。一覧では ◀もどる=ワールドマップへ（1階層） */}
-      <Header save={save} title="💡 かんがえる クイズ" onBack={session ? undefined : () => go("home")} onSound={onSound} />
+      <Header save={save} title="💡 かんがえる クイズ" onBack={session ? undefined : () => go("home")} onSound={onSound} onOpenHome={openHome} />
       {session
         ? <QuizPlay key={session.key + session.qs[0].id} session={session} save={save} update={update} onBack={() => setSession(null)} />
         : (

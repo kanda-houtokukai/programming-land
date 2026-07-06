@@ -55,7 +55,7 @@ function HudPill({ children, style }) {
 
 const T = { windup: 680, impact: 320, atkEnd: 780, fxClear: 980, heartGone: 900, downEnd: 950, overlay: 2150 };
 
-function BattleFight({ enemy, diff, save, update, go, onBack }) {
+function BattleFight({ enemy, diff, save, update, go, onBack, openHome }) {
   const sound = save.settings.sound;
   const maxHp = HP_BY_DIFF[diff];
   const [queue] = useState(() => battlePool(diff));
@@ -195,7 +195,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack }) {
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 14px 30px" }}>
       {/* バトル中の戻りは「◀ にげる」1つ（1階層＝てき選びへ。ヘッダーには置かない＝二重にしない） */}
-      <Header save={save} title="⚔️ クイズバトル" onSound={() => {}} />
+      <Header save={save} title="⚔️ クイズバトル" onSound={() => {}} onOpenHome={openHome} />
       <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "8px 0" }}>
         <Btn bg="#fff" onClick={onBack} disabled={!!overlay}>◀ にげる</Btn>
         <div style={{ fontWeight: 900 }}>{DIFFICULTIES.find(d => d.id === diff).short} バトル</div>
@@ -383,20 +383,20 @@ function BattleFight({ enemy, diff, save, update, go, onBack }) {
 
 /* ---- 入口（難易度→敵選択） ---- */
 
-export default function Battle({ save, update, go, onSound }) {
+export default function Battle({ save, update, go, onSound, openHome }) {
   const [diff, setDiff] = useState("easy");
   const [fight, setFight] = useState(null);
   const defeated = (save.battle && save.battle.defeated) || [];
 
   if (fight) {
     return <BattleFight key={fight.id + diff} enemy={fight} diff={diff} save={save} update={update} go={go}
-      onBack={() => setFight(null)} />;
+      onBack={() => setFight(null)} openHome={openHome} />;
   }
 
   const list = enemiesFor(diff);
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
-      <Header save={save} title="⚔️ クイズバトル" onBack={() => go("home")} onSound={onSound} />
+      <Header save={save} title="⚔️ クイズバトル" onBack={() => go("home")} onSound={onSound} onOpenHome={openHome} />
       {/* むずかしさ えらび: タブ（色＋言葉。★は成績専用＝メモ03） */}
       <div style={{ display: "flex", gap: 8, padding: "0 16px" }}>
         {DIFFICULTIES.map(d => (

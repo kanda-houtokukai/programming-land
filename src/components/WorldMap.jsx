@@ -41,7 +41,7 @@ export const AREAS = [
   { key: "battle", short: "バトル", place: "バトルのアリーナ", img: iconBattle, left: 88, top: 26 },
 ];
 
-export default function WorldMap({ save, go, onSound }) {
+export default function WorldMap({ save, go, onSound, onOpenHome }) {
   const [popup, setPopup] = useState(null); // タップ中のエリア（場所名＋「へ いく」）
   const battleOk = battleUnlocked(save);
   const sound = save.settings.sound;
@@ -51,7 +51,7 @@ export default function WorldMap({ save, go, onSound }) {
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
       {/* ヘッダーは従来どおり（相棒・⭐・🪙・きろく・音）をマップの上にそのまま維持 */}
-      <Header save={save} title="" onSound={onSound} onRecords={() => go("records")} />
+      <Header save={save} title="" onSound={onSound} onRecords={() => go("records")} onOpenHome={onOpenHome} />
       <div style={{ textAlign: "center", margin: "0 0 10px" }}>
         <h1 className="pl-display" style={{ fontSize: 26, margin: 0 }}>🗺️ プログラミングランド</h1>
         <div style={{ fontWeight: 700, fontSize: 13 }}>いきたい ばしょを タップしてね</div>
@@ -121,7 +121,7 @@ export default function WorldMap({ save, go, onSound }) {
               </>
             ) : (
               <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 12 }}>
-                <Btn big bg={C.leaf} onClick={() => { SFX.tap(sound); setPopup(null); go(area.key); }}>▶ いく！</Btn>
+                <Btn big bg={C.leaf} onClick={() => { SFX.tap(sound); setPopup(null); area.key === "myhome" ? onOpenHome() : go(area.key); }}>▶ いく！</Btn>
                 <Btn bg="#fff" onClick={() => setPopup(null)}>とじる</Btn>
               </div>
             )}

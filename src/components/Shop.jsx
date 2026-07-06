@@ -9,7 +9,7 @@ import { SHOP_GUIDE } from "../data/parent-guide.js";
 import { ITEMS, COSMETICS, cosmeticById } from "../data/battle.js";
 import { SFX } from "../sound.js";
 
-export default function Shop({ save, update, go, onSound }) {
+export default function Shop({ save, update, go, onSound, openHome }) {
   const sound = save.settings.sound;
   const [msg, setMsg] = useState(null);
   const coins = save.coins || 0;
@@ -50,7 +50,7 @@ export default function Shop({ save, update, go, onSound }) {
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
-      <Header save={save} title="🪙 おみせ" onBack={() => go("home")} onSound={onSound} />
+      <Header save={save} title="🪙 おみせ" onBack={() => go("home")} onSound={onSound} onOpenHome={openHome} />
       <div style={{ padding: "0 16px", display: "grid", gap: 14 }}>
         <HowTo id="shop" />
         {msg && <div className="panel slide" style={{ padding: 10, background: "#FFFBE0", fontWeight: 800, fontSize: 14, textAlign: "center" }}>{msg}</div>}
