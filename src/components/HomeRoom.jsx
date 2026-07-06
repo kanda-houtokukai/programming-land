@@ -17,7 +17,7 @@ import roomBg from "../assets/room-home.webp";
 const FURNITURE = [
   { key: "dex", label: "ずかん", left: 11, top: 40, w: 20, h: 62 },   // 左の本棚（縦長）
   { key: "records", label: "きろく", left: 89, top: 44, w: 18, h: 40 }, // 右の机の上の日記
-  { key: "profile", label: "プロフィール", left: 47, top: 20, w: 15, h: 22 }, // 中央奥の壁の額縁
+  { key: "profile", label: "プロフィール", left: 52, top: 22, w: 12, h: 16 }, // 中央奥の壁の額縁（グリッド実測で中心52/22に合わせた）
   { key: "chest", label: "たからばこ", left: 90, top: 80, w: 14, h: 22 },   // 右下の宝箱（将来用）
 ];
 
@@ -47,11 +47,15 @@ export default function HomeRoom({ save, onClose, onEnter, onSwitchProfile }) {
           <Btn bg="#fff" onClick={onClose} style={{ fontSize: 15, padding: "6px 12px" }}>✕ とじる</Btn>
         </div>
 
-        {/* 部屋（背景＋家具のタップ領域）。ワールドマップと同じ「背景＋%座標」手法 */}
-        <div style={{ position: "relative", aspectRatio: "1600 / 905", borderRadius: 16,
+        {/* 部屋（背景＋家具のタップ領域）。
+            ★表示方式: 背景 img 自身にコンテナ高さを決めさせる（width:100% / height:auto / block）。
+            aspectRatio+objectFit:cover 方式だと 幅ごとにサブピクセルのトリミングが変わり、絵の中の家具と
+            %座標がズレる（実機b2bで額縁がズレた原因）。img が座標空間そのものになるこの方式なら
+            どの幅でも %座標が必ず絵と一致する（トリミング/伸縮に一切依存しない）。 */}
+        <div style={{ position: "relative", borderRadius: 16, lineHeight: 0,
           overflow: "hidden", border: `3px solid ${C.ink}`, background: "#e9c9a0" }}>
           <img src={roomBg} alt="おうちの へや" draggable="false"
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+            style={{ display: "block", width: "100%", height: "auto" }} />
 
           {/* 家具のタップ領域（うっすら光る＝押せる合図・staggerで一斉に光らない） */}
           {FURNITURE.map((f, i) => (
