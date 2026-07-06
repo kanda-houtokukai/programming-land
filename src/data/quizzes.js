@@ -12,10 +12,11 @@ export const QUIZ_CATEGORIES = [
   { id: "yomitori", name: "ずの よみとり", emoji: "🔀", color: "#FF9F43", desc: "フローチャートを よんで こたえよう" },
 ];
 
+// 難易度は「色＋言葉」で見せる（メモ03）。★は評価専用。色は islands.js の DIFFICULTIES と同値に揃える
 export const QUIZ_DIFFS = [
-  { id: "easy", label: "⭐ やさしい" },
-  { id: "normal", label: "⭐⭐ ふつう" },
-  { id: "hard", label: "⭐⭐⭐ むずかしい" },
+  { id: "easy", label: "やさしい", color: "#6BCB77" },
+  { id: "normal", label: "ふつう", color: "#FFD447" },
+  { id: "hard", label: "むずかしい", color: "#FF9F43" },
 ];
 
 export const ALL_QUESTIONS = GEN_QUIZZES;

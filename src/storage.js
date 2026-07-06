@@ -47,6 +47,7 @@ export function newProfileData(name = "", avatar = "") {
     coinsGranted: false,                  // 導入時の「いままでのがんばり」換算を済ませたか
     cosmetics: { owned: [], equipped: { deco: null, bg: null } }, // きせかえ（所持ID・装備中）
     shopUsed: false,                      // ショップで一度でも買ったか（バッジ判定用）
+    powers: { prev: {} },                 // そだったちからF2: 前回見たときの各ちから% { powerId: pct }。差分演出の基準（後方互換=空でマージ）
   };
 }
 

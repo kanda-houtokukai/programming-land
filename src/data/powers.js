@@ -23,18 +23,19 @@ export function growStage(pct) {
   return { ...GROW_STAGES[idx], idx };
 }
 
-// 5つのちから（子ども向け）。grows=そだつ場所の説明／go=詳細から飛べるモードkey（フェーズ2で使用）
+// 5つのちから（子ども向け）。grows=そだつ場所の説明（メモ02の場所名で統一・代表1〜2か所）／
+// go=詳細の「いってみる」で飛ぶ先のモードkey（メモ02の遷移に沿う）／goLabel=ボタンに出す場所名
 export const POWERS = [
-  { id: "junji", name: "じゅんばんの ちから", emoji: "👣", go: "puzzle",
-    grows: "「じゅんばんの しま」と「じゅんばん クイズ」で そだつよ" },
-  { id: "repeat", name: "くりかえしの ちから", emoji: "🔁", go: "puzzle",
-    grows: "「くりかえしの しま」と「きまり みつけ」で そだつよ" },
-  { id: "think", name: "かんがえる ちから", emoji: "🧠", go: "quiz",
-    grows: "「もしもの しま」や クイズ（なかまわけ・ずのよみとり）で そだつよ" },
-  { id: "keyboard", name: "キーボードの ちから", emoji: "⌨️", go: "typing",
-    grows: "「タイピング」で そだつよ" },
-  { id: "create", name: "つくる ちから", emoji: "🎨", go: "art",
-    grows: "「おえかき コード」で さくひんを つくると そだつよ" },
+  { id: "junji", name: "じゅんばんの ちから", emoji: "👣", go: "puzzle", goLabel: "パズルのしま",
+    grows: "「パズルのしま」や「クイズのひろば」の じゅんばん で そだつよ" },
+  { id: "repeat", name: "くりかえしの ちから", emoji: "🔁", go: "puzzle", goLabel: "パズルのしま",
+    grows: "「パズルのしま」の くりかえし や「クイズのひろば」の きまりみつけ で そだつよ" },
+  { id: "think", name: "かんがえる ちから", emoji: "🧠", go: "quiz", goLabel: "クイズのひろば",
+    grows: "「パズルのしま」の もしも や「クイズのひろば」の なかまわけ で そだつよ" },
+  { id: "keyboard", name: "キーボードの ちから", emoji: "⌨️", go: "typing", goLabel: "タイピングタワー",
+    grows: "「タイピングタワー」で そだつよ" },
+  { id: "create", name: "つくる ちから", emoji: "🎨", go: "art", goLabel: "おえかきのへや",
+    grows: "「おえかきのへや」で さくひんを つくると そだつよ" },
 ];
 
 /* 到達度% を計算（保護者画面 skillProgress と同じ式・5つに集約）

@@ -109,7 +109,7 @@ export default function Art({ save, update, go, onSound }) {
   }
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
-      <Header save={save} title="🎨 おえかき コード" onHome={() => go("home")} onSound={onSound} />
+      <Header save={save} title="🎨 おえかき コード" onBack={() => go("home")} onSound={onSound} />
       <div style={{ padding: "0 16px", display: "grid", gap: 14 }}>
         <HowTo id="art" />
         <div className="panel" style={{ padding: 10, display: "flex", justifyContent: "center" }}>

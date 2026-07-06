@@ -32,11 +32,13 @@ export function Toast({ toast }) {
   );
 }
 
-export function Header({ save, onHome, onSound, title, onRecords }) {
+// 戻る導線は「◀ もどる」1つ＝1階層だけ戻る（メモ03で全画面統一。🏠ホーム等の二重ボタンは廃止）。
+// onBack には「1つ前の画面」に戻す関数を渡す。プレイ中など画面内に自前の◀もどるがある場合は渡さない。
+export function Header({ save, onBack, onSound, title, onRecords }) {
   const stars = puzzleStarsTotal(save);
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", flexWrap: "wrap" }}>
-      {onHome && <Btn bg={C.white} onClick={onHome} style={{ fontSize: 18 }}>🏠 ホーム</Btn>}
+      {onBack && <Btn bg={C.white} onClick={onBack} style={{ fontSize: 16 }}>◀ もどる</Btn>}
       <div className="pl-display" style={{ fontSize: 20, fontWeight: 900, flex: 1, minWidth: 120 }}>{title}</div>
       <div className="panel" style={{ padding: "6px 14px", display: "flex", gap: 8, alignItems: "center", borderRadius: 999 }}>
         <span style={{ fontSize: 22 }}>{save.avatar}</span>

@@ -117,14 +117,17 @@ export default function Quiz({ save, update, go, onSound }) {
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
-      <Header save={save} title="💡 かんがえる クイズ" onHome={() => go("home")} onSound={onSound} />
+      {/* プレイ中の戻りは QuizPlay 内の「◀ もどる」1つ。一覧では ◀もどる=ワールドマップへ（1階層） */}
+      <Header save={save} title="💡 かんがえる クイズ" onBack={session ? undefined : () => go("home")} onSound={onSound} />
       {session
         ? <QuizPlay key={session.key + session.qs[0].id} session={session} save={save} update={update} onBack={() => setSession(null)} />
         : (
           <>
-            <div style={{ display: "flex", gap: 8, padding: "0 16px", flexWrap: "wrap", marginBottom: 4 }}>
+            {/* むずかしさ えらび: タブ（色＋言葉。★は成績専用＝メモ03） */}
+            <div style={{ display: "flex", gap: 8, padding: "0 16px", marginBottom: 4 }}>
               {QUIZ_DIFFS.map(d => (
-                <Btn key={d.id} bg={diff === d.id ? C.sun : "#fff"} onClick={() => setDiff(d.id)} style={{ fontSize: 14 }}>
+                <Btn key={d.id} bg={diff === d.id ? d.color : "#fff"} onClick={() => setDiff(d.id)}
+                  style={{ fontSize: 14, flex: 1, padding: "10px 6px", opacity: diff === d.id ? 1 : 0.75 }}>
                   {d.label}
                 </Btn>
               ))}

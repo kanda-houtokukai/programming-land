@@ -149,7 +149,7 @@ export default function App() {
       {/* ホーム＝ワールドマップ（worldmap-home フェーズ1）。screen名"home"を維持＝各モードの go("home") が自動でここへ戻る */}
       {save && screen === "home" && save.partner && <WorldMap save={save} go={setScreen} onSound={onSound} />}
       {save && screen === "myhome" && <MyHome save={save} go={setScreen} onSound={onSound} onSwitchProfile={switchProfile} />}
-      {save && screen === "powers" && <Powers save={save} go={setScreen} onSound={onSound} />}
+      {save && screen === "powers" && <Powers save={save} update={update} go={setScreen} onSound={onSound} />}
       {save && screen === "dex" && <Dex save={save} go={setScreen} onSound={onSound} />}
       {save && screen === "puzzle" && <Puzzle save={save} update={update} go={setScreen} onSound={onSound} unlockAll={unlockAll} />}
       {save && screen === "quiz" && <Quiz save={save} update={update} go={setScreen} onSound={onSound} />}

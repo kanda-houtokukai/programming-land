@@ -194,7 +194,8 @@ function BattleFight({ enemy, diff, save, update, go, onBack }) {
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 14px 30px" }}>
-      <Header save={save} title="⚔️ クイズバトル" onHome={() => go("home")} onSound={() => {}} />
+      {/* バトル中の戻りは「◀ にげる」1つ（1階層＝てき選びへ。ヘッダーには置かない＝二重にしない） */}
+      <Header save={save} title="⚔️ クイズバトル" onSound={() => {}} />
       <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "8px 0" }}>
         <Btn bg="#fff" onClick={onBack} disabled={!!overlay}>◀ にげる</Btn>
         <div style={{ fontWeight: 900 }}>{DIFFICULTIES.find(d => d.id === diff).short} バトル</div>
@@ -395,10 +396,12 @@ export default function Battle({ save, update, go, onSound }) {
   const list = enemiesFor(diff);
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
-      <Header save={save} title="⚔️ クイズバトル" onHome={() => go("home")} onSound={onSound} />
-      <div style={{ display: "flex", gap: 8, padding: "0 16px", flexWrap: "wrap" }}>
+      <Header save={save} title="⚔️ クイズバトル" onBack={() => go("home")} onSound={onSound} />
+      {/* むずかしさ えらび: タブ（色＋言葉。★は成績専用＝メモ03） */}
+      <div style={{ display: "flex", gap: 8, padding: "0 16px" }}>
         {DIFFICULTIES.map(d => (
-          <Btn key={d.id} bg={diff === d.id ? C.sun : "#fff"} onClick={() => { SFX.tap(save.settings.sound); setDiff(d.id); }} style={{ fontSize: 14 }}>
+          <Btn key={d.id} bg={diff === d.id ? d.color : "#fff"} onClick={() => { SFX.tap(save.settings.sound); setDiff(d.id); }}
+            style={{ fontSize: 14, flex: 1, padding: "10px 6px", opacity: diff === d.id ? 1 : 0.75 }}>
             {d.label}
           </Btn>
         ))}

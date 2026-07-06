@@ -12,7 +12,7 @@ export default function MyHome({ save, go, onSound, onSwitchProfile }) {
   const badges = save.badges.length;
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
-      <Header save={save} title="🏠 わたしの おうち" onHome={() => go("home")} onSound={onSound} />
+      <Header save={save} title="🏠 わたしの おうち" onBack={() => go("home")} onSound={onSound} />
       <div style={{ padding: "0 16px", display: "grid", gap: 14 }}>
         {/* プロフィール */}
         <div className="panel slide" style={{ padding: 16, textAlign: "center" }}>

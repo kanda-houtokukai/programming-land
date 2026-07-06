@@ -27,8 +27,11 @@ export const ISLANDS = {
     hint: "おおきな めいろは こわくない！ みちを ちいさく わけて、🔁で まとめよう！" },
 };
 
+// 難易度は「色＋言葉」で見せる（メモ03）。★は評価（クリア成績）専用にして混同を避ける。
+// 色: やさしい=緑（安心）/ ふつう=黄（中間）/ むずかしい=濃いオレンジ（挑戦。赤=失敗の色なので使わない）
+// ※quizzes.js の QUIZ_DIFFS と同じ色（tools からの node 直import都合で相互importせず値を揃える）
 export const DIFFICULTIES = [
-  { id: "easy", label: "⭐ やさしい", short: "やさしい" },
-  { id: "normal", label: "⭐⭐ ふつう", short: "ふつう" },
-  { id: "hard", label: "⭐⭐⭐ むずかしい", short: "むずかしい" },
+  { id: "easy", label: "やさしい", short: "やさしい", color: "#6BCB77" },
+  { id: "normal", label: "ふつう", short: "ふつう", color: "#FFD447" },
+  { id: "hard", label: "むずかしい", short: "むずかしい", color: "#FF9F43" },
 ];

@@ -37,7 +37,7 @@ function diffBreakdown(save) {
     const total = STAGES.filter(s => s.difficulty === d.id).length;
     const cleared = clearedInDiff(save, d.id);
     const star3 = star3InDiff(save, d.id);
-    return { id: d.id, label: d.short, total, cleared, star3, pct: Math.round(100 * cleared / total) };
+    return { id: d.id, label: d.short, color: d.color, total, cleared, star3, pct: Math.round(100 * cleared / total) };
   });
 }
 
@@ -56,7 +56,7 @@ export default function Records({ save, profiles = [], go, onSound, onExport, on
   const diffs = diffBreakdown(save);
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 40 }}>
-      <Header save={save} title="📖 きろくの へや" onHome={() => go("home")} onSound={onSound} />
+      <Header save={save} title="📖 きろくの へや" onBack={() => go("home")} onSound={onSound} />
       <div style={{ display: "flex", gap: 10, padding: "0 16px", marginBottom: 14 }}>
         <Btn bg={tab === "kid" ? C.sun : "#fff"} onClick={() => setTab("kid")}>🧒 わたしの きろく</Btn>
         <Btn bg={tab === "parent" ? C.sun : "#fff"} onClick={() => { setTab("parent"); setGate(false); setAns(""); setIoMsg(null); }}>👪 おうちのひとへ</Btn>
@@ -139,12 +139,15 @@ export default function Records({ save, profiles = [], go, onSound, onExport, on
             </p>
             {diffs.map(d => (
               <div key={d.id} style={{ marginBottom: 12 }}>
+                {/* 難易度は色＋言葉で表示（メモ03）。★は成績（★3が◯面）だけに使う */}
                 <div style={{ fontWeight: 900, fontSize: 14 }}>
-                  ⭐{"⭐".repeat(DIFFICULTIES.findIndex(x => x.id === d.id))} {d.label}
+                  <span style={{ display: "inline-block", width: 11, height: 11, borderRadius: 999,
+                    background: d.color, border: `2px solid ${C.ink}`, marginRight: 6 }} />
+                  {d.label}
                   <span style={{ float: "right" }}>{d.cleared}/{d.total}面（★3が {d.star3}面）</span>
                 </div>
                 <div style={{ height: 12, border: `2px solid ${C.ink}`, borderRadius: 999, overflow: "hidden", background: "#fff", marginTop: 4 }}>
-                  <div style={{ width: `${d.pct}%`, height: "100%", background: d.id === "easy" ? C.leaf : d.id === "normal" ? C.sky : C.grape }} />
+                  <div style={{ width: `${d.pct}%`, height: "100%", background: d.color }} />
                 </div>
               </div>
             ))}

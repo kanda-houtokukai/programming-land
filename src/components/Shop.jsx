@@ -50,7 +50,7 @@ export default function Shop({ save, update, go, onSound }) {
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
-      <Header save={save} title="🪙 おみせ" onHome={() => go("home")} onSound={onSound} />
+      <Header save={save} title="🪙 おみせ" onBack={() => go("home")} onSound={onSound} />
       <div style={{ padding: "0 16px", display: "grid", gap: 14 }}>
         <HowTo id="shop" />
         {msg && <div className="panel slide" style={{ padding: 10, background: "#FFFBE0", fontWeight: 800, fontSize: 14, textAlign: "center" }}>{msg}</div>}

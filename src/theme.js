@@ -149,10 +149,28 @@ export const CSS = `
     100%{ transform: translateY(260px) rotate(560deg); opacity: 0 }
   }
   .confetti { animation: pl-confetti 1.9s ease-in forwards; display: inline-block; }
+  /* ---- ワールドマップ フェーズ2（世界に命を吹き込む やさしい微演出） ---- */
+  /* ポップアップ: 背景ふわっと＋パネルを軽くスケールイン（低学年向けに ゆっくり・派手すぎず） */
+  @keyframes pl-fadein { from { opacity: 0 } to { opacity: 1 } }
+  .fadein { animation: pl-fadein .2s ease; }
+  @keyframes pl-softpop { 0% { transform: scale(.86); opacity: 0 } 100% { transform: scale(1); opacity: 1 } }
+  .softpop { animation: pl-softpop .26s cubic-bezier(.2,.8,.3,1.1); }
+  /* マップアイコンのふわふわ（生きている世界感）。数pxを ゆっくり・位相はインラインのdelay/durでばらす＝同位相で酔うのを防ぐ */
+  @keyframes pl-mapfloat { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
+  .mapfloat { animation: pl-mapfloat 3s ease-in-out infinite; will-change: transform; }
+  /* ---- そだったちから フェーズ2（育った瞬間の やさしい祝い・1-3と同じトーン） ---- */
+  /* 植物が「にゅっ」と育つ（下から伸びる＝根が張る向き）。段階アップは強め版で上書き */
+  @keyframes pl-growpop { 0% { transform: scale(.3) translateY(14px); opacity: 0 } 60% { transform: scale(1.12) translateY(-4px); opacity: 1 } 100% { transform: scale(1) translateY(0) } }
+  .growpop { animation: pl-growpop .7s cubic-bezier(.2,.8,.3,1.2) both; transform-origin: bottom center; }
+  .growpop.big { animation-duration: .95s; }
+  /* キラキラ（そのばで ちいさく またたく・上へ舞わない＝優しい） */
+  @keyframes pl-sparkle { 0%,100% { transform: scale(.5); opacity: 0 } 40% { transform: scale(1.15); opacity: 1 } }
+  .sparkle { animation: pl-sparkle 1.1s ease-in-out infinite; }
   @media (prefers-reduced-motion: reduce) {
     .pop,.shake,.bounce,.slide,.glow { animation: none; }
     .idle,.idle2,.lunge,.hitflash,.shake2,.hitfx,.critpop,.heartbreak,.fall,.victory,.droop,.riseup,.aura,.shieldpop,.healglow { animation: none; }
     .charge,.spinlight,.morph,.slam,.whiteflash,.confetti { animation: none; }
+    .fadein,.softpop,.mapfloat,.growpop,.sparkle { animation: none; }
     .whiteflash { opacity: 0; }
     .pbtn { transition: none; }
   }

@@ -16,7 +16,8 @@ export default function Dex({ save, go, onSound }) {
   const defeated = (save.battle && save.battle.defeated) || [];
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
-      <Header save={save} title="📔 なかまずかん" onHome={() => go("home")} onSound={onSound} />
+      {/* ずかんの入口は「わたしのおうち」のみ → 1階層もどる＝おうち（go("home")だと2階層飛びだった） */}
+      <Header save={save} title="📔 なかまずかん" onBack={() => go("myhome")} onSound={onSound} />
       <div style={{ padding: "0 16px", display: "grid", gap: 14 }}>
         <div className="panel slide" style={{ padding: "10px 16px", textAlign: "center", fontWeight: 900 }}>
           みつけた すがた: {found} / {total}

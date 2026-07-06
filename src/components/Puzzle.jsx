@@ -463,7 +463,8 @@ export default function Puzzle({ save, update, go, onSound, unlockAll }) {
     const next = stages[idx + 1];
     return (
       <div>
-        <Header save={save} title="🤖 ロボット パズル" onHome={() => go("home")} onSound={onSound} />
+        {/* プレイ中の戻りは PuzzlePlay 内の「◀ もどる」1つ（ヘッダーには置かない＝二重にしない） */}
+        <Header save={save} title="🤖 ロボット パズル" onSound={onSound} />
         <PuzzlePlay stage={stage} save={save} update={update}
           onBack={() => setStageId(null)}
           hasNext={!!next}
@@ -474,11 +475,14 @@ export default function Puzzle({ save, update, go, onSound, unlockAll }) {
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
-      <Header save={save} title="🤖 ロボット パズル" onHome={() => go("home")} onSound={onSound} />
-      {/* むずかしさ えらび */}
-      <div style={{ display: "flex", gap: 8, padding: "0 16px", flexWrap: "wrap" }}>
+      {/* ◀もどる=1階層: ステージ一覧→島マップ／島マップ→ワールドマップ */}
+      <Header save={save} title="🤖 ロボット パズル" onSound={onSound}
+        onBack={island !== null ? () => { SFX.tap(save.settings.sound); setIsland(null); } : () => go("home")} />
+      {/* むずかしさ えらび: タブ（色＋言葉。★は成績専用＝メモ03） */}
+      <div style={{ display: "flex", gap: 8, padding: "0 16px" }}>
         {DIFFICULTIES.map(d => (
-          <Btn key={d.id} bg={diff === d.id ? C.sun : "#fff"} onClick={() => setDiff(d.id)} style={{ fontSize: 14 }}>
+          <Btn key={d.id} bg={diff === d.id ? d.color : "#fff"} onClick={() => setDiff(d.id)}
+            style={{ fontSize: 14, flex: 1, padding: "10px 6px", opacity: diff === d.id ? 1 : 0.75 }}>
             {d.label}
           </Btn>
         ))}
@@ -496,7 +500,7 @@ export default function Puzzle({ save, update, go, onSound, unlockAll }) {
       ) : (
         <div style={{ padding: "14px 16px", display: "grid", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-            <Btn bg="#fff" onClick={() => setIsland(null)} style={{ fontSize: 13, padding: "6px 10px" }}>🗺️ マップ</Btn>
+            {/* もどるはヘッダーの「◀ もどる」1つ（🗺️マップボタンは二重だったので廃止＝メモ03） */}
             <div className="pl-display" style={{ fontSize: 21 }}>{ISLANDS[island].emoji} {ISLANDS[island].name}</div>
             <span style={{ fontWeight: 800, fontSize: 12, color: "#6B6265", background: "#F1EDE4",
               border: `2px solid ${C.ink}22`, borderRadius: 999, padding: "3px 10px" }}>
