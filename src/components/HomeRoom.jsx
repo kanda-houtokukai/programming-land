@@ -10,8 +10,8 @@ import { SFX } from "../sound.js";
 import { speciesById, stageForLevel } from "../data/monsters.js";
 import { partnerDisplayName, xpToNext, MAX_LEVEL } from "../growth.js";
 import { BADGES, puzzleStarsTotal, daysPlayed } from "../data/badges.js";
-import { equippedDeco } from "../data/battle.js";
 import MonsterArt from "./MonsterArt.jsx";
+import PlayerAvatar from "./PlayerAvatar.jsx";
 import roomBg from "../assets/room-home.webp";
 
 // 家具のタップ領域（room-home.webp に対する%座標＝家具の絵に合わせる。宝箱は将来枠で座標だけ保持）
@@ -99,7 +99,10 @@ export default function HomeRoom({ save, onClose, onEnter }) {
           style={{ position: "fixed", inset: 0, zIndex: 122, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div className="panel softpop" onClick={e => e.stopPropagation()}
             style={{ maxWidth: 340, width: "100%", padding: 22, textAlign: "center", background: "#FFFDF5" }}>
-            <span style={{ fontSize: 52 }}>{save.avatar}</span>
+            {/* 全身の立ち絵＝着せ替えの確認場所（段階③・買ったおしゃれが ここで見える） */}
+            <span style={{ display: "inline-flex", justifyContent: "center" }}>
+              <PlayerAvatar character={save.character} avatar={save.avatar} dressup={save.dressup} size={120} full />
+            </span>
             <div className="pl-display" style={{ fontSize: 23 }}>{save.name}</div>
             <div style={{ fontWeight: 800, fontSize: 14, margin: "10px 0", lineHeight: 1.9 }}>
               ⭐ ほし {puzzleStarsTotal(save)}こ<br />
@@ -120,7 +123,7 @@ export default function HomeRoom({ save, onClose, onEnter }) {
             style={{ maxWidth: 340, width: "100%", padding: 22, textAlign: "center", background: "#FFFDF5" }}>
             <span style={{ position: "relative", display: "inline-flex", lineHeight: 0 }}>
               <MonsterArt species={partner.species} stage={stage} size={120} />
-              {equippedDeco(save) && <span style={{ position: "absolute", top: -6, right: -6, fontSize: 40 }}>{equippedDeco(save)}</span>}
+              {/* 相棒の飾り(deco)は第3波②で廃止（着せ替えは主人公へ） */}
             </span>
             <div className="pl-display" style={{ fontSize: 22, marginTop: 4 }}>{partnerDisplayName(partner)}</div>
             <div style={{ fontWeight: 900, fontSize: 15, margin: "6px 0" }}>{speciesById(partner.species).typeEmoji} Lv.{partner.level}</div>

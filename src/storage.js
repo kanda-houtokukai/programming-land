@@ -26,11 +26,13 @@ export function lastNDays(n) {
 function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 
 // 相棒・ずかん・タイピング・バトル・難易度別記録の枠はP1以降で使う（今から予約）
-export function newProfileData(name = "", avatar = "") {
+export function newProfileData(name = "", character = null) {
   return {
     schema: SCHEMA_VERSION,
     id: genId(),
-    name, avatar,
+    name,
+    character,                            // 主人公 "boy"|"girl"（第3波①）。旧avatar（動物絵文字）は廃止・既存セーブはnullのまま残りCharacterSelectで移行
+    dressup: { head: null, face: null, neck: null, chest: null, waist: null, back: null }, // 着せ替え装備（各スロットのアイテムID・第3波）
     createdAt: today(),
     settings: { sound: true },
     puzzle: { stars: {}, difficulty: "easy" },
@@ -88,10 +90,10 @@ export function listProfiles() {
 }
 export function setLastProfile(id) { const m = loadMeta(); m.lastProfileId = id; saveMeta(m); }
 
-export function createProfile(name, avatar) {
+export function createProfile(name, character) {
   const m = loadMeta();
   if (m.ids.length >= MAX_PROFILES) return null;
-  const p = newProfileData(name, avatar);
+  const p = newProfileData(name, character);
   saveProfile(p);
   m.ids.push(p.id); m.lastProfileId = p.id; saveMeta(m);
   return p;

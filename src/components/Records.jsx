@@ -6,7 +6,7 @@ import { C } from "../theme.js";
 import { Header } from "./common.jsx";
 import { BADGES, puzzleStarsTotal, daysPlayed } from "../data/badges.js";
 import PartnerCard from "./PartnerCard.jsx";
-import { equippedDeco } from "../data/battle.js";
+import PlayerAvatar from "./PlayerAvatar.jsx";
 
 export default function Records({ save, go, onSound, onBack, openHome }) {
   return (
@@ -15,11 +15,13 @@ export default function Records({ save, go, onSound, onBack, openHome }) {
       <Header save={save} title="📖 きろくの へや" onBack={onBack} onSound={onSound} onOpenHome={openHome} />
       <div style={{ display: "grid", gap: 16, padding: "0 16px" }}>
         <div className="panel slide" style={{ padding: 18, textAlign: "center" }}>
-          <span style={{ fontSize: 50 }}>{save.avatar}</span>
+          <span style={{ display: "inline-flex", justifyContent: "center" }}>
+            <PlayerAvatar character={save.character} avatar={save.avatar} dressup={save.dressup} size={64} />
+          </span>
           <div className="pl-display" style={{ fontSize: 24 }}>{save.name} の ぼうけん</div>
           <div style={{ fontWeight: 800, marginTop: 6 }}>⭐ {puzzleStarsTotal(save)}こ ／ 🏅 バッジ {save.badges.length}こ ／ 🔥 {daysPlayed(save)}にち あそんだ</div>
         </div>
-        <PartnerCard partner={save.partner} size={80} deco={equippedDeco(save)} />
+        <PartnerCard partner={save.partner} size={80} />
         <div className="panel" style={{ padding: 18 }}>
           <div className="pl-display" style={{ fontSize: 20, marginBottom: 10 }}>🏅 バッジ コレクション</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(140px,1fr))", gap: 10 }}>

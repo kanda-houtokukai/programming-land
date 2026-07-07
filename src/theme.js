@@ -1,5 +1,5 @@
-// 色・アバター・共通CSS（v1から移植）
-export const AVATARS = ["🐻", "🐰", "🦊", "🐼", "🐸", "🦄"];
+// 色・共通CSS（v1から移植）
+// ※旧・動物アバター（AVATARS）は第3波①で廃止（主人公=男女の探検家キャラクターに置き換え・data/dressup.js参照）
 
 export const C = {
   bg: "#FFF9EF",

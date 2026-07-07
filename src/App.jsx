@@ -22,11 +22,13 @@ import Shop from "./components/Shop.jsx";
 import Records from "./components/Records.jsx";
 import ParentHub from "./components/ParentHub.jsx";
 import PartnerSelect from "./components/PartnerSelect.jsx";
+import CharacterSelect from "./components/CharacterSelect.jsx";
 import Dex from "./components/Dex.jsx";
 import EvolutionOverlay from "./components/EvolutionOverlay.jsx";
 import { stageForLevel } from "./data/monsters.js";
 import { grantLegacyCoins } from "./growth.js";
 import { battleUnlocked, BATTLE_UNLOCK_LEVEL } from "./data/battle.js";
+import { checkAchievementUnlocks } from "./data/dressup.js";
 
 export default function App() {
   const [profiles, setProfiles] = useState(() => listProfiles());
@@ -68,6 +70,14 @@ export default function App() {
         const b = BADGES.find(x => x.id === news[0]);
         SFX.badge(next.settings.sound);
         showToast(b.emoji, `バッジ ゲット！「${b.name}」`);
+      }
+      // 実績解放のきせかえ（第3波③: はかせぼうし=全パズル制覇／おうかん=バッジ全部）。
+      // 獲得のみ（装備は本人が おみせで「つける」）。バッジ同様に一度だけ・自動付与
+      const unlocked = checkAchievementUnlocks(next);
+      if (unlocked.length > 0) {
+        unlocked.forEach(d => next.cosmetics.owned.push(d.id));
+        SFX.fanfare(next.settings.sound);
+        showToast("🎁", `きせかえ「${unlocked[0].name}」を てにいれた！（おみせで つけられるよ）`);
       }
       // 相棒のレベルアップ・進化を検知（経験値の加算は各モードの applyXp が行う）
       if (p.partner && next.partner) {
@@ -149,7 +159,12 @@ export default function App() {
       {screen === "create" && (
         <ProfileCreate onDone={handleCreate} onCancel={() => setScreen("select")} />
       )}
-      {save && screen === "home" && !save.partner && (
+      {/* 既存プロファイルの移行（第3波①）: character未選択なら一度だけ男女選択（相棒の初回選択と同パターン・partnerより先） */}
+      {save && screen === "home" && !save.character && (
+        <CharacterSelect profileName={save.name} sound={save.settings.sound}
+          onPick={ch => update(s => { s.character = ch; return s; })} />
+      )}
+      {save && screen === "home" && save.character && !save.partner && (
         <PartnerSelect profileName={save.name} onPick={sp => update(s => {
           s.partner = { species: sp, xp: 0, level: 1 };
           const key = `${sp}-1`;
@@ -159,7 +174,7 @@ export default function App() {
       )}
       {/* ホーム＝ワールドマップ（worldmap-home フェーズ1）。screen名"home"を維持＝各モードの go("home") が自動でここへ戻る。
           おうちはモーダル（下の HomeRoom）で開くため screen "myhome" は廃止。マップの家・各ヘッダー名タップ→openHome */}
-      {save && screen === "home" && save.partner && <WorldMap save={save} go={setScreen} onSound={onSound} onOpenHome={openHome} onSwitchProfile={switchProfile} />}
+      {save && screen === "home" && save.character && save.partner && <WorldMap save={save} go={setScreen} onSound={onSound} onOpenHome={openHome} onSwitchProfile={switchProfile} />}
       {save && screen === "powers" && <Powers save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
       {save && screen === "dex" && <Dex save={save} go={setScreen} onSound={onSound} onBack={funcBack} openHome={openHome} />}
       {save && screen === "puzzle" && <Puzzle save={save} update={update} go={setScreen} onSound={onSound} unlockAll={unlockAll} openHome={openHome} />}

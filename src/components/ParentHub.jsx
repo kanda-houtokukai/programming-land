@@ -16,6 +16,7 @@ import { APP_VERSION, BUILD_DATE } from "../version.js";
 import { PARENT_INTRO } from "../data/parent-intro.js";
 import { GUIDE_SECTIONS, RECORDS_GUIDE } from "../data/parent-index.js";
 import { PARENT_GUIDE, QUIZ_GUIDE, TYPING_GUIDE, ART_GUIDE } from "../data/parent-guide.js";
+import PlayerAvatar from "./PlayerAvatar.jsx";
 
 // 保護者向けトーン（ParentGuide.jsx と同じ配色＝うすむらさき・落ち着いた見た目）
 const INK = "#3A3335";
@@ -188,7 +189,7 @@ export default function ParentHub({ save, profiles = [], go, onSound, onExport, 
           <div style={{ position: "sticky", top: 8, zIndex: 5, display: "flex", alignItems: "center", gap: 10,
             background: PANEL_BG, border: `2px solid ${ACCENT}`, borderRadius: 999, padding: "8px 16px",
             boxShadow: "0 2px 8px rgba(58,51,53,.18)" }}>
-            <span style={{ fontSize: 24 }}>{save.avatar}</span>
+            <PlayerAvatar character={save.character} avatar={save.avatar} dressup={save.dressup} size={30} />
             <span style={{ fontWeight: 900, fontSize: 14, color: INK }}>👀 いま見ているのは <b>{save.name}</b> さんの きろく</span>
           </div>
 
@@ -262,7 +263,7 @@ export default function ParentHub({ save, profiles = [], go, onSound, onExport, 
                   return (
                     <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px",
                       border: `2px solid ${C.ink}`, borderRadius: 12, background: isMe ? "#FFF7E6" : "#fff" }}>
-                      <span style={{ fontSize: 26 }}>{p.avatar}</span>
+                      <PlayerAvatar character={p.character} avatar={p.avatar} dressup={p.dressup} size={32} />
                       <span style={{ flex: 1, fontWeight: 900, fontSize: 14 }}>{p.name}{isMe && <span style={{ fontSize: 11, color: "#6B6265" }}>（いま えらんでいる子）</span>}</span>
                       <span style={{ fontWeight: 800, fontSize: 12, textAlign: "right", lineHeight: 1.5 }}>
                         パズル {cleared}面 ・ ⭐{puzzleStarsTotal(p)}<br />

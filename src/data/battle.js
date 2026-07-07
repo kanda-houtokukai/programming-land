@@ -32,39 +32,37 @@ export const BATTLE_XP = { easy: 12, normal: 16, hard: 22 };
 // 勝利でもらえるコインは growth.js の COIN.battle に集約（学習全体のレートと同じ場所で管理）。
 
 // バトルアイテム（消耗品・各所持上限3・価格は設計書 §5A）。
-// 演出はフェーズ1.5で実装済み。購入はフェーズ2のショップから（それまで所持0＝バトルに出ない）。
+// 第3波②: 絵文字プレースホルダー→イラストに差し替え（効果・価格・上限は不変・置き換え指示書§C）。
+// emoji は画像が出ないときのフォールバック。
+import imgPotion from "../assets/battle_item_potion.png";
+import imgHintGlasses from "../assets/battle_item_hintglasses.png";
+import imgPowerband from "../assets/battle_item_powerband.png";
+import imgShieldItem from "../assets/battle_item_shield.png";
 export const ITEMS = [
-  { id: "drink", emoji: "🧃", name: "かいふくドリンク", desc: "ハートを 1つ かいふく", price: 10, max: 3 },
-  { id: "glasses", emoji: "👓", name: "ヒントメガネ", desc: "こたえじゃない ものを 1つ けす", price: 15, max: 3 },
-  { id: "power", emoji: "💪", name: "パワーバンド", desc: "つぎの せいかいの ダメージ 2ばい", price: 15, max: 3 },
-  { id: "shield", emoji: "🛡️", name: "まもりのたて", desc: "つぎの ミスの ダメージを ふせぐ", price: 15, max: 3 },
+  { id: "drink", emoji: "🧃", img: imgPotion, name: "かいふくドリンク", desc: "ハートを 1つ かいふく", price: 10, max: 3 },
+  { id: "glasses", emoji: "👓", img: imgHintGlasses, name: "ヒントメガネ", desc: "こたえじゃない ものを 1つ けす", price: 15, max: 3 },
+  { id: "power", emoji: "💪", img: imgPowerband, name: "パワーバンド", desc: "つぎの せいかいの ダメージ 2ばい", price: 15, max: 3 },
+  { id: "shield", emoji: "🛡️", img: imgShieldItem, name: "まもりのたて", desc: "つぎの ミスの ダメージを ふせぐ", price: 15, max: 3 },
 ];
 export function itemById(id) { return ITEMS.find(i => i.id === id); }
 
-// きせかえ（非消耗・全品定価・ガチャなし・設計書§5B）。
-// deco=相棒カード/バトルの相棒につく飾り（絵文字）／ bg=バトル背景（自作CSSグラデ）。
+// きせかえ「バトルのぶたい」（非消耗・全品定価・ガチャなし）。
+// 第3波②: 旧・相棒の飾り5種（シルクハット等）と にじ/うちゅうの舞台は廃止（置き換え指示書§B/§D）。
+// 主人公の着せ替えは data/dressup.js の DRESSUP_ITEMS が担う。ここはバトル背景のコレクション枠のみ。
+// ※既存の難易度別3枚（草原/夕日/夜=BATTLE_BG・自動切替）とは別物・そちらは不変。
+// ※旧IDを購入済みのセーブは owned に残るが表示・販売はしない（cosmeticById が undefined → 装備は無効に落ちる＝安全）。
+import bgJungle from "../assets/bg_battle_jungle.webp";
+import bgCanyon from "../assets/bg_battle_canyon.webp";
 export const COSMETICS = [
-  { id: "deco_hat", type: "deco", emoji: "🎩", name: "シルクハット", price: 30 },
-  { id: "deco_ribbon", type: "deco", emoji: "🎀", name: "あかい リボン", price: 40 },
-  { id: "deco_shades", type: "deco", emoji: "🕶️", name: "サングラス", price: 50 },
-  { id: "deco_wand", type: "deco", emoji: "✨", name: "きらきら", price: 60 },
-  { id: "deco_crown", type: "deco", emoji: "👑", name: "おうかん", price: 80 },
-  { id: "bg_rainbow", type: "bg", emoji: "🌈", name: "にじの ぶたい", price: 50,
-    css: "linear-gradient(180deg,#FFD1E8 0%,#FFE9B0 30%,#C9F5C0 55%,#B7E4FF 80%,#D8C9FF 100%)" },
-  { id: "bg_space", type: "bg", emoji: "🌌", name: "うちゅうの ぶたい", price: 50,
-    css: "radial-gradient(circle at 30% 20%, #3a2a6b 0%, #1b1440 45%, #0a0820 100%)" },
+  { id: "bg_jungle", type: "bg", emoji: "🌴", name: "ジャングルの ぶたい", price: 50, img: bgJungle },
+  { id: "bg_canyon", type: "bg", emoji: "🏜️", name: "だいちの ぶたい", price: 50, img: bgCanyon },
 ];
 export function cosmeticById(id) { return COSMETICS.find(c => c.id === id); }
-// 装備中のきせかえを取り出す（未装備は null）
-export function equippedDeco(save) {
-  const id = save.cosmetics && save.cosmetics.equipped && save.cosmetics.equipped.deco;
-  const c = id && cosmeticById(id);
-  return c ? c.emoji : null;
-}
-export function equippedBgCss(save) {
+// 装備中のバトル舞台の画像（未装備・旧IDは null → 難易度別の基本背景を使う）
+export function equippedBgImg(save) {
   const id = save.cosmetics && save.cosmetics.equipped && save.cosmetics.equipped.bg;
   const c = id && cosmeticById(id);
-  return c ? c.css : null;
+  return c ? c.img : null;
 }
 
 // 敵モンスター9体（各難易度3体・順に解放）。絵は生成画像（透過PNG・画像対応.md準拠）。

@@ -1,6 +1,7 @@
 // 共通の小さな部品（v1から移植）
 import { C } from "../theme.js";
 import { puzzleStarsTotal } from "../data/badges.js";
+import PlayerAvatar from "./PlayerAvatar.jsx";
 
 export function Btn({ children, onClick, bg = C.sun, style = {}, className = "", disabled, big }) {
   return (
@@ -40,7 +41,7 @@ export function Header({ save, onBack, onSound, title, onOpenHome }) {
   // 名前パネル: onOpenHome があれば button（タップでおうち）、なければ従来の表示用 div
   const profileInner = (
     <>
-      <span style={{ fontSize: 22 }}>{save.avatar}</span>
+      <PlayerAvatar character={save.character} avatar={save.avatar} dressup={save.dressup} size={28} />
       <b>{save.name}</b>
       <span style={{ fontWeight: 900 }}>⭐{stars}</span>
       <span style={{ fontWeight: 900 }}>🪙{save.coins || 0}</span>

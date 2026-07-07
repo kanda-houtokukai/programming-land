@@ -9,6 +9,7 @@ import { MAX_PROFILES } from "../storage.js";
 import { APP_VERSION, BUILD_DATE } from "../version.js";
 import { stageForLevel } from "../data/monsters.js";
 import MonsterArt from "./MonsterArt.jsx";
+import PlayerAvatar from "./PlayerAvatar.jsx";
 import harborBg from "../assets/harbor-entrance.webp";
 
 // 白フチ文字（港の絵の上でも読める・ワールドマップのラベルと同じ手法）
@@ -26,7 +27,7 @@ export default function ProfileSelect({ profiles, onPick, onNew }) {
           {profiles.map(p => (
             <button key={p.id} className="pbtn slide" onClick={() => onPick(p.id)}
               style={{ background: "rgba(255,253,245,.96)", padding: "14px 16px", display: "flex", gap: 14, alignItems: "center", textAlign: "left" }}>
-              <span style={{ fontSize: 44, background: C.sun, border: `3px solid ${C.ink}`, borderRadius: 16, padding: "8px 12px", lineHeight: 1 }}>{p.avatar}</span>
+              <PlayerAvatar character={p.character} avatar={p.avatar} dressup={p.dressup} size={56} />
               <span style={{ flex: 1, minWidth: 0 }}>
                 <span className="pl-display" style={{ fontSize: 24, display: "block" }}>{p.name}</span>
                 <span style={{ fontWeight: 700, fontSize: 13 }}>⭐ {puzzleStarsTotal(p)}こ ・ 🏅 {p.badges.length}こ</span>

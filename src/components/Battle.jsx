@@ -15,7 +15,7 @@ import { DIFFICULTIES } from "../data/islands.js";
 import { battlePool } from "../data/quizzes.js";
 import {
   PLAYER_HEARTS, HP_BY_DIFF, NORMAL_DAMAGE, CRIT_DAMAGE, critChance, BATTLE_XP,
-  BATTLE_BG, ITEMS, enemiesFor, enemyUnlocked, equippedDeco, equippedBgCss,
+  BATTLE_BG, ITEMS, enemiesFor, enemyUnlocked, equippedBgImg,
 } from "../data/battle.js";
 import { applyXp, addCoins, COIN } from "../growth.js";
 import { today } from "../storage.js";
@@ -79,8 +79,8 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome }) {
   const granted = useRef(false);
   const q = queue[qi % queue.length];
   const pstage = stageForLevel(save.partner.level);
-  const deco = equippedDeco(save);
-  const bgCss = equippedBgCss(save); // きせかえ背景があれば 難易度背景を上書き
+  // 第3波②: 相棒の飾り(deco)は廃止（着せ替えは主人公へ移行・dressup.js）。舞台はショップの画像背景で上書き
+  const bgImg = equippedBgImg(save); // きせかえ舞台（画像）があれば 難易度背景を上書き
 
   const later = (ms, fn) => { timers.current.push(setTimeout(fn, ms)); };
   const clearTimers = () => { timers.current.forEach(clearTimeout); timers.current = []; };
@@ -205,7 +205,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome }) {
       <div className={shakeCls} style={{ border: `3px solid ${C.ink}`, borderRadius: 20, overflow: "hidden",
         boxShadow: "5px 5px 0 rgba(58,51,53,.9)" }}>
         <div style={{ position: "relative", aspectRatio: "16 / 9",
-          ...(bgCss ? { background: bgCss } : { backgroundImage: `url(${BATTLE_BG[diff]})` }),
+          ...{ backgroundImage: `url(${bgImg || BATTLE_BG[diff]})` },
           backgroundSize: "cover", backgroundPosition: "center" }}>
 
           {/* 敵HUD（右上） */}
@@ -254,7 +254,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome }) {
               ].filter(Boolean).join(" ")}>
                 <div className={overlay || phase === "lose" ? "" : "idle2"} style={{ position: "relative" }}>
                   <div className="fitArt"><MonsterArt species={save.partner.species} stage={pstage} size={200} /></div>
-                  {deco && <span style={{ position: "absolute", top: "-6%", right: "6%", fontSize: "min(6vw,32px)" }}>{deco}</span>}
+                  {/* 相棒の飾り(deco)は第3波②で廃止（着せ替えは主人公へ） */}
                 </div>
               </div>
             </div>
@@ -307,7 +307,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome }) {
               disabled={locked || itemUsed || (it.id === "drink" && hearts >= PLAYER_HEARTS) || (it.id === "glasses" && fadedIdx !== null)}
               title={it.desc}
               style={{ background: "#fff", padding: "6px 10px", fontSize: 14 }}>
-              {it.emoji} ×{save.items[it.id]}
+              <img src={it.img} alt={it.emoji} draggable="false" style={{ width: 22, height: 22, objectFit: "contain", verticalAlign: "-4px" }} /> ×{save.items[it.id]}
             </button>
           ))}
           {itemUsed && <span style={{ fontWeight: 700, fontSize: 11, color: "#6B6265" }}>（この もんだいでは もう つかったよ）</span>}
