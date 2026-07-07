@@ -58,29 +58,28 @@ export default function HomeRoom({ save, onClose, onEnter }) {
           <img src={roomBg} alt="おうちの へや" draggable="false"
             style={{ display: "block", width: "100%", height: "auto" }} />
 
-          {/* 家具のタップ領域（うっすら光る＝押せる合図・staggerで一斉に光らない） */}
+          {/* 家具のタップ領域（透明）＋RPG風の吹き出しラベル（押せる目印・ふわふわをstaggerで） */}
           {FURNITURE.map((f, i) => (
-            <button key={f.key} className="roomhot" onClick={() => tap(f.key)} aria-label={f.label}
+            <button key={f.key} className="tapzone" onClick={() => tap(f.key)} aria-label={f.label}
               style={{ position: "absolute", left: `${f.left}%`, top: `${f.top}%`,
                 transform: "translate(-50%,-50%)", width: `${f.w}%`, height: `${f.h}%`,
                 border: "none", background: "transparent", cursor: "pointer", padding: 0,
-                animationDelay: `${(i * 0.6).toFixed(1)}s`, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-              <span style={{ whiteSpace: "nowrap", marginBottom: 2, fontWeight: 900, fontSize: "clamp(8px,1.9vw,12px)", color: C.ink,
-                textShadow: "0 0 3px #fff,1.5px 1.5px 0 #fff,-1.5px 1.5px 0 #fff,1.5px -1.5px 0 #fff,-1.5px -1.5px 0 #fff" }}>{f.label}</span>
+                display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+              <span className="bubble mapfloat" style={{ marginBottom: 6, fontSize: "clamp(8px,1.9vw,12px)",
+                animationDelay: `${(i * 0.6).toFixed(1)}s` }}>{f.label}</span>
             </button>
           ))}
 
           {/* 相棒（中央床・別画像を動的に乗せる＝進化で姿が変わるため。軽いふわふわ） */}
           {partner && (
-            <button className="roomhot" onClick={() => tap("partner")} aria-label="あいぼう"
+            <button className="tapzone" onClick={() => tap("partner")} aria-label="あいぼう"
               style={{ position: "absolute", left: "46%", top: "66%", transform: "translate(-50%,-50%)",
                 width: "26%", border: "none", background: "transparent", cursor: "pointer", padding: 0,
-                display: "flex", flexDirection: "column", alignItems: "center" }}>
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
               <span className="mapfloat" style={{ lineHeight: 0, filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
                 <MonsterArt species={partner.species} stage={stage} size={92} />
               </span>
-              <span style={{ whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(8px,1.9vw,12px)", color: C.ink,
-                textShadow: "0 0 3px #fff,1.5px 1.5px 0 #fff,-1.5px 1.5px 0 #fff,1.5px -1.5px 0 #fff,-1.5px -1.5px 0 #fff" }}>あいぼう</span>
+              <span className="bubble" style={{ fontSize: "clamp(8px,1.9vw,12px)" }}>あいぼう</span>
             </button>
           )}
 

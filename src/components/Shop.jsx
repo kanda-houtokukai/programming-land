@@ -88,13 +88,13 @@ export default function Shop({ save, update, go, onSound, openHome }) {
             overflow: "hidden", border: `3px solid ${C.ink}`, background: "#e9c9a0" }}>
             <img src={shopBg} alt="おみせの なか" draggable="false"
               style={{ display: "block", width: "100%", height: "auto" }} />
-            {/* 店員のタップ領域（絵の店主に重ねる・うっすら光る＝おうちの家具と同じ作法） */}
-            <button className="roomhot" onClick={() => { SFX.tap(sound); setTalking(true); }} aria-label="てんいんさんに はなしかける"
+            {/* 店員のタップ領域（透明）＋RPG風の吹き出し（おうちの家具ラベルと同じ作法）。
+                吹き出しは店主の頭の上に置く（話しかける相手の位置を指す） */}
+            <button className="tapzone" onClick={() => { SFX.tap(sound); setTalking(true); }} aria-label="てんいんさんに はなしかける"
               style={{ position: "absolute", left: "51%", top: "40%", transform: "translate(-50%,-50%)",
                 width: "28%", height: "48%", border: "none", background: "transparent", cursor: "pointer", padding: 0,
-                display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-              <span style={{ whiteSpace: "nowrap", marginBottom: 4, fontWeight: 900, fontSize: "clamp(9px,2vw,13px)", color: C.ink,
-                textShadow: "0 0 3px #fff,1.5px 1.5px 0 #fff,-1.5px 1.5px 0 #fff,1.5px -1.5px 0 #fff,-1.5px -1.5px 0 #fff" }}>はなしかける</span>
+                display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
+              <span className="bubble mapfloat" style={{ marginTop: "-8%", fontSize: "clamp(9px,2vw,13px)" }}>💬 はなしかける</span>
             </button>
           </div>
 

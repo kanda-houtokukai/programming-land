@@ -167,15 +167,27 @@ export const CSS = `
   /* キラキラ（そのばで ちいさく またたく・上へ舞わない＝優しい） */
   @keyframes pl-sparkle { 0%,100% { transform: scale(.5); opacity: 0 } 40% { transform: scale(1.15); opacity: 1 } }
   .sparkle { animation: pl-sparkle 1.1s ease-in-out infinite; }
-  /* ---- おうちRPG部屋（第2波・段階①）。家具が「うっすら光る」＝タップできる合図（控えめ・staggerで一斉に光らない） ---- */
-  @keyframes pl-roomhot { 0%,100% { box-shadow: 0 0 0 2px rgba(255,255,255,0), 0 0 8px 2px rgba(255,236,150,0) } 55% { box-shadow: 0 0 0 2px rgba(255,255,255,.5), 0 0 11px 3px rgba(255,236,150,.55) } }
-  .roomhot { animation: pl-roomhot 2.8s ease-in-out infinite; border-radius: 12px; transition: transform .08s; }
-  .roomhot:active { transform: translate(-50%,-50%) scale(.92) !important; }
+  /* ---- おうちRPG部屋・おみせのタップ領域。
+     旧: 四角い光る枠(roomhot)は「半透明の箱」に見えて世界観から浮くため廃止（実機FB 2026-07-07）。
+     新: 透明のタップ領域(tapzone)＋RPG風の吹き出しラベル(bubble)を目印にする ---- */
+  .tapzone { transition: transform .08s; }
+  .tapzone:active { transform: translate(-50%,-50%) scale(.94) !important; }
+  /* RPG風スピーチバブル: 白いピル＋下向きのしっぽ。ふわふわ(mapfloat)を併用して「押せる」感を出す */
+  .bubble {
+    position: relative; display: inline-block; background: #FFFDF5;
+    border: 2px solid ${C.ink}; border-radius: 999px; padding: 3px 12px;
+    font-weight: 900; color: ${C.ink}; white-space: nowrap;
+    box-shadow: 2px 2px 0 rgba(58,51,53,.45);
+  }
+  .bubble::after { content: ""; position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%);
+    border: 6px solid transparent; border-top: 7px solid ${C.ink}; }
+  .bubble::before { content: ""; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%);
+    border: 5px solid transparent; border-top: 6px solid #FFFDF5; z-index: 1; }
   @media (prefers-reduced-motion: reduce) {
     .pop,.shake,.bounce,.slide,.glow { animation: none; }
     .idle,.idle2,.lunge,.hitflash,.shake2,.hitfx,.critpop,.heartbreak,.fall,.victory,.droop,.riseup,.aura,.shieldpop,.healglow { animation: none; }
     .charge,.spinlight,.morph,.slam,.whiteflash,.confetti { animation: none; }
-    .fadein,.softpop,.mapfloat,.growpop,.sparkle,.roomhot { animation: none; }
+    .fadein,.softpop,.mapfloat,.growpop,.sparkle { animation: none; }
     .whiteflash { opacity: 0; }
     .pbtn { transition: none; }
   }

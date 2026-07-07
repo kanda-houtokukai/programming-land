@@ -60,7 +60,8 @@ export const DRESSUP_ITEMS = [
     anchor: { top: 4.1, left: 50, width: 25.8 }, acquire: { type: "achievement", condition: "all_badges", label: "バッジを ぜんぶ あつめると もらえる" },
     flavor: "しまの だいぼうけんを なしとげた あかし" },
   { id: "face_glasses", slot: "face", name: "たんけんメガネ", skillTie: null, img: faceExplorerGlasses,
-    anchor: { top: 20.4, left: 50, width: 23.9 }, acquire: { type: "shop", price: 30 },
+    anchor: { top: 16.5, left: 50, width: 23.9 }, // 実機FBで20.4→16.5（鼻〜口に落ちていたのを目の高さへ・2026-07-07）
+    acquire: { type: "shop", price: 30 },
     flavor: "よーく みる ちからが そだつ メガネ" },
   { id: "neck_bandana", slot: "neck", name: "たんけんバンダナ", skillTie: null, img: neckExplorerBandana,
     anchor: { top: 31.8, left: 50, width: 20.3 }, acquire: { type: "shop", price: 30 },
