@@ -54,8 +54,8 @@ export function itemById(id) { return ITEMS.find(i => i.id === id); }
 import bgJungle from "../assets/bg_battle_jungle.webp";
 import bgCanyon from "../assets/bg_battle_canyon.webp";
 export const COSMETICS = [
-  { id: "bg_jungle", type: "bg", emoji: "🌴", name: "ジャングルの ぶたい", price: 50, img: bgJungle },
-  { id: "bg_canyon", type: "bg", emoji: "🏜️", name: "だいちの ぶたい", price: 50, img: bgCanyon },
+  { id: "bg_jungle", type: "bg", emoji: "🌴", name: "ジャングルの ぶたい", price: 100, img: bgJungle },
+  { id: "bg_canyon", type: "bg", emoji: "🏜️", name: "だいちの ぶたい", price: 100, img: bgCanyon },
 ];
 export function cosmeticById(id) { return COSMETICS.find(c => c.id === id); }
 // 装備中のバトル舞台の画像（未装備・旧IDは null → 難易度別の基本背景を使う）

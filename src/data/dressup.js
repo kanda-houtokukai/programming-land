@@ -52,7 +52,7 @@ import waistToolBelt from "../assets/waist_tool_belt.png";
 export const DRESSUP_ITEMS = [
   { id: "head_compass", slot: "head", name: "コンパスぼうし", skillTie: "junji", img: headCompassHat,
     anchor: { top: 1.6, left: 50, width: 31.3 }, // 実機FBで3.8→1.6（深めで額が隠れ気味→上へ・2026-07-08）
-    acquire: { type: "shop", price: 40 },
+    acquire: { type: "shop", price: 55 },
     flavor: "じゅんばんの ちからを みにつけた たんけんかの ぼうし" },
   { id: "head_hakase", slot: "head", name: "はかせぼうし", skillTie: null, img: headHakaseHat,
     anchor: { top: 1.6, left: 50, width: 31.3 }, // コンパスぼうしと同一シルエット＝必ず同値で揃える
@@ -63,27 +63,27 @@ export const DRESSUP_ITEMS = [
     flavor: "しまの だいぼうけんを なしとげた あかし" },
   { id: "face_glasses", slot: "face", name: "たんけんメガネ", skillTie: null, img: faceExplorerGlasses,
     anchor: { top: 16.5, left: 50, width: 23.9 }, // 実機FBで20.4→16.5（鼻〜口に落ちていたのを目の高さへ・2026-07-07）
-    acquire: { type: "shop", price: 30 },
+    acquire: { type: "shop", price: 40 },
     flavor: "よーく みる ちからが そだつ メガネ" },
   { id: "neck_bandana", slot: "neck", name: "たんけんバンダナ", skillTie: null, img: neckExplorerBandana,
-    anchor: { top: 31.8, left: 50, width: 20.3 }, acquire: { type: "shop", price: 30 },
+    anchor: { top: 31.8, left: 50, width: 20.3 }, acquire: { type: "shop", price: 40 },
     flavor: "ぼうけんの こころいきを しめす バンダナ" },
   { id: "chest_gear", slot: "chest", name: "はぐるまバッジ", skillTie: "repeat", img: chestGearBadge,
-    anchor: { top: 40.5, left: 38.7, width: 8.5 }, acquire: { type: "shop", price: 40 },
+    anchor: { top: 40.5, left: 38.7, width: 8.5 }, acquire: { type: "shop", price: 55 },
     flavor: "くりかえしの ちからを みにつけた しるし" },
   { id: "chest_magnifier", slot: "chest", name: "むしめがねバッジ", skillTie: "think", img: chestMagnifyingBadge,
-    anchor: { top: 40.5, left: 38.7, width: 8.5 }, acquire: { type: "shop", price: 40 },
+    anchor: { top: 40.5, left: 38.7, width: 8.5 }, acquire: { type: "shop", price: 55 },
     flavor: "「もしも」で かんがえる ちからの しるし" },
   { id: "waist_belt", slot: "waist", name: "どうぐベルト", skillTie: null, img: waistToolBelt,
     anchor: { top: 50.0, left: 50, width: 23.9 }, // 実機FBで52.5→50.0（少し低かった→上へ・2026-07-08）
-    acquire: { type: "shop", price: 50 },
+    acquire: { type: "shop", price: 70 },
     flavor: "こまったとき なおす どうぐが つまった ベルト" },
   // back はレイヤーでなくベース人物ごと切り替え（BASES）＝anchor なし
   { id: "back_keyboard", slot: "back", name: "キーボードリュック", skillTie: "keyboard", img: null,
-    anchor: null, acquire: { type: "shop", price: 60 },
+    anchor: null, acquire: { type: "shop", price: 120 },
     flavor: "タイピングの ちからを せおう リュック" },
   { id: "back_book", slot: "back", name: "まほうのほんリュック", skillTie: "think", img: null,
-    anchor: null, acquire: { type: "shop", price: 60 },
+    anchor: null, acquire: { type: "shop", price: 120 },
     flavor: "クイズの ちしきが つまった まほうの ほん" },
 ];
 export function dressupById(id) { return DRESSUP_ITEMS.find(d => d.id === id); }

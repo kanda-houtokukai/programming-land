@@ -31,9 +31,10 @@ function QuizPlay({ session, save, update, onBack }) {
       const final = score;
       setDone(true); SFX.win(sound);
       update(s => {
-        s.quiz.best[session.key] = Math.max(s.quiz.best[session.key] || 0, final);
+        const prevBest = s.quiz.best[session.key] || 0;
+        s.quiz.best[session.key] = Math.max(prevBest, final);
         const d = today(); s.log[d] = s.log[d] || {}; s.log[d].quiz = (s.log[d].quiz || 0) + 1;
-        addCoins(s, final * COIN.quizCorrect); // 正解した問数ぶん
+        addCoins(s, Math.max(0, final - prevBest) * COIN.quizCorrect); // ベスト更新分だけ（周回で稼げない・06-C）
         applyXp(s, XP.quizSet(final));
         return s;
       });

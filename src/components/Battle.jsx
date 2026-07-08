@@ -93,8 +93,11 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome }) {
       setFirstKill(!save.battle.defeated.includes(enemy.id));
       update(s => {
         applyXp(s, BATTLE_XP[diff]);
-        addCoins(s, COIN.battle[diff]); // 勝利コイン（難易度別）
-        if (!s.battle.defeated.includes(enemy.id)) s.battle.defeated.push(enemy.id);
+        const isFirstKill = !s.battle.defeated.includes(enemy.id);
+        if (isFirstKill) {
+          addCoins(s, COIN.battle[diff]); // 初撃破のみ（再戦は0・周回で稼げない・06-C）
+          s.battle.defeated.push(enemy.id);
+        }
         s.battle.best[diff] = (s.battle.best[diff] || 0) + 1;
         const d = today(); s.log[d] = s.log[d] || {}; s.log[d].battle = (s.log[d].battle || 0) + 1;
         return s;

@@ -78,6 +78,9 @@ export function grantLegacyCoins(profile) {
     .filter(([k]) => k.includes(":")).reduce((a, [, v]) => a + (v || 0), 0) * COIN.quizCorrect;
   total += Object.keys((profile.typing && profile.typing.best) || {}).length * COIN.typingClear;
   total += (((profile.art && profile.art.gallery) || []).length) * COIN.artSave;
+  // バトルは best[diff]（勝利数）×レート。06-Cで通常付与は「初撃破のみ」に変えたが、legacyは
+  // 現状式を維持（ずかんbestベースへ寄せると growth.js→battle.js import が必要＝node直import不可の
+  // 既知事故と同型になるため回避。coinsGranted ゲートで実プロファイルは基本再付与されず影響も小）。
   const best = (profile.battle && profile.battle.best) || {};
   for (const d of ["easy", "normal", "hard"]) total += (best[d] || 0) * COIN.battle[d];
   profile.coins = (profile.coins || 0) + total;

@@ -63,11 +63,12 @@ function TypingPlay({ stage, save, update, onBack }) {
         setResult({ acc, kpm });
         SFX.win(sound);
         update(s => {
+          const first = s.typing.best[stage.id] === undefined; // 初クリアか（best更新判定は現行のまま）
           const b = s.typing.best[stage.id] || {};
           const isBest = kpm > (b.kpm || 0) || acc > (b.acc || 0); // 自己ベスト更新か
           s.typing.best[stage.id] = { acc: Math.max(b.acc || 0, acc), kpm: Math.max(b.kpm || 0, kpm) };
           const d = today(); s.log[d] = s.log[d] || {}; s.log[d].typing = (s.log[d].typing || 0) + 1;
-          addCoins(s, COIN.typingClear + (isBest ? COIN.typingBest : 0));
+          addCoins(s, first ? (COIN.typingClear + COIN.typingBest) : (isBest ? COIN.typingBest : 0)); // 初クリア=8/以後は更新時のみ+5（周回で稼げない・06-C）
           applyXp(s, XP.typing());
           return s;
         });
