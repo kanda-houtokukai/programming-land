@@ -38,16 +38,22 @@ function clampStep(x, y, nx, ny) {
 }
 
 // 旧作品互換: 旧ID（fwd/right/left/color）の挙動は不変。新IDは追加のみ。
+// 壁に当たったら、その fwd をふちまで描いて実行を打ち切る（以降の命令は実行しない・b3j）。
 function turtleSegs(cmds) {
   let x = START.x, y = START.y, ang = -90, ci = 0, pen = true; // ペンは初期=下（B1）
   const segs = [];
-  for (const t of cmds) {
+  let hitWall = false, haltIndex = -1;
+  for (let idx = 0; idx < cmds.length; idx++) {
+    const t = cmds[idx];
     if (t === "fwd") {
       const rawX = x + Math.cos(ang * Math.PI / 180) * STEP;
       const rawY = y + Math.sin(ang * Math.PI / 180) * STEP;
       const p = clampStep(x, y, rawX, rawY); // ② ふちで止まる＝カメは常に画面内
+      // クランプされた（部分縮小 or すでにふちで0移動）＝壁に当たった
+      const clamped = Math.abs(p.x - rawX) > 0.01 || Math.abs(p.y - rawY) > 0.01;
       if (pen && (p.x !== x || p.y !== y)) segs.push({ x1: x, y1: y, x2: p.x, y2: p.y, c: ART_COLORS[ci] });
       x = p.x; y = p.y;
+      if (clamped) { hitWall = true; haltIndex = idx; break; } // ここで実行を止める
     } else if (t === "right") ang += 90;
     else if (t === "left") ang -= 90;
     else if (t === "right45") ang += 45;
@@ -56,7 +62,7 @@ function turtleSegs(cmds) {
     else if (t === "pendown") pen = true;
     else if (t === "color") ci = (ci + 1) % ART_COLORS.length;
   }
-  return { segs, x, y, ang, ci, pen };
+  return { segs, x, y, ang, ci, pen, hitWall, haltIndex };
 }
 
 /* ③ 命令リストの圧縮表示: 連続する同じ命令を ×N にまとめる（表示のみ・データ不変） */
@@ -188,7 +194,11 @@ export default function Art({ save, update, go, onSound, openHome }) {
     update(s => { s.art.gallery = s.art.gallery.filter(a => a.id !== id); return s; });
   }
   const modalBg = { position: "fixed", inset: 0, background: "rgba(60,50,40,.45)", display: "grid", placeItems: "center", zIndex: 60 };
-  const packed = compressCmds(cmds);
+  // ③命令リスト圧縮＋各グループの開始flat-index（haltIndex以降を薄表示するため）
+  let _acc = 0;
+  const packed = compressCmds(cmds).map(p => { const start = _acc; _acc += p.n; return { ...p, start }; });
+  // 壁メッセージ: 静止時は壁に当たっていれば表示・再生中は末尾（ふち到達）で表示
+  const showWall = state.hitWall && (reveal === Infinity || reveal >= segsN);
   return (
     <div style={{ maxWidth: 960, margin: "0 auto", paddingBottom: 30 }}>
       <Header save={save} title="🎨 おえかき コード" onBack={() => go("home")} onSound={onSound} onOpenHome={openHome} />
@@ -197,8 +207,15 @@ export default function Art({ save, update, go, onSound, openHome }) {
         {/* ① キャンバス左・操作右（狭い画面は縦積み＝theme.js .artgrid） */}
         <div className="artgrid">
           {/* 左: キャンバス（パネル枠いっぱい・固定4:3） */}
-          <div className="panel" style={{ padding: 8 }}>
+          <div className="panel" style={{ padding: 8, position: "relative" }}>
             <ArtSVG cmds={cmds} reveal={reveal === Infinity ? segsN : reveal} />
+            {showWall && (
+              <div className="slide" style={{ position: "absolute", left: "50%", bottom: 16, transform: "translateX(-50%)",
+                background: "#FFF0D6", border: `2px solid ${C.ink}`, borderRadius: 999, padding: "5px 14px",
+                fontWeight: 900, fontSize: 13, boxShadow: "2px 2px 0 rgba(58,51,53,.35)", whiteSpace: "nowrap" }}>
+                🚧 これ いじょう すすめないよ
+              </div>
+            )}
           </div>
           {/* 右: 操作カラム */}
           <div style={{ display: "grid", gap: 8 }}>
@@ -237,11 +254,15 @@ export default function Art({ save, update, go, onSound, openHome }) {
               <div style={{ fontWeight: 900, fontSize: 12, marginBottom: 4 }}>📜 めいれい（{cmds.length}こ）</div>
               <div style={{ display: "flex", gap: 4, flexWrap: "wrap", minHeight: 22, maxHeight: 96, overflowY: "auto", alignContent: "flex-start" }}>
                 {cmds.length === 0 && <span style={{ fontWeight: 700, opacity: .5, fontSize: 12 }}>ここに ならぶよ</span>}
-                {packed.map((p, i) => (
-                  <span key={i} style={{ fontSize: 15, fontWeight: 900, background: "#F7FBFF", border: `1.5px solid ${C.ink}`, borderRadius: 8, padding: "1px 5px", whiteSpace: "nowrap" }}>
-                    {ART_CMDS[p.t].emoji}{p.n > 1 && <span style={{ fontSize: 11 }}> ×{p.n}</span>}
-                  </span>
-                ))}
+                {packed.map((p, i) => {
+                  // 壁で止まった位置より後のグループは薄く（＝実行されていないことを示す）
+                  const notRun = state.hitWall && p.start > state.haltIndex;
+                  return (
+                    <span key={i} style={{ fontSize: 15, fontWeight: 900, background: notRun ? "#F1EEE8" : "#F7FBFF", border: `1.5px solid ${C.ink}`, borderRadius: 8, padding: "1px 5px", whiteSpace: "nowrap", opacity: notRun ? .4 : 1 }}>
+                      {ART_CMDS[p.t].emoji}{p.n > 1 && <span style={{ fontSize: 11 }}> ×{p.n}</span>}
+                    </span>
+                  );
+                })}
               </div>
             </div>
             {/* 4. 操作アイコン（小さく横並び） */}
