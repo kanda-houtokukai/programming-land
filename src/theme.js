@@ -183,6 +183,11 @@ export const CSS = `
     border: 6px solid transparent; border-top: 7px solid ${C.ink}; }
   .bubble::before { content: ""; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%);
     border: 5px solid transparent; border-top: 6px solid #FFFDF5; z-index: 1; }
+  /* おえかき: キャンバス左・操作右の2カラム（狭い画面は縦積みフォールバック・メモ08 b3i） */
+  .artgrid { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
+  @media (min-width: 700px) {
+    .artgrid { grid-template-columns: 1fr 232px; }
+  }
   @media (prefers-reduced-motion: reduce) {
     .pop,.shake,.bounce,.slide,.glow { animation: none; }
     .idle,.idle2,.lunge,.hitflash,.shake2,.hitfx,.critpop,.heartbreak,.fall,.victory,.droop,.riseup,.aura,.shieldpop,.healglow { animation: none; }

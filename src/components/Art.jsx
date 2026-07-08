@@ -1,4 +1,5 @@
-// おえかきコード（v1から移植・メモ08で大改善: 自動フィット/ペン上下/45°/UIコンパクト・2026-07-08）
+// おえかきコード（メモ08 b3i: レイアウト刷新＋キャンバス固定・2026-07-08）
+// b3h の機能（ペン上下/45°/名前入力/全消し確認/上限100/保護者ガイド改訂）は維持。
 import { useState, useRef } from "react";
 import { C } from "../theme.js";
 import { Btn, Header } from "./common.jsx";
@@ -11,18 +12,42 @@ import HowTo from "./HowTo.jsx";
 import ParentGuide from "./ParentGuide.jsx";
 import { ART_GUIDE } from "../data/parent-guide.js";
 
-const CMD_LIMIT = 100; // B3: 60→100（自動フィットで大きい絵も収まる）
+const CMD_LIMIT = 100; // B3: 命令の上限
+
+/* ② 固定キャンバス（自動フィット廃止・b3iで刷新）。
+   横長4:3でパネル枠いっぱいに使う。数値は初期値＝実機で微調整:
+   - CANVAS: viewBox の大きさ（4:3・端まで描ける）
+   - START: 開始位置（中央やや下・上向きスタートの据わり）
+   - WALL: カメが枠外に出ない内側マージン（カメの見た目ぶん） */
+const CANVAS = { w: 480, h: 360 };
+const START = { x: 240, y: 220 };
+const WALL = 14;
+const STEP = 34;
+
+/* 前進の壁クランプ: 次位置が枠を超えるなら、進行方向を保ったまま ふちで止める
+   （軸別クランプだと斜め45°の向きが変わるため、進める割合 t で縮める） */
+function clampStep(x, y, nx, ny) {
+  const lo = WALL, hiX = CANVAS.w - WALL, hiY = CANVAS.h - WALL;
+  let t = 1;
+  if (nx < lo) t = Math.min(t, (lo - x) / (nx - x));
+  if (nx > hiX) t = Math.min(t, (hiX - x) / (nx - x));
+  if (ny < lo) t = Math.min(t, (lo - y) / (ny - y));
+  if (ny > hiY) t = Math.min(t, (hiY - y) / (ny - y));
+  t = Math.max(0, t);
+  return { x: x + (nx - x) * t, y: y + (ny - y) * t };
+}
 
 // 旧作品互換: 旧ID（fwd/right/left/color）の挙動は不変。新IDは追加のみ。
 function turtleSegs(cmds) {
-  let x = 160, y = 215, ang = -90, ci = 0, pen = true; // ペンは初期=下（B1）
+  let x = START.x, y = START.y, ang = -90, ci = 0, pen = true; // ペンは初期=下（B1）
   const segs = [];
   for (const t of cmds) {
     if (t === "fwd") {
-      const nx = x + Math.cos(ang * Math.PI / 180) * 34;
-      const ny = y + Math.sin(ang * Math.PI / 180) * 34;
-      if (pen) segs.push({ x1: x, y1: y, x2: nx, y2: ny, c: ART_COLORS[ci] });
-      x = nx; y = ny;
+      const rawX = x + Math.cos(ang * Math.PI / 180) * STEP;
+      const rawY = y + Math.sin(ang * Math.PI / 180) * STEP;
+      const p = clampStep(x, y, rawX, rawY); // ② ふちで止まる＝カメは常に画面内
+      if (pen && (p.x !== x || p.y !== y)) segs.push({ x1: x, y1: y, x2: p.x, y2: p.y, c: ART_COLORS[ci] });
+      x = p.x; y = p.y;
     } else if (t === "right") ang += 90;
     else if (t === "left") ang -= 90;
     else if (t === "right45") ang += 45;
@@ -34,34 +59,29 @@ function turtleSegs(cmds) {
   return { segs, x, y, ang, ci, pen };
 }
 
-/* A1: 全線分＋カメ現在地のバウンディングボックス → 正方形viewBox（余白20・最小320で拡大しすぎない）。
-   常に「完成形」の cmds から計算するため、再生中（reveal変化）も viewBox は安定 */
-function fitBox(segs, x, y) {
-  let minX = x, maxX = x, minY = y, maxY = y;
-  for (const s of segs) {
-    minX = Math.min(minX, s.x1, s.x2); maxX = Math.max(maxX, s.x1, s.x2);
-    minY = Math.min(minY, s.y1, s.y2); maxY = Math.max(maxY, s.y1, s.y2);
+/* ③ 命令リストの圧縮表示: 連続する同じ命令を ×N にまとめる（表示のみ・データ不変） */
+function compressCmds(cmds) {
+  const out = [];
+  for (const t of cmds) {
+    const last = out[out.length - 1];
+    if (last && last.t === t) last.n++;
+    else out.push({ t, n: 1 });
   }
-  const pad = 20;
-  minX -= pad; maxX += pad; minY -= pad; maxY += pad;
-  const size = Math.max(320, maxX - minX, maxY - minY);
-  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
-  return { x: cx - size / 2, y: cy - size / 2, size };
+  return out;
 }
 
-function ArtSVG({ cmds, size = 320, reveal = Infinity, showTurtle = true }) {
+function ArtSVG({ cmds, width = "100%", reveal = Infinity, showTurtle = true }) {
   const { segs, x, y, ang } = turtleSegs(cmds);
-  const box = fitBox(segs, x, y); // ギャラリー小表示（showTurtle=false）も同じフィット
   const shown = segs.slice(0, reveal);
   const cur = shown.length ? shown[shown.length - 1] : null;
   const done = reveal >= segs.length;
-  const tx = done ? x : cur ? cur.x2 : 160;
-  const ty = done ? y : cur ? cur.y2 : 215;
+  const tx = done ? x : cur ? cur.x2 : START.x;
+  const ty = done ? y : cur ? cur.y2 : START.y;
   // カメの向き: 完成形は実ang（ペン上げ移動でも向きが合う）・再生中は直前の線分の向き（45°刻み）
   const deg = done ? ang : cur ? Math.round(Math.atan2(cur.y2 - cur.y1, cur.x2 - cur.x1) * 180 / Math.PI / 45) * 45 : -90;
   return (
-    <svg width={size} height={size} viewBox={`${box.x} ${box.y} ${box.size} ${box.size}`} style={{ display: "block", maxWidth: "100%" }}>
-      <rect x={box.x} y={box.y} width={box.size} height={box.size} fill="#FFFFFF" rx={box.size * 0.05} />
+    <svg width={width} viewBox={`0 0 ${CANVAS.w} ${CANVAS.h}`} style={{ display: "block", maxWidth: "100%", height: "auto" }}>
+      <rect x="0" y="0" width={CANVAS.w} height={CANVAS.h} fill="#FFFFFF" rx="14" />
       {shown.map((s, i) => (
         <line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke={s.c} strokeWidth="7" strokeLinecap="round" />
       ))}
@@ -70,15 +90,14 @@ function ArtSVG({ cmds, size = 320, reveal = Infinity, showTurtle = true }) {
   );
 }
 
-/* カメ（右向きドット絵）。45°刻みの向きに対応（C）:
-   右半分(0/45/315)と真上下(90/270)は回転、左半分(135/180/225)はミラー＋回転で逆さにしない。
-   見え方が不自然なら実機FBで微調整 */
+/* カメ（右向きドット絵・固定サイズ）。45°刻みの向きに対応:
+   左半分(135/180/225)はミラー＋差分回転で逆さにしない。見え方は実機FBで微調整 */
 function TurtleSprite({ deg, tx, ty }) {
   const a = ((Math.round(deg / 45) * 45) % 360 + 360) % 360; // 0=右 90=下 180=左 270=上
   const half = 18;
   let tf = "";
   if (a === 135 || a === 180 || a === 225) {
-    tf = `translate(${tx} ${ty}) rotate(${a - 180}) scale(-1 1) translate(${-tx} ${-ty})`; // 左向きは反転で 逆さにしない
+    tf = `translate(${tx} ${ty}) rotate(${a - 180}) scale(-1 1) translate(${-tx} ${-ty})`;
   } else if (a !== 0) {
     tf = `rotate(${a} ${tx} ${ty})`;
   }
@@ -90,14 +109,14 @@ function TurtleSprite({ deg, tx, ty }) {
   );
 }
 
-/* E: コンパクトな命令ボタン（アイコン主体＋小さな文字ラベル） */
-function CmdBtn({ t, onAdd, big = false, bg = "#fff" }) {
+/* ① 右カラムの命令ボタン（ゲームパッド風・コンパクト: アイコン＋小ラベル） */
+function PadBtn({ t, onAdd, big = false, bg = "#fff" }) {
   const d = ART_CMDS[t];
   return (
     <button className="pbtn" onClick={() => onAdd(t)}
-      style={{ background: bg, padding: big ? "10px 6px" : "8px 4px", display: "grid", justifyItems: "center", gap: 2, minWidth: 0 }}>
-      <span style={{ fontSize: big ? 26 : 20, lineHeight: 1 }}>{d.emoji}</span>
-      <span style={{ fontSize: 10, fontWeight: 900 }}>{d.label}</span>
+      style={{ background: bg, padding: big ? "8px 4px" : "6px 2px", display: "grid", justifyItems: "center", gap: 1, minWidth: 0 }}>
+      <span style={{ fontSize: big ? 22 : 17, lineHeight: 1 }}>{d.emoji}</span>
+      <span style={{ fontSize: 9, fontWeight: 900 }}>{d.label}</span>
     </button>
   );
 }
@@ -109,8 +128,8 @@ export default function Art({ save, update, go, onSound, openHome }) {
   const [playing, setPlaying] = useState(false);
   const [savedMsg, setSavedMsg] = useState(null);
   const [confirmClear, setConfirmClear] = useState(false); // A3
-  const [naming, setNaming] = useState(null);              // A4: null | 入力中の名前
-  const [palette, setPalette] = useState(false);           // E: 色ポップアップ
+  const [naming, setNaming] = useState(null);              // A4
+  const [palette, setPalette] = useState(false);           // 色ポップアップ
   const playRef = useRef(0);
   const state = turtleSegs(cmds);
   const segsN = state.segs.length;
@@ -121,7 +140,7 @@ export default function Art({ save, update, go, onSound, openHome }) {
     // 上限ガードは関数型更新の内側にも（連打時のstale closureで100を超えない）
     setCmds(c => (c.length >= CMD_LIMIT ? c : [...c, t])); setReveal(Infinity);
   }
-  // E/A2: パレットで色を選ぶ＝いまの色から目的の色まで🎨を必要数つむ（コマンド列の考え方は不変）
+  // 色パレット: いまの色から目的の色まで🎨を必要数つむ（コマンド列の考え方は不変）
   function pickColor(k) {
     const n = (k - state.ci + ART_COLORS.length) % ART_COLORS.length;
     setPalette(false);
@@ -151,13 +170,13 @@ export default function Art({ save, update, go, onSound, openHome }) {
   }
   function saveArt(name) {
     const fallback = `さくひん ${save.art.gallery.length + 1}`;
-    const finalName = (name || "").trim() || fallback; // 空なら初期値（スキーマ不変）
+    const finalName = (name || "").trim() || fallback;
     SFX.badge(sound);
     update(s => {
       const d = today();
       s.art.gallery.push({ id: Date.now(), date: d, cmds: [...cmds], name: finalName });
       s.log[d] = s.log[d] || {}; s.log[d].art = (s.log[d].art || 0) + 1;
-      awardArtCoins(s, d); // 1日の上限内でコイン付与
+      awardArtCoins(s, d);
       applyXp(s, XP.artSave());
       return s;
     });
@@ -169,59 +188,84 @@ export default function Art({ save, update, go, onSound, openHome }) {
     update(s => { s.art.gallery = s.art.gallery.filter(a => a.id !== id); return s; });
   }
   const modalBg = { position: "fixed", inset: 0, background: "rgba(60,50,40,.45)", display: "grid", placeItems: "center", zIndex: 60 };
+  const packed = compressCmds(cmds);
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
+    <div style={{ maxWidth: 960, margin: "0 auto", paddingBottom: 30 }}>
       <Header save={save} title="🎨 おえかき コード" onBack={() => go("home")} onSound={onSound} onOpenHome={openHome} />
       <div style={{ padding: "0 16px", display: "grid", gap: 14 }}>
         <HowTo id="art" />
-        <div className="panel" style={{ padding: 10, display: "flex", justifyContent: "center" }}>
-          <ArtSVG cmds={cmds} reveal={reveal === Infinity ? segsN : reveal} />
-        </div>
-        {/* E: 十字キー風の命令パッド（すすむ中央・45/90が左右）＋ペン・いろ */}
-        <div className="panel" style={{ padding: 10, display: "grid", gap: 8 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1.3fr 1fr 1fr", gap: 6 }}>
-            <CmdBtn t="left" onAdd={add} bg={C.sky} />
-            <CmdBtn t="left45" onAdd={add} bg="#EAF4FF" />
-            <CmdBtn t="fwd" onAdd={add} big bg={C.leaf} />
-            <CmdBtn t="right45" onAdd={add} bg="#EAF4FF" />
-            <CmdBtn t="right" onAdd={add} bg={C.sky} />
+        {/* ① キャンバス左・操作右（狭い画面は縦積み＝theme.js .artgrid） */}
+        <div className="artgrid">
+          {/* 左: キャンバス（パネル枠いっぱい・固定4:3） */}
+          <div className="panel" style={{ padding: 8 }}>
+            <ArtSVG cmds={cmds} reveal={reveal === Infinity ? segsN : reveal} />
           </div>
-          <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-            {/* B1: ペンは現在の状態に合わせて「あげる/おろす」を出し分け（押すと該当めいれいが つまれる） */}
-            <button className="pbtn" onClick={() => add(state.pen ? "penup" : "pendown")}
-              style={{ background: "#fff", padding: "8px 14px", fontSize: 13, fontWeight: 900 }}>
-              {state.pen ? "🖐️ ペンを あげる" : "✍️ ペンを おろす"}
-            </button>
-            {/* A2/E: いまの色スウォッチ＝タップでパレット */}
-            <button className="pbtn" onClick={() => { SFX.tap(sound); setPalette(p => !p); }}
-              style={{ background: "#fff", padding: "8px 14px", fontSize: 13, fontWeight: 900, display: "flex", alignItems: "center", gap: 6 }}>
-              🎨 いろ
-              <span style={{ width: 18, height: 18, borderRadius: "50%", background: ART_COLORS[state.ci], border: `2px solid ${C.ink}`, display: "inline-block" }} />
-            </button>
-          </div>
-          {palette && (
-            <div className="panel slide" style={{ padding: 8, display: "flex", gap: 8, justifyContent: "center", background: "#FFFDF4" }}>
-              {ART_COLORS.map((col, k) => (
-                <button key={col} className="pbtn" onClick={() => pickColor(k)} aria-label={`いろ ${k + 1}`}
-                  style={{ width: 34, height: 34, borderRadius: "50%", background: col, padding: 0, border: `3px solid ${k === state.ci ? C.ink : "#fff"}` }} />
-              ))}
+          {/* 右: 操作カラム */}
+          <div style={{ display: "grid", gap: 8 }}>
+            {/* 1. 方向パッド: すすむ＋2×2（45/90） */}
+            <div className="panel" style={{ padding: 8, display: "grid", gap: 6 }}>
+              <PadBtn t="fwd" onAdd={add} big bg={C.leaf} />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                <PadBtn t="left45" onAdd={add} bg="#EAF4FF" />
+                <PadBtn t="right45" onAdd={add} bg="#EAF4FF" />
+                <PadBtn t="left" onAdd={add} bg={C.sky} />
+                <PadBtn t="right" onAdd={add} bg={C.sky} />
+              </div>
+              {/* 2. ペン＋いろ */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                <button className="pbtn" onClick={() => add(state.pen ? "penup" : "pendown")}
+                  style={{ background: "#fff", padding: "6px 4px", fontSize: 11, fontWeight: 900 }}>
+                  {state.pen ? "🖐️ ペンを あげる" : "✍️ ペンを おろす"}
+                </button>
+                <button className="pbtn" onClick={() => { SFX.tap(sound); setPalette(p => !p); }}
+                  style={{ background: "#fff", padding: "6px 4px", fontSize: 11, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+                  🎨 いろ
+                  <span style={{ width: 15, height: 15, borderRadius: "50%", background: ART_COLORS[state.ci], border: `2px solid ${C.ink}`, display: "inline-block" }} />
+                </button>
+              </div>
+              {palette && (
+                <div className="panel slide" style={{ padding: 6, display: "flex", gap: 5, justifyContent: "center", background: "#FFFDF4" }}>
+                  {ART_COLORS.map((col, k) => (
+                    <button key={col} className="pbtn" onClick={() => pickColor(k)} aria-label={`いろ ${k + 1}`}
+                      style={{ width: 26, height: 26, borderRadius: "50%", background: col, padding: 0, border: `3px solid ${k === state.ci ? C.ink : "#fff"}` }} />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <div className="panel" style={{ padding: 10 }}>
-          <div style={{ fontWeight: 900, fontSize: 13, marginBottom: 6 }}>📜 めいれい（{cmds.length}こ）</div>
-          <div style={{ display: "flex", gap: 4, flexWrap: "wrap", minHeight: 26 }}>
-            {cmds.length === 0 && <span style={{ fontWeight: 700, opacity: .5 }}>ここに めいれいが ならぶよ</span>}
-            {cmds.map((t, i) => <span key={i} style={{ fontSize: 20 }}>{ART_CMDS[t].emoji}</span>)}
+            {/* 3. 命令リスト（③ 連続する同じ命令は ×N に圧縮・表示のみ） */}
+            <div className="panel" style={{ padding: 8 }}>
+              <div style={{ fontWeight: 900, fontSize: 12, marginBottom: 4 }}>📜 めいれい（{cmds.length}こ）</div>
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap", minHeight: 22, maxHeight: 96, overflowY: "auto", alignContent: "flex-start" }}>
+                {cmds.length === 0 && <span style={{ fontWeight: 700, opacity: .5, fontSize: 12 }}>ここに ならぶよ</span>}
+                {packed.map((p, i) => (
+                  <span key={i} style={{ fontSize: 15, fontWeight: 900, background: "#F7FBFF", border: `1.5px solid ${C.ink}`, borderRadius: 8, padding: "1px 5px", whiteSpace: "nowrap" }}>
+                    {ART_CMDS[p.t].emoji}{p.n > 1 && <span style={{ fontSize: 11 }}> ×{p.n}</span>}
+                  </span>
+                ))}
+              </div>
+            </div>
+            {/* 4. 操作アイコン（小さく横並び） */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+              <button className="pbtn" onClick={replay} disabled={playing}
+                style={{ background: C.leaf, padding: "7px 2px", display: "grid", justifyItems: "center", gap: 1 }}>
+                <span style={{ fontSize: 16, lineHeight: 1 }}>▶️</span><span style={{ fontSize: 9, fontWeight: 900 }}>さいせい</span>
+              </button>
+              <button className="pbtn" onClick={undo} disabled={cmds.length === 0}
+                style={{ background: "#fff", padding: "7px 2px", display: "grid", justifyItems: "center", gap: 1 }}>
+                <span style={{ fontSize: 16, lineHeight: 1 }}>↩️</span><span style={{ fontSize: 9, fontWeight: 900 }}>もどす</span>
+              </button>
+              <button className="pbtn" onClick={() => { SFX.tap(sound); setConfirmClear(true); }} disabled={cmds.length === 0}
+                style={{ background: "#fff", padding: "7px 2px", display: "grid", justifyItems: "center", gap: 1 }}>
+                <span style={{ fontSize: 16, lineHeight: 1 }}>🧽</span><span style={{ fontSize: 9, fontWeight: 900 }}>けす</span>
+              </button>
+              <button className="pbtn" onClick={askSave}
+                style={{ background: C.sun, padding: "7px 2px", display: "grid", justifyItems: "center", gap: 1 }}>
+                <span style={{ fontSize: 16, lineHeight: 1 }}>💾</span><span style={{ fontSize: 9, fontWeight: 900 }}>ほぞん</span>
+              </button>
+            </div>
+            {savedMsg && <div className="panel slide" style={{ padding: 8, background: "#FFFBE0", fontWeight: 800, fontSize: 12 }}>{savedMsg}</div>}
           </div>
         </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <Btn big bg={C.leaf} onClick={replay} disabled={playing}>▶️ さいせい</Btn>
-          <Btn bg="#fff" onClick={undo} disabled={cmds.length === 0}>↩️ ひとつ もどす</Btn>
-          <Btn bg="#fff" onClick={() => { SFX.tap(sound); setConfirmClear(true); }} disabled={cmds.length === 0}>🧽 ぜんぶ けす</Btn>
-          <Btn bg={C.sun} onClick={askSave}>💾 ほぞんする</Btn>
-        </div>
-        {savedMsg && <div className="panel slide" style={{ padding: 12, background: "#FFFBE0", fontWeight: 800 }}>{savedMsg}</div>}
         <div className="panel" style={{ padding: 14 }}>
           <div className="pl-display" style={{ fontSize: 18, marginBottom: 8 }}>🎯 ちょうせん してみよう</div>
           <div style={{ display: "grid", gap: 8 }}>
@@ -240,7 +284,7 @@ export default function Art({ save, update, go, onSound, openHome }) {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(130px,1fr))", gap: 10 }}>
               {save.art.gallery.map(a => (
                 <div key={a.id} className="panel" style={{ padding: 8, borderRadius: 14, textAlign: "center" }}>
-                  <ArtSVG cmds={a.cmds} size={110} showTurtle={false} />
+                  <ArtSVG cmds={a.cmds} showTurtle={false} />
                   <div style={{ fontWeight: 900, fontSize: 12 }}>{a.name}</div>
                   <div style={{ fontSize: 10, fontWeight: 700 }}>{a.date}</div>
                   <button className="pbtn" style={{ padding: "2px 8px", background: "#FFB3B3", fontSize: 11, marginTop: 4 }}
