@@ -89,6 +89,8 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
   const [hint, setHint] = useState(false);
   const [failCount, setFailCount] = useState(0); // この面で失敗した回数（救済ヒントの段階）
   const [showAnswer, setShowAnswer] = useState(false); // 第3層「こたえをみる」を押したか
+  const [memoMode, setMemoMode] = useState(false); // 📝方眼メモ（ルート下書き）モード・一時状態
+  const [route, setRoute] = useState([]);          // 下書きの通り道 {x,y}[]・保存しない
   const runIdRef = useRef(0);
   const uidRef = useRef(0);
 
@@ -108,9 +110,20 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
     runIdRef.current++;
     setProg([]); setOpenRepeat(null); setBot(info.start); setCollected({});
     setRunning(false); setActiveUid(null); setCrash(false); setMsg(null); setResult(null); setHint(false); setFailCount(0); setShowAnswer(false);
+    setMemoMode(false); setRoute([]); // 方眼メモも面替えでリセット
   }, [stage.id]);
 
   const isWall = (x, y) => x < 0 || y < 0 || x >= info.w || y >= info.h || info.cells[y][x] === "#";
+
+  // 📝方眼メモ: マスをタップすると通り道に追加（同マス連続は無視）。ロボット・progには一切触れない
+  function appendRoute(x, y) {
+    const last = route[route.length - 1];
+    if (last && last.x === x && last.y === y) return;
+    SFX.tap(sound);
+    setRoute(r => [...r, { x, y }]);
+  }
+  function undoRoute() { SFX.tap(sound); setRoute(r => r.slice(0, -1)); }
+  function clearRoute() { SFX.tap(sound); setRoute([]); }
 
   function addBlock(type) {
     if (running) return;
@@ -216,6 +229,8 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
         <Btn bg="#fff" onClick={onBack}>◀ もどる</Btn>
         <div className="pl-display" style={{ fontSize: 20, flex: 1, minWidth: 100 }}>{stage.name}</div>
         <StarRow n={save.puzzle.stars[stage.id] || 0} size={20} />
+        {/* 📝方眼メモ: 盤面に自分でルートを下書きできる（考える道具・メモ07） */}
+        <Btn bg={memoMode ? C.sun : "#fff"} onClick={() => { setMemoMode(m => !m); SFX.tap(sound); }} style={{ fontSize: 14, padding: "8px 12px" }}>📝 メモ</Btn>
         {/* ③ こまったら: ヒントは 操作ボタンから はずして ヘッダーに小さく置く */}
         <Btn bg={hint ? C.sun : "#fff"} onClick={() => { setHint(h => !h); SFX.tap(sound); }} style={{ fontSize: 14, padding: "8px 12px" }}>💡 ヒント</Btn>
       </div>
@@ -229,19 +244,36 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
       <div className="panel" style={{ padding: 14, display: "flex", justifyContent: "center", background: "#FBFDFF" }}>
         <div className={crash ? "shake" : ""} style={{ position: "relative", width: cell * info.w, height: cell * info.h }}>
           {info.cells.map((row, y) => row.map((c, x) => (
-            <div key={`${x},${y}`} style={{
+            <div key={`${x},${y}`} onClick={memoMode ? () => appendRoute(x, y) : undefined} style={{
               position: "absolute", left: x * cell, top: y * cell, width: cell - 4, height: cell - 4,
               margin: 2, borderRadius: 10, border: `2px solid ${C.ink}`,
               background: c === "#" ? "#8FBF7F" : (x + y) % 2 ? "#FFF3D6" : "#FFFBEF",
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: cell * 0.55,
+              cursor: memoMode ? "pointer" : "default",
             }}>
               {c === "#" ? "🌳" : c === "*" && !collected[`${x},${y}`] ? "⭐" : ""}
             </div>
           )))}
+          {/* 📝ルート下書き（セルの上・ロボットの下）。線種と色を盤面/ロボットと変えて区別 */}
+          {memoMode && route.length > 0 && (
+            <svg width={cell * info.w} height={cell * info.h} style={{ position: "absolute", left: 0, top: 0, zIndex: 4, pointerEvents: "none" }}>
+              <polyline points={route.map(p => `${p.x * cell + cell / 2},${p.y * cell + cell / 2}`).join(" ")}
+                fill="none" stroke="#7C4DD8" strokeOpacity="0.7" strokeWidth={Math.max(3, cell * 0.09)}
+                strokeDasharray="6 5" strokeLinecap="round" strokeLinejoin="round" />
+              {route.map((p, i) => {
+                const cx = p.x * cell + cell / 2, cy = p.y * cell + cell / 2;
+                if (i === 0) return <circle key={i} cx={cx} cy={cy} r={cell * 0.13} fill="#7C4DD8" fillOpacity="0.85" />;
+                const pr = route[i - 1];
+                const ang = Math.atan2(p.y - pr.y, p.x - pr.x) * 180 / Math.PI;
+                return <text key={i} x={cx} y={cy} fontSize={cell * 0.4} fill="#7C4DD8" fillOpacity="0.9"
+                  textAnchor="middle" dominantBaseline="central" transform={`rotate(${ang} ${cx} ${cy})`}>▶</text>;
+              })}
+            </svg>
+          )}
           <div style={{
             position: "absolute", left: bot.x * cell, top: bot.y * cell, width: cell, height: cell,
             display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "left .3s, top .3s", zIndex: 5,
+            transition: "left .3s, top .3s", zIndex: 5, pointerEvents: "none",
           }}>
             <span style={{ position: "relative", display: "inline-flex" }}>
               {/* ロボットは正面固定。向きは まわりの ▶矢印で しめす（robot.pngはドット絵＝pixelated） */}
@@ -257,6 +289,16 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
           </div>
         </div>
       </div>
+
+      {/* 📝メモの操作（メモモード中だけ・盤面の近く） */}
+      {memoMode && (
+        <div className="panel slide" style={{ padding: 10, marginTop: 10, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", background: "#F3EEFF" }}>
+          <span style={{ fontWeight: 800, fontSize: 13 }}>✏️ マスを タップして みちを かいてみよう（ロボットは うごかないよ）</span>
+          <div style={{ flex: 1 }} />
+          <Btn bg="#fff" onClick={undoRoute} disabled={route.length === 0}>↩️ ひとつ</Btn>
+          <Btn bg="#fff" onClick={clearRoute} disabled={route.length === 0}>🧽 けす</Btn>
+        </div>
+      )}
 
       {/* 救済（第2層＝親切・視覚的／第3層＝こたえをみる）。第1層は面設計側。 */}
       {rescue && (
