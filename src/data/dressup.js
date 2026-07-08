@@ -51,10 +51,12 @@ import waistToolBelt from "../assets/waist_tool_belt.png";
 
 export const DRESSUP_ITEMS = [
   { id: "head_compass", slot: "head", name: "コンパスぼうし", skillTie: "junji", img: headCompassHat,
-    anchor: { top: 3.8, left: 50, width: 31.3 }, acquire: { type: "shop", price: 40 },
+    anchor: { top: 1.6, left: 50, width: 31.3 }, // 実機FBで3.8→1.6（深めで額が隠れ気味→上へ・2026-07-08）
+    acquire: { type: "shop", price: 40 },
     flavor: "じゅんばんの ちからを みにつけた たんけんかの ぼうし" },
   { id: "head_hakase", slot: "head", name: "はかせぼうし", skillTie: null, img: headHakaseHat,
-    anchor: { top: 3.8, left: 50, width: 31.3 }, acquire: { type: "achievement", condition: "all_puzzles_clear", label: "パズルを ぜんぶ クリアすると もらえる" },
+    anchor: { top: 1.6, left: 50, width: 31.3 }, // コンパスぼうしと同一シルエット＝必ず同値で揃える
+    acquire: { type: "achievement", condition: "all_puzzles_clear", label: "パズルを ぜんぶ クリアすると もらえる" },
     flavor: "ぜんぶの パズルを といた はかせの あかし" },
   { id: "head_crown", slot: "head", name: "おうかん", skillTie: null, img: headCrown,
     anchor: { top: 4.1, left: 50, width: 25.8 }, acquire: { type: "achievement", condition: "all_badges", label: "バッジを ぜんぶ あつめると もらえる" },
