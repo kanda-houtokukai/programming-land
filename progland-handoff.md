@@ -123,6 +123,7 @@
 | `progland-handoff.md` | 本台帳（引き継ぎの入口はここ1本） |
 | `CLAUDE.md` | Code用の案件前提・固有注意 |
 | `brushup/` | **ブラッシュアップ設計パックの新規ドキュメント**（2026-07-06振り分け）。実装の波の地図=`03_code_guide_by_wave.md`（波ごとの使うファイル＋指示文）・`01_roadmap_implementation.md`・`02_handoff.md`、新規実装指示=memo04(おうち部屋)/memo05(ショップ)/worldmap_home_design。配置経緯は`brushup/_配置メモ.md`。※P6等の重複.md9本は既存日本語名ドキュメントが正本のため取り込まず |
+| `brushup/shop_dressup/dressup_asset_baseline.md` | **着せ替え・アイテム作成の恒久基準**（画風・後処理・確定アンカー・微調整目安。実装値の正は`dressup.js`）。同フォルダに生成プロンプト原本8点＋レイヤー図を収載（2026-07-08・原本は`~/progland-brushup/20260707_shop_dressup/docs/`）。⚠️恒久文書を`docs/`に置かない（deploy毎に`rm -rf docs`で消える） |
 | （保管・リポジトリ外） | メモ08/09の統合待ち.js（`art_guide_revised.js`=第4波おえかき・`parent_intro.js`=第2波③理念文・`parent_guide_full.js`=参考）は `~/progland-brushup/js統合待ち/` に保管（Downloads一括削除の対象外・リポジトリ外）。波が来たら統合。新規画像 room-home.webp/shop-interior.webp は `src/assets/` へ配置済み |
 | `programming-land.jsx` | v1移植元。参照専用・編集しない |
 | `src/data/` | ステージ・クイズ・おえかき・バッジのデータ（ハードコード禁止の受け皿） |
