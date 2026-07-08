@@ -107,16 +107,27 @@ khaki / earth tones, vests, pockets, boots).
 むしめがねバッジ=じょうけん／どうぐベルト=デバッグ／キーボードリュック=タイピング／
 まほうのほんリュック=クイズ。**新モードを足すときは対応アイテムも一緒に設計**する。
 
-## 8. プロンプトファイル（本書と一緒にリポジトリへ置く）
+## 8. プロンプトファイル（本書と同じ `brushup/shop_dressup/` に置く）
 
 各アイテムの個別生成プロンプト本体（英語・ChatGPT用）は下記に分かれている。
-これらは過去セッションで作成済み（神田さんのダウンロード済みファイルが正）。
-本書と同じ場所（例: `docs/assets/`）へコミットして双方保管する:
+配置先は **`brushup/shop_dressup/`**（`docs/` は deploy が毎回 `rm -rf docs` で消すため不可）。
 
-- `adventure_base_prompts.md` … 探検家ベース人物（男女・背負わない基本形＋リュック版で6体）
+ベース人物（6体＝背負わない2体＋リュック4体）:
+- `character_base_prompts.md` … 初期試作ベース2体（無地シャツ版・**不使用/経緯資料**）
+- `adventure_base_prompts.md` … 探検家 基本形2体（背負わない・**実採用ベース**＝
+  player_boy_adventure.png / player_girl_adventure.png の元）
+- `backpack_variant_prompts.md` … 探検家×リュック4体（back スロットの埋め込み型）
+
+着せ替え／バトルのアイテム:
+- `dressup_item_batch1_prompts.md` … 着せ替え第1弾8種（コンパスぼうし／はかせぼうし／
+  おうかん／はぐるまバッジ／むしめがねバッジ／どうぐベルト／キーボードリュック／まほうのほんリュック）
 - `battle_items_and_new_dressup_prompts.md` … バトル消耗品4種＋たんけんメガネ・バンダナ
-- （着せ替え第1弾）コンパスぼうし／はかせぼうし／おうかん／はぐるまバッジ／むしめがねバッジ／
-  どうぐベルト／キーボードリュック／まほうのほんリュック のプロンプトファイル
+- `battle_stage_jungle_nature_prompts.md` … バトル舞台（ジャングル/だいち）の背景
+- `bandana_reprompt_v2.md` … たんけんバンダナの再生成プロンプト（v2）
+- `magnifying_badge_reprompt.md` … むしめがねバッジの再生成プロンプト
+- `dressup_belt_backpack_reprompt.md` … どうぐベルト／リュックの再生成プロンプト
 
-※上記ファイルが手元に無い場合は、過去会話から復元可能（ただし検索復元は途中で切れる
-　ことがあるため、復元版は「ダウンロード済み原本」と照合してからコミットする）。
+図: `layer_system_diagram.svg` … レイヤー合成の重ね順（waist→chest→neck→face→head）。
+
+※プロンプト原本が手元に無い場合は過去会話から復元可能（検索復元は途中で切れることが
+　あるため、復元版はダウンロード済み原本と照合してからコミットする）。
