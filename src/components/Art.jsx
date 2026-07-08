@@ -12,7 +12,7 @@ import HowTo from "./HowTo.jsx";
 import ParentGuide from "./ParentGuide.jsx";
 import { ART_GUIDE } from "../data/parent-guide.js";
 
-const CMD_LIMIT = 100; // B3: 命令の上限
+const CMD_LIMIT = 300; // B3: 命令の上限（2026-07-08 100→300）
 
 /* ② 固定キャンバス（自動フィット廃止・b3iで刷新）。
    横長4:3でパネル枠いっぱいに使う。数値は初期値＝実機で微調整:
