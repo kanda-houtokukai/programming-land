@@ -371,11 +371,28 @@ export default function Art({ save, update, go, onSound, openHome }) {
       {viewWork && (
         <div style={modalBg} onClick={() => setViewWork(null)}>
           <div className="panel slide" style={{ padding: 18, maxWidth: 420, width: "90%", textAlign: "center" }} onClick={e => e.stopPropagation()}>
-            {/* 木枠ふうの額縁 */}
-            <div style={{ background: "linear-gradient(135deg,#C69B6D,#A2764B)", padding: 12, borderRadius: 10, boxShadow: "inset 0 0 0 3px rgba(255,255,255,.35), 3px 3px 0 rgba(58,51,53,.4)" }}>
-              <div style={{ background: "#fff", borderRadius: 4, padding: 4 }}>
-                <ArtSVG cmds={viewWork.cmds} showTurtle={false} />
+            {/* 豪華な金彫刻ふうの額縁（立体・装飾つき） */}
+            <div style={{ position: "relative", display: "inline-block", padding: 26, borderRadius: 8,
+              // メタリックな金のグラデ（複数ストップで金属光沢）
+              background: "linear-gradient(135deg,#F8E29A 0%,#D9AE52 16%,#9C6F27 34%,#CD9A31 50%,#F5DA7C 66%,#A87A20 84%,#E7C55D 100%)",
+              // 立体感: 落ち影＋上ハイライト＋下影＋左右ベベル
+              boxShadow: "0 14px 34px rgba(0,0,0,.5), inset 0 3px 5px rgba(255,255,255,.7), inset 0 -5px 9px rgba(0,0,0,.45), inset 5px 0 6px rgba(255,255,255,.3), inset -5px 0 7px rgba(0,0,0,.4)" }}>
+              {/* 外周の彫り込みリング（モールディングの溝） */}
+              <div style={{ position: "absolute", inset: 9, borderRadius: 5, pointerEvents: "none",
+                boxShadow: "inset 0 0 0 1.5px rgba(255,255,255,.4), inset 0 0 0 3px rgba(110,75,20,.55), inset 0 0 6px 3px rgba(0,0,0,.25)" }} />
+              {/* 濃い金のフィレット＋白マット＋作品 */}
+              <div style={{ padding: 6, borderRadius: 4, background: "linear-gradient(135deg,#6a4a1c,#3c2810)",
+                boxShadow: "inset 0 2px 5px rgba(0,0,0,.65), 0 1px 0 rgba(255,255,255,.25)" }}>
+                <div style={{ background: "#FBF6EA", padding: 11, borderRadius: 2, boxShadow: "inset 0 0 9px rgba(0,0,0,.3)" }}>
+                  <ArtSVG cmds={viewWork.cmds} showTurtle={false} />
+                </div>
               </div>
+              {/* 四隅の飾り（ロゼット風の立体ボス） */}
+              {[{ top: 3, left: 3 }, { top: 3, right: 3 }, { bottom: 3, left: 3 }, { bottom: 3, right: 3 }].map((pos, i) => (
+                <span key={i} style={{ position: "absolute", ...pos, width: 20, height: 20, borderRadius: "50%",
+                  background: "radial-gradient(circle at 34% 32%, #FCEBAE 0%, #E7C55D 42%, #B0821F 72%, #6E4A16 100%)",
+                  boxShadow: "0 2px 3px rgba(0,0,0,.55), inset 0 1px 1px rgba(255,255,255,.7), inset 0 -1px 2px rgba(0,0,0,.4)" }} />
+              ))}
             </div>
             <div style={{ fontWeight: 900, fontSize: 16, marginTop: 12 }}>{viewWork.name}</div>
             <div style={{ fontSize: 11, fontWeight: 700, opacity: .7, marginBottom: 12 }}>{viewWork.date}</div>
