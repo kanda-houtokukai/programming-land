@@ -136,13 +136,18 @@ export default function Art({ save, update, go, onSound, openHome }) {
   const [confirmClear, setConfirmClear] = useState(false); // A3
   const [naming, setNaming] = useState(null);              // A4
   const [palette, setPalette] = useState(false);           // 色ポップアップ
+  const [dirty, setDirty] = useState(false);               // ① 未保存の変更
+  const [confirmBack, setConfirmBack] = useState(false);   // ① 戻る確認
+  const [backAfterSave, setBackAfterSave] = useState(false); // ① 保存してから戻る
+  const [confirmDel, setConfirmDel] = useState(null);      // ② 削除確認（対象作品）
+  const [viewWork, setViewWork] = useState(null);          // ③ 額縁ポップアップ（対象作品）
   const playRef = useRef(0);
   const state = turtleSegs(cmds);
   const segsN = state.segs.length;
 
   function add(t) {
     if (cmds.length >= CMD_LIMIT) { setSavedMsg("めいれいが いっぱいだよ！"); return; }
-    SFX.tap(sound); setSavedMsg(null);
+    SFX.tap(sound); setSavedMsg(null); setDirty(true);
     // 上限ガードは関数型更新の内側にも（連打時のstale closureで100を超えない）
     setCmds(c => (c.length >= CMD_LIMIT ? c : [...c, t])); setReveal(Infinity);
   }
@@ -152,11 +157,13 @@ export default function Art({ save, update, go, onSound, openHome }) {
     setPalette(false);
     if (n === 0) return;
     if (cmds.length + n > CMD_LIMIT) { setSavedMsg("めいれいが いっぱいだよ！"); return; }
-    SFX.tap(sound); setSavedMsg(null);
+    SFX.tap(sound); setSavedMsg(null); setDirty(true);
     setCmds(c => (c.length + n > CMD_LIMIT ? c : [...c, ...Array(n).fill("color")])); setReveal(Infinity);
   }
-  function undo() { SFX.tap(sound); setCmds(c => c.slice(0, -1)); setReveal(Infinity); }
-  function clearAll() { SFX.tap(sound); setCmds([]); setReveal(Infinity); setSavedMsg(null); setConfirmClear(false); }
+  function undo() { SFX.tap(sound); setDirty(true); setCmds(c => c.slice(0, -1)); setReveal(Infinity); }
+  function clearAll() { SFX.tap(sound); setCmds([]); setReveal(Infinity); setSavedMsg(null); setConfirmClear(false); setDirty(false); }
+  // ① 戻る: かきかけ（未保存）があれば確認・無ければそのまま
+  function requestBack() { (cmds.length > 0 && dirty) ? setConfirmBack(true) : go("home"); }
   async function replay() {
     if (playing || segsN === 0) return;
     const my = ++playRef.current;
@@ -187,11 +194,14 @@ export default function Art({ save, update, go, onSound, openHome }) {
       return s;
     });
     setNaming(null);
+    setDirty(false);
+    if (backAfterSave) { setBackAfterSave(false); go("home"); return; } // ① 保存後に戻る
     setSavedMsg("🖼️ びじゅつかんに ほぞんしたよ！");
   }
   function delArt(id) {
     SFX.tap(sound);
     update(s => { s.art.gallery = s.art.gallery.filter(a => a.id !== id); return s; });
+    setConfirmDel(null); setViewWork(null); // ② 確認・③額縁 を閉じる
   }
   const modalBg = { position: "fixed", inset: 0, background: "rgba(60,50,40,.45)", display: "grid", placeItems: "center", zIndex: 60 };
   // ③命令リスト圧縮＋各グループの開始flat-index（haltIndex以降を薄表示するため）
@@ -201,7 +211,7 @@ export default function Art({ save, update, go, onSound, openHome }) {
   const showWall = state.hitWall && (reveal === Infinity || reveal >= segsN);
   return (
     <div style={{ maxWidth: 960, margin: "0 auto", paddingBottom: 30 }}>
-      <Header save={save} title="🎨 おえかき コード" onBack={() => go("home")} onSound={onSound} onOpenHome={openHome} />
+      <Header save={save} title="🎨 おえかき コード" onBack={requestBack} onSound={onSound} onOpenHome={openHome} />
       <div style={{ padding: "0 16px", display: "grid", gap: 14 }}>
         <HowTo id="art" />
         {/* ① キャンバス左・操作右（狭い画面は縦積み＝theme.js .artgrid） */}
@@ -302,15 +312,15 @@ export default function Art({ save, update, go, onSound, openHome }) {
         {save.art.gallery.length > 0 && (
           <div className="panel" style={{ padding: 14 }}>
             <div className="pl-display" style={{ fontSize: 18, marginBottom: 8 }}>🖼️ わたしの びじゅつかん</div>
+            <div style={{ fontSize: 11, fontWeight: 700, opacity: .6, marginBottom: 8 }}>さくひんを タップすると おおきく みえるよ</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(130px,1fr))", gap: 10 }}>
               {save.art.gallery.map(a => (
-                <div key={a.id} className="panel" style={{ padding: 8, borderRadius: 14, textAlign: "center" }}>
+                <button key={a.id} className="pbtn" onClick={() => { SFX.tap(sound); setViewWork(a); }}
+                  style={{ padding: 8, borderRadius: 14, textAlign: "center", background: "#fff", display: "block" }}>
                   <ArtSVG cmds={a.cmds} showTurtle={false} />
                   <div style={{ fontWeight: 900, fontSize: 12 }}>{a.name}</div>
                   <div style={{ fontSize: 10, fontWeight: 700 }}>{a.date}</div>
-                  <button className="pbtn" style={{ padding: "2px 8px", background: "#FFB3B3", fontSize: 11, marginTop: 4 }}
-                    onClick={() => delArt(a.id)}>✖ けす</button>
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -338,6 +348,52 @@ export default function Art({ save, update, go, onSound, openHome }) {
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
               <Btn bg={C.sun} onClick={() => saveArt(naming)}>ほぞんする</Btn>
               <Btn bg="#fff" onClick={() => setNaming(null)}>やめる</Btn>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ① 未保存で戻る確認 */}
+      {confirmBack && (
+        <div style={modalBg} onClick={() => setConfirmBack(false)}>
+          <div className="panel slide" style={{ padding: 18, maxWidth: 320, width: "88%", textAlign: "center" }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontWeight: 900, fontSize: 15, marginBottom: 14, lineHeight: 1.5 }}>ほぞんしていない え が あるよ。<br />もどると きえちゃうけど いい？</div>
+            <div style={{ display: "grid", gap: 8, justifyItems: "center" }}>
+              <Btn bg={C.sun} onClick={() => { setConfirmBack(false); setBackAfterSave(true); askSave(); }}>💾 ほぞんする</Btn>
+              <div style={{ display: "flex", gap: 10 }}>
+                <Btn bg="#FFB3B3" onClick={() => { setConfirmBack(false); go("home"); }}>ほぞんしないで もどる</Btn>
+                <Btn bg="#fff" onClick={() => setConfirmBack(false)}>やめる</Btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ③ 作品の額縁ポップアップ */}
+      {viewWork && (
+        <div style={modalBg} onClick={() => setViewWork(null)}>
+          <div className="panel slide" style={{ padding: 18, maxWidth: 420, width: "90%", textAlign: "center" }} onClick={e => e.stopPropagation()}>
+            {/* 木枠ふうの額縁 */}
+            <div style={{ background: "linear-gradient(135deg,#C69B6D,#A2764B)", padding: 12, borderRadius: 10, boxShadow: "inset 0 0 0 3px rgba(255,255,255,.35), 3px 3px 0 rgba(58,51,53,.4)" }}>
+              <div style={{ background: "#fff", borderRadius: 4, padding: 4 }}>
+                <ArtSVG cmds={viewWork.cmds} showTurtle={false} />
+              </div>
+            </div>
+            <div style={{ fontWeight: 900, fontSize: 16, marginTop: 12 }}>{viewWork.name}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, opacity: .7, marginBottom: 12 }}>{viewWork.date}</div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+              <Btn bg="#fff" onClick={() => setViewWork(null)}>とじる</Btn>
+              <Btn bg="#FFB3B3" onClick={() => setConfirmDel(viewWork)}>🗑 けす</Btn>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ② 作品の削除確認 */}
+      {confirmDel && (
+        <div style={modalBg} onClick={() => setConfirmDel(null)}>
+          <div className="panel slide" style={{ padding: 18, maxWidth: 300, width: "86%", textAlign: "center" }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontWeight: 900, fontSize: 15, marginBottom: 14, lineHeight: 1.5 }}>この さくひん<br />「{confirmDel.name}」を けす？</div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+              <Btn bg="#FFB3B3" onClick={() => delArt(confirmDel.id)}>けす</Btn>
+              <Btn bg="#fff" onClick={() => setConfirmDel(null)}>やめる</Btn>
             </div>
           </div>
         </div>
