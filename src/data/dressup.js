@@ -75,7 +75,8 @@ export const DRESSUP_ITEMS = [
     anchor: { top: 40.5, left: 38.7, width: 8.5 }, acquire: { type: "shop", price: 40 },
     flavor: "「もしも」で かんがえる ちからの しるし" },
   { id: "waist_belt", slot: "waist", name: "どうぐベルト", skillTie: null, img: waistToolBelt,
-    anchor: { top: 52.5, left: 50, width: 23.9 }, acquire: { type: "shop", price: 50 },
+    anchor: { top: 50.0, left: 50, width: 23.9 }, // 実機FBで52.5→50.0（少し低かった→上へ・2026-07-08）
+    acquire: { type: "shop", price: 50 },
     flavor: "こまったとき なおす どうぐが つまった ベルト" },
   // back はレイヤーでなくベース人物ごと切り替え（BASES）＝anchor なし
   { id: "back_keyboard", slot: "back", name: "キーボードリュック", skillTie: "keyboard", img: null,
