@@ -86,6 +86,20 @@ export const CSS = `
   /* かいしん！の文字ポップ */
   @keyframes pl-critpop { 0%{ transform: scale(0) rotate(-8deg); opacity:0 } 30%{ transform: scale(1.35) rotate(3deg); opacity:1 } 70%{ transform: scale(1.1) rotate(-2deg); opacity:1 } 100%{ transform: scale(1); opacity:0 } }
   .critpop { animation: pl-critpop .9s ease forwards; }
+  /* 06-A Phase2 演出磨き: 浮遊ダメージ数字（オーバーシュート拡大→上昇フェード） */
+  @keyframes pl-dmgfloat {
+    0%   { transform: translateY(0) scale(.3); opacity: 0 }
+    18%  { transform: translateY(-4px) scale(1.25); opacity: 1 }
+    32%  { transform: translateY(-10px) scale(1); opacity: 1 }
+    100% { transform: translateY(-56px) scale(1); opacity: 0 }
+  }
+  .dmgfloat { animation: pl-dmgfloat .9s cubic-bezier(.2,.7,.3,1) forwards; }
+  /* 06-A Phase2 演出磨き: 通常攻撃の予備動作（突進前に少し引いてかがむ・かいしんは既存の溜めがあるので対象外） */
+  @keyframes pl-anticip {
+    0%   { transform: translate(0,0) }
+    60%,100% { transform: translate(-7px,4px) scale(.97) }
+  }
+  .anticip { animation: pl-anticip .12s ease-out forwards; }
   /* ハートが割れる */
   @keyframes pl-heartbreak { 0%{ transform: scale(1) } 30%{ transform: scale(1.5) rotate(-12deg) } 100%{ transform: scale(.2) rotate(20deg) translateY(14px); opacity: 0 } }
   .heartbreak { display:inline-block; animation: pl-heartbreak .6s ease forwards; }
@@ -191,6 +205,7 @@ export const CSS = `
   @media (prefers-reduced-motion: reduce) {
     .pop,.shake,.bounce,.slide,.glow { animation: none; }
     .idle,.idle2,.lunge,.hitflash,.shake2,.hitfx,.critpop,.heartbreak,.fall,.victory,.droop,.riseup,.aura,.shieldpop,.healglow { animation: none; }
+    .dmgfloat,.anticip { animation: none; }
     .charge,.spinlight,.morph,.slam,.whiteflash,.confetti { animation: none; }
     .fadein,.softpop,.mapfloat,.growpop,.sparkle { animation: none; }
     .whiteflash { opacity: 0; }

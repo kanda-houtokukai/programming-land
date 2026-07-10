@@ -78,6 +78,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
   const [itemUsed, setItemUsed] = useState(false);
   const [overlay, setOverlay] = useState(null); // 'win' | 'lose'
   const [firstKill, setFirstKill] = useState(false);
+  const [dmgPop, setDmgPop] = useState(null); // 演出磨き③: 浮遊ダメージ数字 {value, crit, id}（reduced-motionでは出さない）
   const timers = useRef([]);
   const granted = useRef(false);
   // 演出磨き①（06-A Phase2）: メッセージのタイプライター表示。1文字ずつ・タップで即全表示。
@@ -163,13 +164,18 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
       const dmg = (isCrit ? CRIT_DAMAGE : NORMAL_DAMAGE) * (buffs.power ? 2 : 1);
       const powered = buffs.power;
       const nhp = Math.max(0, enemyHp - dmg);
-      const delay = isCrit ? T.windup : 0; // かいしんだけ 溜めのぶん 後ろへずれる
+      // 演出磨き④: 通常攻撃の予備動作＝突進の直前に≈110msの「引き」（かいしんは既存の溜めがあるので二重にしない）
+      const pre = (isCrit || reducedMotion) ? 0 : 110;
+      const delay = isCrit ? T.windup : pre; // かいしんは溜め・通常は予備動作のぶん 後ろへずれる
       setCritAtk(isCrit);
       if (isCrit) {
         setPhase("windup");
         SFX.charge(sound);
         setMsg("⚡ なにか くるぞ…！");
         later(T.windup, () => setPhase("atk"));
+      } else if (pre) {
+        setPhase("ready");
+        later(pre, () => setPhase("atk"));
       } else {
         setPhase("atk");
       }
@@ -183,11 +189,12 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
       later(delay + T.impact + stop, () => {
         setShakeCls(isCrit || dmg >= 2 ? "shake2" : "shake");
         setEnemyHp(nhp);
+        if (!reducedMotion) setDmgPop({ value: dmg, crit: isCrit, id: Date.now() }); // 演出磨き③: ヒットストップ解放と同時に数字が飛ぶ
         if (powered) setBuffs(b => ({ ...b, power: false }));
         setMsg(`${isCrit ? "⚡ かいしんの いちげき！" : "こうげき せいこう！"}${powered ? "（💪 2ばい）" : ""} ${dmg}ダメージ！`);
       });
       later(delay + T.atkEnd + stop, () => { if (nhp <= 0) startWin(); else setPhase("fb"); });
-      later(delay + T.fxClear + stop, () => { setFx(f => ({ ...f, hit: null })); setShakeCls(""); setCritAtk(false); });
+      later(delay + T.fxClear + stop, () => { setFx(f => ({ ...f, hit: null })); setShakeCls(""); setCritAtk(false); setDmgPop(null); });
     } else if (buffs.shield) {
       setPhase("eatk");
       later(T.impact, () => {
@@ -218,7 +225,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
 
   function next() {
     SFX.tap(sound); clearTimers();
-    setPicked(null); setMsg(null); setFx({}); setShakeCls(""); setCritAtk(false);
+    setPicked(null); setMsg(null); setFx({}); setShakeCls(""); setCritAtk(false); setDmgPop(null);
     setFadedIdx(null); setItemUsed(false); setQi(v => v + 1); setPhase("idle");
   }
 
@@ -293,7 +300,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
 
           {/* 相棒（左下寄り）。かいしん時は 溜め(charge)→大きい突進(--lsc) */}
           <div style={{ position: "absolute", left: "5%", bottom: "4%", width: "24%", zIndex: 4 }}>
-            <div className={phase === "atk" ? "lunge" : ""}
+            <div className={phase === "atk" ? "lunge" : phase === "ready" ? "anticip" : ""}
               style={{ "--dx": critAtk ? "48vw" : "44vw", "--dy": critAtk ? "-12vw" : "-10vw", "--lsc": critAtk ? 1.22 : 1.06, maxWidth: "100%" }}>
               <div className={[
                 phase === "windup" ? "charge" : "",
@@ -322,6 +329,11 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
           )}
           {/* 命中エフェクト💥（かいしんは大きく） */}
           {fx.hit === "enemy" && <div className="hitfx" style={{ position: "absolute", right: "16%", top: "26%", fontSize: fx.crit ? "min(14vw,84px)" : "min(9vw,56px)", zIndex: 5 }}>💥</div>}
+          {/* 演出磨き③: 浮遊ダメージ数字（かいしんは大きめ・金色＝「かいしん！」ポップと同系色） */}
+          {dmgPop && <div key={dmgPop.id} className="dmgfloat" style={{ position: "absolute", right: "17%", top: "18%", zIndex: 6,
+            fontWeight: 900, fontSize: dmgPop.crit ? "min(11vw,64px)" : "min(7.5vw,44px)",
+            color: dmgPop.crit ? "#FFD447" : "#fff",
+            textShadow: `2px 2px 0 ${C.ink}, -2px 2px 0 ${C.ink}, 2px -2px 0 ${C.ink}, -2px -2px 0 ${C.ink}` }}>-{dmgPop.value}</div>}
           {fx.hit === "partner" && <div className="hitfx" style={{ position: "absolute", left: "12%", bottom: "24%", fontSize: "min(9vw,56px)", zIndex: 5 }}>💥</div>}
           {/* まもりのたてバリア */}
           {fx.shield && <div className="shieldpop" style={{ position: "absolute", left: "10%", bottom: "18%", fontSize: "min(11vw,64px)", zIndex: 5 }}>🛡️</div>}
