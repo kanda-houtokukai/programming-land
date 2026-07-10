@@ -16,6 +16,7 @@ import { battlePool } from "../data/quizzes.js";
 import {
   PLAYER_HEARTS, HP_BY_DIFF, NORMAL_DAMAGE, CRIT_DAMAGE, critChance, BATTLE_XP,
   BATTLE_BG, ITEMS, enemiesFor, enemyUnlocked, equippedBgImg,
+  TOWER_START_FLOOR, towerHp,
 } from "../data/battle.js";
 import { applyXp, addCoins, COIN } from "../growth.js";
 import { today } from "../storage.js";
@@ -55,9 +56,11 @@ function HudPill({ children, style }) {
 
 const T = { windup: 680, impact: 320, atkEnd: 780, fxClear: 980, heartGone: 900, downEnd: 950, overlay: 2150 };
 
-function BattleFight({ enemy, diff, save, update, go, onBack, openHome }) {
+// tower=🗼タワーモード（06-A）: maxHpはtowerHpで上書き・勝敗コールバック差し替え・コイン/討伐/best/ずかんに触れない。
+// 非tower（名前つき戦）は従来どおり不変。
+function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = false, floor = 1, maxHpOverride = 0, onFloorClear, onTowerLose, onTowerRetry }) {
   const sound = save.settings.sound;
-  const maxHp = HP_BY_DIFF[diff];
+  const maxHp = tower ? maxHpOverride : HP_BY_DIFF[diff];
   const [queue] = useState(() => battlePool(diff));
   const [qi, setQi] = useState(0);
   const [hearts, setHearts] = useState(PLAYER_HEARTS);
@@ -90,24 +93,36 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome }) {
     setPhase("down"); SFX.down(sound);
     if (!granted.current) {
       granted.current = true;
-      setFirstKill(!save.battle.defeated.includes(enemy.id));
-      update(s => {
-        applyXp(s, BATTLE_XP[diff]);
-        const isFirstKill = !s.battle.defeated.includes(enemy.id);
-        if (isFirstKill) {
-          addCoins(s, COIN.battle[diff]); // 初撃破のみ（再戦は0・周回で稼げない・06-C）
-          s.battle.defeated.push(enemy.id);
-        }
-        s.battle.best[diff] = (s.battle.best[diff] || 0) + 1;
-        const d = today(); s.log[d] = s.log[d] || {}; s.log[d].battle = (s.log[d].battle || 0) + 1;
-        return s;
-      });
+      if (tower) {
+        // 🗼フロアクリア: XPのみ（コイン無し=周回防止・06-C準拠。討伐/best/ずかんも触れない）。到達フロアをベスト記録
+        update(s => {
+          applyXp(s, BATTLE_XP[diff]);
+          const d = today(); s.log[d] = s.log[d] || {}; s.log[d].battle = (s.log[d].battle || 0) + 1;
+          s.battle.towerBest = s.battle.towerBest || {};
+          s.battle.towerBest[diff] = Math.max(s.battle.towerBest[diff] || 0, floor);
+          return s;
+        });
+      } else {
+        setFirstKill(!save.battle.defeated.includes(enemy.id));
+        update(s => {
+          applyXp(s, BATTLE_XP[diff]);
+          const isFirstKill = !s.battle.defeated.includes(enemy.id);
+          if (isFirstKill) {
+            addCoins(s, COIN.battle[diff]); // 初撃破のみ（再戦は0・周回で稼げない・06-C）
+            s.battle.defeated.push(enemy.id);
+          }
+          s.battle.best[diff] = (s.battle.best[diff] || 0) + 1;
+          const d = today(); s.log[d] = s.log[d] || {}; s.log[d].battle = (s.log[d].battle || 0) + 1;
+          return s;
+        });
+      }
     }
     later(T.downEnd, () => { setPhase("victory"); setFx(f => ({ ...f, sparkle: true, won: true })); SFX.win(sound); });
     later(T.overlay, () => setOverlay("win"));
   }
   function startLose() {
-    setPhase("lose"); // 罰なし: セーブは何も変えない
+    setPhase("lose"); // 罰なし: セーブは何も変えない（タワーは到達フロアのベストだけ記録）
+    if (tower && onTowerLose) onTowerLose(floor);
     later(1100, () => setOverlay("lose"));
   }
 
@@ -201,7 +216,8 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome }) {
       <Header save={save} title="⚔️ クイズバトル" onSound={() => {}} onOpenHome={openHome} />
       <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "8px 0" }}>
         <Btn bg="#fff" onClick={onBack} disabled={!!overlay}>◀ にげる</Btn>
-        <div style={{ fontWeight: 900 }}>{DIFFICULTIES.find(d => d.id === diff).short} バトル</div>
+        <div style={{ fontWeight: 900 }}>{DIFFICULTIES.find(d => d.id === diff).short} {tower ? "タワー" : "バトル"}</div>
+        {tower && <div style={{ fontWeight: 900, fontSize: 13, background: "#EFE7FF", border: `2px solid ${C.ink}`, borderRadius: 999, padding: "2px 10px" }}>🗼 {floor}かい</div>}
       </div>
 
       {/* ===== バトルシーン（背景に切り抜きキャラが立つ） ===== */}
@@ -347,17 +363,20 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome }) {
       {overlay === "win" && (
         <div style={{ position: "fixed", inset: 0, zIndex: 110, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div className="panel pop" style={{ padding: 24, textAlign: "center", maxWidth: 400, background: "#FFFDF5" }}>
-            <div style={{ fontSize: 48 }}>🎉</div>
-            <div className="pl-display" style={{ fontSize: 25 }}>{enemy.name}に かった！</div>
+            <div style={{ fontSize: 48 }}>{tower ? "🗼" : "🎉"}</div>
+            <div className="pl-display" style={{ fontSize: 25 }}>{tower ? `${floor}かいを クリア！` : `${enemy.name}に かった！`}</div>
             <div style={{ margin: "10px 0", display: "flex", justifyContent: "center", alignItems: "center", gap: 6 }}>
               <EnemyIcon enemy={enemy} size={64} /><span style={{ fontSize: 34 }}>✨</span>
             </div>
             <div style={{ fontWeight: 800, fontSize: 14 }}>
-              けいけんち ＋{BATTLE_XP[diff]} XP ／ 🪙 ＋{COIN.battle[diff]}！
-              {firstKill && <><br />🆕 あたらしい あいてを ずかんに とうろく！</>}
+              {tower ? <>けいけんち ＋{BATTLE_XP[diff]} XP</> : <>けいけんち ＋{BATTLE_XP[diff]} XP ／ 🪙 {firstKill ? `＋${COIN.battle[diff]}！` : "＋0（たおしたことのある あいて）"}</>}
+              {!tower && firstKill && <><br />🆕 あたらしい あいてを ずかんに とうろく！</>}
+              {tower && <><br />うえの かいは てきが つよくなるよ！</>}
             </div>
             <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginTop: 14 }}>
-              <Btn big bg={C.leaf} onClick={onBack}>つぎの てきへ ▶</Btn>
+              {tower
+                ? <Btn big bg={C.leaf} onClick={() => onFloorClear && onFloorClear()}>つぎの フロアへ ▶</Btn>
+                : <Btn big bg={C.leaf} onClick={onBack}>つぎの てきへ ▶</Btn>}
               <Btn bg="#fff" onClick={() => go("home")}>ホームへ</Btn>
             </div>
           </div>
@@ -367,14 +386,19 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome }) {
         <div style={{ position: "fixed", inset: 0, zIndex: 110, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div className="panel pop" style={{ padding: 24, textAlign: "center", maxWidth: 400, background: "#F3F7FF" }}>
             <div style={{ fontSize: 48 }}>💧</div>
-            <div className="pl-display" style={{ fontSize: 23 }}>おしかった！ また ちょうせんしよう</div>
+            <div className="pl-display" style={{ fontSize: 23 }}>
+              {tower ? `🗼 ${floor}かいまで のぼった！` : "おしかった！ また ちょうせんしよう"}
+            </div>
             <div style={{ fontWeight: 800, fontSize: 14, margin: "10px 0" }}>
+              {tower && <>さいこうきろく: {Math.max((save.battle.towerBest || {})[diff] || 0, floor)}かい<br /></>}
               まちがえた もんだいを おぼえたら つぎは かてるよ。
               {diff !== "easy" && <><br />「やさしい」で れんしゅうするのも いいね。</>}
               {ITEMS.some(it => (save.items[it.id] || 0) > 0) && <><br />アイテムを つかうと らくに なるよ。</>}
             </div>
             <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginTop: 10 }}>
-              <Btn big bg={C.leaf} onClick={onBack}>もういちど</Btn>
+              {tower
+                ? <Btn big bg={C.leaf} onClick={() => onTowerRetry && onTowerRetry()}>もういちど（1かいから）</Btn>
+                : <Btn big bg={C.leaf} onClick={onBack}>もういちど</Btn>}
               <Btn bg="#fff" onClick={() => go("home")}>ホームへ</Btn>
             </div>
           </div>
@@ -389,14 +413,28 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome }) {
 export default function Battle({ save, update, go, onSound, openHome }) {
   const [diff, setDiff] = useState("easy");
   const [fight, setFight] = useState(null);
+  const [tower, setTower] = useState(false);        // 🗼タワー起動中か（06-A）
+  const [floor, setFloor] = useState(TOWER_START_FLOOR);
+  const [towerRun, setTowerRun] = useState(0);      // もういちど用（floor1同士でもremountさせる）
   const defeated = (save.battle && save.battle.defeated) || [];
+  const towerBest = (save.battle && save.battle.towerBest) || {};
+  const list = enemiesFor(diff);
+
+  if (tower) {
+    // 🗼タワー: 帯の3体を巡回・フロアが上がるほどHP増（towerHp）・クイズは帯の難易度のまま
+    const e = list[(floor - 1) % list.length];
+    return <BattleFight key={`tower-${diff}-${towerRun}-${floor}`} enemy={e} diff={diff} save={save} update={update} go={go}
+      tower floor={floor} maxHpOverride={towerHp(diff, floor)}
+      onFloorClear={() => setFloor(f => f + 1)}
+      onTowerLose={fl => update(s => { s.battle.towerBest = s.battle.towerBest || {}; s.battle.towerBest[diff] = Math.max(s.battle.towerBest[diff] || 0, fl); return s; })}
+      onTowerRetry={() => { setFloor(TOWER_START_FLOOR); setTowerRun(r => r + 1); }}
+      onBack={() => { setTower(false); setFloor(TOWER_START_FLOOR); }} openHome={openHome} />;
+  }
 
   if (fight) {
     return <BattleFight key={fight.id + diff} enemy={fight} diff={diff} save={save} update={update} go={go}
       onBack={() => setFight(null)} openHome={openHome} />;
   }
-
-  const list = enemiesFor(diff);
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
       <Header save={save} title="⚔️ クイズバトル" onBack={() => go("home")} onSound={onSound} onOpenHome={openHome} />
@@ -428,6 +466,26 @@ export default function Battle({ save, update, go, onSound, openHome }) {
             </button>
           );
         })}
+        {/* 🗼タワー入口（06-A）: 帯の3体を全撃破で解放。どこまで のぼれるか＝towerBest */}
+        {(() => {
+          const allDefeated = list.every(e => defeated.includes(e.id));
+          const best = towerBest[diff] || 0;
+          return (
+            <button className="pbtn" disabled={!allDefeated}
+              onClick={() => { SFX.tap(save.settings.sound); setFloor(TOWER_START_FLOOR); setTowerRun(r => r + 1); setTower(true); }}
+              style={{ background: allDefeated ? "#F5EFFF" : "#fff", padding: 14, display: "flex", gap: 14, alignItems: "center", textAlign: "left", opacity: allDefeated ? 1 : 0.5 }}>
+              <span style={{ fontSize: 34 }}>🗼</span>
+              <span style={{ flex: 1 }}>
+                <span className="pl-display" style={{ fontSize: 19, display: "block" }}>タワー</span>
+                <span style={{ fontWeight: 700, fontSize: 13 }}>
+                  {allDefeated
+                    ? <>どこまで のぼれるか ちょうせん！ うえの かいほど てきが つよいよ{best > 0 && <>　🏅 さいこう {best}かい</>}</>
+                    : "3体 たおすと あらわれる"}
+                </span>
+              </span>
+            </button>
+          );
+        })()}
         <ParentGuide guide={BATTLE_GUIDE} />
       </div>
     </div>

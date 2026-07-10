@@ -29,7 +29,7 @@ p.dex = ["leaf-1", "leaf-2"];
 // 新旧まざったバッジ配列（新規ID typeFast/hard3_5/w4/battle1/shopper 等を含む）
 p.badges = ["first", "w1", "w4", "star10", "type1", "typeFast", "hard3_5", "quizHardAll", "art1", "battle1", "shopper"];
 // P6フェーズ2の項目
-p.battle = { defeated: ["slime", "mushroom", "ghost"], best: { easy: 2, normal: 1 } };
+p.battle = { defeated: ["slime", "mushroom", "ghost"], best: { easy: 2, normal: 1 }, towerBest: { easy: 7 } }; // towerBest=06-A タワー最高フロア
 p.coins = 137;
 p.coinsGranted = true;
 p.items = { drink: 2, glasses: 1, shield: 3 };
@@ -67,7 +67,17 @@ ok(JSON.stringify(q.badges.slice().sort()) === JSON.stringify(p.badges.slice().s
 ok(q.coins === 137 && q.coinsGranted === true, "コイン枚数・換算フラグ");
 ok(JSON.stringify(q.items) === JSON.stringify(p.items), "バトルアイテム所持数");
 ok(JSON.stringify(q.cosmetics) === JSON.stringify(p.cosmetics), "きせかえ（所持・装備）");
-ok(JSON.stringify(q.battle) === JSON.stringify(p.battle), "討伐記録（defeated/best）");
+ok(JSON.stringify(q.battle) === JSON.stringify(p.battle), "討伐記録（defeated/best/towerBest）");
+// 06-A: 旧セーブ（towerBest なし）はマージで {} が補完される
+{
+  const legacy = createProfile("むかしのセーブ", "boy");
+  const raw = JSON.parse(localStorage.getItem(`progland:v2:profile:${legacy.id}`));
+  delete raw.battle.towerBest;
+  localStorage.setItem(`progland:v2:profile:${legacy.id}`, JSON.stringify(raw));
+  const migrated = loadProfile(legacy.id);
+  ok(migrated.battle && typeof migrated.battle.towerBest === "object" && Object.keys(migrated.battle.towerBest).length === 0,
+    "06-A 旧セーブに towerBest が {} で補完される（デフォルト値マージ）");
+}
 ok(q.shopUsed === true, "ショップ利用フラグ");
 ok(JSON.stringify(q.powers) === JSON.stringify(p.powers), "そだったちからF2 前回%（powers.prev）");
 ok(q.character === "girl" && JSON.stringify(q.dressup) === JSON.stringify(p.dressup), "第3波 主人公キャラ＋着せ替え装備（character/dressup）");

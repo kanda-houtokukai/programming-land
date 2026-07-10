@@ -15,6 +15,12 @@ export function battleUnlocked(save) {
 // 難易度ごとの 敵HP（＝そのHP問正解で1体たおせる）
 export const HP_BY_DIFF = { easy: 3, normal: 4, hard: 5 };
 
+// 🗼タワー（06-A Phase1）: 帯の3体を全撃破で解放。フロアが上がるほど敵HPが増える。
+// クイズは帯の難易度のまま（発達段階に適切・帯を超えて難しくしない）。★数値は初期値＝実機で調整
+export const TOWER_START_FLOOR = 1;
+export function towerFloorBonus(floor) { return Math.floor((floor - 1) / 2); } // 2フロアごとに +1（控えめ）
+export function towerHp(diff, floor) { return HP_BY_DIFF[diff] + towerFloorBonus(floor); }
+
 // こうげきの ダメージ
 export const NORMAL_DAMAGE = 1;
 export const CRIT_DAMAGE = 2;

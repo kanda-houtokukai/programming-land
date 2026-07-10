@@ -43,7 +43,7 @@ export function newProfileData(name = "", character = null) {
     partner: null,
     dex: [],
     typing: { best: {} },
-    battle: { defeated: [], best: {} },  // defeated=たおした敵ID / best=難易度別の勝利数
+    battle: { defeated: [], best: {}, towerBest: {} },  // defeated=たおした敵ID / best=難易度別の勝利数 / towerBest=🗼タワー最高到達フロア（難易度別・06-A。旧セーブはマージで{}補完・|| 0 で読む）
     items: {},                            // バトルアイテム { id: 個数 }
     coins: 0,                             // 🪙コイン（学習で貯まる）
     coinsGranted: false,                  // 導入時の「いままでのがんばり」換算を済ませたか
