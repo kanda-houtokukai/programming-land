@@ -80,6 +80,33 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
   const [firstKill, setFirstKill] = useState(false);
   const timers = useRef([]);
   const granted = useRef(false);
+  // 演出磨き①（06-A Phase2）: メッセージのタイプライター表示。1文字ずつ・タップで即全表示。
+  // reduced-motion は即時全表示（プロジェクト既定の尊重）
+  const reducedMotion = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const [typedLen, setTypedLen] = useState(0);
+  const [typedFor, setTypedFor] = useState(null);
+  const typeTimer = useRef(null);
+  if (msg !== typedFor) { // msg が変わった描画で即リセット（effect待ちだと前の長さで一瞬全文が見える）
+    setTypedFor(msg);
+    setTypedLen(!msg || reducedMotion ? (msg || "").length : 0);
+  }
+  useEffect(() => {
+    if (typeTimer.current) { clearInterval(typeTimer.current); typeTimer.current = null; }
+    if (!msg || reducedMotion) return;
+    const step = Math.max(1, Math.ceil(msg.length / 25)); // 1文字≈28ms・全文≈700ms以内（長文は文字数/ tickを増やす）
+    typeTimer.current = setInterval(() => {
+      setTypedLen(n => {
+        const nn = Math.min(msg.length, n + step);
+        if (nn >= msg.length && typeTimer.current) { clearInterval(typeTimer.current); typeTimer.current = null; }
+        return nn;
+      });
+    }, 28);
+    return () => { if (typeTimer.current) { clearInterval(typeTimer.current); typeTimer.current = null; } };
+  }, [msg, reducedMotion]);
+  const skipType = () => { // パネルをタップで即全表示
+    if (typeTimer.current) { clearInterval(typeTimer.current); typeTimer.current = null; }
+    if (msg) setTypedLen(msg.length);
+  };
   const q = queue[qi % queue.length];
   const pstage = stageForLevel(save.partner.level);
   // 第3波②: 相棒の飾り(deco)は廃止（着せ替えは主人公へ移行・dressup.js）。舞台はショップの画像背景で上書き
@@ -146,16 +173,21 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
       } else {
         setPhase("atk");
       }
+      // 演出磨き②: ヒットストップ＝命中の瞬間は💥だけ出して一瞬固め、止めの後に揺れ・ダメージ・メッセージを解放。
+      // かいしんは止めを長くして「重み」の差を出す。reduced-motion は止めなし。後続タイマも止めのぶん後ろへ。
+      const stop = reducedMotion ? 0 : (isCrit ? 140 : 90);
       later(delay + T.impact, () => {
         (isCrit ? SFX.crit : SFX.star)(sound);
         setFx({ hit: "enemy", crit: isCrit, critPop: isCrit });
+      });
+      later(delay + T.impact + stop, () => {
         setShakeCls(isCrit || dmg >= 2 ? "shake2" : "shake");
         setEnemyHp(nhp);
         if (powered) setBuffs(b => ({ ...b, power: false }));
         setMsg(`${isCrit ? "⚡ かいしんの いちげき！" : "こうげき せいこう！"}${powered ? "（💪 2ばい）" : ""} ${dmg}ダメージ！`);
       });
-      later(delay + T.atkEnd, () => { if (nhp <= 0) startWin(); else setPhase("fb"); });
-      later(delay + T.fxClear, () => { setFx(f => ({ ...f, hit: null })); setShakeCls(""); setCritAtk(false); });
+      later(delay + T.atkEnd + stop, () => { if (nhp <= 0) startWin(); else setPhase("fb"); });
+      later(delay + T.fxClear + stop, () => { setFx(f => ({ ...f, hit: null })); setShakeCls(""); setCritAtk(false); });
     } else if (buffs.shield) {
       setPhase("eatk");
       later(T.impact, () => {
@@ -313,9 +345,9 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
         </div>
       </div>
 
-      {/* たたかいメッセージ */}
-      {msg && <div className="panel slide" style={{ padding: "8px 12px", marginTop: 8, textAlign: "center", fontWeight: 900, fontSize: 14,
-        background: fx.crit ? "#FFF0B3" : fx.hit === "partner" ? "#FFE6EA" : "#FFFDF5" }}>{msg}</div>}
+      {/* たたかいメッセージ（演出磨き①: 1文字ずつ表示・タップで即全表示） */}
+      {msg && <div className="panel slide" onClick={skipType} style={{ padding: "8px 12px", marginTop: 8, textAlign: "center", fontWeight: 900, fontSize: 14,
+        background: fx.crit ? "#FFF0B3" : fx.hit === "partner" ? "#FFE6EA" : "#FFFDF5", minHeight: 21, cursor: "pointer" }}>{msg.slice(0, typedLen)}</div>}
 
       {/* アイテム（もっている ときだけ・1もんに 1こ） */}
       {ownedItems.length > 0 && !overlay && (
