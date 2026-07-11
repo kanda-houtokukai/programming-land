@@ -21,7 +21,7 @@ import {
 import { applyXp, addCoins, COIN } from "../growth.js";
 import { today } from "../storage.js";
 import { SFX } from "../sound.js";
-import { stageForLevel } from "../data/monsters.js";
+import { stageForLevel, partnerStageScale } from "../data/monsters.js";
 import MonsterArt from "./MonsterArt.jsx";
 
 /* ---- 部品 ---- */
@@ -55,6 +55,10 @@ function HudPill({ children, style }) {
 /* ---- バトル本体 ---- */
 
 const T = { windup: 680, impact: 320, atkEnd: 780, fxClear: 980, heartGone: 900, downEnd: 950, overlay: 2150 };
+
+// 相棒スプライトの基準幅%（stage1）。表示幅＝これ × partnerStageScale[stage]（20/24/29%・stage2≒従来の24%）。
+// 実機で大きすぎ/小さすぎならこの1箇所を調整
+const PARTNER_BASE_W = 20;
 
 // tower=🗼タワーモード（06-A）: maxHpはtowerHpで上書き・勝敗コールバック差し替え・コイン/討伐/best/ずかんに触れない。
 // 非tower（名前つき戦）は従来どおり不変。
@@ -298,8 +302,8 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
             </span>
           </HudPill>
 
-          {/* 相棒（左下寄り）。かいしん時は 溜め(charge)→大きい突進(--lsc) */}
-          <div style={{ position: "absolute", left: "5%", bottom: "4%", width: "24%", zIndex: 4 }}>
+          {/* 相棒（左下寄り）。かいしん時は 溜め(charge)→大きい突進(--lsc)。幅は進化スケール適用（.fitArtがコンテナ幅で表示） */}
+          <div style={{ position: "absolute", left: "5%", bottom: "4%", width: `${PARTNER_BASE_W * (partnerStageScale[pstage] || 1)}%`, zIndex: 4 }}>
             <div className={phase === "atk" ? "lunge" : phase === "ready" ? "anticip" : ""}
               style={{ "--dx": critAtk ? "48vw" : "44vw", "--dy": critAtk ? "-12vw" : "-10vw", "--lsc": critAtk ? 1.22 : 1.06, maxWidth: "100%" }}>
               <div className={[
