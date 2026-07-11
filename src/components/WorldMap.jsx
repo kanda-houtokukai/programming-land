@@ -19,6 +19,7 @@ import buildingQuiz from "../assets/building_quiz.png";
 import buildingTyping from "../assets/building_typing.png";
 import buildingHome from "../assets/building_home.png";
 import iconHarbor from "../assets/icon_harbor.png";
+import titleLogo from "../assets/title_logo.webp";
 
 // 8エリアの%座標（1600×900の背景に対して）。ブラウザで背景に照らして微調整する。
 // 拡張用の空き地（今回は何も置かない・将来の新エリア用）: 中央上(46,30)・北(58,16)・右中(70,36)
@@ -57,7 +58,9 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
       {/* ヘッダー（相棒・⭐・🪙・音）。「きろく」ボタンは段階③で削除＝子どもの記録はおうちの机の日記へ一本化 */}
       <Header save={save} title="" onSound={onSound} onOpenHome={onOpenHome} />
       <div style={{ textAlign: "center", margin: "0 0 10px" }}>
-        <h1 className="pl-display" style={{ fontSize: 26, margin: 0 }}>🗺️ プログラミングランド</h1>
+        {/* タイトルロゴ（title_logo.webp・透過・2026-07-11差し替え）。大きさは初期値＝実機で調整可 */}
+        <img src={titleLogo} alt="プログラミングランド" draggable="false"
+          style={{ width: "min(90%, 460px)", height: "auto", display: "block", margin: "0 auto" }} />
         <div style={{ fontWeight: 700, fontSize: 13 }}>いきたい ばしょを タップしてね</div>
       </div>
 

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { C } from "../theme.js";
 import { Btn } from "./common.jsx";
 import { CHARACTERS } from "../data/dressup.js";
+import titleLogo from "../assets/title_logo.webp";
 
 export default function ProfileCreate({ onDone, onCancel }) {
   const [name, setName] = useState("");
@@ -13,7 +14,9 @@ export default function ProfileCreate({ onDone, onCancel }) {
   return (
     <div style={{ maxWidth: 520, margin: "0 auto", padding: 20, textAlign: "center" }}>
       <div className="bounce" style={{ fontSize: 64, marginTop: 30 }}>🤖</div>
-      <h1 className="pl-display" style={{ fontSize: 34, margin: "8px 0 4px" }}>プログラミングランド</h1>
+      {/* タイトルロゴ（title_logo.webp・透過・2026-07-11差し替え・全画面で統一） */}
+      <img src={titleLogo} alt="プログラミングランド" draggable="false"
+        style={{ width: "min(90%, 460px)", height: "auto", display: "block", margin: "8px auto 4px" }} />
       <p style={{ fontWeight: 700, marginBottom: 20 }}>あそびながら プログラミングの あたまを きたえよう！</p>
       <div className="panel slide" style={{ padding: 22, textAlign: "left" }}>
         <label style={{ fontWeight: 900, display: "block", marginBottom: 8 }}>なまえを いれてね</label>

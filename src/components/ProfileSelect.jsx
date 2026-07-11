@@ -11,6 +11,7 @@ import { stageForLevel } from "../data/monsters.js";
 import MonsterArt from "./MonsterArt.jsx";
 import PlayerAvatar from "./PlayerAvatar.jsx";
 import harborBg from "../assets/harbor-entrance.webp";
+import titleLogo from "../assets/title_logo.webp";
 
 // 白フチ文字（港の絵の上でも読める・ワールドマップのラベルと同じ手法）
 const outline = "0 0 3px #fff,1.5px 1.5px 0 #fff,-1.5px 1.5px 0 #fff,1.5px -1.5px 0 #fff,-1.5px -1.5px 0 #fff,0 2px 4px rgba(0,0,0,.35)";
@@ -20,7 +21,9 @@ export default function ProfileSelect({ profiles, onPick, onNew }) {
     <div style={{ minHeight: "100vh", backgroundImage: `url(${harborBg})`,
       backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}>
       <div style={{ maxWidth: 520, margin: "0 auto", padding: "16px 20px 20px", textAlign: "center" }}>
-        <h1 className="pl-display" style={{ fontSize: 32, margin: "10px 0 2px", textShadow: outline }}>プログラミングランド</h1>
+        {/* タイトルロゴ（title_logo.webp・透過・2026-07-11差し替え・全画面で統一） */}
+        <img src={titleLogo} alt="プログラミングランド" draggable="false"
+          style={{ width: "min(90%, 460px)", height: "auto", display: "block", margin: "0 auto" }} />
         <p style={{ fontWeight: 900, fontSize: 16, margin: "0 0 14px", textShadow: outline }}>だれが あそぶ？</p>
         {/* カードは背景の桟橋デッキ（中央〜下部）に乗るよう、上の空を空けて配置 */}
         <div style={{ display: "grid", gap: 12, marginTop: "clamp(40px, 16vh, 150px)" }}>
