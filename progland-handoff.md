@@ -9,7 +9,12 @@
 ### 今どこか
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
-- **v2.3-b4a まで公開済み（2026-07-11・タイトルロゴ差し替え＝⚠️実機確認待ち）**:
+- **v2.3-b4b まで公開済み（2026-07-12・おうちUI実機FB③点＝⚠️実機確認待ち）**:
+  - **①ラベル可読性**: `.bubble`を定石で強化＝地#FFF9EC（不透明・明度up）+drop shadow(0 2px 4px)+文字#59300A+細text-shadow。しっぽ色同期。全ラベル共通
+  - **②相棒進化サイズ**: `monsters.js`に**共有`partnerStageScale{1:1.0, 2:1.2, 3:1.45}`新設**（★バトル側への適用は演出チャットへ申し送り＝本線は定義のみ）。部屋の相棒=92×scale（stage3=133≒アバター156の肩・実測比0.64）。足元の床線維持=`PARTNER_TOP{1:66, 2:64, 3:61}`（初期値）
+  - **③スマホ対応**: 指示のmatchMedia(window幅)案は Browser pane で`innerWidth=0`誤発火＋固定%topとpx spriteの混在が幅でズレるため、**部屋の実幅比例方式**に変更（ResizeObserver・`sizeK=clamp(roomW/612, 0.5, 1)`）＝背景と同じ空間でスケール→**どの幅でも足元の%が崩れない**。デスクトップ/iPadはk=1で不変
+  - 検証: verify全PASS・roundtrip全一致・プレビュー=stage3が肩の高さ・足元同一線・ラベルくっきり・mobile375で比例縮小（スクショ確認）。指示書=`brushup/ouchi_ui_fb3_labels_scale_responsive.md`
+- **v2.3-b4a（2026-07-11・タイトルロゴ差し替え＝⚠️実機確認待ち）**:
   - タイトル文字→`title_logo.webp` に差し替え（**3画面で統一**: ワールドマップ上部〔サブ文字は残す〕・港のProfileSelect・ProfileCreate）。`width:min(90%,460px)`・中央寄せ（初期値）
   - ★受領原本（1000×686）は下部の透明余白が大きく、マップでロゴ下に大きな空白が出た→**実絵bbox+16pxでトリミングして821×364**（PIL・140KB）。透過素材は配置前にbbox確認が吉
 - **v2.3-b3z（2026-07-11・アバター立ち位置=相棒と足元揃え＝⚠️実機確認待ち）**:
