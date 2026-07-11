@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-08（正本4ファイルを更新版に差し替え・版ズレ解消）
+最終更新: 2026-07-12（v2.3-b4c バトルの相棒サイズを進化スケールで・実機確認待ち）
 
 ---
 
@@ -9,7 +9,12 @@
 ### 今どこか
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
-- **v2.3-b4b まで公開済み（2026-07-12・おうちUI実機FB③点＝⚠️実機確認待ち）**:
+- **v2.3-b4c まで公開済み（2026-07-12・バトルの相棒サイズを進化スケールで＝⚠️実機確認待ち）**:
+  - `Battle.jsx` の相棒に `partnerStageScale` を適用（b4bの申し送り消化・演出チャット終了済みのため本線で実施）。★調査で判明: バトルの相棒は`.fitArt`（svg width:100%）で**コンテナ幅が表示サイズを決めており`MonsterArt size`propは効いていない**→「sizeに掛ける」の実体は**コンテナ幅に掛ける**実装に。新定数`PARTNER_BASE_W=20`（%・★実機調整はここ1箇所）×scale＝**stage1=20%/stage2=24%/stage3=29%**（stage2≒従来の24%に合わせた初期値）。足元アンカー(bottom4%)不変＝接地線維持・接地影はコンテナ幅比例で追従・突進距離(vw)不変
+  - 境界遵守: 命中解決168–197・dmgPop等state・メッセージパネル・突進コンテナclassName・pl-dmgfloat/pl-anticip は不変。スキーマ不変
+  - 検証: verify全PASS・roundtrip全一致・プレビュー実測=svg幅126.8/152.2/183.9px（比1.0/1.2/1.45どおり）・通常攻撃(anticip 0ms→lunge+100ms→「-1」+520ms)・かいしん(charge→大突進+694ms→金「-2」)・タイプライター・HP減少すべて従来どおり。HudPill(z6)は相棒(z4)より上で干渉なし。指示書=`brushup/battle_partner_stage_scale.md`
+  - ⚠️次:神田さんの実機確認（stage1/2/3の大きさの体感が部屋と揃うか・stage3が大きすぎないか→`PARTNER_BASE_W`1箇所で調整）
+- **v2.3-b4b（2026-07-12・おうちUI実機FB③点＝⚠️実機確認待ち）**:
   - **①ラベル可読性**: `.bubble`を定石で強化＝地#FFF9EC（不透明・明度up）+drop shadow(0 2px 4px)+文字#59300A+細text-shadow。しっぽ色同期。全ラベル共通
   - **②相棒進化サイズ**: `monsters.js`に**共有`partnerStageScale{1:1.0, 2:1.2, 3:1.45}`新設**（★バトル側への適用は演出チャットへ申し送り＝本線は定義のみ）。部屋の相棒=92×scale（stage3=133≒アバター156の肩・実測比0.64）。足元の床線維持=`PARTNER_TOP{1:66, 2:64, 3:61}`（初期値）
   - **③スマホ対応**: 指示のmatchMedia(window幅)案は Browser pane で`innerWidth=0`誤発火＋固定%topとpx spriteの混在が幅でズレるため、**部屋の実幅比例方式**に変更（ResizeObserver・`sizeK=clamp(roomW/612, 0.5, 1)`）＝背景と同じ空間でスケール→**どの幅でも足元の%が崩れない**。デスクトップ/iPadはk=1で不変

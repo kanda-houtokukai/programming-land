@@ -38,7 +38,7 @@ export function stageForLevel(level) {
 }
 
 // 進化段階ごとの表示スケール（共有・2026-07-12）。進化で「大きくなった」を見せる。
-// 初期値＝実機調整。おうちの部屋で使用中。バトル側への適用は演出チャットへ申し送り（本線では触らない）。
+// 初期値＝実機調整。おうちの部屋（HomeRoom）とバトル（Battle.jsx PARTNER_BASE_W×これ）の両方で使用中（b4c）。
 export const partnerStageScale = { 1: 1.0, 2: 1.2, 3: 1.45 };
 
 export function monsterName(speciesId, stage) {
