@@ -114,7 +114,7 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
               display: "flex", flexDirection: "column", alignItems: "center" }}>
             <span className="bubble pulse" style={{ marginBottom: 5, fontSize: "clamp(8px,1.9vw,12px)", animationDelay: "1.3s" }}>プロフィール</span>
             <span className="mapfloat" style={{ lineHeight: 0, animationDelay: "1.5s", filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
-              <PlayerAvatar character={save.character} avatar={save.avatar} dressup={save.dressup} size={78} full />
+              <PlayerAvatar character={save.character} avatar={save.avatar} dressup={save.dressup} size={156} full />{/* b3y実機FB: 78→156（2倍） */}
             </span>
           </button>
         </div>
