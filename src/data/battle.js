@@ -64,10 +64,18 @@ export const COSMETICS = [
   { id: "bg_canyon", type: "bg", emoji: "🏜️", name: "だいちの ぶたい", price: 100, img: bgCanyon },
 ];
 export function cosmeticById(id) { return COSMETICS.find(c => c.id === id); }
-// 装備中のバトル舞台の画像（未装備・旧IDは null → 難易度別の基本背景を使う）
+// もちもの（UI改修②・2026-07-11）: 既定3枚も「固定の舞台」として選べる選択肢。
+// equipped.bg にこのIDが入ると難易度自動でなく固定表示（既存の equipped.bg 文字列を流用＝スキーマ不変）。
+// ※定義は BATTLE_BG の import 後に評価される必要があるため getter で遅延参照しない単純参照でOK（同モジュール内 hoisting）。
+export const DEFAULT_BG_CHOICES = [
+  { id: "bgdef_easy", name: "そうげんの ぶたい", get img() { return BATTLE_BG.easy; } },
+  { id: "bgdef_normal", name: "ゆうひの ぶたい", get img() { return BATTLE_BG.normal; } },
+  { id: "bgdef_hard", name: "よるの ぶたい", get img() { return BATTLE_BG.hard; } },
+];
+// 装備中のバトル舞台の画像（未装備・旧IDは null → 難易度別の基本背景を使う。既定3枚の固定選択にも対応）
 export function equippedBgImg(save) {
   const id = save.cosmetics && save.cosmetics.equipped && save.cosmetics.equipped.bg;
-  const c = id && cosmeticById(id);
+  const c = id && (cosmeticById(id) || DEFAULT_BG_CHOICES.find(d => d.id === id));
   return c ? c.img : null;
 }
 

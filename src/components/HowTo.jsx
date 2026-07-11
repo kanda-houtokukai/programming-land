@@ -22,7 +22,7 @@ export default function HowTo({ id }) {
         <span style={{ flex: 1, fontWeight: 900 }}>あそびかた</span>
         {/* 閉じている間だけ「おしてね」を出して、押せば開くと分かるようにする */}
         {!open && (
-          <span className="bounce" style={{
+          <span className="pulse" style={{
             fontSize: 12, fontWeight: 900, color: C.ink, background: "#fff",
             border: `2px solid ${C.ink}`, borderRadius: 999, padding: "2px 9px", whiteSpace: "nowrap",
           }}>👆 おしてね</span>

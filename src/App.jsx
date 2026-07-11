@@ -53,6 +53,9 @@ export default function App() {
   const enterFromHome = target => { setScreen(target); setHome(h => (h ? { ...h, open: false } : h)); }; // 本棚/机→全画面
   // ずかん・きろくの◀もどる: おうち経由なら部屋を再オープン、そうでなければ（ヘッダーきろく等）ワールドマップへ
   const funcBack = () => { if (home) setHome(h => ({ ...h, open: true })); else setScreen("home"); };
+  // プロフィールの「きせかえ」→おみせの きせかえ棚を直接開く（UI改修③）。Shop がマウント時に消費して次回は通常入店
+  const [shopInit, setShopInit] = useState(null);
+  const openDressup = () => { setShopInit("dressup"); enterFromHome("shop"); };
 
   function showToast(emoji, text) {
     setToast({ emoji, text }); setTimeout(() => setToast(null), 2800);
@@ -182,7 +185,8 @@ export default function App() {
       {save && screen === "art" && <Art save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
       {save && screen === "typing" && <Typing save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
       {save && screen === "battle" && battleUnlocked(save) && <Battle save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
-      {save && screen === "shop" && <Shop save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
+      {save && screen === "shop" && <Shop save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome}
+        initialStage={shopInit} onConsumeInit={() => setShopInit(null)} />}
       {/* きろく=子ども向けの日記（机から）。保護者向けは parenthub（マップ最下部→ゲート奥）に分離（段階③） */}
       {save && screen === "records" && (
         <Records save={save} go={setScreen} onSound={onSound} onBack={funcBack} openHome={openHome} />
@@ -195,7 +199,7 @@ export default function App() {
       )}
       {/* おうち（RPG部屋・モーダル）: 呼び出し元の画面の上に開く。閉じたら from へ戻る（メモ01+04）。交代はマップの「みなと」へ一本化（段階②） */}
       {save && home && home.open && (
-        <HomeRoom save={save} onClose={closeHome} onEnter={enterFromHome} />
+        <HomeRoom save={save} update={update} onClose={closeHome} onEnter={enterFromHome} onDressup={openDressup} />
       )}
       <EvolutionOverlay evolution={evolution} sound={save ? save.settings.sound : false} onClose={() => setEvolution(null)} />
       {legacyCoins > 0 && (

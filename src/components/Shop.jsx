@@ -4,7 +4,7 @@
 //        きせかえ=主人公の着せ替え（SHOP_DRESSUP）＋バトルのぶたい2種（ジャングル/だいち）。
 // もどるは1階層ずつ（リスト→店内→ワールドマップ＝メモ03）。ガチャ・課金なし・全品定価。
 // 背景は img駆動方式（b2cの教訓: 絵の中の店員とタップ枠を一致させるため aspectRatio+cover は使わない）。
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { C } from "../theme.js";
 import { Btn, Header } from "./common.jsx";
 import HowTo from "./HowTo.jsx";
@@ -25,9 +25,11 @@ const SERIF = {
   bye: "またね！",
 };
 
-export default function Shop({ save, update, go, onSound, openHome }) {
+export default function Shop({ save, update, go, onSound, openHome, initialStage, onConsumeInit }) {
   const sound = save.settings.sound;
-  const [stage, setStage] = useState("front");   // "front"=店内 / "items"=どうぐ / "dressup"=きせかえ
+  // initialStage: プロフィールの「きせかえ」から直接 dressup 棚を開く導線（UI改修③）。マウント時に消費＝次回入店は通常どおり
+  const [stage, setStage] = useState(initialStage || "front");   // "front"=店内 / "items"=どうぐ / "dressup"=きせかえ
+  useEffect(() => { if (initialStage && onConsumeInit) onConsumeInit(); }, []); // eslint-disable-line
   const [talking, setTalking] = useState(false); // 店員に話しかけた（カテゴリ選択の吹き出し表示）
   const [msg, setMsg] = useState(null);          // 店員のひとこと（購入・コイン不足等）
   const coins = save.coins || 0;
@@ -92,9 +94,10 @@ export default function Shop({ save, update, go, onSound, openHome }) {
                 吹き出しは店主の頭の上に置く（話しかける相手の位置を指す） */}
             <button className="tapzone" onClick={() => { SFX.tap(sound); setTalking(true); }} aria-label="てんいんさんに はなしかける"
               style={{ position: "absolute", left: "51%", top: "40%", transform: "translate(-50%,-50%)",
-                width: "28%", height: "48%", border: "none", background: "transparent", cursor: "pointer", padding: 0,
-                display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
-              <span className="bubble mapfloat" style={{ marginTop: "-8%", fontSize: "clamp(9px,2vw,13px)" }}>💬 はなしかける</span>
+                width: "28%", height: "48%", border: "none", background: "transparent", cursor: "pointer", padding: 0 }}>
+              {/* RPG看板ラベル＝店主の頭の「上」・しっぽで指す・うっすら点滅（UI改修①④） */}
+              <span className="bubble pulse" style={{ position: "absolute", left: "50%", top: "6%",
+                transform: "translate(-50%,-100%)", fontSize: "clamp(9px,2vw,13px)" }}>はなしかける</span>
             </button>
           </div>
 

@@ -186,17 +186,21 @@ export const CSS = `
      新: 透明のタップ領域(tapzone)＋RPG風の吹き出しラベル(bubble)を目印にする ---- */
   .tapzone { transition: transform .08s; }
   .tapzone:active { transform: translate(-50%,-50%) scale(.94) !important; }
-  /* RPG風スピーチバブル: 白いピル＋下向きのしっぽ。ふわふわ(mapfloat)を併用して「押せる」感を出す */
+  /* RPG看板調ラベル（UI改修①・2026-07-11）: 温かい紙/木の色＋下向きの三角しっぽで対象を指す。
+     旧: 白いピル（丸チップの単調さ解消のため作り替え）。おうち/お店の全ラベル共通 */
   .bubble {
-    position: relative; display: inline-block; background: #FFFDF5;
-    border: 2px solid ${C.ink}; border-radius: 999px; padding: 3px 12px;
-    font-weight: 900; color: ${C.ink}; white-space: nowrap;
-    box-shadow: 2px 2px 0 rgba(58,51,53,.45);
+    position: relative; display: inline-block; background: #FAEEDA;
+    border: 2.5px solid #BA7517; border-radius: 9px; padding: 3px 11px;
+    font-weight: 900; color: #633806; white-space: nowrap;
+    box-shadow: 0 2px 0 rgba(99,56,6,.35), inset 0 1px 0 rgba(255,255,255,.6);
   }
   .bubble::after { content: ""; position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%);
-    border: 6px solid transparent; border-top: 7px solid ${C.ink}; }
+    border: 6px solid transparent; border-top: 7px solid #BA7517; }
   .bubble::before { content: ""; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%);
-    border: 5px solid transparent; border-top: 6px solid #FFFDF5; z-index: 1; }
+    border: 5px solid transparent; border-top: 6px solid #FAEEDA; z-index: 1; }
+  /* ラベル/ヒントの誘導＝うっすら優しい点滅（UI改修④・上下ふわふわから変更。キャラの揺れには使わない） */
+  @keyframes pl-pulse { 0%,100% { opacity: 1 } 50% { opacity: .7 } }
+  .pulse { animation: pl-pulse 2.6s ease-in-out infinite; }
   /* おえかき: キャンバス左・操作右の2カラム（狭い画面は縦積みフォールバック・メモ08 b3i） */
   .artgrid { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
   @media (min-width: 700px) {
@@ -207,7 +211,7 @@ export const CSS = `
     .idle,.idle2,.lunge,.hitflash,.shake2,.hitfx,.critpop,.heartbreak,.fall,.victory,.droop,.riseup,.aura,.shieldpop,.healglow { animation: none; }
     .dmgfloat,.anticip { animation: none; }
     .charge,.spinlight,.morph,.slam,.whiteflash,.confetti { animation: none; }
-    .fadein,.softpop,.mapfloat,.growpop,.sparkle { animation: none; }
+    .fadein,.softpop,.mapfloat,.growpop,.sparkle,.pulse { animation: none; }
     .whiteflash { opacity: 0; }
     .pbtn { transition: none; }
   }
