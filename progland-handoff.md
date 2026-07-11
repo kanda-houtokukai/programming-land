@@ -9,7 +9,13 @@
 ### 今どこか
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
-- **v2.3-b3q まで公開済み（2026-07-10・06-A Phase2演出磨き フェーズ2＝⚠️停止ポイント2・実機確認待ち）**:
+- **v2.3-b3r まで公開済み（2026-07-11・クイズのひろば化＝⚠️実機確認待ち）**:
+  - **カテゴリ選択をお祭り広場マップに刷新**（Quiz.jsx・パズル島と同方式）: `PLAZA_BG`（昼/夕/夜=難易度タブで切替）＋`PLAZA_POS`（5拠点の%座標・**3枚共通・指示書実測値**・微調整はこの定数だけ）。各拠点=透過アイコン＋白地チップ（パズル島ラベルと同作法）＋mapfloat（index別ディレイ）。中央(50,41)は電球モニュメント=装飾・タップ無し
+  - **ポップアップ**: フル名前＋説明＋（もんだい○こから5もん）＋はじめて/ベスト/🏆まんてん→▶はじめる（fadein＋softpop=WorldMap作法）。旧カードリストの情報は全てポップアップへ移設。もどるは1階層ずつ（出題→ひろば→ワールドマップ）
+  - **出題・採点・記録・難易度ロジックは不変**（見た目のみ）。素材=`quizplaza-{day,sunset,night}.webp`＋`icon_quiz_{junban,kimari,nakamawake,robot,yomitori}.png`（src/assets/）。指示書=`brushup/quizplaza_instructions_for_code.md`・設計経緯=`brushup/handoff_quizplaza_20260709.md`
+  - 検証: verify全PASS・roundtrip全一致・プレビュー=3難易度の背景切替/5拠点が指定座標で空き地に乗る（スクショ確認）/ポップアップのベスト・まんてん表示/はじめる→出題→もどり
+  - ⚠️**次:神田さんのiPad実機確認（横・縦×3難易度）**: 5アイコンが空き地に乗るか。ズレは「どの難易度の・どのカテゴリが・時計の何時方向に」で報告（座標3枚共通=ズレるなら全難易度同方向のはず）→OK後にChatがroadmap/feature-specのクイズ項目を「ひろば化 済」に更新
+- **v2.3-b3q（2026-07-10・06-A Phase2演出磨き フェーズ2＝⚠️停止ポイント2・実機確認待ち）**:
   - **2-A 浮遊ダメージ数字**: ヒットストップ解放と同時に敵の命中位置（💥の少し上・right17%/top18%）へ「-1」／かいしん「-2」（大きめ・金`#FFD447`＝critpop同系・通常は白フチ文字）。`pl-dmgfloat`（theme.js新設: オーバーシュート拡大→上昇56px＋フェード0.9s）。fxClear/next()でクリア・reduced-motionは非表示
   - **2-B 通常攻撃の予備動作**: 突進直前に`ready`フェーズ**110ms**＋`anticip`クラス（translate(-7px,4px) scale(.97)＝少し引いてかがむ・theme.js新設）。`delay=isCrit?T.windup:pre`＝通常のみ全タイマ+110ms（上限120ms以内・かいしんは既存の溜めと二重にしない）・reduced-motionはpre=0
   - §5かいしん微増幅は未実施（実機を見てから・不要なら省略）。ロジック/バランス/タワー/`battle.js`数値は不変
