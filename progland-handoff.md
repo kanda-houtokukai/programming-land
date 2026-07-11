@@ -9,7 +9,15 @@
 ### 今どこか
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
-- **v2.3-b3v まで公開済み（2026-07-11・クイズのひろば化＋拠点座標調整＝⚠️実機確認待ち）**:
+- **v2.3-b3w まで公開済み（2026-07-11・おうち/お店UI改修①〜④＝⚠️実機確認待ち）**:
+  - **①看板ラベル**: `.bubble`をRPG看板調に作り替え（地#FAEEDA・枠#BA7517・字#633806・角丸9px・下向きしっぽ）＝おうち/お店の全ラベル一括反映。配置は**対象の「上」**（家具=タップ領域の上・あいぼう/アバター=スプライトの上・お店=店主の頭の上・💬絵文字除去）
+  - **②たからばこ→もちもの**: どうぐ=所持数>0の消耗品を数つきグリッド（**イラスト流用・絵文字なし**）／バトルはいけい切替=おまかせ(null)+既定3枚（`battle.js`に`DEFAULT_BG_CHOICES`新設・id=bgdef_*・`equippedBgImg`をcosmetic→default順の検索に拡張）+購入舞台。**equipped.bg文字列を流用＝スキーマ不変**（roundtrip追加不要）
+  - **③プロフィール**: 額縁導線を廃止（FURNITURE から除去・座標52/22はコメント保持）→**あいぼうの横のアバター**（left60/top66・PlayerAvatar full 78px・dressup反映）から。画面=左アバター大(130)+👗きせかえ（**Shopのdressup棚へ直行**＝App `shopInit`/Shop `initialStage`+`onConsumeInit`）／右=名前+ステータスplate4種（`MiniIcon`=SVG仮アイコン・絵文字不採用・後で専用イラスト差し替え）
+  - **④点滅**: `.pulse`新設（opacity1↔.7・2.6s・reduced-motion無効）。ラベル（bubble）とHowTo「おしてね」（旧bounce）を点滅に。**キャラの揺れ（部屋の相棒/アバターのmapfloat・WorldMapアイコン）は据え置き**
+  - **境界遵守**: Battle.jsx・バトル演出keyframe（pl-dmgfloat/pl-anticip/pl-idle）は不変（別ライン担当）
+  - 検証: verify全PASS・roundtrip全一致・プレビュー=看板ラベル5つ/もちもの（×2×1表示・背景切替がsave反映・未購入だいち非表示）/plate/きせかえ直行→もどる1階層/スクショ確認。指示書=`brushup/ouchi_ui_redesign_implementation.md`（実装記録つき）
+  - ⚠️**次:神田さんの実機確認**（バブル質感/配置・もちものの据わり・plate・アバター立ち位置60/66と大きさ78px・点滅の強さ）→OK後にChatが正本反映。ステータス/おまかせサムネの専用イラストはChatが後日用意→差し替え
+- **v2.3-b3v（2026-07-11・クイズのひろば化＋拠点座標調整＝⚠️実機確認待ち）**:
   - **b3v 微調整**: なかまわけ top 56.0→**57.0**（さらに+1pt下）。現在の`PLAZA_POS`確定値＝junban 27.5/29.5・kimari 72.5/29.5・nakama 19.5/57.0・robot 79.5/54.0・yomitori 50/79
   - **b3u 個別微調整**: なかまわけ+2pt下・ロボット left 80.5→79.5（-1pt左）
   - **b3t 座標再調整**（b3uの土台）: 四隅4拠点を中心(50,41)へ当初から各軸3pt寄せ（b3sの1ptでは寄せ不足）。`PLAZA_POS`が座標の集約1箇所＝以後の追い込みもここだけ。3背景共通＝3難易度に反映
