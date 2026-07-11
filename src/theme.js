@@ -186,18 +186,20 @@ export const CSS = `
      新: 透明のタップ領域(tapzone)＋RPG風の吹き出しラベル(bubble)を目印にする ---- */
   .tapzone { transition: transform .08s; }
   .tapzone:active { transform: translate(-50%,-50%) scale(.94) !important; }
-  /* RPG看板調ラベル（UI改修①・2026-07-11）: 温かい紙/木の色＋下向きの三角しっぽで対象を指す。
-     旧: 白いピル（丸チップの単調さ解消のため作り替え）。おうち/お店の全ラベル共通 */
+  /* RPG看板調ラベル（UI改修①・2026-07-11／可読性FB・2026-07-12）: 温かい紙/木の色＋下向きの三角しっぽ。
+     可読性の定石: 不透明で部屋より明るい地＋ドロップシャドウで分離＋文字の細い縁取り（太い縁は小字で潰れる）。
+     おうち/お店の全ラベル共通 */
   .bubble {
-    position: relative; display: inline-block; background: #FAEEDA;
+    position: relative; display: inline-block; background: #FFF9EC;
     border: 2.5px solid #BA7517; border-radius: 9px; padding: 3px 11px;
-    font-weight: 900; color: #633806; white-space: nowrap;
-    box-shadow: 0 2px 0 rgba(99,56,6,.35), inset 0 1px 0 rgba(255,255,255,.6);
+    font-weight: 900; color: #59300A; white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(60,40,20,.35), inset 0 1px 0 rgba(255,255,255,.7);
+    text-shadow: 0 1px 0 rgba(255,255,255,.6), 0 1px 2px rgba(0,0,0,.25);
   }
   .bubble::after { content: ""; position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%);
     border: 6px solid transparent; border-top: 7px solid #BA7517; }
   .bubble::before { content: ""; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%);
-    border: 5px solid transparent; border-top: 6px solid #FAEEDA; z-index: 1; }
+    border: 5px solid transparent; border-top: 6px solid #FFF9EC; z-index: 1; }
   /* ラベル/ヒントの誘導＝うっすら優しい点滅（UI改修④・上下ふわふわから変更。キャラの揺れには使わない） */
   @keyframes pl-pulse { 0%,100% { opacity: 1 } 50% { opacity: .7 } }
   .pulse { animation: pl-pulse 2.6s ease-in-out infinite; }

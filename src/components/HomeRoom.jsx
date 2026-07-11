@@ -4,11 +4,11 @@
 // プロファイル交代はマップの「みなと」に一本化（段階②）＝この部屋には置かない。
 // UI改修①〜③（2026-07-11）: ラベル=RPG看板調で対象の「上」／たからばこ=もちもの（どうぐ＋はいけい切替）／
 // プロフィール導線=額縁→あいぼうの横のアバター（額縁は装飾に）・画面刷新（左アバター大＋右ステータスplate＋きせかえ）。
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { C } from "../theme.js";
 import { Btn } from "./common.jsx";
 import { SFX } from "../sound.js";
-import { speciesById, stageForLevel } from "../data/monsters.js";
+import { speciesById, stageForLevel, partnerStageScale } from "../data/monsters.js";
 import { partnerDisplayName, xpToNext, MAX_LEVEL } from "../growth.js";
 import { BADGES, puzzleStarsTotal, daysPlayed } from "../data/badges.js";
 import { ITEMS, COSMETICS, DEFAULT_BG_CHOICES } from "../data/battle.js";
@@ -45,12 +45,32 @@ function MiniIcon({ kind }) {
       <circle cx="12" cy="15" r="3" fill="#FF6B6B" stroke={C.ink} strokeWidth="1.2" /></svg>);
 }
 
+// 相棒の立ち位置（進化サイズ別・実機FB③②・2026-07-12）。大きいほど中心を上げて足元を床の線に保つ
+// （中心アンカーのため。b3zのアバター調整と同じ考え方・初期値→実機で詰める）
+const PARTNER_TOP = { 1: 66, 2: 64, 3: 61 };
+
 export default function HomeRoom({ save, update, onClose, onEnter }) {
   const [nested, setNested] = useState(null); // "profile" | "partner" | "chest" | "dressup" | null（部屋内のネストモーダル）
   const [dressMsg, setDressMsg] = useState(null); // きせかえモーダル内のメッセージ（購入/コイン不足）
+  // 実機FB③: スマホ（狭幅）ではアバター・相棒を比例して縮小。
+  // 方式: 部屋の実幅（img駆動）に比例させる＝背景と同じ空間でスケールするため、
+  // どの幅でも %座標（足元の床の線）が崩れない。612=最大幅時の部屋幅（640パネル-padding）。
+  const roomRef = useRef(null);
+  const [roomW, setRoomW] = useState(612);
+  useEffect(() => {
+    const el = roomRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setRoomW(el.clientWidth || 612));
+    ro.observe(el);
+    setRoomW(el.clientWidth || 612);
+    return () => ro.disconnect();
+  }, []);
+  const sizeK = Math.min(1, Math.max(0.5, roomW / 612)); // 下限0.5＝極小画面の保険
   const sound = save.settings.sound;
   const partner = save.partner;
   const stage = partner ? stageForLevel(partner.level) : 1;
+  const partnerSize = Math.round(92 * (partnerStageScale[stage] || 1) * sizeK); // 実機FB②: 進化で大きく（stage3≈アバターの肩）
+  const avatarSize = Math.round(156 * sizeK);
   const items = save.items || {};
   const ownedItems = ITEMS.filter(it => (items[it.id] || 0) > 0);
   const ownedBgs = COSMETICS.filter(c => ((save.cosmetics && save.cosmetics.owned) || []).includes(c.id));
@@ -77,7 +97,7 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
         </div>
 
         {/* 部屋（背景＋家具のタップ領域）。★img駆動方式（b2cの教訓）＝%座標が常に絵と一致 */}
-        <div style={{ position: "relative", borderRadius: 16, lineHeight: 0,
+        <div ref={roomRef} style={{ position: "relative", borderRadius: 16, lineHeight: 0,
           overflow: "hidden", border: `3px solid ${C.ink}`, background: "#e9c9a0" }}>
           <img src={roomBg} alt="おうちの へや" draggable="false"
             style={{ display: "block", width: "100%", height: "auto" }} />
@@ -97,12 +117,12 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
           {/* 相棒（中央床・進化で姿が変わるため動的表示。生きている感の揺れ=mapfloatは据え置き・点滅にしない） */}
           {partner && (
             <button className="tapzone" onClick={() => tap("partner")} aria-label="あいぼう"
-              style={{ position: "absolute", left: "42%", top: "66%", transform: "translate(-50%,-50%)",
+              style={{ position: "absolute", left: "42%", top: `${PARTNER_TOP[stage] || 66}%`, transform: "translate(-50%,-50%)",
                 width: "24%", border: "none", background: "transparent", cursor: "pointer", padding: 0,
                 display: "flex", flexDirection: "column", alignItems: "center" }}>
               <span className="bubble pulse" style={{ marginBottom: 5, fontSize: "clamp(8px,1.9vw,12px)" }}>あいぼう</span>
               <span className="mapfloat" style={{ lineHeight: 0, filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
-                <MonsterArt species={partner.species} stage={stage} size={92} />
+                <MonsterArt species={partner.species} stage={stage} size={partnerSize} />
               </span>
             </button>
           )}
@@ -114,7 +134,7 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
               display: "flex", flexDirection: "column", alignItems: "center" }}>{/* b3z実機FB: top66→47＝156px化した背丈差ぶん上げて相棒と足元（床の線）を揃える */}
             <span className="bubble pulse" style={{ marginBottom: 5, fontSize: "clamp(8px,1.9vw,12px)", animationDelay: "1.3s" }}>プロフィール</span>
             <span className="mapfloat" style={{ lineHeight: 0, animationDelay: "1.5s", filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
-              <PlayerAvatar character={save.character} avatar={save.avatar} dressup={save.dressup} size={156} full />{/* b3y実機FB: 78→156（2倍） */}
+              <PlayerAvatar character={save.character} avatar={save.avatar} dressup={save.dressup} size={avatarSize} full />{/* b3y=156・狭幅はsizeKで縮小（実機FB③） */}
             </span>
           </button>
         </div>

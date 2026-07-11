@@ -37,6 +37,10 @@ export function stageForLevel(level) {
   return 1;
 }
 
+// 進化段階ごとの表示スケール（共有・2026-07-12）。進化で「大きくなった」を見せる。
+// 初期値＝実機調整。おうちの部屋で使用中。バトル側への適用は演出チャットへ申し送り（本線では触らない）。
+export const partnerStageScale = { 1: 1.0, 2: 1.2, 3: 1.45 };
+
 export function monsterName(speciesId, stage) {
   const sp = speciesById(speciesId);
   return sp ? sp.stages[stage - 1].name : "";
