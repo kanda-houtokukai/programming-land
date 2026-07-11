@@ -52,3 +52,20 @@ HowTo.jsx（おしてね点滅）／App.jsx（配線）／battle.js（DEFAULT_BG
 ## 実機確認待ち（→OK後にChatが正本反映）
 バブルの質感・配置／もちもののどうぐ・背景切替の据わり／プロフィールのplate／アバターの立ち位置(60/66)・
 大きさ(78px)／点滅の強さ(0.7)・周期(2.6s)。
+
+---
+
+## 実機FB調整（b3x・2026-07-11）
+
+① **きせかえ＝おみせに行かせない**: 着せ替え棚を共通コンポーネント `DressupShelf.jsx` に抽出
+   （購入/装備トグルのロジック集約・メッセージ文言は onBought/onPoor コールバックで呼び出し側が決める）。
+   - おみせ: dressup 棚を DressupShelf 呼び出しに置換（店員セリフで包む・挙動不変）。
+   - プロフィール: 「きせかえ」→部屋内ネストモーダル（nested="dressup"）で棚を直接開く。
+     ◀もどる→プロフィールへ戻る。**Shop への遷移なし**＝b3w の App shopInit／Shop initialStage 配線は廃止。
+② **プロフィールのアバター2倍**: PlayerAvatar size 130→**260**（モーダル maxWidth 430→560・
+   flexWrap で狭幅は縦積み）。部屋のアバター(78px)は不変。
+③ **ずかん・きろくのラベルを少し下に**: FURNITURE に `labelDy`（下方向オフセットpx）＝
+   dex **16** / records **12** / chest 0。対象の上のまま transform で下げる。
+- 検証: verify全PASS・roundtrip全一致。プレビュー=labelDy反映(16/12/0px)／プロフィールアバター224×298
+  （≒2倍）／きせかえ棚モーダルで購入（コイン100→45・head_compass装備・メッセージ表示）→もどる→
+  プロフィールのplateに戻る（Shop遷移なし）。

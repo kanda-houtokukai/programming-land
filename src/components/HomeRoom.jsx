@@ -14,14 +14,16 @@ import { BADGES, puzzleStarsTotal, daysPlayed } from "../data/badges.js";
 import { ITEMS, COSMETICS, DEFAULT_BG_CHOICES } from "../data/battle.js";
 import MonsterArt from "./MonsterArt.jsx";
 import PlayerAvatar from "./PlayerAvatar.jsx";
+import DressupShelf from "./DressupShelf.jsx";
 import roomBg from "../assets/room-home.webp";
 
 // 家具のタップ領域（room-home.webp に対する%座標＝家具の絵に合わせる）。
 // プロフィールは額縁→アバター導線へ移行（UI改修③）＝額縁(52/22)は装飾に戻した（座標はコメントで保持）。
+// labelDy: 看板ラベルの下方向オフセットpx（b3x実機FB: 本棚/机のラベルが天井際で高い→少し下へ）
 const FURNITURE = [
-  { key: "dex", label: "ずかん", left: 11, top: 40, w: 20, h: 62 },   // 左の本棚（縦長）
-  { key: "records", label: "きろく", left: 89, top: 44, w: 18, h: 40 }, // 右の机の上の日記
-  { key: "chest", label: "もちもの", left: 90, top: 80, w: 14, h: 22 },  // 右下の宝箱＝もちもの（UI改修②）
+  { key: "dex", label: "ずかん", left: 11, top: 40, w: 20, h: 62, labelDy: 16 },   // 左の本棚（縦長）
+  { key: "records", label: "きろく", left: 89, top: 44, w: 18, h: 40, labelDy: 12 }, // 右の机の上の日記
+  { key: "chest", label: "もちもの", left: 90, top: 80, w: 14, h: 22, labelDy: 0 },  // 右下の宝箱＝もちもの（UI改修②）
   // { key: "profile", left: 52, top: 22 } … 中央奥の額縁（装飾・将来枠）
 ];
 
@@ -43,8 +45,9 @@ function MiniIcon({ kind }) {
       <circle cx="12" cy="15" r="3" fill="#FF6B6B" stroke={C.ink} strokeWidth="1.2" /></svg>);
 }
 
-export default function HomeRoom({ save, update, onClose, onEnter, onDressup }) {
-  const [nested, setNested] = useState(null); // "profile" | "partner" | "chest" | null（部屋内のネストモーダル）
+export default function HomeRoom({ save, update, onClose, onEnter }) {
+  const [nested, setNested] = useState(null); // "profile" | "partner" | "chest" | "dressup" | null（部屋内のネストモーダル）
+  const [dressMsg, setDressMsg] = useState(null); // きせかえモーダル内のメッセージ（購入/コイン不足）
   const sound = save.settings.sound;
   const partner = save.partner;
   const stage = partner ? stageForLevel(partner.level) : 1;
@@ -86,7 +89,7 @@ export default function HomeRoom({ save, update, onClose, onEnter, onDressup }) 
                 transform: "translate(-50%,-50%)", width: `${f.w}%`, height: `${f.h}%`,
                 border: "none", background: "transparent", cursor: "pointer", padding: 0 }}>
               <span className="bubble pulse" style={{ position: "absolute", left: "50%", bottom: "calc(100% + 2px)",
-                transform: "translateX(-50%)", fontSize: "clamp(8px,1.9vw,12px)",
+                transform: `translate(-50%, ${f.labelDy || 0}px)`, fontSize: "clamp(8px,1.9vw,12px)",
                 animationDelay: `${(i * 0.7).toFixed(1)}s` }}>{f.label}</span>
             </button>
           ))}
@@ -122,12 +125,12 @@ export default function HomeRoom({ save, update, onClose, onEnter, onDressup }) 
         <div role="dialog" aria-modal="true" onClick={() => setNested(null)}
           style={{ position: "fixed", inset: 0, zIndex: 122, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div className="panel softpop" onClick={e => e.stopPropagation()}
-            style={{ maxWidth: 430, width: "100%", padding: 20, background: "#FFFDF5" }}>
-            <div style={{ display: "flex", gap: 16, alignItems: "stretch" }}>
-              {/* 左: アバター大＋きせかえ */}
+            style={{ maxWidth: 560, width: "100%", padding: 20, background: "#FFFDF5", maxHeight: "88vh", overflowY: "auto" }}>
+            <div style={{ display: "flex", gap: 16, alignItems: "stretch", flexWrap: "wrap", justifyContent: "center" }}>
+              {/* 左: アバター大（b3x実機FB: 人物なので2倍の260に）＋きせかえ（部屋内モーダル＝おみせに行かない） */}
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, justifyContent: "center" }}>
-                <PlayerAvatar character={save.character} avatar={save.avatar} dressup={save.dressup} size={130} full />
-                <Btn bg={C.sakura} onClick={() => { SFX.tap(sound); setNested(null); onDressup && onDressup(); }}
+                <PlayerAvatar character={save.character} avatar={save.avatar} dressup={save.dressup} size={260} full />
+                <Btn bg={C.sakura} onClick={() => { SFX.tap(sound); setNested("dressup"); }}
                   style={{ fontSize: 12, padding: "6px 12px" }}>👗 きせかえ</Btn>
               </div>
               {/* 右: ゲーム調ステータス（枠つきplate・アイコンは仮＝後で専用イラストに差し替え） */}
@@ -151,6 +154,25 @@ export default function HomeRoom({ save, update, onClose, onEnter, onDressup }) 
             <div style={{ textAlign: "center", marginTop: 14 }}>
               <Btn big bg={C.leaf} onClick={() => setNested(null)}>とじる</Btn>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ネスト: きせかえ（b3x: おみせに行かず着せ替えUIだけ開く＝共通棚DressupShelf。もどる→プロフィール） */}
+      {nested === "dressup" && (
+        <div role="dialog" aria-modal="true" onClick={() => { setDressMsg(null); setNested("profile"); }}
+          style={{ position: "fixed", inset: 0, zIndex: 122, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div className="panel softpop" onClick={e => e.stopPropagation()}
+            style={{ maxWidth: 560, width: "100%", padding: 16, background: "#FFFDF5", maxHeight: "88vh", overflowY: "auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <Btn bg="#fff" onClick={() => { SFX.tap(sound); setDressMsg(null); setNested("profile"); }}
+                style={{ fontSize: 14, padding: "6px 12px" }}>◀ もどる</Btn>
+              <span style={{ fontWeight: 900, fontSize: 14, marginLeft: "auto" }}>🪙 {save.coins || 0}</span>
+            </div>
+            {dressMsg && <div className="panel slide" style={{ padding: 10, marginBottom: 8, background: "#FFFBE0", fontWeight: 800, fontSize: 13, textAlign: "center" }}>{dressMsg}</div>}
+            <DressupShelf save={save} update={update}
+              onBought={d => setDressMsg(`${d.name}を かって つけたよ！`)}
+              onPoor={(d, diff) => setDressMsg(`コインが たりないよ（あと 🪙${diff}）`)} />
           </div>
         </div>
       )}

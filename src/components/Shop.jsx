@@ -4,14 +4,14 @@
 //        きせかえ=主人公の着せ替え（SHOP_DRESSUP）＋バトルのぶたい2種（ジャングル/だいち）。
 // もどるは1階層ずつ（リスト→店内→ワールドマップ＝メモ03）。ガチャ・課金なし・全品定価。
 // 背景は img駆動方式（b2cの教訓: 絵の中の店員とタップ枠を一致させるため aspectRatio+cover は使わない）。
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { C } from "../theme.js";
 import { Btn, Header } from "./common.jsx";
 import HowTo from "./HowTo.jsx";
 import ParentGuide from "./ParentGuide.jsx";
 import { SHOP_GUIDE } from "../data/parent-guide.js";
 import { ITEMS, COSMETICS } from "../data/battle.js";
-import { DRESSUP_ITEMS, baseImageFor } from "../data/dressup.js";
+import DressupShelf from "./DressupShelf.jsx";
 import { SFX } from "../sound.js";
 import shopBg from "../assets/shop-interior.webp";
 
@@ -25,18 +25,16 @@ const SERIF = {
   bye: "またね！",
 };
 
-export default function Shop({ save, update, go, onSound, openHome, initialStage, onConsumeInit }) {
+export default function Shop({ save, update, go, onSound, openHome }) {
   const sound = save.settings.sound;
-  // initialStage: プロフィールの「きせかえ」から直接 dressup 棚を開く導線（UI改修③）。マウント時に消費＝次回入店は通常どおり
-  const [stage, setStage] = useState(initialStage || "front");   // "front"=店内 / "items"=どうぐ / "dressup"=きせかえ
-  useEffect(() => { if (initialStage && onConsumeInit) onConsumeInit(); }, []); // eslint-disable-line
+  // ※b3xでinitialStage導線は廃止（プロフィールのきせかえは部屋内モーダル＝DressupShelfを直接開く形に変更）
+  const [stage, setStage] = useState("front");   // "front"=店内 / "items"=どうぐ / "dressup"=きせかえ
   const [talking, setTalking] = useState(false); // 店員に話しかけた（カテゴリ選択の吹き出し表示）
   const [msg, setMsg] = useState(null);          // 店員のひとこと（購入・コイン不足等）
   const coins = save.coins || 0;
   const items = save.items || {};
   const owned = (save.cosmetics && save.cosmetics.owned) || [];
   const equipped = (save.cosmetics && save.cosmetics.equipped) || { deco: null, bg: null };
-  const dressup = save.dressup || {};
   const flash = t => setMsg(t);
 
   function buyItem(it) {
@@ -47,22 +45,7 @@ export default function Shop({ save, update, go, onSound, openHome, initialStage
     update(s => { s.coins -= it.price; s.items[it.id] = (s.items[it.id] || 0) + 1; s.shopUsed = true; return s; });
     flash(`💬 ${SERIF.bought}（${it.name}）`);
   }
-  // 着せ替え購入（買ったらすぐつける＝既存の作法踏襲。同スロットは1個まで＝上書き装備）
-  function buyDressup(d) {
-    if (owned.includes(d.id)) return;
-    if (coins < d.acquire.price) return flash(`💬 ${SERIF.poor}（あと 🪙${d.acquire.price - coins}）`);
-    SFX.badge(sound);
-    update(s => {
-      s.coins -= d.acquire.price; s.cosmetics.owned.push(d.id); s.shopUsed = true;
-      s.dressup[d.slot] = d.id; // 買ったら すぐ つける
-      return s;
-    });
-    flash(`💬 ${SERIF.bought}（${d.name}を つけたよ！）`);
-  }
-  function toggleDressup(d) {
-    SFX.tap(sound);
-    update(s => { s.dressup[d.slot] = s.dressup[d.slot] === d.id ? null : d.id; return s; });
-  }
+  // 着せ替えの購入/装備は DressupShelf（共通棚・b3x）に集約。メッセージだけ店員のセリフで包む。
   // バトルのぶたい（既存機構流用・買ったらすぐ装備・トグルで着脱）
   function buyCosmetic(c) {
     if (owned.includes(c.id)) return;
@@ -156,37 +139,10 @@ export default function Shop({ save, update, go, onSound, openHome, initialStage
 
           {stage === "dressup" && (
             <>
-              {/* 主人公の着せ替え（第3波②で相棒の飾りから総入れ替え・装備の見た目反映は段階③） */}
-              <div className="panel" style={{ padding: 16 }}>
-                <div className="pl-display" style={{ fontSize: 19, marginBottom: 4 }}>🎩 きみの おしゃれ</div>
-                <div style={{ fontWeight: 700, fontSize: 12, marginBottom: 10, color: "#6B6265" }}>ぼうけんかの きせかえ（ずっと つかえる・まなびの あかし）</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 10 }}>
-                  {DRESSUP_ITEMS.map(d => {
-                    const has = owned.includes(d.id);
-                    const isAchievement = d.acquire.type === "achievement";
-                    const lockedAch = isAchievement && !has; // 実績解放は買えない＝条件を見せる（バッジの条件表示と同じ思想）
-                    const on = dressup[d.slot] === d.id;
-                    // back はベース人物切り替え＝その子の性別のリュック姿でプレビュー
-                    const preview = d.slot === "back"
-                      ? <img src={baseImageFor(save.character, d.id)} alt="" draggable="false" style={{ height: 56, width: "auto", filter: lockedAch ? "grayscale(1) opacity(.55)" : "none" }} />
-                      : <img src={d.img} alt="" draggable="false" style={{ width: 44, height: 44, objectFit: "contain", filter: lockedAch ? "grayscale(1) opacity(.55)" : "none" }} />;
-                    return (
-                      <div key={d.id} style={{ border: `2px solid ${C.ink}`, borderRadius: 14, padding: 10, textAlign: "center", background: on ? "#FFF7E6" : lockedAch ? "#F5F2EC" : "#fff" }}>
-                        <div style={{ height: 58, display: "flex", alignItems: "center", justifyContent: "center" }}>{preview}</div>
-                        <div style={{ fontWeight: 900, fontSize: 12, margin: "4px 0", lineHeight: 1.3 }}>{lockedAch ? "🔒 " : ""}{d.name}</div>
-                        <div style={{ fontWeight: 700, fontSize: 10, color: "#6B6265", minHeight: 26, lineHeight: 1.3 }}>
-                          {lockedAch ? d.acquire.label : d.flavor}
-                        </div>
-                        {lockedAch
-                          ? <span style={{ fontWeight: 800, fontSize: 11, color: "#A49E95" }}>とくべつな ごほうび</span>
-                          : has
-                            ? <Btn bg={on ? C.sun : "#fff"} onClick={() => toggleDressup(d)} style={{ fontSize: 12, padding: "5px 10px" }}>{on ? "つけてる ✓" : "つける"}</Btn>
-                            : <Btn bg={coins >= d.acquire.price ? C.leaf : "#fff"} onClick={() => buyDressup(d)} style={{ fontSize: 12, padding: "5px 10px" }}>🪙{d.acquire.price}</Btn>}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+              {/* 主人公の着せ替え＝共通棚（DressupShelf・b3x）。メッセージは店員のセリフで包む */}
+              <DressupShelf save={save} update={update}
+                onBought={d => flash(`💬 ${SERIF.bought}（${d.name}を つけたよ！）`)}
+                onPoor={(d, diff) => flash(`💬 ${SERIF.poor}（あと 🪙${diff}）`)} />
               {/* バトルのぶたい（ジャングル/だいち・既存の難易度別3枚とは別のコレクション枠） */}
               <div className="panel" style={{ padding: 16 }}>
                 <div className="pl-display" style={{ fontSize: 19, marginBottom: 4 }}>🖼️ バトルの ぶたい</div>
