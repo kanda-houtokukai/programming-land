@@ -9,7 +9,12 @@
 ### 今どこか
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
-- **v2.3-b3w まで公開済み（2026-07-11・おうち/お店UI改修①〜④＝⚠️実機確認待ち）**:
+- **v2.3-b3x まで公開済み（2026-07-11・おうちUI実機FB調整＝⚠️実機確認待ち）**:
+  - **①きせかえ=おみせに行かせない**: 着せ替え棚を`DressupShelf.jsx`に共通化（購入/装備ロジック集約・メッセージはonBought/onPoorで呼び出し側＝おみせは店員セリフ・プロフィールはニュートラル）。プロフィールの「きせかえ」=部屋内ネストモーダル（nested="dressup"）で棚を直接開き、◀もどる→プロフィールへ。**b3wのApp shopInit/Shop initialStage配線は廃止**
+  - **②プロフィールのアバター2倍**: PlayerAvatar 130→**260**（モーダルmaxWidth 560・flexWrapで狭幅縦積み）。部屋のアバター78pxは不変
+  - **③ラベル微調整**: FURNITUREに`labelDy`（下方向px）＝ずかん**+16**・きろく**+12**・もちもの0（対象の上のまま少し下げ）
+  - 検証: verify全PASS・roundtrip全一致・プレビュー=labelDy反映/アバター224×298/棚モーダルで購入（コイン100→45・装備反映）→もどる→プロフィール（Shop遷移なし）
+- **v2.3-b3w（2026-07-11・おうち/お店UI改修①〜④＝⚠️実機確認待ち）**:
   - **①看板ラベル**: `.bubble`をRPG看板調に作り替え（地#FAEEDA・枠#BA7517・字#633806・角丸9px・下向きしっぽ）＝おうち/お店の全ラベル一括反映。配置は**対象の「上」**（家具=タップ領域の上・あいぼう/アバター=スプライトの上・お店=店主の頭の上・💬絵文字除去）
   - **②たからばこ→もちもの**: どうぐ=所持数>0の消耗品を数つきグリッド（**イラスト流用・絵文字なし**）／バトルはいけい切替=おまかせ(null)+既定3枚（`battle.js`に`DEFAULT_BG_CHOICES`新設・id=bgdef_*・`equippedBgImg`をcosmetic→default順の検索に拡張）+購入舞台。**equipped.bg文字列を流用＝スキーマ不変**（roundtrip追加不要）
   - **③プロフィール**: 額縁導線を廃止（FURNITURE から除去・座標52/22はコメント保持）→**あいぼうの横のアバター**（left60/top66・PlayerAvatar full 78px・dressup反映）から。画面=左アバター大(130)+👗きせかえ（**Shopのdressup棚へ直行**＝App `shopInit`/Shop `initialStage`+`onConsumeInit`）／右=名前+ステータスplate4種（`MiniIcon`=SVG仮アイコン・絵文字不採用・後で専用イラスト差し替え）
