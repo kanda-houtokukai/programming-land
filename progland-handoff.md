@@ -9,7 +9,9 @@
 ### 今どこか
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
-- **v2.3-b3r まで公開済み（2026-07-11・クイズのひろば化＝⚠️実機確認待ち）**:
+- **v2.3-b3s まで公開済み（2026-07-11・クイズのひろば化＋拠点座標微調整＝⚠️実機確認待ち）**:
+  - **b3s 座標微調整**: 四隅4拠点を中心(50,41)へ各軸1ptずつ寄せた（`PLAZA_POS`＝junban 25.5/27.5・kimari 74.5/27.5・nakama 17.5/56.0・robot 82.5/56.0。よみとり50/79は不変）。3背景共通＝3難易度に反映。まだ遠い/寄せすぎなら同定数で追い込む
+  - --- 以下は b3r ひろば化の内容 ---
   - **カテゴリ選択をお祭り広場マップに刷新**（Quiz.jsx・パズル島と同方式）: `PLAZA_BG`（昼/夕/夜=難易度タブで切替）＋`PLAZA_POS`（5拠点の%座標・**3枚共通・指示書実測値**・微調整はこの定数だけ）。各拠点=透過アイコン＋白地チップ（パズル島ラベルと同作法）＋mapfloat（index別ディレイ）。中央(50,41)は電球モニュメント=装飾・タップ無し
   - **ポップアップ**: フル名前＋説明＋（もんだい○こから5もん）＋はじめて/ベスト/🏆まんてん→▶はじめる（fadein＋softpop=WorldMap作法）。旧カードリストの情報は全てポップアップへ移設。もどるは1階層ずつ（出題→ひろば→ワールドマップ）
   - **出題・採点・記録・難易度ロジックは不変**（見た目のみ）。素材=`quizplaza-{day,sunset,night}.webp`＋`icon_quiz_{junban,kimari,nakamawake,robot,yomitori}.png`（src/assets/）。指示書=`brushup/quizplaza_instructions_for_code.md`・設計経緯=`brushup/handoff_quizplaza_20260709.md`
