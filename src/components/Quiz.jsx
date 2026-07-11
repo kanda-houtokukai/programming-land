@@ -24,10 +24,11 @@ const PLAZA_BG = { easy: plazaDay, normal: plazaSunset, hard: plazaNight };
 // 拠点の%座標＋アイコン＋短い名前（指示書の実測値・3枚共通で空き地に乗ることを検証済み）。
 // 中央(50, 41)は電球モニュメント（装飾・タップ無し）。座標微調整はここだけ触ればよい。
 const PLAZA_POS = {
-  junban: { left: 24.5, top: 26.5, img: iconJunban, short: "じゅんばん" },
-  kimari: { left: 75.5, top: 26.5, img: iconKimari, short: "きまり" },
-  nakama: { left: 16.5, top: 57.0, img: iconNakama, short: "なかまわけ" },
-  robot: { left: 83.5, top: 57.0, img: iconRobot, short: "ロボット" },
+  // 実機FBで四隅4拠点を中心(50,41)へ各軸1ptずつ寄せた（b3s・2026-07-11）。よみとりはぴったりで不変
+  junban: { left: 25.5, top: 27.5, img: iconJunban, short: "じゅんばん" },
+  kimari: { left: 74.5, top: 27.5, img: iconKimari, short: "きまり" },
+  nakama: { left: 17.5, top: 56.0, img: iconNakama, short: "なかまわけ" },
+  robot: { left: 82.5, top: 56.0, img: iconRobot, short: "ロボット" },
   yomitori: { left: 50.0, top: 79.0, img: iconYomitori, short: "よみとり" },
 };
 
