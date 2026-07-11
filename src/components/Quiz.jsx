@@ -27,7 +27,7 @@ const PLAZA_POS = {
   // 実機FBで四隅4拠点を中心(50,41)へ寄せた（当初から各軸3pt・b3t・2026-07-11）。よみとりはぴったりで不変
   junban: { left: 27.5, top: 29.5, img: iconJunban, short: "じゅんばん" },
   kimari: { left: 72.5, top: 29.5, img: iconKimari, short: "きまり" },
-  nakama: { left: 19.5, top: 56.0, img: iconNakama, short: "なかまわけ" }, // 実機FBで +2pt 下（b3u）
+  nakama: { left: 19.5, top: 57.0, img: iconNakama, short: "なかまわけ" }, // 実機FBで +2pt(b3u)→さらに+1pt 下（b3v）
   robot: { left: 79.5, top: 54.0, img: iconRobot, short: "ロボット" },     // 実機FBで -1pt 左（b3u）
   yomitori: { left: 50.0, top: 79.0, img: iconYomitori, short: "よみとり" },
 };
