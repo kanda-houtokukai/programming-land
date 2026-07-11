@@ -109,9 +109,9 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
 
           {/* 自分のアバター（UI改修③: あいぼうの横＝プロフィールの入口。着せ替えが反映された姿） */}
           <button className="tapzone" onClick={() => tap("profile")} aria-label="プロフィール"
-            style={{ position: "absolute", left: "60%", top: "66%", transform: "translate(-50%,-50%)",
+            style={{ position: "absolute", left: "60%", top: "47%", transform: "translate(-50%,-50%)",
               width: "16%", border: "none", background: "transparent", cursor: "pointer", padding: 0,
-              display: "flex", flexDirection: "column", alignItems: "center" }}>
+              display: "flex", flexDirection: "column", alignItems: "center" }}>{/* b3z実機FB: top66→47＝156px化した背丈差ぶん上げて相棒と足元（床の線）を揃える */}
             <span className="bubble pulse" style={{ marginBottom: 5, fontSize: "clamp(8px,1.9vw,12px)", animationDelay: "1.3s" }}>プロフィール</span>
             <span className="mapfloat" style={{ lineHeight: 0, animationDelay: "1.5s", filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
               <PlayerAvatar character={save.character} avatar={save.avatar} dressup={save.dressup} size={156} full />{/* b3y実機FB: 78→156（2倍） */}
