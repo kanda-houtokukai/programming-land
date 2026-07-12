@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { C } from "../theme.js";
 import { Btn } from "./common.jsx";
 import { SFX } from "../sound.js";
-import { speciesById, stageForLevel, partnerStageScale } from "../data/monsters.js";
+import { speciesById, stageForLevel, partnerStageScale, SPECIES, pendingEggs, monsterName } from "../data/monsters.js";
 import { partnerDisplayName, xpToNext, MAX_LEVEL } from "../growth.js";
 import { BADGES, puzzleStarsTotal, daysPlayed } from "../data/badges.js";
 import { ITEMS, COSMETICS, DEFAULT_BG_CHOICES } from "../data/battle.js";
@@ -43,6 +43,19 @@ function MiniIcon({ kind }) {
 // （中心アンカーのため。b3zのアバター調整と同じ考え方・初期値→実機で詰める）
 const PARTNER_TOP = { 1: 66, 2: 64, 3: 61 };
 
+// たまごの仮アイコン（b4f: 専用イラストは後日・絵文字不可のため簡単な図形。斑点いりのたまご）
+function EggIcon({ size = 34 }) {
+  return (
+    <svg width={size} height={Math.round(size * 1.2)} viewBox="0 0 40 48" style={{ display: "block" }}>
+      <path d="M20 2 C31 2 38 16 38 29 C38 40 30 46 20 46 C10 46 2 40 2 29 C2 16 9 2 20 2 Z"
+        fill="#FFF6DC" stroke="#3A3335" strokeWidth="2.5" />
+      <circle cx="14" cy="17" r="3" fill="#FFD447" />
+      <circle cx="25" cy="27" r="4" fill="#9BD48A" />
+      <circle cx="16" cy="34" r="2.6" fill="#7FC8F8" />
+    </svg>
+  );
+}
+
 export default function HomeRoom({ save, update, onClose, onEnter }) {
   const [nested, setNested] = useState(null); // "profile" | "partner" | "chest" | "dressup" | null（部屋内のネストモーダル）
   const [dressMsg, setDressMsg] = useState(null); // きせかえモーダル内のメッセージ（購入/コイン不足）
@@ -65,6 +78,8 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
   const stage = partner ? stageForLevel(partner.level) : 1;
   const partnerSize = Math.round(92 * (partnerStageScale[stage] || 1) * sizeK); // 実機FB②: 進化で大きく（stage3≈アバターの肩）
   const avatarSize = Math.round(156 * sizeK);
+  const eggs = pendingEggs(partner); // b4f: 未開封たまご数（節目到達−孵化済みの導出＝スキーマ追加なし）
+  const [hatched, setHatched] = useState(null); // たまごモーダル内: 孵ったばかりのタイプid（祝福表示）
   const items = save.items || {};
   const ownedItems = ITEMS.filter(it => (items[it.id] || 0) > 0);
   const ownedBgs = COSMETICS.filter(c => ((save.cosmetics && save.cosmetics.owned) || []).includes(c.id));
@@ -116,7 +131,21 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
                 display: "flex", flexDirection: "column", alignItems: "center" }}>
               <span className="bubble pulse" style={{ marginBottom: 5, fontSize: "clamp(8px,1.9vw,12px)" }}>あいぼう</span>
               <span className="mapfloat" style={{ lineHeight: 0, filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
-                <MonsterArt species={partner.species} stage={stage} size={partnerSize} />
+                <MonsterArt species={partner.active} stage={stage} size={partnerSize} />
+              </span>
+            </button>
+          )}
+
+          {/* たまご（b4f: 節目Lv到達で届く。相棒の左の床に置く・開封は部屋で＝バトル等を邪魔しない） */}
+          {partner && eggs > 0 && (
+            <button className="tapzone" onClick={() => { setHatched(null); tap("egg"); }} aria-label="たまご"
+              style={{ position: "absolute", left: "24%", top: "72%", transform: "translate(-50%,-50%)",
+                border: "none", background: "transparent", cursor: "pointer", padding: 0,
+                display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <span className="bubble pulse" style={{ marginBottom: 4, fontSize: "clamp(8px,1.9vw,12px)", animationDelay: ".4s" }}>
+                たまご{eggs > 1 ? ` ×${eggs}` : ""}</span>
+              <span className="mapfloat" style={{ lineHeight: 0, animationDelay: ".8s", filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
+                <EggIcon size={Math.round(34 * sizeK)} />
               </span>
             </button>
           )}
@@ -238,24 +267,112 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
         </div>
       )}
 
-      {/* ネスト: 相棒の詳細（Lv・つぎのレベルまで・ずかんへ） */}
-      {nested === "partner" && partner && (
+      {/* ネスト: 相棒のロア（b4f: 大きめ画像＋なまえ＋タイプ＋ものがたり＋Lv）＋きりかえ（ownedから選ぶ） */}
+      {nested === "partner" && partner && (() => {
+        const asp = speciesById(partner.active);
+        return (
+          <div role="dialog" aria-modal="true" onClick={() => setNested(null)}
+            style={{ position: "fixed", inset: 0, zIndex: 122, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <div className="panel softpop" onClick={e => e.stopPropagation()}
+              style={{ maxWidth: 360, width: "100%", padding: 20, textAlign: "center", background: "#FFFDF5", maxHeight: "88vh", overflowY: "auto" }}>
+              <MonsterArt species={partner.active} stage={stage} size={150} />
+              <div className="pl-display" style={{ fontSize: 22, marginTop: 2 }}>{partnerDisplayName(partner)}</div>
+              <div style={{ fontWeight: 900, fontSize: 13, margin: "4px 0 2px", background: asp.headBg, border: `2px solid ${C.ink}`, borderRadius: 999, padding: "2px 10px", display: "inline-block" }}>
+                {asp.typeName}　Lv.{partner.level}</div>
+              <div style={{ fontWeight: 700, fontSize: 11.5, color: "#6B6265", margin: "4px 0 8px" }}>
+                {partner.level >= MAX_LEVEL ? "レベル マックス！" : `つぎの レベルまで あと ${xpToNext(partner.level) - partner.xp}`}
+              </div>
+              <div style={{ fontWeight: 700, fontSize: 13, lineHeight: 1.7, textAlign: "left", background: "#FAF3E3", border: `2px solid ${C.ink}`, borderRadius: 12, padding: "10px 12px" }}>{asp.lore}</div>
+              {/* きりかえ: なかまに した タイプから えらぶ（levelは共有＝みんな いっしょに そだつ） */}
+              {(partner.owned || []).length > 1 && (
+                <div style={{ marginTop: 10 }}>
+                  <div style={{ fontWeight: 900, fontSize: 13, marginBottom: 5 }}>あいぼうを きりかえる</div>
+                  <div style={{ display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap" }}>
+                    {partner.owned.map(id => {
+                      const osp = speciesById(id);
+                      if (!osp) return null;
+                      const isActive = id === partner.active;
+                      return (
+                        <button key={id} className="pbtn" disabled={isActive}
+                          onClick={() => { SFX.tap(sound); update(s => { s.partner.active = id; return s; }); }}
+                          style={{ padding: 5, background: isActive ? "#FFF7E6" : "#fff", borderRadius: 12, opacity: 1 }}>
+                          <MonsterArt species={id} stage={stage} size={46} />
+                          <div style={{ fontWeight: 900, fontSize: 9.5 }}>{monsterName(id, stage)}{isActive && " ✓"}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 12 }}>
+                <Btn big bg={C.sun} onClick={() => { setNested(null); onEnter("dex"); }}>📔 ずかん</Btn>
+                <Btn bg="#fff" onClick={() => setNested(null)}>とじる</Btn>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ネスト: たまご（b4f: 未所持タイプから1つ えらんで 孵す。孵ったら祝福→きりかえ導線） */}
+      {nested === "egg" && partner && (
         <div role="dialog" aria-modal="true" onClick={() => setNested(null)}
           style={{ position: "fixed", inset: 0, zIndex: 122, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div className="panel softpop" onClick={e => e.stopPropagation()}
-            style={{ maxWidth: 340, width: "100%", padding: 22, textAlign: "center", background: "#FFFDF5" }}>
-            <span style={{ position: "relative", display: "inline-flex", lineHeight: 0 }}>
-              <MonsterArt species={partner.species} stage={stage} size={120} />
-            </span>
-            <div className="pl-display" style={{ fontSize: 22, marginTop: 4 }}>{partnerDisplayName(partner)}</div>
-            <div style={{ fontWeight: 900, fontSize: 15, margin: "6px 0" }}>{speciesById(partner.species).typeEmoji} Lv.{partner.level}</div>
-            <div style={{ fontWeight: 700, fontSize: 12, color: "#6B6265", marginBottom: 14 }}>
-              {partner.level >= MAX_LEVEL ? "レベル マックス！" : `つぎの レベルまで あと ${xpToNext(partner.level) - partner.xp}`}
-            </div>
-            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-              <Btn big bg={C.sun} onClick={() => { setNested(null); onEnter("dex"); }}>📔 ずかん</Btn>
-              <Btn bg="#fff" onClick={() => setNested(null)}>とじる</Btn>
-            </div>
+            style={{ maxWidth: 400, width: "100%", padding: 20, textAlign: "center", background: "#FFFDF5", maxHeight: "88vh", overflowY: "auto" }}>
+            {!hatched ? (
+              <>
+                <div style={{ display: "flex", justifyContent: "center" }}><EggIcon size={54} /></div>
+                <div className="pl-display" style={{ fontSize: 22, margin: "4px 0" }}>たまごが とどいた！</div>
+                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10 }}>
+                  どの こを むかえる？{eggs > 1 && <span>（たまごは あと {eggs}こ）</span>}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(100px,1fr))", gap: 8 }}>
+                  {SPECIES.filter(sp => !(partner.owned || []).includes(sp.id)).map(sp => (
+                    <button key={sp.id} className="pbtn"
+                      onClick={() => {
+                        SFX.fanfare(sound);
+                        setHatched(sp.id);
+                        update(s => {
+                          if (!s.partner.owned.includes(sp.id)) s.partner.owned.push(sp.id);
+                          // ずかん登録: level共有なので いま到達している段階まで まとめて登録
+                          for (let st = 1; st <= stageForLevel(s.partner.level); st++) {
+                            const key = `${sp.id}-${st}`;
+                            if (!s.dex.includes(key)) s.dex.push(key);
+                          }
+                          return s;
+                        });
+                      }}
+                      style={{ padding: 8, background: sp.headBg, borderRadius: 14 }}>
+                      <MonsterArt species={sp.id} stage={1} size={72} />
+                      <div style={{ fontWeight: 900, fontSize: 12 }}>{sp.stages[0].name}</div>
+                      <div style={{ fontWeight: 700, fontSize: 10, color: "#6B6265" }}>{sp.typeName}</div>
+                    </button>
+                  ))}
+                </div>
+                <div style={{ marginTop: 12 }}>
+                  <Btn bg="#fff" onClick={() => setNested(null)}>あとで あける</Btn>
+                </div>
+              </>
+            ) : (() => {
+              const hsp = speciesById(hatched);
+              return (
+                <>
+                  <div className="pop">
+                    <MonsterArt species={hatched} stage={stageForLevel(partner.level)} size={140} />
+                  </div>
+                  <div className="pl-display" style={{ fontSize: 23, margin: "4px 0" }}>
+                    {monsterName(hatched, stageForLevel(partner.level))}が なかまに なった！</div>
+                  <div style={{ fontWeight: 700, fontSize: 12.5, color: "#6B6265", marginBottom: 12 }}>
+                    ずかんに とうろくされたよ。レベルは あいぼう みんなで いっしょに そだつよ
+                  </div>
+                  <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+                    <Btn big bg={hsp.color} onClick={() => { SFX.tap(sound); update(s => { s.partner.active = hatched; return s; }); setNested(null); }}>
+                      この こに きりかえる</Btn>
+                    <Btn bg="#fff" onClick={() => { setHatched(null); if (eggs <= 0) setNested(null); }}>とじる</Btn>{/* eggs は孵化後の再renderで再計算済み */}
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}

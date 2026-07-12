@@ -25,7 +25,7 @@ import PartnerSelect from "./components/PartnerSelect.jsx";
 import CharacterSelect from "./components/CharacterSelect.jsx";
 import Dex from "./components/Dex.jsx";
 import EvolutionOverlay from "./components/EvolutionOverlay.jsx";
-import { stageForLevel } from "./data/monsters.js";
+import { stageForLevel, EGG_LEVELS, SPECIES } from "./data/monsters.js";
 import { grantLegacyCoins } from "./growth.js";
 import { battleUnlocked, BATTLE_UNLOCK_LEVEL } from "./data/battle.js";
 import { checkAchievementUnlocks } from "./data/dressup.js";
@@ -86,7 +86,7 @@ export default function App() {
         const toStage = stageForLevel(next.partner.level);
         if (toStage > fromStage) {
           // 進化の音は EvolutionOverlay が段階演出（溜め→渦→登場→ファンファーレ）に合わせて鳴らす
-          setEvolution({ species: next.partner.species, from: fromStage, to: toStage });
+          setEvolution({ species: next.partner.active, from: fromStage, to: toStage });
         } else if (next.partner.level > p.partner.level) {
           SFX.levelup(next.settings.sound);
           // Lv3到達＝バトル解放の通知（レベルアップより うれしいお知らせ）
@@ -95,6 +95,12 @@ export default function App() {
           } else {
             showToast("⬆️", `レベルアップ！ Lv.${next.partner.level} に なった！`);
           }
+        }
+        // b4f たまご: レベル節目に到達したら通知（開封は おうちの部屋で。未所持が残っている場合のみ）
+        if (next.partner.level > p.partner.level
+          && EGG_LEVELS.some(l => p.partner.level < l && next.partner.level >= l)
+          && (next.partner.owned || []).length < SPECIES.length) {
+          showToast("✨", "たまごが とどいた！ おうちで あけてみよう");
         }
       }
       saveProfile(next);
@@ -167,7 +173,7 @@ export default function App() {
       )}
       {save && screen === "home" && save.character && !save.partner && (
         <PartnerSelect profileName={save.name} onPick={sp => update(s => {
-          s.partner = { species: sp, xp: 0, level: 1 };
+          s.partner = { active: sp, owned: [sp], xp: 0, level: 1 }; // b4f: たまごで なかまが増える（owned）
           const key = `${sp}-1`;
           if (!s.dex.includes(key)) s.dex.push(key);
           return s;

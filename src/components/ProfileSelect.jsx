@@ -38,7 +38,7 @@ export default function ProfileSelect({ profiles, onPick, onNew }) {
               {/* 相棒（現在の姿・プロファイルごと）。まだ相棒がいない子は ▶ のみ */}
               {p.partner && (
                 <span style={{ lineHeight: 0, filter: "drop-shadow(1px 2px 2px rgba(20,15,25,.3))" }}>
-                  <MonsterArt species={p.partner.species} stage={stageForLevel(p.partner.level)} size={62} />
+                  <MonsterArt species={p.partner.active} stage={stageForLevel(p.partner.level)} size={62} />
                 </span>
               )}
               <span style={{ fontSize: 22 }}>▶</span>

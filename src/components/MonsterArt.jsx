@@ -1,12 +1,16 @@
-// モンスターの絵（承認済みSVGをそのまま描画）。silhouette=true で ずかんの「？？？」表示
-import { MONSTER_ART } from "../data/monster-art.js";
+// モンスターの絵（b4f: CSS/SVG描画→スプライトpngの<img>に刷新。propsは従来互換）。
+// silhouette=true で ずかんの「？？？」表示（シルエット化は従来と同じfilter）
+import { monsterImg, monsterName } from "../data/monsters.js";
 
 export default function MonsterArt({ species, stage, size = 96, silhouette = false }) {
-  const art = MONSTER_ART[`${species}-${stage}`];
-  if (!art) return null;
+  const src = monsterImg(species, stage);
+  if (!src) return null;
+  // size=null は「寸法をCSSに任せる」モード（バトルの .fitArt=コンテナ幅100%）。
+  // inlineのwidth/heightは .fitArt の width:100% より強いため、指定しないことが重要（b4cの進化スケール保護）
+  const dim = size == null ? null : { width: size, height: size };
   return (
-    <svg width={size} height={size} viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"
-      style={silhouette ? { filter: "brightness(0)", opacity: 0.3 } : undefined}
-      dangerouslySetInnerHTML={{ __html: art }} />
+    <img src={src} alt={silhouette ? "？？？" : monsterName(species, stage)} draggable="false"
+      style={{ objectFit: "contain", display: "inline-block", ...dim,
+        ...(silhouette ? { filter: "brightness(0)", opacity: 0.3 } : null) }} />
   );
 }

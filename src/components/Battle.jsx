@@ -322,7 +322,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
                 buffs.power && phase !== "windup" ? "aura" : "",
               ].filter(Boolean).join(" ")}>
                 <div className={overlay || phase === "lose" ? "" : "idle2"} style={{ position: "relative" }}>
-                  <div className="fitArt"><MonsterArt species={save.partner.species} stage={pstage} size={200} /></div>
+                  <div className="fitArt"><MonsterArt species={save.partner.active} stage={pstage} size={null} /></div>{/* size=null＝.fitArtのコンテナ幅100%に任せる（進化スケール=外側divの幅） */}
                   {/* 相棒の飾り(deco)は第3波②で廃止（着せ替えは主人公へ） */}
                 </div>
               </div>

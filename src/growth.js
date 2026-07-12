@@ -34,14 +34,17 @@ export function applyXp(profile, amount) {
   let evolvedTo = null;
   if (afterStage > beforeStage) {
     evolvedTo = afterStage;
-    const key = `${p.species}-${afterStage}`;
-    if (!profile.dex.includes(key)) profile.dex.push(key);
+    // b4f: level共有＝所持している なかま全員がいっしょに進化する → 全員ぶん ずかんに登録
+    for (const id of (p.owned || [p.active])) {
+      const key = `${id}-${afterStage}`;
+      if (!profile.dex.includes(key)) profile.dex.push(key);
+    }
   }
   return { levelsGained, evolvedTo };
 }
 
 export function partnerDisplayName(partner) {
-  return monsterName(partner.species, stageForLevel(partner.level));
+  return monsterName(partner.active, stageForLevel(partner.level));
 }
 
 /* ===== コイン（P6フェーズ2）。★入手レートはここに集約★（設計書§4） =====

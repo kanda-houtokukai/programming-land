@@ -40,7 +40,7 @@ export function newProfileData(name = "", character = null) {
     art: { gallery: [] },
     badges: [],
     log: {},
-    partner: null,
+    partner: null,                        // b4f: {active, owned:[typeId…], level, xp}（level/xp共有）。スターター選択で作成・旧{species,level,xp}はmigratePartnerで移行
     dex: [],
     typing: { best: {} },
     battle: { defeated: [], best: {}, towerBest: {} },  // defeated=たおした敵ID / best=難易度別の勝利数 / towerBest=🗼タワー最高到達フロア（難易度別・06-A。旧セーブはマージで{}補完・|| 0 で読む）
@@ -53,6 +53,23 @@ export function newProfileData(name = "", character = null) {
   };
 }
 
+/* 相棒スキーマ移行（b4f）: 旧 {species, level, xp} → 新 {active, owned:[…], level, xp}（levelとxpは全員共有）。
+   旧タイプID（3タイプ時代）→ 新IDの読み替えもここで吸収: moko(もり)→mori／shizuku(うみ)→mizu／hoshi(そら)→denki（最近縁の空・雷へ）。
+   ⚠️ monsters.js は画像importを含み node から読めないため、このマップは storage.js に自己完結で持つ（roundtrip試験の保護） */
+const OLD_SPECIES_MAP = { moko: "mori", shizuku: "mizu", hoshi: "denki" };
+const mapSpeciesId = id => OLD_SPECIES_MAP[id] || id;
+function migratePartner(partner) {
+  if (!partner) return null;
+  if (Array.isArray(partner.owned)) { // すでに新形式: 旧IDの残存だけ読み替え
+    const owned = [...new Set(partner.owned.map(mapSpeciesId))];
+    const active = mapSpeciesId(partner.active) || owned[0] || null;
+    return { active, owned: owned.length ? owned : (active ? [active] : []), level: partner.level || 1, xp: partner.xp || 0 };
+  }
+  const sp = mapSpeciesId(partner.species);
+  if (!sp) return null;
+  return { active: sp, owned: [sp], level: partner.level || 1, xp: partner.xp || 0 };
+}
+
 // 2階層のデフォルト値マージ（v1の {...newSave(), ...parsed} 方式を強化）
 function mergeDefaults(parsed) {
   const d = newProfileData();
@@ -62,6 +79,11 @@ function mergeDefaults(parsed) {
       out[k] = { ...d[k], ...(parsed && typeof parsed[k] === "object" ? parsed[k] : {}) };
     }
   }
+  out.partner = migratePartner(out.partner);
+  out.dex = [...new Set((out.dex || []).map(k => {
+    const i = k.indexOf("-");
+    return i > 0 ? `${mapSpeciesId(k.slice(0, i))}${k.slice(i)}` : k;
+  }))];
   return out;
 }
 
