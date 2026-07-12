@@ -53,6 +53,12 @@ function HudPill({ children, style }) {
     display: "flex", alignItems: "center", gap: 6, ...style }}>{children}</div>;
 }
 
+// タワーの小アイコン（b4e: バトル中の🗼絵文字置換・テキスト高に合わせるinline img。大きさ調整はここ1箇所）
+function TowerMini() {
+  return <img src={iconTower} alt="" draggable="false"
+    style={{ width: "1.1em", height: "1.1em", display: "inline-block", verticalAlign: "-0.18em", objectFit: "contain" }} />;
+}
+
 /* ---- バトル本体 ---- */
 
 const T = { windup: 680, impact: 320, atkEnd: 780, fxClear: 980, heartGone: 900, downEnd: 950, overlay: 2150 };
@@ -261,7 +267,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
       <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "8px 0" }}>
         <Btn bg="#fff" onClick={onBack} disabled={!!overlay}>◀ にげる</Btn>
         <div style={{ fontWeight: 900 }}>{DIFFICULTIES.find(d => d.id === diff).short} {tower ? "タワー" : "バトル"}</div>
-        {tower && <div style={{ fontWeight: 900, fontSize: 13, background: "#EFE7FF", border: `2px solid ${C.ink}`, borderRadius: 999, padding: "2px 10px" }}>🗼 {floor}かい</div>}
+        {tower && <div style={{ fontWeight: 900, fontSize: 13, background: "#EFE7FF", border: `2px solid ${C.ink}`, borderRadius: 999, padding: "2px 10px" }}><TowerMini /> {floor}かい</div>}
       </div>
 
       {/* ===== バトルシーン（背景に切り抜きキャラが立つ） ===== */}
@@ -412,7 +418,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
       {overlay === "win" && (
         <div style={{ position: "fixed", inset: 0, zIndex: 110, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div className="panel pop" style={{ padding: 24, textAlign: "center", maxWidth: 400, background: "#FFFDF5" }}>
-            <div style={{ fontSize: 48 }}>{tower ? "🗼" : "🎉"}</div>
+            <div style={{ fontSize: 48 }}>{tower ? <TowerMini /> : "🎉"}</div>
             <div className="pl-display" style={{ fontSize: 25 }}>{tower ? `${floor}かいを クリア！` : `${enemy.name}に かった！`}</div>
             <div style={{ margin: "10px 0", display: "flex", justifyContent: "center", alignItems: "center", gap: 6 }}>
               <EnemyIcon enemy={enemy} size={64} /><span style={{ fontSize: 34 }}>✨</span>
@@ -436,7 +442,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
           <div className="panel pop" style={{ padding: 24, textAlign: "center", maxWidth: 400, background: "#F3F7FF" }}>
             <div style={{ fontSize: 48 }}>💧</div>
             <div className="pl-display" style={{ fontSize: 23 }}>
-              {tower ? `🗼 ${floor}かいまで のぼった！` : "おしかった！ また ちょうせんしよう"}
+              {tower ? <><TowerMini /> {floor}かいまで のぼった！</> : "おしかった！ また ちょうせんしよう"}
             </div>
             <div style={{ fontWeight: 800, fontSize: 14, margin: "10px 0" }}>
               {tower && <>さいこうきろく: {Math.max((save.battle.towerBest || {})[diff] || 0, floor)}かい<br /></>}
