@@ -6,6 +6,7 @@ import { useState } from "react";
 import { C } from "../theme.js";
 import { Btn, Header } from "./common.jsx";
 import { battleUnlocked, BATTLE_UNLOCK_LEVEL } from "../data/battle.js";
+import { activeMon } from "../growth.js";
 import { SFX } from "../sound.js";
 import bgUrl from "../assets/worldmap-home.webp";
 import iconQuiz from "../assets/icon_quiz.png";
@@ -135,7 +136,7 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
               <>
                 <div style={{ fontWeight: 800, fontSize: 14, margin: "10px 0" }}>
                   🔒 あいぼうが Lv{BATTLE_UNLOCK_LEVEL}に なると あそべるよ<br />
-                  <span style={{ fontWeight: 700, fontSize: 12, color: "#6B6265" }}>（いま Lv{save.partner ? save.partner.level : 1}。パズルや クイズで そだてよう！）</span>
+                  <span style={{ fontWeight: 700, fontSize: 12, color: "#6B6265" }}>（いま Lv{activeMon(save.partner) ? activeMon(save.partner).level : 1}。パズルや クイズで そだてよう！）</span>
                 </div>
                 <Btn bg="#fff" onClick={() => setPopup(null)}>とじる</Btn>
               </>

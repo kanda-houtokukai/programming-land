@@ -18,7 +18,7 @@ import {
   BATTLE_BG, ITEMS, enemiesFor, enemyUnlocked, equippedBgImg,
   TOWER_START_FLOOR, towerHp,
 } from "../data/battle.js";
-import { applyXp, addCoins, COIN } from "../growth.js";
+import { applyXp, addCoins, COIN, activeMon } from "../growth.js";
 import { today } from "../storage.js";
 import { SFX } from "../sound.js";
 import { stageForLevel, partnerStageScale } from "../data/monsters.js";
@@ -120,7 +120,8 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
     if (msg) setTypedLen(msg.length);
   };
   const q = queue[qi % queue.length];
-  const pstage = stageForLevel(save.partner.level);
+  const pmon = activeMon(save.partner); // b4j: レベルは相棒ごと（アクティブのレコードで判定）
+  const pstage = stageForLevel(pmon.level);
   // 第3波②: 相棒の飾り(deco)は廃止（着せ替えは主人公へ移行・dressup.js）。舞台はショップの画像背景で上書き
   const bgImg = equippedBgImg(save); // きせかえ舞台（画像）があれば 難易度背景を上書き
 
@@ -171,7 +172,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
     if (idx === q.a) {
       // かいしんは正解確定の時点で事前判定し、突進の前に「予兆」から演出を分岐する（推奨A）。
       // 予兆=相棒が光って構える(charge)→期待が高まってから 大きい突進→派手なヒット。
-      const isCrit = Math.random() < critChance(save.partner.level);
+      const isCrit = Math.random() < critChance(pmon.level); // b4j: 参照先のみ変更（判定ロジック不変）
       const dmg = (isCrit ? CRIT_DAMAGE : NORMAL_DAMAGE) * (buffs.power ? 2 : 1);
       const powered = buffs.power;
       const nhp = Math.max(0, enemyHp - dmg);
@@ -300,7 +301,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
 
           {/* 相棒HUD（左下のキャラの横） */}
           <HudPill style={{ bottom: "5%", left: "32%" }}>
-            <span>あいぼう Lv.{save.partner.level}</span>
+            <span>あいぼう Lv.{pmon.level}</span>
             <span style={{ fontSize: 14, letterSpacing: 1 }}>
               {Array.from({ length: PLAYER_HEARTS }, (_, i) =>
                 i === breakingIdx

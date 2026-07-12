@@ -4,7 +4,7 @@
      progland:v2:profile:<id>  … 各プロファイルの記録本体
    将来の項目追加でクラッシュしないよう、読み込みは常にデフォルト値マージで行う */
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3; // b4j: partner を相棒ごとレベル {active, owned:[{id,level,xp}], egg} に
 export const MAX_PROFILES = 4;
 const META_KEY = "progland:v2:meta";
 const profileKey = id => `progland:v2:profile:${id}`;
@@ -40,7 +40,7 @@ export function newProfileData(name = "", character = null) {
     art: { gallery: [] },
     badges: [],
     log: {},
-    partner: null,                        // b4f: {active, owned:[typeId…], level, xp}（level/xp共有）。スターター選択で作成・旧{species,level,xp}はmigratePartnerで移行
+    partner: null,                        // b4j: {active, owned:[{id,level,xp}…], egg:null|{xp}}（レベルは相棒ごと・eggは孵化ゲージ）。スターター選択で作成・旧形式はmigratePartnerで移行
     dex: [],
     typing: { best: {} },
     battle: { defeated: [], best: {}, towerBest: {} },  // defeated=たおした敵ID / best=難易度別の勝利数 / towerBest=🗼タワー最高到達フロア（難易度別・06-A。旧セーブはマージで{}補完・|| 0 で読む）
@@ -53,21 +53,38 @@ export function newProfileData(name = "", character = null) {
   };
 }
 
-/* 相棒スキーマ移行（b4f）: 旧 {species, level, xp} → 新 {active, owned:[…], level, xp}（levelとxpは全員共有）。
-   旧タイプID（3タイプ時代）→ 新IDの読み替えもここで吸収: moko(もり)→mori／shizuku(うみ)→mizu／hoshi(そら)→denki（最近縁の空・雷へ）。
+/* 相棒スキーマ移行: 最新＝b4j {active, owned:[{id, level, xp}…], egg:null|{xp}}（レベルは相棒ごと）。
+   吸収する旧世代: ①b4f〜b4i {active, owned:[id…], level, xp}（level/xp共有）→ 各ownedに共有level/xpを引き継ぐ
+   ②b4f以前 {species, level, xp}（1体）。旧タイプIDの読み替えも継続: moko→mori／shizuku→mizu／hoshi→denki。
+   ★移行では egg を付与しない（付与は「stage3へ到達する瞬間」のイベント限定＝既にstage3でも卵は付かない）。
    ⚠️ monsters.js は画像importを含み node から読めないため、このマップは storage.js に自己完結で持つ（roundtrip試験の保護） */
 const OLD_SPECIES_MAP = { moko: "mori", shizuku: "mizu", hoshi: "denki" };
 const mapSpeciesId = id => OLD_SPECIES_MAP[id] || id;
 function migratePartner(partner) {
   if (!partner) return null;
-  if (Array.isArray(partner.owned)) { // すでに新形式: 旧IDの残存だけ読み替え
-    const owned = [...new Set(partner.owned.map(mapSpeciesId))];
-    const active = mapSpeciesId(partner.active) || owned[0] || null;
-    return { active, owned: owned.length ? owned : (active ? [active] : []), level: partner.level || 1, xp: partner.xp || 0 };
+  // 最新形式（owned が {id,…} の配列）: 旧ID残存と欠損値だけ吸収
+  if (Array.isArray(partner.owned) && partner.owned.length && typeof partner.owned[0] === "object") {
+    const seen = new Set();
+    const owned = partner.owned.filter(m => m && m.id).map(m => ({ id: mapSpeciesId(m.id), level: m.level || 1, xp: m.xp || 0 }))
+      .filter(m => (seen.has(m.id) ? false : seen.add(m.id)));
+    if (!owned.length) return null;
+    const active = seen.has(mapSpeciesId(partner.active)) ? mapSpeciesId(partner.active) : owned[0].id;
+    const egg = partner.egg && typeof partner.egg === "object" ? { xp: partner.egg.xp || 0 } : null;
+    return { active, owned, egg };
   }
+  // b4f〜b4i形式（owned=id配列＋共有level/xp）: 全員が現状レベルを引き継ぐ（見た目の退行なし）
+  if (Array.isArray(partner.owned)) {
+    const lvl = partner.level || 1, xp = partner.xp || 0;
+    const ids = [...new Set(partner.owned.map(mapSpeciesId))];
+    const active = mapSpeciesId(partner.active);
+    const list = ids.length ? ids : (active ? [active] : []);
+    if (!list.length) return null;
+    return { active: list.includes(active) ? active : list[0], owned: list.map(id => ({ id, level: lvl, xp })), egg: null };
+  }
+  // b4f以前（1体・species）
   const sp = mapSpeciesId(partner.species);
   if (!sp) return null;
-  return { active: sp, owned: [sp], level: partner.level || 1, xp: partner.xp || 0 };
+  return { active: sp, owned: [{ id: sp, level: partner.level || 1, xp: partner.xp || 0 }], egg: null };
 }
 
 // 2階層のデフォルト値マージ（v1の {...newSave(), ...parsed} 方式を強化）

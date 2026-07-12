@@ -9,7 +9,10 @@ export const PLAYER_HEARTS = 3;
 // 既にLv3以上のプロファイルは最初から解放。学習を少しすればすぐ届く。
 export const BATTLE_UNLOCK_LEVEL = 3;
 export function battleUnlocked(save) {
-  return !!(save.partner && save.partner.level >= BATTLE_UNLOCK_LEVEL);
+  // b4j: レベルは相棒ごと＝アクティブ相棒のレベルで判定（growth.jsに依存しない自己完結の参照）
+  const p = save.partner;
+  const mon = p && Array.isArray(p.owned) && p.owned.length ? (p.owned.find(m => m.id === p.active) || p.owned[0]) : null;
+  return !!(mon && mon.level >= BATTLE_UNLOCK_LEVEL);
 }
 
 // 難易度ごとの 敵HP（＝そのHP問正解で1体たおせる）

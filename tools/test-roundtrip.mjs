@@ -60,10 +60,11 @@ ok(JSON.stringify(q.quiz.best) === JSON.stringify(p.quiz.best), "クイズ記録
 ok(JSON.stringify(q.typing.best) === JSON.stringify(p.typing.best), "タイピング記録（acc/kpm）");
 ok(JSON.stringify(q.art.gallery) === JSON.stringify(p.art.gallery), "おえかき作品");
 ok(JSON.stringify(q.log) === JSON.stringify(p.log), "日別ログ");
-// b4f 相棒スキーマ移行: 旧 {species:"moko",…} → 新 {active:"mori", owned:["mori"], level, xp}（旧ID読み替え込み）
-ok(q.partner && q.partner.active === "mori" && JSON.stringify(q.partner.owned) === JSON.stringify(["mori"])
-  && q.partner.level === 7 && q.partner.xp === 5 && q.partner.species === undefined,
-  "b4f 相棒移行（旧{species:moko}→新{active:mori, owned:[mori], level, xp}）");
+// b4j 相棒スキーマ移行: 旧々 {species:"moko",…} → 新 {active:"mori", owned:[{id,level,xp}], egg:null}（旧ID読み替え込み）
+ok(q.partner && q.partner.active === "mori"
+  && JSON.stringify(q.partner.owned) === JSON.stringify([{ id: "mori", level: 7, xp: 5 }])
+  && q.partner.egg === null && q.partner.species === undefined && q.partner.level === undefined,
+  "b4j 相棒移行（旧々{species:moko}→{active:mori, owned:[{id,level:7,xp:5}], egg:null}）");
 ok(JSON.stringify(q.dex) === JSON.stringify(["mori-1", "mori-2"]), "ずかん（dex・旧ID moko-* → mori-* に読み替え）");
 ok(JSON.stringify(q.badges.slice().sort()) === JSON.stringify(p.badges.slice().sort()), "バッジ配列（新規IDまで完全一致）");
 // P6フェーズ2: コイン・アイテム・きせかえ・討伐記録
@@ -81,7 +82,7 @@ ok(JSON.stringify(q.battle) === JSON.stringify(p.battle), "討伐記録（defeat
   ok(migrated.battle && typeof migrated.battle.towerBest === "object" && Object.keys(migrated.battle.towerBest).length === 0,
     "06-A 旧セーブに towerBest が {} で補完される（デフォルト値マージ）");
 }
-// b4f 相棒移行の追加ケース: 旧ID各種＋新形式の素通し
+// b4j 相棒移行の追加ケース: 旧ID各種＋b4f共有level形式＋最新形式の素通し
 {
   const l2 = createProfile("うみのこ", "girl");
   const raw2 = JSON.parse(localStorage.getItem(`progland:v2:profile:${l2.id}`));
@@ -89,24 +90,35 @@ ok(JSON.stringify(q.battle) === JSON.stringify(p.battle), "討伐記録（defeat
   raw2.dex = ["shizuku-1", "hoshi-1"];
   localStorage.setItem(`progland:v2:profile:${l2.id}`, JSON.stringify(raw2));
   const m2 = loadFresh(l2.id);
-  ok(m2.partner.active === "mizu" && JSON.stringify(m2.partner.owned) === JSON.stringify(["mizu"])
+  ok(m2.partner.active === "mizu" && JSON.stringify(m2.partner.owned) === JSON.stringify([{ id: "mizu", level: 3, xp: 1 }])
     && JSON.stringify(m2.dex) === JSON.stringify(["mizu-1", "denki-1"]),
-    "b4f 旧ID読み替え（shizuku→mizu／hoshi→denki・dex込み）");
+    "b4j 旧ID読み替え（shizuku→mizu／hoshi→denki・dex込み）");
 
+  // b4f〜b4i形式（owned=id配列＋共有level13=すでにstage3）→ 全員がlevel13を引き継ぎ・★eggは付与されない
   const l3 = createProfile("あたらしいこ", "boy");
   const raw3 = JSON.parse(localStorage.getItem(`progland:v2:profile:${l3.id}`));
   raw3.partner = { active: "denki", owned: ["denki", "iwa"], level: 13, xp: 2 };
   localStorage.setItem(`progland:v2:profile:${l3.id}`, JSON.stringify(raw3));
   const m3 = loadFresh(l3.id);
-  ok(m3.partner.active === "denki" && JSON.stringify(m3.partner.owned) === JSON.stringify(["denki", "iwa"])
-    && m3.partner.level === 13 && m3.partner.xp === 2,
-    "b4f 新形式 {active, owned, level, xp} は そのまま往復（たまご所持2体）");
+  ok(m3.partner.active === "denki"
+    && JSON.stringify(m3.partner.owned) === JSON.stringify([{ id: "denki", level: 13, xp: 2 }, { id: "iwa", level: 13, xp: 2 }])
+    && m3.partner.egg === null && m3.partner.level === undefined,
+    "b4j b4f形式（共有level13）→ 全員level引き継ぎ＋★stage3既存でも egg=null（誤付与なし）");
+
+  // 最新形式（相棒ごとlevel＋孵化ゲージつき）は そのまま往復
+  raw3.partner = { active: "denki", owned: [{ id: "denki", level: 12, xp: 3 }, { id: "iwa", level: 2, xp: 0 }], egg: { xp: 15 } };
+  localStorage.setItem(`progland:v2:profile:${l3.id}`, JSON.stringify(raw3));
+  const m5 = loadFresh(l3.id);
+  ok(m5.partner.active === "denki"
+    && JSON.stringify(m5.partner.owned) === JSON.stringify([{ id: "denki", level: 12, xp: 3 }, { id: "iwa", level: 2, xp: 0 }])
+    && m5.partner.egg && m5.partner.egg.xp === 15,
+    "b4j 最新形式 {owned:[{id,level,xp}], egg:{xp}} は そのまま往復（ゲージ保持）");
 
   // partner=null（スターター未選択）: 上限4人のため l2 のスロットを上書きして確認
   raw2.partner = null;
   localStorage.setItem(`progland:v2:profile:${l2.id}`, JSON.stringify(raw2));
   const m4 = loadFresh(l2.id);
-  ok(m4.partner === null, "b4f partner=null（スターター未選択）は null のまま");
+  ok(m4.partner === null, "b4j partner=null（スターター未選択）は null のまま");
 }
 ok(q.shopUsed === true, "ショップ利用フラグ");
 ok(JSON.stringify(q.powers) === JSON.stringify(p.powers), "そだったちからF2 前回%（powers.prev）");

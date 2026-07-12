@@ -1,5 +1,5 @@
-// 経験値・レベル・進化のルール
-import { stageForLevel, monsterName } from "./data/monsters.js";
+// 経験値・レベル・進化・たまごサイクルのルール（b4j: レベルは相棒ごと）
+import { stageForLevel, monsterName, SPECIES } from "./data/monsters.js";
 
 export const MAX_LEVEL = 30;
 
@@ -16,35 +16,73 @@ export const XP = {
 // （旧: 12+4*(level-1)。Lv5到達 72→90 XP／Lv12到達 352→440 XP＝ちょうど+25%）
 export function xpToNext(level) { return 15 + 5 * (level - 1); }
 
-/* profile.partner に経験値を加算し、レベルアップ・進化を処理する（profileを直接書き換える）。
-   返り値: { levelsGained, evolvedTo } evolvedTo は進化した場合の新しいすがた番号 */
+// アクティブ相棒のレコード（b4j: owned は {id, level, xp} の配列）。移行前の不正値でも落ちない
+export function activeMon(partner) {
+  if (!partner || !Array.isArray(partner.owned) || !partner.owned.length) return null;
+  return partner.owned.find(m => m.id === partner.active) || partner.owned[0];
+}
+
+/* ===== たまごサイクル（b4j・旧EGG_LEVELS方式は廃止） =====
+   付与: アクティブ相棒が stage3（Lv12）へ「到達した瞬間」に卵1個（未所持タイプが残っていて・卵が保留中でないとき）
+   ＝卵は常に1個だけ・溜まらない。孵化: 以後アクティブが得るEXPでゲージが進み、満ちたら未所持からランダムで1体（Lv1）。
+   ★EGG_HATCH_XP は初期値＝実機でテンポ調整（BATTLE_XP: easy12/normal16/hard22 → やさしいバトル3〜4回ぶん） */
+export const EGG_HATCH_XP = 40;
+
+/* profile.partner のアクティブ相棒に経験値を加算し、レベルアップ・進化・たまご付与/孵化を処理する
+   （profileを直接書き換える）。返り値: { levelsGained, evolvedTo, eggArrived, hatched }
+   evolvedTo=進化した場合の新すがた番号／eggArrived=このXPで卵が届いた／hatched=孵化した場合の新タイプid */
 export function applyXp(profile, amount) {
   const p = profile.partner;
-  if (!p) return { levelsGained: 0, evolvedTo: null };
-  const beforeStage = stageForLevel(p.level);
+  const mon = activeMon(p);
+  if (!mon) return { levelsGained: 0, evolvedTo: null, eggArrived: false, hatched: null };
+  const beforeStage = stageForLevel(mon.level);
   let levelsGained = 0;
-  p.xp += amount;
-  while (p.level < MAX_LEVEL && p.xp >= xpToNext(p.level)) {
-    p.xp -= xpToNext(p.level);
-    p.level += 1;
+  mon.xp += amount;
+  while (mon.level < MAX_LEVEL && mon.xp >= xpToNext(mon.level)) {
+    mon.xp -= xpToNext(mon.level);
+    mon.level += 1;
     levelsGained += 1;
   }
-  if (p.level >= MAX_LEVEL) p.xp = Math.min(p.xp, xpToNext(MAX_LEVEL) - 1);
-  const afterStage = stageForLevel(p.level);
+  if (mon.level >= MAX_LEVEL) mon.xp = Math.min(mon.xp, xpToNext(MAX_LEVEL) - 1);
+  const afterStage = stageForLevel(mon.level);
   let evolvedTo = null;
   if (afterStage > beforeStage) {
     evolvedTo = afterStage;
-    // b4f: level共有＝所持している なかま全員がいっしょに進化する → 全員ぶん ずかんに登録
-    for (const id of (p.owned || [p.active])) {
-      const key = `${id}-${afterStage}`;
+    // レベルは相棒ごと＝進化した本人だけ ずかんに登録（途中段階の飛び級も埋める）
+    for (let st = beforeStage + 1; st <= afterStage; st++) {
+      const key = `${mon.id}-${st}`;
       if (!profile.dex.includes(key)) profile.dex.push(key);
     }
   }
-  return { levelsGained, evolvedTo };
+  // たまご付与: アクティブが stage3 へ「新たに到達」した瞬間だけ（未所持あり＆卵なし）
+  let eggArrived = false;
+  const unowned = () => SPECIES.filter(sp => !p.owned.some(m => m.id === sp.id));
+  if (beforeStage < 3 && afterStage === 3 && !p.egg && unowned().length > 0) {
+    p.egg = { xp: 0 };
+    eggArrived = true;
+  }
+  // 孵化ゲージ: 卵が「この加算の前から」あった場合のみ進む（届いた瞬間のXPは二重計上しない）
+  let hatched = null;
+  if (p.egg && !eggArrived) {
+    p.egg.xp += amount;
+    if (p.egg.xp >= EGG_HATCH_XP) {
+      const pool = unowned();
+      if (pool.length > 0) {
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        p.owned.push({ id: pick.id, level: 1, xp: 0 });
+        const key = `${pick.id}-1`;
+        if (!profile.dex.includes(key)) profile.dex.push(key);
+        hatched = pick.id;
+      }
+      p.egg = null; // 5体そろっていたら消えるだけ（保険・通常は付与時点で止まる）
+    }
+  }
+  return { levelsGained, evolvedTo, eggArrived, hatched };
 }
 
 export function partnerDisplayName(partner) {
-  return monsterName(partner.active, stageForLevel(partner.level));
+  const mon = activeMon(partner);
+  return mon ? monsterName(mon.id, stageForLevel(mon.level)) : "";
 }
 
 /* ===== コイン（P6フェーズ2）。★入手レートはここに集約★（設計書§4） =====

@@ -8,8 +8,8 @@ import { useState, useEffect, useRef } from "react";
 import { C } from "../theme.js";
 import { Btn } from "./common.jsx";
 import { SFX } from "../sound.js";
-import { speciesById, stageForLevel, partnerStageScale, SPECIES, pendingEggs, monsterName } from "../data/monsters.js";
-import { partnerDisplayName, xpToNext, MAX_LEVEL } from "../growth.js";
+import { speciesById, stageForLevel, partnerStageScale, monsterName } from "../data/monsters.js";
+import { partnerDisplayName, xpToNext, MAX_LEVEL, activeMon, EGG_HATCH_XP } from "../growth.js";
 import { BADGES, puzzleStarsTotal, daysPlayed } from "../data/badges.js";
 import { ITEMS, COSMETICS, DEFAULT_BG_CHOICES } from "../data/battle.js";
 import MonsterArt from "./MonsterArt.jsx";
@@ -69,11 +69,13 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
   const sizeK = Math.min(1, Math.max(0.5, roomW / 612)); // 下限0.5＝極小画面の保険
   const sound = save.settings.sound;
   const partner = save.partner;
-  const stage = partner ? stageForLevel(partner.level) : 1;
+  const mon = activeMon(partner); // b4j: レベルは相棒ごと（アクティブのレコード）
+  const stage = mon ? stageForLevel(mon.level) : 1;
   const partnerSize = Math.round(92 * (partnerStageScale[stage] || 1) * sizeK); // 実機FB②: 進化で大きく（stage3≈アバターの肩）
   const avatarSize = Math.round(156 * sizeK);
-  const eggs = pendingEggs(partner); // b4f: 未開封たまご数（節目到達−孵化済みの導出＝スキーマ追加なし）
-  const [hatched, setHatched] = useState(null); // たまごモーダル内: 孵ったばかりのタイプid（祝福表示）
+  // b4j 卵欄: 孵化ゲージ%（stage3到達で届く・アクティブのEXPで進む・満ちたら applyXp が自動孵化）
+  const eggPct = partner && partner.egg ? Math.min(100, Math.round(100 * (partner.egg.xp || 0) / EGG_HATCH_XP)) : 0;
+  const eggMsg = eggPct < 50 ? "たまごを あたためてる" : eggPct < 90 ? "あと ちょっと" : "もうすぐ！";
   const items = save.items || {};
   const ownedItems = ITEMS.filter(it => (items[it.id] || 0) > 0);
   const ownedBgs = COSMETICS.filter(c => ((save.cosmetics && save.cosmetics.owned) || []).includes(c.id));
@@ -118,30 +120,35 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
           ))}
 
           {/* 相棒（中央床・進化で姿が変わるため動的表示。生きている感の揺れ=mapfloatは据え置き・点滅にしない） */}
-          {partner && (
+          {mon && (
             <button className="tapzone" onClick={() => tap("partner")} aria-label="あいぼう"
               style={{ position: "absolute", left: "42%", top: `${PARTNER_TOP[stage] || 66}%`, transform: "translate(-50%,-50%)",
                 width: "24%", border: "none", background: "transparent", cursor: "pointer", padding: 0,
                 display: "flex", flexDirection: "column", alignItems: "center" }}>
               <span className="bubble pulse" style={{ marginBottom: 5, fontSize: "clamp(8px,1.9vw,12px)" }}>あいぼう</span>
               <span className="mapfloat" style={{ lineHeight: 0, filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
-                <MonsterArt species={partner.active} stage={stage} size={partnerSize} />
+                <MonsterArt species={mon.id} stage={stage} size={partnerSize} />
               </span>
             </button>
           )}
 
-          {/* たまご（b4f: 節目Lv到達で届く。相棒の左の床に置く・開封は部屋で＝バトル等を邪魔しない） */}
-          {partner && eggs > 0 && (
-            <button className="tapzone" onClick={() => { setHatched(null); tap("egg"); }} aria-label="たまご"
+          {/* 卵欄（b4j: stage3到達で届く→アクティブのEXPで孵化ゲージが進む→満ちたら自動でランダム孵化。
+              タップ操作なし＝見守る表示。相棒の左の床・卵が無いときは非表示 */}
+          {partner && partner.egg && (
+            <div aria-label="たまご"
               style={{ position: "absolute", left: "24%", top: "72%", transform: "translate(-50%,-50%)",
-                border: "none", background: "transparent", cursor: "pointer", padding: 0,
-                display: "flex", flexDirection: "column", alignItems: "center" }}>
+                display: "flex", flexDirection: "column", alignItems: "center", pointerEvents: "none" }}>
               <span className="bubble pulse" style={{ marginBottom: 4, fontSize: "clamp(8px,1.9vw,12px)", animationDelay: ".4s" }}>
-                たまご{eggs > 1 ? ` ×${eggs}` : ""}</span>
+                {eggMsg}</span>
               <span className="mapfloat" style={{ lineHeight: 0, animationDelay: ".8s", filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
                 <EggIcon size={Math.round(40 * sizeK)} />
               </span>
-            </button>
+              {/* 孵化ゲージ（★据わり・幅は実機調整） */}
+              <span style={{ display: "block", width: Math.round(52 * sizeK), height: 8, marginTop: 3,
+                border: `2px solid ${C.ink}`, borderRadius: 999, background: "#fff", overflow: "hidden" }}>
+                <span style={{ display: "block", width: `${eggPct}%`, height: "100%", background: "#FFD447", transition: "width .4s" }} />
+              </span>
+            </div>
           )}
 
           {/* 自分のアバター（UI改修③: あいぼうの横＝プロフィールの入口。着せ替えが反映された姿） */}
@@ -261,37 +268,40 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
         </div>
       )}
 
-      {/* ネスト: 相棒のロア（b4f: 大きめ画像＋なまえ＋タイプ＋ものがたり＋Lv）＋きりかえ（ownedから選ぶ） */}
-      {nested === "partner" && partner && (() => {
-        const asp = speciesById(partner.active);
+      {/* ネスト: 相棒のロア（大きめ画像＋なまえ＋タイプ＋ものがたり＋Lv）＋きりかえ（ownedから選ぶ）。
+          b4j: レベルは相棒ごと＝きりかえ候補も各自の Lv/すがた で表示。旧たまごモーダルは廃止（孵化はEXPで自動） */}
+      {nested === "partner" && mon && (() => {
+        const asp = speciesById(mon.id);
         return (
           <div role="dialog" aria-modal="true" onClick={() => setNested(null)}
             style={{ position: "fixed", inset: 0, zIndex: 122, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
             <div className="panel softpop" onClick={e => e.stopPropagation()}
               style={{ maxWidth: 360, width: "100%", padding: 20, textAlign: "center", background: "#FFFDF5", maxHeight: "88vh", overflowY: "auto" }}>
-              <MonsterArt species={partner.active} stage={stage} size={150} />
+              <MonsterArt species={mon.id} stage={stage} size={150} />
               <div className="pl-display" style={{ fontSize: 22, marginTop: 2 }}>{partnerDisplayName(partner)}</div>
               <div style={{ fontWeight: 900, fontSize: 13, margin: "4px 0 2px", background: asp.headBg, border: `2px solid ${C.ink}`, borderRadius: 999, padding: "2px 10px", display: "inline-block" }}>
-                {asp.typeName}　Lv.{partner.level}</div>
+                {asp.typeName}　Lv.{mon.level}</div>
               <div style={{ fontWeight: 700, fontSize: 11.5, color: "#6B6265", margin: "4px 0 8px" }}>
-                {partner.level >= MAX_LEVEL ? "レベル マックス！" : `つぎの レベルまで あと ${xpToNext(partner.level) - partner.xp}`}
+                {mon.level >= MAX_LEVEL ? "レベル マックス！" : `つぎの レベルまで あと ${xpToNext(mon.level) - mon.xp}`}
               </div>
               <div style={{ fontWeight: 700, fontSize: 13, lineHeight: 1.7, textAlign: "left", background: "#FAF3E3", border: `2px solid ${C.ink}`, borderRadius: 12, padding: "10px 12px" }}>{asp.lore}</div>
-              {/* きりかえ: なかまに した タイプから えらぶ（levelは共有＝みんな いっしょに そだつ） */}
+              {/* きりかえ: なかまに した タイプから えらぶ（各自の Lv で育つ・そだてる子をここで選ぶ） */}
               {(partner.owned || []).length > 1 && (
                 <div style={{ marginTop: 10 }}>
                   <div style={{ fontWeight: 900, fontSize: 13, marginBottom: 5 }}>あいぼうを きりかえる</div>
                   <div style={{ display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap" }}>
-                    {partner.owned.map(id => {
-                      const osp = speciesById(id);
+                    {partner.owned.map(m => {
+                      const osp = speciesById(m.id);
                       if (!osp) return null;
-                      const isActive = id === partner.active;
+                      const isActive = m.id === partner.active;
+                      const mstage = stageForLevel(m.level);
                       return (
-                        <button key={id} className="pbtn" disabled={isActive}
-                          onClick={() => { SFX.tap(sound); update(s => { s.partner.active = id; return s; }); }}
+                        <button key={m.id} className="pbtn" disabled={isActive}
+                          onClick={() => { SFX.tap(sound); update(s => { s.partner.active = m.id; return s; }); }}
                           style={{ padding: 5, background: isActive ? "#FFF7E6" : "#fff", borderRadius: 12, opacity: 1 }}>
-                          <MonsterArt species={id} stage={stage} size={46} />
-                          <div style={{ fontWeight: 900, fontSize: 9.5 }}>{monsterName(id, stage)}{isActive && " ✓"}</div>
+                          <MonsterArt species={m.id} stage={mstage} size={46} />
+                          <div style={{ fontWeight: 900, fontSize: 9.5 }}>{monsterName(m.id, mstage)}{isActive && " ✓"}</div>
+                          <div style={{ fontWeight: 800, fontSize: 9, color: "#6B6265" }}>Lv.{m.level}</div>
                         </button>
                       );
                     })}
@@ -306,68 +316,6 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
           </div>
         );
       })()}
-
-      {/* ネスト: たまご（b4f: 未所持タイプから1つ えらんで 孵す。孵ったら祝福→きりかえ導線） */}
-      {nested === "egg" && partner && (
-        <div role="dialog" aria-modal="true" onClick={() => setNested(null)}
-          style={{ position: "fixed", inset: 0, zIndex: 122, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div className="panel softpop" onClick={e => e.stopPropagation()}
-            style={{ maxWidth: 400, width: "100%", padding: 20, textAlign: "center", background: "#FFFDF5", maxHeight: "88vh", overflowY: "auto" }}>
-            {!hatched ? (
-              <>
-                {/* b4i: 中身は内緒＝たまごをタップで孵す（未所持タイプからランダムで1体）。選択UIは廃止 */}
-                <div className="pl-display" style={{ fontSize: 22, margin: "4px 0" }}>たまごが とどいた！</div>
-                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6 }}>
-                  タップして あけてみよう！ なにが でるかは おたのしみ{eggs > 1 && <span>（たまごは あと {eggs}こ）</span>}
-                </div>
-                <button className="pbtn pulse" aria-label="たまごを あける"
-                  onClick={() => {
-                    const pool = SPECIES.filter(sp => !(partner.owned || []).includes(sp.id));
-                    if (pool.length === 0) { setNested(null); return; }
-                    const pick = pool[Math.floor(Math.random() * pool.length)];
-                    SFX.fanfare(sound);
-                    setHatched(pick.id);
-                    update(s => {
-                      if (!s.partner.owned.includes(pick.id)) s.partner.owned.push(pick.id);
-                      // ずかん登録: level共有なので いま到達している段階まで まとめて登録
-                      for (let st = 1; st <= stageForLevel(s.partner.level); st++) {
-                        const key = `${pick.id}-${st}`;
-                        if (!s.dex.includes(key)) s.dex.push(key);
-                      }
-                      return s;
-                    });
-                  }}
-                  style={{ background: "transparent", border: "none", padding: 6, margin: "0 auto", display: "block" }}>
-                  <EggIcon size={140} />
-                  <div style={{ fontWeight: 900, fontSize: 13, marginTop: 4 }}>ぱかっ と あける</div>
-                </button>
-                <div style={{ marginTop: 10 }}>
-                  <Btn bg="#fff" onClick={() => setNested(null)}>あとで あける</Btn>
-                </div>
-              </>
-            ) : (() => {
-              const hsp = speciesById(hatched);
-              return (
-                <>
-                  <div className="pop">
-                    <MonsterArt species={hatched} stage={stageForLevel(partner.level)} size={140} />
-                  </div>
-                  <div className="pl-display" style={{ fontSize: 23, margin: "4px 0" }}>
-                    {monsterName(hatched, stageForLevel(partner.level))}が なかまに なった！</div>
-                  <div style={{ fontWeight: 700, fontSize: 12.5, color: "#6B6265", marginBottom: 12 }}>
-                    ずかんに とうろくされたよ。レベルは あいぼう みんなで いっしょに そだつよ
-                  </div>
-                  <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-                    <Btn big bg={hsp.color} onClick={() => { SFX.tap(sound); update(s => { s.partner.active = hatched; return s; }); setNested(null); }}>
-                      この こに きりかえる</Btn>
-                    <Btn bg="#fff" onClick={() => { setHatched(null); if (eggs <= 0) setNested(null); }}>とじる</Btn>{/* eggs は孵化後の再renderで再計算済み */}
-                  </div>
-                </>
-              );
-            })()}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

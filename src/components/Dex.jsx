@@ -12,7 +12,7 @@ import MonsterArt from "./MonsterArt.jsx";
 const STAGE_LABEL = { 1: "あかちゃん", 2: "こども", 3: "せいちょう" };
 
 export default function Dex({ save, go, onSound, onBack, openHome }) {
-  const owned = (save.partner && save.partner.owned) || [];
+  const owned = ((save.partner && save.partner.owned) || []).map(m => m.id); // b4j: owned は {id,level,xp} の配列
   const badgeGot = BADGES.filter(b => save.badges.includes(b.id)).length;
   const defeated = (save.battle && save.battle.defeated) || [];
   const [lore, setLore] = useState(null); // {sp, stage} ロアのポップアップ

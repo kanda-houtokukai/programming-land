@@ -95,16 +95,4 @@ export const DEX_ENTRIES = SPECIES.flatMap(sp =>
   [1, 2, 3].map(stage => ({ key: `${sp.id}-${stage}`, species: sp.id, stage }))
 );
 
-/* ===== たまご収集（b4f・図鑑コンプの道すじ） =====
-   レベル節目でたまごが届き、未所持タイプから1つ選んで孵す（計4個で5タイプコンプ）。
-   ★節目Lvは初期値＝実機でテンポ調整。保存スキーマは増やさず、
-   「届いた数 − 孵した数（owned-1）」の導出式で未開封たまご数を求める（過去の節目も取りこぼさない） */
-export const EGG_LEVELS = [5, 12, 18, 24];
-
-export function pendingEggs(partner) {
-  if (!partner || !partner.owned) return 0;
-  const reached = EGG_LEVELS.filter(l => partner.level >= l).length;
-  const hatched = Math.max(0, partner.owned.length - 1); // スターターの1体はたまご由来でない
-  const unownedLeft = SPECIES.length - partner.owned.length;
-  return Math.max(0, Math.min(reached - hatched, unownedLeft));
-}
+// たまごサイクル（b4j）: 付与＝アクティブ相棒のstage3到達・孵化＝EXPゲージ。ロジックと定数は growth.js（applyXp/EGG_HATCH_XP）に集約

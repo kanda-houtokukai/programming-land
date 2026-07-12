@@ -8,6 +8,7 @@ import { puzzleStarsTotal } from "../data/badges.js";
 import { MAX_PROFILES } from "../storage.js";
 import { APP_VERSION, BUILD_DATE } from "../version.js";
 import { stageForLevel } from "../data/monsters.js";
+import { activeMon } from "../growth.js";
 import MonsterArt from "./MonsterArt.jsx";
 import PlayerAvatar from "./PlayerAvatar.jsx";
 import harborBg from "../assets/harbor-entrance.webp";
@@ -36,9 +37,9 @@ export default function ProfileSelect({ profiles, onPick, onNew }) {
                 <span style={{ fontWeight: 700, fontSize: 13 }}>⭐ {puzzleStarsTotal(p)}こ ・ 🏅 {p.badges.length}こ</span>
               </span>
               {/* 相棒（現在の姿・プロファイルごと）。まだ相棒がいない子は ▶ のみ */}
-              {p.partner && (
+              {activeMon(p.partner) && (
                 <span style={{ lineHeight: 0, filter: "drop-shadow(1px 2px 2px rgba(20,15,25,.3))" }}>
-                  <MonsterArt species={p.partner.active} stage={stageForLevel(p.partner.level)} size={62} />
+                  <MonsterArt species={activeMon(p.partner).id} stage={stageForLevel(activeMon(p.partner).level)} size={62} />
                 </span>
               )}
               <span style={{ fontSize: 22 }}>▶</span>

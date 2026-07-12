@@ -25,8 +25,8 @@ import PartnerSelect from "./components/PartnerSelect.jsx";
 import CharacterSelect from "./components/CharacterSelect.jsx";
 import Dex from "./components/Dex.jsx";
 import EvolutionOverlay from "./components/EvolutionOverlay.jsx";
-import { stageForLevel, EGG_LEVELS, SPECIES } from "./data/monsters.js";
-import { grantLegacyCoins } from "./growth.js";
+import { stageForLevel, monsterName } from "./data/monsters.js";
+import { grantLegacyCoins, activeMon } from "./growth.js";
 import { battleUnlocked, BATTLE_UNLOCK_LEVEL } from "./data/battle.js";
 import { checkAchievementUnlocks } from "./data/dressup.js";
 
@@ -80,27 +80,35 @@ export default function App() {
         SFX.fanfare(next.settings.sound);
         showToast("🎁", `きせかえ「${unlocked[0].name}」を てにいれた！（おみせで つけられるよ）`);
       }
-      // 相棒のレベルアップ・進化を検知（経験値の加算は各モードの applyXp が行う）
+      // 相棒のレベルアップ・進化・たまごを検知（経験値の加算は各モードの applyXp が行う）
       if (p.partner && next.partner) {
-        const fromStage = stageForLevel(p.partner.level);
-        const toStage = stageForLevel(next.partner.level);
-        if (toStage > fromStage) {
-          // 進化の音は EvolutionOverlay が段階演出（溜め→渦→登場→ファンファーレ）に合わせて鳴らす
-          setEvolution({ species: next.partner.active, from: fromStage, to: toStage });
-        } else if (next.partner.level > p.partner.level) {
-          SFX.levelup(next.settings.sound);
-          // Lv3到達＝バトル解放の通知（レベルアップより うれしいお知らせ）
-          if (p.partner.level < BATTLE_UNLOCK_LEVEL && next.partner.level >= BATTLE_UNLOCK_LEVEL) {
-            showToast("⚔️", "バトルが あそべるように なったよ！");
-          } else {
-            showToast("⬆️", `レベルアップ！ Lv.${next.partner.level} に なった！`);
+        const pm = activeMon(p.partner), nm = activeMon(next.partner);
+        if (pm && nm && pm.id === nm.id) { // 同じ子のときだけレベル比較（きりかえ直後の誤検知防止）
+          const fromStage = stageForLevel(pm.level);
+          const toStage = stageForLevel(nm.level);
+          if (toStage > fromStage) {
+            // 進化の音は EvolutionOverlay が段階演出（溜め→渦→登場→ファンファーレ）に合わせて鳴らす
+            setEvolution({ species: nm.id, from: fromStage, to: toStage });
+          } else if (nm.level > pm.level) {
+            SFX.levelup(next.settings.sound);
+            // Lv3到達＝バトル解放の通知（レベルアップより うれしいお知らせ）
+            if (pm.level < BATTLE_UNLOCK_LEVEL && nm.level >= BATTLE_UNLOCK_LEVEL) {
+              showToast("⚔️", "バトルが あそべるように なったよ！");
+            } else {
+              showToast("⬆️", `レベルアップ！ Lv.${nm.level} に なった！`);
+            }
           }
         }
-        // b4f たまご: レベル節目に到達したら通知（開封は おうちの部屋で。未所持が残っている場合のみ）
-        if (next.partner.level > p.partner.level
-          && EGG_LEVELS.some(l => p.partner.level < l && next.partner.level >= l)
-          && (next.partner.owned || []).length < SPECIES.length) {
-          showToast("✨", "たまごが とどいた！ おうちで あけてみよう");
+        // b4j たまごサイクル: 付与（stage3到達の瞬間）と孵化（ゲージ満タン）を検知して通知
+        if (!p.partner.egg && next.partner.egg) {
+          showToast("✨", "たまごが とどいた！ あそんで あたためよう");
+        }
+        if ((next.partner.owned || []).length > (p.partner.owned || []).length) {
+          const newIds = next.partner.owned.filter(m => !p.partner.owned.some(o => o.id === m.id));
+          if (newIds.length > 0) {
+            SFX.fanfare(next.settings.sound);
+            showToast("🎉", `たまごが かえって ${monsterName(newIds[0].id, 1)}が なかまに なった！（おうちで きりかえられるよ）`);
+          }
         }
       }
       saveProfile(next);
@@ -173,7 +181,7 @@ export default function App() {
       )}
       {save && screen === "home" && save.character && !save.partner && (
         <PartnerSelect profileName={save.name} onPick={sp => update(s => {
-          s.partner = { active: sp, owned: [sp], xp: 0, level: 1 }; // b4f: たまごで なかまが増える（owned）
+          s.partner = { active: sp, owned: [{ id: sp, level: 1, xp: 0 }], egg: null }; // b4j: レベルは相棒ごと・たまごはstage3到達で届く
           const key = `${sp}-1`;
           if (!s.dex.includes(key)) s.dex.push(key);
           return s;
