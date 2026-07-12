@@ -23,7 +23,7 @@ export const EVOLVE_LEVELS = { 2: 5, 3: 12 }; // stage: 必要レベル
 export const SPECIES = [
   {
     id: "mori", typeName: "もりタイプ", color: "#6BCB77", headBg: "#EAF8E7",
-    lore: "森の奥の泉のそばで生まれる。静かで優しく、枯れた草花をそっと蘇らせる力をもつ。",
+    lore: "もりの おくの いずみの そばで うまれる。しずかで やさしくて、かれた はなを げんきに する ちからを もつ。",
     stages: [
       { name: "モコ", img: monMori1 },
       { name: "モスガ", img: monMori2 },
@@ -32,7 +32,7 @@ export const SPECIES = [
   },
   {
     id: "mizu", typeName: "みずタイプ", color: "#5BB8F0", headBg: "#E5F4FE",
-    lore: "澄んだ入り江の底で眠る。穏やかだが、仲間を守るときは大波を起こす。",
+    lore: "すんだ いりえの そこで ねむる。おだやかだけど、なかまを まもる ときは おおなみを おこす。",
     stages: [
       { name: "ポチャ", img: monMizu1 },
       { name: "ミズチ", img: monMizu2 },
@@ -41,7 +41,7 @@ export const SPECIES = [
   },
   {
     id: "hono", typeName: "ほのおタイプ", color: "#FF7A45", headBg: "#FFEDE3",
-    lore: "火山のふもとの温かい岩場で生まれる。明るく勇敢で、暗い夜道を照らす。",
+    lore: "かざんの ふもとの あたたかい いわばで うまれる。あかるくて ゆうかん、くらい みちを てらす。",
     stages: [
       { name: "ポポ", img: monHono1 },
       { name: "ヒノコ", img: monHono2 },
@@ -50,7 +50,7 @@ export const SPECIES = [
   },
   {
     id: "denki", typeName: "でんきタイプ", color: "#FFD447", headBg: "#FFF8DC",
-    lore: "高い峰の雲の中で生まれる。好奇心旺盛ですばしっこく、閃きを運ぶ。",
+    lore: "たかい やまの くもの なかで うまれる。げんきで すばしっこくて、ひらめきを はこぶ。",
     stages: [
       { name: "ピカ", img: monDenki1 },
       { name: "イナズ", img: monDenki2 },
@@ -59,7 +59,7 @@ export const SPECIES = [
   },
   {
     id: "iwa", typeName: "いわタイプ", color: "#A98A6B", headBg: "#EFEAE2",
-    lore: "深い洞窟の宝石の間で生まれる。無口で優しく、崩れた道をそっと直す。",
+    lore: "ふかい どうくつの ほうせきの へやで うまれる。しずかで やさしくて、こわれた みちを なおす。",
     stages: [
       { name: "ゴロ", img: monIwa1 },
       { name: "イワゴロ", img: monIwa2 },
