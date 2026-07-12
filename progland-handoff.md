@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-12（v2.3-b4e バトル中の🗼をtowerアイコンに統一・実機確認待ち）
+最終更新: 2026-07-12（v2.3-b4f 相棒モンスター全面刷新・実機確認待ち）
 
 ---
 
@@ -9,7 +9,16 @@
 ### 今どこか
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
-- **v2.3-b4e まで公開済み（2026-07-12・バトル中の🗼をtowerアイコンに統一＝⚠️実機確認待ち）**:
+- **v2.3-b4f まで公開済み（2026-07-12・相棒モンスター全面刷新＝⚠️実機確認待ち・大型）**:
+  - **15体化**: `monsters.js`=5タイプ×3進化（mori/mizu/hono/denki/iwa・lore・スプライトpng 512px×15・typeEmoji廃止）。`MonsterArt`をCSS描画→`<img>`に刷新（**props互換**＝部屋/バトル/図鑑/進化演出/港カードが自動で新絵）。旧`monster-art.js`削除
+  - **スキーマ移行**: `partner {species,level,xp}`→**`{active, owned:[…], level, xp}`**（level/xp共有）。旧ID読み替え **moko→mori／shizuku→mizu／★hoshi→denki（そら→でんき=最近縁と判断）**・save.dexの旧キーも読み替え。移行は`storage.js`に自己完結（`migratePartner`・monsters.js非依存＝node/roundtrip保護）。roundtripに移行4ケース追加・全PASS
+  - **たまご収集**: `EGG_LEVELS=[5,12,18,24]`（初期値・★実機でテンポ調整）。**未開封数=導出式**（到達節目−孵化数＝スキーマにたまごフィールド無し・取りこぼし無し）。節目でトースト→部屋の床のたまご（SVG仮図形・絵文字不使用）→未所持から選んで孵化（現到達stageで登場・図鑑一括登録）→きりかえ導線。スターター選択は5体に
+  - **図鑑15/ロア/きりかえ**: 図鑑=所持タイプ3すがた＋タップでロア・未所持シルエット・コンプ=5タイプ。部屋の相棒タップ→ロアモーダル（画像150・タイプ+Lv・lore・きりかえ=ownedサムネ・ずかん導線）
+  - ★**受領アセットのstage順を2組リネームして配置**: `mizu_1↔2`・`denki_1↔3`は実絵と進化順が逆（雫の赤ちゃん=ポチャ・電気玉の赤ちゃん=ピカ・結晶竜=ライオウ）→**実機確認で各タイプの進化順を裏取りしてほしい**
+  - ★技術教訓: `.fitArt`のwidth:100%は**imgのinline widthに負ける**→MonsterArtに`size=null`（寸法をCSSに任せる）を追加しバトルはnull＝b4cの進化スケール（コンテナ幅20/24/29%）を保全
+  - 検証: verify全PASS・roundtrip全PASS・プレビュー=5体選択/部屋/ロア/たまご孵化→きりかえ/図鑑2/5表示/バトル演出実測（anticip0→lunge+119ms→-1+521ms）/進化演出（ミズチ→ウズリュウ）/owned全員の進化図鑑登録/旧セーブ（moko Lv12）が移行されモリガルド表示。演出境界・battle.js数値は不変。指示書=`brushup/partner_monster_redesign_implementation.md`
+  - ⚠️次:神田さんの実機確認（15体の見た目と進化順・たまごのテンポ〔Lv5/12/18/24〕・ロアの据わり・部屋/バトルのサイズ感）。roadmap/feature-specの相棒項目更新はChatが別途
+- **v2.3-b4e（2026-07-12・バトル中の🗼をtowerアイコンに統一＝⚠️実機確認待ち）**:
   - b4dの申し送り（バトル中に残っていた🗼絵文字3箇所）を消化: フロア表示ピル「Nかい」・勝利オーバーレイ・敗北メッセージ文中 → いずれも`icon_tower.png`のinline imgに置換
   - 実装: `TowerMini`部品を新設（Battle.jsx・**1.1em**のinline img・verticalAlign -0.18em＝テキスト高追従。★大きさ調整はこの1箇所）。3箇所とも同部品＝ピル14px級/オーバーレイ53px級が自動で出る。レイアウト・ロジック・文言・演出境界は不変
   - 検証: verify全PASS・プレビュー実測=タワー戦でピル（icon_tower.png・14.3px）／フロア1クリアで勝利オーバーレイの塔イラスト／わざと3敗で敗北オーバーレイ「（塔）2かいまで のぼった！」・**DOM上の🗼はゼロ**（残りはコードコメントのみ）。かいしん・ハート減・タイプライター等の演出も従来どおり動作
