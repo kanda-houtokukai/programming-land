@@ -16,6 +16,11 @@ import MonsterArt from "./MonsterArt.jsx";
 import PlayerAvatar from "./PlayerAvatar.jsx";
 import DressupShelf from "./DressupShelf.jsx";
 import roomBg from "../assets/room-home.webp";
+import iconStatStar from "../assets/icon_stat_star.png";
+import iconStatCoin from "../assets/icon_stat_coin.png";
+import iconStatBadge from "../assets/icon_stat_badge.png";
+import iconStatDays from "../assets/icon_stat_days.png";
+import bgAuto from "../assets/bg_auto.webp";
 
 // 家具のタップ領域（room-home.webp に対する%座標＝家具の絵に合わせる）。
 // プロフィールは額縁→アバター導線へ移行（UI改修③）＝額縁(52/22)は装飾に戻した（座標はコメントで保持）。
@@ -27,22 +32,11 @@ const FURNITURE = [
   // { key: "profile", left: 52, top: 22 } … 中央奥の額縁（装飾・将来枠）
 ];
 
-// 仮アイコン（ステータスplate用・絵文字不可のためSVGの単純図形。専用イラストが来たら差し替え）
+// ステータスplateの専用アイコン（b4d: SVG仮図形→専用イラストに差し替え。大きさは従来の22px＝実機で調整可）
+const STAT_ICONS = { star: iconStatStar, coin: iconStatCoin, badge: iconStatBadge, days: iconStatDays };
 function MiniIcon({ kind }) {
-  const s = { width: 22, height: 22, display: "block" };
-  if (kind === "star") return (
-    <svg viewBox="0 0 24 24" style={s}><polygon points="12,2 15,9 22,9.5 17,14.5 18.5,22 12,18 5.5,22 7,14.5 2,9.5 9,9"
-      fill="#FFD447" stroke={C.ink} strokeWidth="1.6" strokeLinejoin="round" /></svg>);
-  if (kind === "coin") return (
-    <svg viewBox="0 0 24 24" style={s}><circle cx="12" cy="12" r="9" fill="#F5C542" stroke={C.ink} strokeWidth="1.6" />
-      <circle cx="12" cy="12" r="5" fill="none" stroke="#B8860B" strokeWidth="1.6" /></svg>);
-  if (kind === "badge") return (
-    <svg viewBox="0 0 24 24" style={s}><circle cx="12" cy="9" r="6" fill="#7FC8F8" stroke={C.ink} strokeWidth="1.6" />
-      <polygon points="8,13 8,22 12,19 16,22 16,13" fill="#FF9F43" stroke={C.ink} strokeWidth="1.6" strokeLinejoin="round" /></svg>);
-  return ( // days
-    <svg viewBox="0 0 24 24" style={s}><rect x="3" y="5" width="18" height="16" rx="3" fill="#FFF" stroke={C.ink} strokeWidth="1.6" />
-      <rect x="3" y="5" width="18" height="5" rx="3" fill="#6BCB77" stroke={C.ink} strokeWidth="1.6" />
-      <circle cx="12" cy="15" r="3" fill="#FF6B6B" stroke={C.ink} strokeWidth="1.2" /></svg>);
+  return <img src={STAT_ICONS[kind] || STAT_ICONS.days} alt="" draggable="false"
+    style={{ width: 22, height: 22, display: "block", objectFit: "contain" }} />;
 }
 
 // 相棒の立ち位置（進化サイズ別・実機FB③②・2026-07-12）。大きいほど中心を上げて足元を床の線に保つ
@@ -153,7 +147,7 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
                 <Btn bg={C.sakura} onClick={() => { SFX.tap(sound); setNested("dressup"); }}
                   style={{ fontSize: 12, padding: "6px 12px" }}>👗 きせかえ</Btn>
               </div>
-              {/* 右: ゲーム調ステータス（枠つきplate・アイコンは仮＝後で専用イラストに差し替え） */}
+              {/* 右: ゲーム調ステータス（枠つきplate・アイコンは専用イラスト＝b4d） */}
               <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 7, justifyContent: "center" }}>
                 <div className="pl-display" style={{ fontSize: 21, textAlign: "center", marginBottom: 2 }}>{save.name}</div>
                 {[
@@ -224,9 +218,8 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(96px,1fr))", gap: 8 }}>
               <button className="pbtn" onClick={() => setBattleBg(null)}
                 style={{ padding: 6, background: equippedBg === null ? "#FFF7E6" : "#fff", textAlign: "center" }}>
-                <div style={{ width: "100%", aspectRatio: "16/9", borderRadius: 8, border: `2px solid ${C.ink}`,
-                  background: "linear-gradient(90deg,#9BD48A 33%,#F2B366 33%,#F2B366 66%,#5A5E8F 66%)",
-                  display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 11 }}>おまかせ</div>
+                <img src={bgAuto} alt="おまかせ" draggable="false"
+                  style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover", borderRadius: 8, border: `2px solid ${C.ink}` }} />
                 <div style={{ fontWeight: 800, fontSize: 10, marginTop: 3 }}>むずかしさで かわる{equippedBg === null && " ✓"}</div>
               </button>
               {[...DEFAULT_BG_CHOICES, ...ownedBgs].map(bgc => (

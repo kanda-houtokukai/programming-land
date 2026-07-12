@@ -23,6 +23,7 @@ import { today } from "../storage.js";
 import { SFX } from "../sound.js";
 import { stageForLevel, partnerStageScale } from "../data/monsters.js";
 import MonsterArt from "./MonsterArt.jsx";
+import iconTower from "../assets/icon_tower.png";
 
 /* ---- 部品 ---- */
 
@@ -522,7 +523,7 @@ export default function Battle({ save, update, go, onSound, openHome }) {
             <button className="pbtn" disabled={!allDefeated}
               onClick={() => { SFX.tap(save.settings.sound); setFloor(TOWER_START_FLOOR); setTowerRun(r => r + 1); setTower(true); }}
               style={{ background: allDefeated ? "#F5EFFF" : "#fff", padding: 14, display: "flex", gap: 14, alignItems: "center", textAlign: "left", opacity: allDefeated ? 1 : 0.5 }}>
-              <span style={{ fontSize: 34 }}>🗼</span>
+              <img src={iconTower} alt="" draggable="false" style={{ width: 44, height: 44, display: "block", objectFit: "contain" }} />
               <span style={{ flex: 1 }}>
                 <span className="pl-display" style={{ fontSize: 19, display: "block" }}>タワー</span>
                 <span style={{ fontWeight: 700, fontSize: 13 }}>
