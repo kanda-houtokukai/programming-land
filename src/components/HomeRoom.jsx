@@ -16,6 +16,7 @@ import MonsterArt from "./MonsterArt.jsx";
 import PlayerAvatar from "./PlayerAvatar.jsx";
 import DressupShelf from "./DressupShelf.jsx";
 import roomBg from "../assets/room-home.webp";
+import eggImg from "../assets/egg.png";
 import iconStatStar from "../assets/icon_stat_star.png";
 import iconStatCoin from "../assets/icon_stat_coin.png";
 import iconStatBadge from "../assets/icon_stat_badge.png";
@@ -43,17 +44,10 @@ function MiniIcon({ kind }) {
 // （中心アンカーのため。b3zのアバター調整と同じ考え方・初期値→実機で詰める）
 const PARTNER_TOP = { 1: 66, 2: 64, 3: 61 };
 
-// たまごの仮アイコン（b4f: 専用イラストは後日・絵文字不可のため簡単な図形。斑点いりのたまご）
-function EggIcon({ size = 34 }) {
-  return (
-    <svg width={size} height={Math.round(size * 1.2)} viewBox="0 0 40 48" style={{ display: "block" }}>
-      <path d="M20 2 C31 2 38 16 38 29 C38 40 30 46 20 46 C10 46 2 40 2 29 C2 16 9 2 20 2 Z"
-        fill="#FFF6DC" stroke="#3A3335" strokeWidth="2.5" />
-      <circle cx="14" cy="17" r="3" fill="#FFD447" />
-      <circle cx="25" cy="27" r="4" fill="#9BD48A" />
-      <circle cx="16" cy="34" r="2.6" fill="#7FC8F8" />
-    </svg>
-  );
+// たまごのアイコン（b4i: 仮SVG→専用イラスト egg.png に差し替え。部屋の床とたまごモーダルで共用）
+function EggIcon({ size = 40 }) {
+  return <img src={eggImg} alt="たまご" draggable="false"
+    style={{ width: size, height: size, objectFit: "contain", display: "block" }} />;
 }
 
 export default function HomeRoom({ save, update, onClose, onEnter }) {
@@ -145,7 +139,7 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
               <span className="bubble pulse" style={{ marginBottom: 4, fontSize: "clamp(8px,1.9vw,12px)", animationDelay: ".4s" }}>
                 たまご{eggs > 1 ? ` ×${eggs}` : ""}</span>
               <span className="mapfloat" style={{ lineHeight: 0, animationDelay: ".8s", filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
-                <EggIcon size={Math.round(34 * sizeK)} />
+                <EggIcon size={Math.round(40 * sizeK)} />
               </span>
             </button>
           )}
@@ -321,35 +315,33 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
             style={{ maxWidth: 400, width: "100%", padding: 20, textAlign: "center", background: "#FFFDF5", maxHeight: "88vh", overflowY: "auto" }}>
             {!hatched ? (
               <>
-                <div style={{ display: "flex", justifyContent: "center" }}><EggIcon size={54} /></div>
+                {/* b4i: 中身は内緒＝たまごをタップで孵す（未所持タイプからランダムで1体）。選択UIは廃止 */}
                 <div className="pl-display" style={{ fontSize: 22, margin: "4px 0" }}>たまごが とどいた！</div>
-                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10 }}>
-                  どの こを むかえる？{eggs > 1 && <span>（たまごは あと {eggs}こ）</span>}
+                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6 }}>
+                  タップして あけてみよう！ なにが でるかは おたのしみ{eggs > 1 && <span>（たまごは あと {eggs}こ）</span>}
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(100px,1fr))", gap: 8 }}>
-                  {SPECIES.filter(sp => !(partner.owned || []).includes(sp.id)).map(sp => (
-                    <button key={sp.id} className="pbtn"
-                      onClick={() => {
-                        SFX.fanfare(sound);
-                        setHatched(sp.id);
-                        update(s => {
-                          if (!s.partner.owned.includes(sp.id)) s.partner.owned.push(sp.id);
-                          // ずかん登録: level共有なので いま到達している段階まで まとめて登録
-                          for (let st = 1; st <= stageForLevel(s.partner.level); st++) {
-                            const key = `${sp.id}-${st}`;
-                            if (!s.dex.includes(key)) s.dex.push(key);
-                          }
-                          return s;
-                        });
-                      }}
-                      style={{ padding: 8, background: sp.headBg, borderRadius: 14 }}>
-                      <MonsterArt species={sp.id} stage={1} size={72} />
-                      <div style={{ fontWeight: 900, fontSize: 12 }}>{sp.stages[0].name}</div>
-                      <div style={{ fontWeight: 700, fontSize: 10, color: "#6B6265" }}>{sp.typeName}</div>
-                    </button>
-                  ))}
-                </div>
-                <div style={{ marginTop: 12 }}>
+                <button className="pbtn pulse" aria-label="たまごを あける"
+                  onClick={() => {
+                    const pool = SPECIES.filter(sp => !(partner.owned || []).includes(sp.id));
+                    if (pool.length === 0) { setNested(null); return; }
+                    const pick = pool[Math.floor(Math.random() * pool.length)];
+                    SFX.fanfare(sound);
+                    setHatched(pick.id);
+                    update(s => {
+                      if (!s.partner.owned.includes(pick.id)) s.partner.owned.push(pick.id);
+                      // ずかん登録: level共有なので いま到達している段階まで まとめて登録
+                      for (let st = 1; st <= stageForLevel(s.partner.level); st++) {
+                        const key = `${pick.id}-${st}`;
+                        if (!s.dex.includes(key)) s.dex.push(key);
+                      }
+                      return s;
+                    });
+                  }}
+                  style={{ background: "transparent", border: "none", padding: 6, margin: "0 auto", display: "block" }}>
+                  <EggIcon size={140} />
+                  <div style={{ fontWeight: 900, fontSize: 13, marginTop: 4 }}>ぱかっ と あける</div>
+                </button>
+                <div style={{ marginTop: 10 }}>
                   <Btn bg="#fff" onClick={() => setNested(null)}>あとで あける</Btn>
                 </div>
               </>
