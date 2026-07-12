@@ -34,12 +34,10 @@ function TypingPlay({ stage, save, update, onBack }) {
   const startRef = useRef(null);
   const stRef = useRef(st); stRef.current = st;
 
-  const onKey = useCallback(e => {
+  // b4l: 入力処理を共通化＝物理キー(keydown)と画面キーボードのタップの両方から呼ぶ（判定・採点は不変）
+  const handleInput = useCallback(ch => {
     if (result) return;
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    const ch = e.key.toLowerCase();
     if (!/^[a-z-]$/.test(ch)) return;
-    e.preventDefault();
     if (startRef.current === null) startRef.current = Date.now();
     const r = typeChar(stRef.current, ch);
     if (!r.ok) {
@@ -77,6 +75,15 @@ function TypingPlay({ stage, save, update, onBack }) {
       setSt(r.state);
     }
   }, [result, sound, wi, words, good, miss, update, stage.id]);
+
+  // 物理キーボード（従来どおり）: e.key から文字を取り出して共通処理へ
+  const onKey = useCallback(e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const ch = e.key.toLowerCase();
+    if (!/^[a-z-]$/.test(ch)) return;
+    e.preventDefault();
+    handleInput(ch);
+  }, [handleInput]);
 
   useEffect(() => {
     window.addEventListener("keydown", onKey);
@@ -152,10 +159,10 @@ function TypingPlay({ stage, save, update, onBack }) {
 
       {/* キーボード図 */}
       <div style={{ marginTop: 12 }}>
-        <TypingKeyboard highlight={showKey ? key : null} />
+        <TypingKeyboard highlight={showKey ? key : null} onKeyTap={handleInput} />
       </div>
       <div style={{ fontWeight: 700, fontSize: 12, color: "#6B6265", textAlign: "center", marginTop: 8 }}>
-        キーボードで うってみよう！（がめんは さわらなくて いいよ）
+        キーを タップして うってね（そとづけキーボードでも OK）
       </div>
       {/* おうちの方へ（共通ガイド＋今の段階の補足・モーダル）。入力途中でも開閉で状態は消えない */}
       <ParentGuide guide={TYPING_GUIDE.common} extra={TYPING_GUIDE[stage.id]} />
@@ -194,7 +201,7 @@ export default function Typing({ save, update, go, onSound, openHome }) {
               );
             })}
             <div style={{ fontWeight: 700, fontSize: 12, color: "#6B6265", textAlign: "center" }}>
-              ⌨️ そとづけキーボードを つかってね
+              ⌨️ がめんの キーを タップしても、そとづけキーボードでも うてるよ
             </div>
           </div>
         )}
