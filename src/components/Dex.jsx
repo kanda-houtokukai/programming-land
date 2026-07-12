@@ -1,5 +1,6 @@
-// ずかん画面。b4f: 5タイプ×3すがた＝15。所持タイプは3すがた表示＋タップでロア、未所持は かげ＋「？？？」。
-// コンプ＝5タイプ所持（たまごで なかまに していく）。
+// ずかん画面。5タイプ×3すがた＝15。b4k: すがたの解禁は「到達記録」（profile.dex の ${id}-${stage}）ごと＝
+// 孵ったばかりの子は あかちゃんだけカラー・進化するたびに その段階が解禁（集める楽しさの本命）。
+// タイプ見出しは従来どおり所持(got)で表示。未所持タイプは全すがた？？？。コンプ＝5タイプ所持。
 // バッジも同じ「集める楽しさ」で見せる（取得済み=カラー＋名前／未取得=？＋ふせ字）
 import { useState } from "react";
 import { C } from "../theme.js";
@@ -31,15 +32,18 @@ export default function Dex({ save, go, onSound, onBack, openHome }) {
             <div key={sp.id} className="panel" style={{ padding: 14 }}>
               <div className="pl-display" style={{ fontSize: 18, marginBottom: 8 }}>{got ? sp.typeName : "？？？"}</div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
-                {[1, 2, 3].map(stage => (
-                  <button key={stage} className="pbtn" disabled={!got}
-                    onClick={() => setLore({ sp, stage })}
-                    style={{ padding: 8, borderRadius: 14, textAlign: "center", background: got ? sp.headBg : "#F1EDE4", opacity: 1 }}>
-                    <div style={{ fontWeight: 800, fontSize: 10, opacity: .7 }}>{STAGE_LABEL[stage]}</div>
-                    <MonsterArt species={sp.id} stage={stage} size={72} silhouette={!got} />
-                    <div style={{ fontWeight: 900, fontSize: 12 }}>{got ? sp.stages[stage - 1].name : "？？？"}</div>
-                  </button>
-                ))}
+                {[1, 2, 3].map(stage => {
+                  const reached = save.dex.includes(`${sp.id}-${stage}`); // b4k: 到達したすがただけ解禁
+                  return (
+                    <button key={stage} className="pbtn" disabled={!reached}
+                      onClick={() => setLore({ sp, stage })}
+                      style={{ padding: 8, borderRadius: 14, textAlign: "center", background: reached ? sp.headBg : "#F1EDE4", opacity: 1 }}>
+                      <div style={{ fontWeight: 800, fontSize: 10, opacity: .7 }}>{STAGE_LABEL[stage]}</div>
+                      <MonsterArt species={sp.id} stage={stage} size={72} silhouette={!reached} />
+                      <div style={{ fontWeight: 900, fontSize: 12 }}>{reached ? sp.stages[stage - 1].name : "？？？"}</div>
+                    </button>
+                  );
+                })}
               </div>
               {!got && <div style={{ fontWeight: 700, fontSize: 11, color: "#6B6265", marginTop: 6, textAlign: "center" }}>レベルが あがると たまごから なかまに なるよ</div>}
             </div>
