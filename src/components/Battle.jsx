@@ -18,12 +18,13 @@ import {
   BATTLE_BG, ITEMS, enemiesFor, enemyUnlocked, equippedBgImg,
   TOWER_START_FLOOR, towerHp,
 } from "../data/battle.js";
-import { applyXp, addCoins, COIN, activeMon } from "../growth.js";
+import { applyXp, addCoins, COIN, activeMon, xpToNext } from "../growth.js";
 import { today } from "../storage.js";
 import { SFX } from "../sound.js";
-import { stageForLevel, partnerStageScale } from "../data/monsters.js";
+import { stageForLevel, partnerStageScale, monsterName } from "../data/monsters.js";
 import MonsterArt from "./MonsterArt.jsx";
 import iconTower from "../assets/icon_tower.png";
+import eggImg from "../assets/egg.png";
 
 /* ---- 部品 ---- */
 
@@ -51,6 +52,17 @@ function HudPill({ children, style }) {
   return <div style={{ position: "absolute", zIndex: 6, background: "rgba(255,255,255,.92)",
     border: `2px solid ${C.ink}`, borderRadius: 999, padding: "3px 10px", fontWeight: 900, fontSize: 12,
     display: "flex", alignItems: "center", gap: 6, ...style }}>{children}</div>;
+}
+
+// b4m: 勝利ステップの けいけんちバー（勝利前→後へ するっと伸びる。レベルアップした回は満タンまで）
+function WinXpBar({ from, to }) {
+  const [p, setP] = useState(from);
+  useEffect(() => { const t = setTimeout(() => setP(to), 400); return () => clearTimeout(t); }, [to]);
+  return (
+    <div style={{ height: 14, border: `2px solid ${C.ink}`, borderRadius: 999, overflow: "hidden", background: "#fff", margin: "8px auto 0", maxWidth: 240 }}>
+      <div style={{ width: `${p}%`, height: "100%", background: C.leaf, transition: "width .9s" }} />
+    </div>
+  );
 }
 
 // タワーの小アイコン（b4e: バトル中の🗼絵文字置換・テキスト高に合わせるinline img。大きさ調整はここ1箇所）
@@ -92,6 +104,9 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
   const [dmgPop, setDmgPop] = useState(null); // 演出磨き③: 浮遊ダメージ数字 {value, crit, id}（reduced-motionでは出さない）
   const timers = useRef([]);
   const granted = useRef(false);
+  // b4m 結果シーケンス: applyXpの戻り値＋レベル/XPの前後を捕捉し、勝利オーバーレイで1ステップずつ見せる
+  const winRes = useRef(null);
+  const [winStep, setWinStep] = useState(0);
   // 演出磨き①（06-A Phase2）: メッセージのタイプライター表示。1文字ずつ・タップで即全表示。
   // reduced-motion は即時全表示（プロジェクト既定の尊重）
   const reducedMotion = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -133,10 +148,18 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
     setPhase("down"); SFX.down(sound);
     if (!granted.current) {
       granted.current = true;
+      // b4m: applyXpの前後を捕捉して結果シーケンス（かった→レベルアップ→進化→卵→孵化）の材料にする
+      const grantXp = s => {
+        const mBefore = activeMon(s.partner);
+        const cap = { monId: s.partner && s.partner.active, lvBefore: mBefore ? mBefore.level : 1, xpBefore: mBefore ? mBefore.xp : 0 };
+        const r = applyXp(s, BATTLE_XP[diff]);
+        const mAfter = activeMon(s.partner);
+        winRes.current = { ...r, ...cap, lvAfter: mAfter ? mAfter.level : cap.lvBefore, xpAfter: mAfter ? mAfter.xp : 0 };
+      };
       if (tower) {
         // 🗼フロアクリア: XPのみ（コイン無し=周回防止・06-C準拠。討伐/best/ずかんも触れない）。到達フロアをベスト記録
         update(s => {
-          applyXp(s, BATTLE_XP[diff]);
+          grantXp(s);
           const d = today(); s.log[d] = s.log[d] || {}; s.log[d].battle = (s.log[d].battle || 0) + 1;
           s.battle.towerBest = s.battle.towerBest || {};
           s.battle.towerBest[diff] = Math.max(s.battle.towerBest[diff] || 0, floor);
@@ -145,7 +168,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
       } else {
         setFirstKill(!save.battle.defeated.includes(enemy.id));
         update(s => {
-          applyXp(s, BATTLE_XP[diff]);
+          grantXp(s);
           const isFirstKill = !s.battle.defeated.includes(enemy.id);
           if (isFirstKill) {
             addCoins(s, COIN.battle[diff]); // 初撃破のみ（再戦は0・周回で稼げない・06-C）
@@ -158,7 +181,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
       }
     }
     later(T.downEnd, () => { setPhase("victory"); setFx(f => ({ ...f, sparkle: true, won: true })); SFX.win(sound); });
-    later(T.overlay, () => setOverlay("win"));
+    later(T.overlay, () => { setWinStep(0); setOverlay("win"); });
   }
   function startLose() {
     setPhase("lose"); // 罰なし: セーブは何も変えない（タワーは到達フロアのベストだけ記録）
@@ -416,28 +439,84 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
       </div>
 
       {/* ===== 勝敗オーバーレイ ===== */}
-      {overlay === "win" && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 110, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div className="panel pop" style={{ padding: 24, textAlign: "center", maxWidth: 400, background: "#FFFDF5" }}>
-            <div style={{ fontSize: 48 }}>{tower ? <TowerMini /> : "🎉"}</div>
-            <div className="pl-display" style={{ fontSize: 25 }}>{tower ? `${floor}かいを クリア！` : `${enemy.name}に かった！`}</div>
-            <div style={{ margin: "10px 0", display: "flex", justifyContent: "center", alignItems: "center", gap: 6 }}>
-              <EnemyIcon enemy={enemy} size={64} /><span style={{ fontSize: 34 }}>✨</span>
-            </div>
-            <div style={{ fontWeight: 800, fontSize: 14 }}>
-              {tower ? <>けいけんち ＋{BATTLE_XP[diff]} XP</> : <>けいけんち ＋{BATTLE_XP[diff]} XP ／ 🪙 {firstKill ? `＋${COIN.battle[diff]}！` : "＋0（たおしたことのある あいて）"}</>}
-              {!tower && firstKill && <><br />🆕 あたらしい あいてを ずかんに とうろく！</>}
-              {tower && <><br />うえの かいは てきが つよくなるよ！</>}
-            </div>
-            <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginTop: 14 }}>
-              {tower
-                ? <Btn big bg={C.leaf} onClick={() => onFloorClear && onFloorClear()}>つぎの フロアへ ▶</Btn>
-                : <Btn big bg={C.leaf} onClick={onBack}>つぎの てきへ ▶</Btn>}
-              <Btn bg="#fff" onClick={() => go("home")}>ホームへ</Btn>
+      {overlay === "win" && (() => {
+        /* b4m 結果シーケンス: 起きたことだけを 1つずつ・タップ送りで見せる（勝つ→育つ→進化→ごほうび の余韻）。
+           勝利アニメ本体・戦闘中の演出ロジックは不変＝“オーバーレイの出し方”だけの再構成 */
+        const r = winRes.current || {};
+        const steps = ["win"];
+        if (r.levelsGained > 0) steps.push("levelup");
+        if (r.evolvedTo) steps.push("evolve");
+        if (r.eggArrived) steps.push("egg");
+        if (r.hatched) steps.push("hatch");
+        const kind = steps[Math.min(winStep, steps.length - 1)];
+        const isLast = winStep >= steps.length - 1;
+        // けいけんちバー: 勝利前→後（レベルアップした回は満タンまで伸ばし、詳細は次のステップで）
+        const fromPct = Math.min(100, Math.round(100 * (r.xpBefore || 0) / xpToNext(r.lvBefore || 1)));
+        const toPct = r.levelsGained > 0 ? 100 : Math.min(100, Math.round(100 * (r.xpAfter || 0) / xpToNext(r.lvAfter || 1)));
+        return (
+          <div style={{ position: "fixed", inset: 0, zIndex: 110, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <div key={winStep} className="panel pop" style={{ padding: 24, textAlign: "center", maxWidth: 400, width: "100%", background: "#FFFDF5" }}>
+              {kind === "win" && (
+                <>
+                  <div style={{ fontSize: 48 }}>{tower ? <TowerMini /> : "🎉"}</div>
+                  <div className="pl-display" style={{ fontSize: 25 }}>{tower ? `${floor}かいを クリア！` : `${enemy.name}に かった！`}</div>
+                  <div style={{ margin: "10px 0", display: "flex", justifyContent: "center", alignItems: "center", gap: 6 }}>
+                    <EnemyIcon enemy={enemy} size={64} /><span style={{ fontSize: 34 }}>✨</span>
+                  </div>
+                  <div style={{ fontWeight: 800, fontSize: 14 }}>
+                    {tower ? <>けいけんち ＋{BATTLE_XP[diff]} XP</> : <>けいけんち ＋{BATTLE_XP[diff]} XP ／ 🪙 {firstKill ? `＋${COIN.battle[diff]}！` : "＋0（たおしたことのある あいて）"}</>}
+                    {!tower && firstKill && <><br />🆕 あたらしい あいてを ずかんに とうろく！</>}
+                    {tower && <><br />うえの かいは てきが つよくなるよ！</>}
+                  </div>
+                  <WinXpBar from={fromPct} to={toPct} />
+                </>
+              )}
+              {kind === "levelup" && (
+                <>
+                  <div className="pl-display pop" style={{ fontSize: 27 }}>レベルアップ！</div>
+                  <div style={{ margin: "8px 0" }}><MonsterArt species={r.monId} stage={stageForLevel(r.lvBefore || 1)} size={110} /></div>{/* 新しいすがたは次の「しんかした！」で見せる */}
+                  <div style={{ fontWeight: 900, fontSize: 24 }}>Lv.{r.lvBefore} <span style={{ opacity: .55 }}>→</span> Lv.{r.lvAfter}</div>
+                </>
+              )}
+              {kind === "evolve" && (
+                <>
+                  <div className="pl-display pop" style={{ fontSize: 27 }}>しんかした！</div>
+                  <div className="pop" style={{ margin: "8px 0" }}><MonsterArt species={r.monId} stage={r.evolvedTo} size={150} /></div>
+                  <div style={{ fontWeight: 900, fontSize: 18 }}>{monsterName(r.monId, r.evolvedTo)}に なった！</div>
+                </>
+              )}
+              {kind === "egg" && (
+                <>
+                  <div className="pl-display pop" style={{ fontSize: 25 }}>たまごが とどいた！</div>
+                  <img src={eggImg} alt="たまご" draggable="false" className="pop"
+                    style={{ width: 110, height: 110, objectFit: "contain", margin: "8px auto", display: "block" }} />
+                  <div style={{ fontWeight: 800, fontSize: 14 }}>あそんで あたためると かえるよ</div>
+                </>
+              )}
+              {kind === "hatch" && (
+                <>
+                  <div className="pl-display pop" style={{ fontSize: 25 }}>なかまが ふえた！</div>
+                  <div className="pop" style={{ margin: "8px 0" }}><MonsterArt species={r.hatched} stage={1} size={140} /></div>
+                  <div style={{ fontWeight: 900, fontSize: 18 }}>{monsterName(r.hatched, 1)}が なかまに なった！</div>
+                  <div style={{ fontWeight: 700, fontSize: 12, color: "#6B6265", marginTop: 4 }}>おうちで きりかえられるよ</div>
+                </>
+              )}
+              <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginTop: 14 }}>
+                {!isLast
+                  ? <Btn big bg={C.sun} onClick={() => { SFX.tap(sound); setWinStep(i => i + 1); }}>つぎへ ▶</Btn>
+                  : (
+                    <>
+                      {tower
+                        ? <Btn big bg={C.leaf} onClick={() => onFloorClear && onFloorClear()}>つぎの フロアへ ▶</Btn>
+                        : <Btn big bg={C.leaf} onClick={onBack}>つぎの てきへ ▶</Btn>}
+                      <Btn bg="#fff" onClick={() => go("home")}>ホームへ</Btn>
+                    </>
+                  )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
       {overlay === "lose" && (
         <div style={{ position: "fixed", inset: 0, zIndex: 110, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div className="panel pop" style={{ padding: 24, textAlign: "center", maxWidth: 400, background: "#F3F7FF" }}>
