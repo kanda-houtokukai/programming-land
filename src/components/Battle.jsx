@@ -82,9 +82,9 @@ const PARTNER_BASE_W = 20;
 /* ===== b4n 結果シーケンスv2: 時間・暗転・タメの定数（★実機調整はここ1箇所） ===== */
 const SEQ = {
   BREATH: 800,        // 勝利アニメ後、何も出さない余韻(ms)
-  DIM_BASE: 0.45,     // 薄幕の基本の暗さ（①かった/④たまご/⑤なかま）
-  DIM_SOFT: 0.10,     // ②レベルアップで基本に足す暗さ（=0.55）
-  DIM_EVOLVE: 0.60,   // ③進化の暗転（総量。1.2sかけてゆっくり暗く=背景transition）
+  DIM_BASE: 0.72,     // 薄幕の基本の暗さ（①かった/④たまご/⑤なかま）。b4o: 0.45→0.72＝後ろの戦闘/クイズが透けて被る問題の解消
+  DIM_SOFT: 0.10,     // ②レベルアップで基本に足す暗さ（=0.82）
+  DIM_EVOLVE: 0.85,   // ③進化の暗転（総量・最暗＝ドラマの暗転。1.2sかけてゆっくり暗く=背景transition）
   HOLD_EVOLVE: 1500,  // 進化: 新すがた登場完了→「つぎへ」表示までのタメ(ms)
   READY: { win: 550, levelup: 850, egg: 1500, hatch: 1750 }, // 各ステップの登場完了(ボタン表示)まで(ms)
   EVOLVE: { burst: 2400, reveal: 2820, riseDur: 600 },       // 進化の内部タイムライン（明滅1.2s×2→光→せり上がり）
@@ -434,8 +434,8 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
           {fx.critPop && <div className="critpop" style={{ position: "absolute", right: "18%", top: "8%", zIndex: 6,
             fontWeight: 900, fontSize: "min(7vw,38px)", color: "#FFD447",
             textShadow: `2px 2px 0 ${C.ink}, -2px 2px 0 ${C.ink}, 2px -2px 0 ${C.ink}, -2px -2px 0 ${C.ink}` }}>かいしん！</div>}
-          {/* 勝利: かった！＋キラキラ */}
-          {fx.won && (
+          {/* 勝利: かった！＋キラキラ（b4o: シーケンス開始=overlayで消す＝金「かった！」との二重を解消） */}
+          {fx.won && !overlay && (
             <>
               <div className="pop" style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 7 }}>
                 <span style={{ fontWeight: 900, fontSize: "min(12vw,64px)", color: "#fff",
