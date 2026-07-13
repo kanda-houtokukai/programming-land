@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-13（v2.3-b4p 結果シーケンスに“間”・実機確認待ち）
+最終更新: 2026-07-13（v2.3-b4q バトルエリア入口を全画面背景に・実機確認待ち）
 
 ---
 
@@ -9,7 +9,12 @@
 ### 今どこか
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
-- **v2.3-b4p まで公開済み（2026-07-13・結果シーケンスに“間”＝⚠️実機確認待ち）**:
+- **v2.3-b4q まで公開済み（2026-07-13・バトルエリア入口を全画面背景に＝⚠️実機確認待ち）**:
+  - `battle-arena.webp`（1600×900）を src/assets/ へ。Battle.jsx の**入口画面**（default export・難易度/敵/タワー選択）を全画面アリーナ背景に（おうち/ひろば/ワールドマップと同じ作法）。外側`div{position:relative;minHeight:100vh}`＋最背面`img{position:absolute;inset:0;objectFit:cover;center}`＋既存UIを`zIndex:1`で重ねる。scrimは無し（初期・実機判断）
+  - ★戦闘中(BattleFight)の背景(BATTLE_BG/そうげん等)・戦闘/演出/結果シーケンスは不変（別関数）
+  - 検証: verify全PASS・プレビュー実測=入口が全画面アリーナ／難易度タブ・敵カード・タワー押下可／375pxで横あふれ0・cover・土俵にUIが乗る／戦闘突入でアリーナ背景は消えBATTLE_BGに戻る（別関数を機械確認）。指示書=`brushup/battle_arena_entry_bg.md`
+  - ⚠️次:神田さんの実機確認（背景の据わり・カードの可読性。読みにくければカード群の後ろに薄いscrimを検討）
+- **v2.3-b4p（2026-07-13・結果シーケンスに“間”＝⚠️実機確認待ち）**:
   - **①各ステップに“ため(HOLD)”**: 登場(LAND)が落ち着いてから HOLD の後に「つぎへ」——win=バー伸び1.7s+1.0s／levelup=0.75s+1.2s／進化=既存1.5s維持（最長・最大の山場）／egg=1.3s+1.0s／hatch=1.53s+1.2s
   - **②切替にひと呼吸**: つぎへ→現ステップふわっと消える(FADE_OUT 250ms)→**薄幕だけの間(STEP_GAP 300ms)**→次ステップ登場（`seqTrans`・連打ガードつき）
   - **③XPバー=過程**: かった!→小さな間400ms→**ゆっくり1.3s**で伸びる（XPBAR定数）。すべてSEQ定数1箇所
