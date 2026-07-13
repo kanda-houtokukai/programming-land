@@ -79,6 +79,26 @@ const T = { windup: 680, impact: 320, atkEnd: 780, fxClear: 980, heartGone: 900,
 // 実機で大きすぎ/小さすぎならこの1箇所を調整
 const PARTNER_BASE_W = 20;
 
+/* ===== b4n 結果シーケンスv2: 時間・暗転・タメの定数（★実機調整はここ1箇所） ===== */
+const SEQ = {
+  BREATH: 800,        // 勝利アニメ後、何も出さない余韻(ms)
+  DIM_BASE: 0.45,     // 薄幕の基本の暗さ（①かった/④たまご/⑤なかま）
+  DIM_SOFT: 0.10,     // ②レベルアップで基本に足す暗さ（=0.55）
+  DIM_EVOLVE: 0.60,   // ③進化の暗転（総量。1.2sかけてゆっくり暗く=背景transition）
+  HOLD_EVOLVE: 1500,  // 進化: 新すがた登場完了→「つぎへ」表示までのタメ(ms)
+  READY: { win: 550, levelup: 850, egg: 1500, hatch: 1750 }, // 各ステップの登場完了(ボタン表示)まで(ms)
+  EVOLVE: { burst: 2400, reveal: 2820, riseDur: 600 },       // 進化の内部タイムライン（明滅1.2s×2→光→せり上がり）
+  EGG: { drop: 600, title: 1300 },                            // ④: ささやき→ころん→大文字
+  HATCH: { burst: 560, reveal: 980 },                         // ⑤: ぷるぷる×2→光→ぽんっ
+};
+// 枠なし大見出し（白フチ=ink4方向＋暖色金）と小文字の共通スタイル
+const seqTitleStyle = {
+  fontSize: "clamp(26px, 7vw, 38px)", color: "#FFD447", lineHeight: 1.3, wordBreak: "keep-all",
+  textShadow: `3px 3px 0 ${C.ink}, -3px 3px 0 ${C.ink}, 3px -3px 0 ${C.ink}, -3px -3px 0 ${C.ink}, 0 2px 14px rgba(0,0,0,.35)`,
+};
+const seqSubStyle = { color: "#fff", fontWeight: 800, fontSize: 14, textShadow: `1.5px 1.5px 0 ${C.ink}, -1.5px 1.5px 0 ${C.ink}, 1.5px -1.5px 0 ${C.ink}, -1.5px -1.5px 0 ${C.ink}` };
+const seqWhisperStyle = { color: "#FFF6DC", fontWeight: 800, fontSize: 15, opacity: .95, textShadow: `1.5px 1.5px 0 ${C.ink}, -1.5px -1.5px 0 ${C.ink}` };
+
 // tower=🗼タワーモード（06-A）: maxHpはtowerHpで上書き・勝敗コールバック差し替え・コイン/討伐/best/ずかんに触れない。
 // 非tower（名前つき戦）は従来どおり不変。
 function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = false, floor = 1, maxHpOverride = 0, onFloorClear, onTowerLose, onTowerRetry }) {
@@ -107,6 +127,18 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
   // b4m 結果シーケンス: applyXpの戻り値＋レベル/XPの前後を捕捉し、勝利オーバーレイで1ステップずつ見せる
   const winRes = useRef(null);
   const [winStep, setWinStep] = useState(0);
+  // b4n 演出リデザイン: ステップ内の段階（進化/たまご/孵化の多段演出）と「登場完了→つぎへ表示」のゲート
+  const [seqPhase, setSeqPhase] = useState(0);
+  const [seqReady, setSeqReady] = useState(false);
+  const buildWinSteps = () => {
+    const r = winRes.current || {};
+    const steps = ["win"];
+    if (r.levelsGained > 0) steps.push("levelup");
+    if (r.evolvedTo) steps.push("evolve");
+    if (r.eggArrived) steps.push("egg");
+    if (r.hatched) steps.push("hatch");
+    return steps;
+  };
   // 演出磨き①（06-A Phase2）: メッセージのタイプライター表示。1文字ずつ・タップで即全表示。
   // reduced-motion は即時全表示（プロジェクト既定の尊重）
   const reducedMotion = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -134,6 +166,32 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
     if (typeTimer.current) { clearInterval(typeTimer.current); typeTimer.current = null; }
     if (msg) setTypedLen(msg.length);
   };
+  // b4n: 結果シーケンスのステップ内タイムライン（★reducedMotion宣言より後に置くこと＝TDZ回避）
+  useEffect(() => {
+    if (overlay !== "win") return;
+    setSeqPhase(0); setSeqReady(false);
+    if (reducedMotion) { setSeqPhase(9); setSeqReady(true); return; } // 即時全表示（既存作法）
+    const steps = buildWinSteps();
+    const kind = steps[Math.min(winStep, steps.length - 1)];
+    const ts = [];
+    const at = (ms, fn) => ts.push(setTimeout(fn, ms));
+    if (kind === "evolve") {
+      at(SEQ.EVOLVE.burst, () => setSeqPhase(1));   // 明滅おわり→光がぱあっ
+      at(SEQ.EVOLVE.reveal, () => setSeqPhase(2));  // 新すがた せり上がり
+      at(SEQ.EVOLVE.reveal + SEQ.EVOLVE.riseDur + SEQ.HOLD_EVOLVE, () => setSeqReady(true));
+    } else if (kind === "egg") {
+      at(SEQ.EGG.drop, () => setSeqPhase(1));       // ころんと落ちる
+      at(SEQ.EGG.title, () => setSeqPhase(2));      // 大文字
+      at(SEQ.READY.egg, () => setSeqReady(true));
+    } else if (kind === "hatch") {
+      at(SEQ.HATCH.burst, () => setSeqPhase(1));    // ぷるぷる×2→光
+      at(SEQ.HATCH.reveal, () => setSeqPhase(2));   // ぽんっと登場
+      at(SEQ.READY.hatch, () => setSeqReady(true));
+    } else {
+      at(SEQ.READY[kind] || 550, () => setSeqReady(true));
+    }
+    return () => ts.forEach(clearTimeout);
+  }, [overlay, winStep, reducedMotion]); // eslint-disable-line react-hooks/exhaustive-deps
   const q = queue[qi % queue.length];
   const pmon = activeMon(save.partner); // b4j: レベルは相棒ごと（アクティブのレコードで判定）
   const pstage = stageForLevel(pmon.level);
@@ -181,7 +239,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
       }
     }
     later(T.downEnd, () => { setPhase("victory"); setFx(f => ({ ...f, sparkle: true, won: true })); SFX.win(sound); });
-    later(T.overlay, () => { setWinStep(0); setOverlay("win"); });
+    later(T.overlay + SEQ.BREATH, () => { setWinStep(0); setOverlay("win"); }); // b4n: 勝利アニメのあと0.8s“何も出さない”余韻
   }
   function startLose() {
     setPhase("lose"); // 罰なし: セーブは何も変えない（タワーは到達フロアのベストだけ記録）
@@ -453,65 +511,121 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
         // けいけんちバー: 勝利前→後（レベルアップした回は満タンまで伸ばし、詳細は次のステップで）
         const fromPct = Math.min(100, Math.round(100 * (r.xpBefore || 0) / xpToNext(r.lvBefore || 1)));
         const toPct = r.levelsGained > 0 ? 100 : Math.min(100, Math.round(100 * (r.xpAfter || 0) / xpToNext(r.lvAfter || 1)));
+        // b4n: 枠なし・薄幕の上に文字と絵だけ。暗さはステップごと（進化はtransition 1.2sでゆっくり暗転）
+        const dim = kind === "evolve" ? SEQ.DIM_EVOLVE : kind === "levelup" ? SEQ.DIM_BASE + SEQ.DIM_SOFT : SEQ.DIM_BASE;
         return (
-          <div style={{ position: "fixed", inset: 0, zIndex: 110, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-            <div key={winStep} className="panel pop" style={{ padding: 24, textAlign: "center", maxWidth: 400, width: "100%", background: "#FFFDF5" }}>
+          <div style={{ position: "fixed", inset: 0, zIndex: 110, background: `rgba(20,15,25,${dim})`, transition: "background 1.2s ease",
+            display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <div key={winStep} style={{ textAlign: "center", maxWidth: 420, width: "100%", position: "relative" }}>
+
               {kind === "win" && (
-                <>
-                  <div style={{ fontSize: 48 }}>{tower ? <TowerMini /> : "🎉"}</div>
-                  <div className="pl-display" style={{ fontSize: 25 }}>{tower ? `${floor}かいを クリア！` : `${enemy.name}に かった！`}</div>
-                  <div style={{ margin: "10px 0", display: "flex", justifyContent: "center", alignItems: "center", gap: 6 }}>
-                    <EnemyIcon enemy={enemy} size={64} /><span style={{ fontSize: 34 }}>✨</span>
-                  </div>
-                  <div style={{ fontWeight: 800, fontSize: 14 }}>
+                <div className="seqFloatUp">{/* ①軽く・テンポよく: 下からふわっ */}
+                  <div className="pl-display" style={seqTitleStyle}>{tower ? `${floor}かいを クリア！` : `${enemy.name}に かった！`}</div>
+                  <div style={{ ...seqSubStyle, marginTop: 10 }}>
                     {tower ? <>けいけんち ＋{BATTLE_XP[diff]} XP</> : <>けいけんち ＋{BATTLE_XP[diff]} XP ／ 🪙 {firstKill ? `＋${COIN.battle[diff]}！` : "＋0（たおしたことのある あいて）"}</>}
-                    {!tower && firstKill && <><br />🆕 あたらしい あいてを ずかんに とうろく！</>}
+                    {!tower && firstKill && <><br />あたらしい あいてを ずかんに とうろく！</>}
                     {tower && <><br />うえの かいは てきが つよくなるよ！</>}
                   </div>
                   <WinXpBar from={fromPct} to={toPct} />
-                </>
+                </div>
               )}
+
               {kind === "levelup" && (
-                <>
-                  <div className="pl-display pop" style={{ fontSize: 27 }}>レベルアップ！</div>
-                  <div style={{ margin: "8px 0" }}><MonsterArt species={r.monId} stage={stageForLevel(r.lvBefore || 1)} size={110} /></div>{/* 新しいすがたは次の「しんかした！」で見せる */}
-                  <div style={{ fontWeight: 900, fontSize: 24 }}>Lv.{r.lvBefore} <span style={{ opacity: .55 }}>→</span> Lv.{r.lvAfter}</div>
+                <>{/* ②中の山: 下からドンと突き上げ→数字がカチッ（すがたは旧のまま＝ネタバレ温存） */}
+                  <div className="seqPunchUp">
+                    <div className="pl-display" style={seqTitleStyle}>レベルアップ！</div>
+                  </div>
+                  <div style={{ margin: "10px 0 4px" }}><MonsterArt species={r.monId} stage={stageForLevel(r.lvBefore || 1)} size={110} /></div>
+                  <div className="seqTick" style={{ ...seqSubStyle, fontSize: 24, fontWeight: 900, animationDelay: ".55s" }}>
+                    Lv.{r.lvBefore} <span style={{ opacity: .6 }}>→</span> <span style={{ color: "#FFD447" }}>Lv.{r.lvAfter}</span>
+                  </div>
                 </>
               )}
+
               {kind === "evolve" && (
-                <>
-                  <div className="pl-display pop" style={{ fontSize: 27 }}>しんかした！</div>
-                  <div className="pop" style={{ margin: "8px 0" }}><MonsterArt species={r.monId} stage={r.evolvedTo} size={150} /></div>
-                  <div style={{ fontWeight: 900, fontSize: 18 }}>{monsterName(r.monId, r.evolvedTo)}に なった！</div>
-                </>
-              )}
-              {kind === "egg" && (
-                <>
-                  <div className="pl-display pop" style={{ fontSize: 25 }}>たまごが とどいた！</div>
-                  <img src={eggImg} alt="たまご" draggable="false" className="pop"
-                    style={{ width: 110, height: 110, objectFit: "contain", margin: "8px auto", display: "block" }} />
-                  <div style={{ fontWeight: 800, fontSize: 14 }}>あそんで あたためると かえるよ</div>
-                </>
-              )}
-              {kind === "hatch" && (
-                <>
-                  <div className="pl-display pop" style={{ fontSize: 25 }}>なかまが ふえた！</div>
-                  <div className="pop" style={{ margin: "8px 0" }}><MonsterArt species={r.hatched} stage={1} size={140} /></div>
-                  <div style={{ fontWeight: 900, fontSize: 18 }}>{monsterName(r.hatched, 1)}が なかまに なった！</div>
-                  <div style={{ fontWeight: 700, fontSize: 12, color: "#6B6265", marginTop: 4 }}>おうちで きりかえられるよ</div>
-                </>
-              )}
-              <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginTop: 14 }}>
-                {!isLast
-                  ? <Btn big bg={C.sun} onClick={() => { SFX.tap(sound); setWinStep(i => i + 1); }}>つぎへ ▶</Btn>
-                  : (
+                <>{/* ③最大の山場: 暗転→白いシルエットが明滅→「…あれ？」→光がぱあっ→新すがたが下から */}
+                  {seqPhase < 2 && (
                     <>
-                      {tower
-                        ? <Btn big bg={C.leaf} onClick={() => onFloorClear && onFloorClear()}>つぎの フロアへ ▶</Btn>
-                        : <Btn big bg={C.leaf} onClick={onBack}>つぎの てきへ ▶</Btn>}
-                      <Btn bg="#fff" onClick={() => go("home")}>ホームへ</Btn>
+                      <div className="seqGlowPulse" style={{ display: "inline-block", lineHeight: 0 }}>
+                        <div style={{ filter: "brightness(0) invert(1)", lineHeight: 0 }}>
+                          <MonsterArt species={r.monId} stage={stageForLevel(r.lvBefore || 1)} size={150} />
+                        </div>
+                      </div>
+                      <div className="fadein" style={{ ...seqWhisperStyle, marginTop: 8, animationDelay: ".9s", animationFillMode: "both" }}>…あれ？</div>
                     </>
                   )}
+                  {seqPhase >= 1 && !reducedMotion && (
+                    <div className="seqBurst" style={{ position: "absolute", left: "50%", top: "40%", width: 280, height: 280,
+                      marginLeft: -140, marginTop: -140, borderRadius: "50%", pointerEvents: "none",
+                      background: "radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(255,246,220,.55) 45%, transparent 70%)" }} />
+                  )}
+                  {seqPhase >= 2 && (
+                    <>
+                      <div className="seqRiseIn" style={{ lineHeight: 0 }}><MonsterArt species={r.monId} stage={r.evolvedTo} size={170} /></div>
+                      <div className="fadein" style={{ ...seqTitleStyle, marginTop: 6 }}><span className="pl-display">しんかした！</span></div>
+                      <div style={{ ...seqSubStyle, fontSize: 16, marginTop: 6 }}>{monsterName(r.monId, r.evolvedTo)}に なった！</div>
+                      {!reducedMotion && [14, 46, 72].map((left, i) => (
+                        <span key={i} className="seqDrift" style={{ position: "absolute", left: `${left}%`, top: "6%", width: 7, height: 7,
+                          borderRadius: "50%", background: "#FFF6DC", boxShadow: "0 0 8px 3px rgba(255,244,200,.75)",
+                          animationDelay: `${i * 0.9}s`, pointerEvents: "none" }} />
+                      ))}
+                    </>
+                  )}
+                </>
+              )}
+
+              {kind === "egg" && (
+                <>{/* ④かわいい山: ささやき→上からころんと落ちて ぽよんと弾む→大文字 */}
+                  <div className="fadein" style={{ ...seqWhisperStyle, marginBottom: 10 }}>あれ？ なにか きたよ…</div>
+                  {seqPhase >= 1 && (
+                    <img src={eggImg} alt="たまご" draggable="false" className="seqDropBounce"
+                      style={{ width: 110, height: 110, objectFit: "contain", margin: "0 auto", display: "block" }} />
+                  )}
+                  {seqPhase >= 2 && (
+                    <>
+                      <div className="fadein" style={{ ...seqTitleStyle, marginTop: 8 }}><span className="pl-display">たまごが とどいた！</span></div>
+                      <div style={{ ...seqSubStyle, fontSize: 13, marginTop: 6 }}>あそんで あたためると かえるよ</div>
+                    </>
+                  )}
+                </>
+              )}
+
+              {kind === "hatch" && (
+                <>{/* ⑤喜び: たまごが ぷるぷる×2→白い光がぱっ→新しい子が ぽんっとジャンプ */}
+                  {seqPhase < 2 && (
+                    <img src={eggImg} alt="たまご" draggable="false" className="seqWiggle"
+                      style={{ width: 110, height: 110, objectFit: "contain", margin: "0 auto", display: "block" }} />
+                  )}
+                  {seqPhase >= 1 && !reducedMotion && (
+                    <div className="seqBurst" style={{ position: "absolute", left: "50%", top: "34%", width: 240, height: 240,
+                      marginLeft: -120, marginTop: -120, borderRadius: "50%", pointerEvents: "none",
+                      background: "radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(255,246,220,.55) 45%, transparent 70%)" }} />
+                  )}
+                  {seqPhase >= 2 && (
+                    <>
+                      <div className="seqPopJump" style={{ lineHeight: 0 }}><MonsterArt species={r.hatched} stage={1} size={150} /></div>
+                      <div className="fadein" style={{ ...seqTitleStyle, marginTop: 6 }}><span className="pl-display">なかまが ふえた！</span></div>
+                      <div style={{ ...seqSubStyle, fontSize: 16, marginTop: 6 }}>{monsterName(r.hatched, 1)}が なかまに なった！</div>
+                      <div style={{ ...seqSubStyle, fontSize: 12, opacity: .9, marginTop: 4 }}>おうちで きりかえられるよ</div>
+                    </>
+                  )}
+                </>
+              )}
+
+              {/* ボタン: 各ステップの登場が終わるまで出さない（畳みかけ防止）。「つぎへ」は小さく下に */}
+              <div style={{ minHeight: 58, display: "flex", gap: 10, justifyContent: "center", alignItems: "center", flexWrap: "wrap", marginTop: 18 }}>
+                {seqReady && (
+                  !isLast
+                    ? <span className="fadein"><Btn bg={C.sun} onClick={() => { SFX.tap(sound); setWinStep(i => i + 1); }} style={{ fontSize: 15, padding: "8px 18px" }}>つぎへ ▶</Btn></span>
+                    : (
+                      <span className="fadein" style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+                        {tower
+                          ? <Btn big bg={C.leaf} onClick={() => onFloorClear && onFloorClear()}>つぎの フロアへ ▶</Btn>
+                          : <Btn big bg={C.leaf} onClick={onBack}>つぎの てきへ ▶</Btn>}
+                        <Btn bg="#fff" onClick={() => go("home")}>ホームへ</Btn>
+                      </span>
+                    )
+                )}
               </div>
             </div>
           </div>

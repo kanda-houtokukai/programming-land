@@ -208,8 +208,32 @@ export const CSS = `
   @media (min-width: 700px) {
     .artgrid { grid-template-columns: 1fr 232px; }
   }
+  /* ===== バトル後・結果シーケンスv2（b4n）＝すべて新名 pl-seq*。既存keyframeは不変。
+     世界観: あたたかい・やわらかい・急かさない（光/ふわっ/ころん。稲妻やシェイクは使わない）。
+     進化の“ゆっくり暗転1.2s”はオーバーレイ背景のtransitionで実装（pl-seqDim相当） ===== */
+  @keyframes pl-seqFloatUp { from{ transform: translateY(24px); opacity:0 } to{ transform: translateY(0); opacity:1 } }
+  .seqFloatUp { animation: pl-seqFloatUp .45s ease-out both; }
+  @keyframes pl-seqPunchUp { 0%{ transform: translateY(90px); opacity:0 } 70%{ transform: translateY(-8px); opacity:1 } 100%{ transform: translateY(0); opacity:1 } }
+  .seqPunchUp { animation: pl-seqPunchUp .55s cubic-bezier(0.2,1.4,0.4,1) both; }
+  @keyframes pl-seqTick { 0%{ opacity:0; transform: scale(1) } 40%{ opacity:1; transform: scale(1.15) } 100%{ opacity:1; transform: scale(1) } }
+  .seqTick { animation: pl-seqTick .2s ease-out both; }
+  @keyframes pl-seqGlowPulse { 0%,100%{ opacity:.45; filter: drop-shadow(0 0 6px rgba(255,255,255,.35)) } 50%{ opacity:.95; filter: drop-shadow(0 0 22px rgba(255,255,255,.9)) } }
+  .seqGlowPulse { animation: pl-seqGlowPulse 1.2s ease-in-out 2; }
+  @keyframes pl-seqBurst { 0%{ transform: scale(.3); opacity:.9 } 100%{ transform: scale(1.7); opacity:0 } }
+  .seqBurst { animation: pl-seqBurst .42s ease-out both; }
+  @keyframes pl-seqRiseIn { from{ transform: translateY(40px) scale(.8); opacity:0 } to{ transform: translateY(0) scale(1); opacity:1 } }
+  .seqRiseIn { animation: pl-seqRiseIn .6s ease-out both; }
+  @keyframes pl-seqDrift { 0%{ transform: translateY(-8px); opacity:0 } 25%{ opacity:.9 } 100%{ transform: translateY(64px); opacity:0 } }
+  .seqDrift { animation: pl-seqDrift 2.8s ease-in-out infinite; }
+  @keyframes pl-seqDropBounce { 0%{ transform: translateY(-120px); opacity:0 } 45%{ transform: translateY(0); opacity:1 } 62%{ transform: translateY(-26px) } 78%{ transform: translateY(0) } 88%{ transform: translateY(-10px) } 100%{ transform: translateY(0) } }
+  .seqDropBounce { animation: pl-seqDropBounce .7s ease-in both; }
+  @keyframes pl-seqWiggle { 0%,100%{ transform: rotate(0deg) } 25%{ transform: rotate(-6deg) } 75%{ transform: rotate(6deg) } }
+  .seqWiggle { animation: pl-seqWiggle .28s ease-in-out 2; }
+  @keyframes pl-seqPopJump { 0%{ transform: scale(0) translateY(0); opacity:0 } 55%{ transform: scale(1.1) translateY(0); opacity:1 } 75%{ transform: scale(1) translateY(-14px) } 100%{ transform: scale(1) translateY(0) } }
+  .seqPopJump { animation: pl-seqPopJump .55s ease-out both; }
   @media (prefers-reduced-motion: reduce) {
     .pop,.shake,.bounce,.slide,.glow { animation: none; }
+    .seqFloatUp,.seqPunchUp,.seqTick,.seqGlowPulse,.seqBurst,.seqRiseIn,.seqDrift,.seqDropBounce,.seqWiggle,.seqPopJump { animation: none; }
     .idle,.idle2,.lunge,.hitflash,.shake2,.hitfx,.critpop,.heartbreak,.fall,.victory,.droop,.riseup,.aura,.shieldpop,.healglow { animation: none; }
     .dmgfloat,.anticip { animation: none; }
     .charge,.spinlight,.morph,.slam,.whiteflash,.confetti { animation: none; }
