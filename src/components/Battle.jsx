@@ -25,6 +25,7 @@ import { stageForLevel, partnerStageScale, monsterName } from "../data/monsters.
 import MonsterArt from "./MonsterArt.jsx";
 import iconTower from "../assets/icon_tower.png";
 import eggImg from "../assets/egg.png";
+import battleArena from "../assets/battle-arena.webp";
 
 /* ---- 部品 ---- */
 
@@ -701,7 +702,12 @@ export default function Battle({ save, update, go, onSound, openHome }) {
       onBack={() => setFight(null)} openHome={openHome} />;
   }
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
+    // b4q: 入口画面を全画面アリーナ背景に（おうち/ひろば/ワールドマップと同じ作法）。
+    // bgは最背面に敷き、Header/難易度タブ/敵カード/タワー入口をその上に重ねる。戦闘中(BattleFight)の背景は不変。
+    <div style={{ position: "relative", minHeight: "100vh" }}>
+      <img src={battleArena} alt="バトルエリア" draggable="false"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", zIndex: 0 }} />
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
       <Header save={save} title="⚔️ クイズバトル" onBack={() => go("home")} onSound={onSound} onOpenHome={openHome} />
       {/* むずかしさ えらび: タブ（色＋言葉。★は成績専用＝メモ03） */}
       <div style={{ display: "flex", gap: 8, padding: "0 16px" }}>
@@ -752,6 +758,7 @@ export default function Battle({ save, update, go, onSound, openHome }) {
           );
         })()}
         <ParentGuide guide={BATTLE_GUIDE} />
+      </div>
       </div>
     </div>
   );
