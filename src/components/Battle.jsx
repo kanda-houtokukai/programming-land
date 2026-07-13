@@ -720,7 +720,7 @@ export default function Battle({ save, update, go, onSound, openHome }) {
       </div>
       <div style={{ padding: "12px 16px 0", display: "grid", gap: 12 }}>
         <HowTo id="battle" />
-        <div style={{ fontWeight: 800, fontSize: 13 }}>てきを えらんで バトル！（1体 たおすと つぎが でるよ）</div>
+        <div style={{ ...seqSubStyle, fontSize: 13 }}>てきを えらんで バトル！（1体 たおすと つぎが でるよ）</div>{/* b4r: アリーナ背景の上でくっきり（白＋ink白フチ） */}
         {list.map((e, i) => {
           const un = enemyUnlocked(diff, i, defeated);
           const done = defeated.includes(e.id);
