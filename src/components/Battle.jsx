@@ -54,13 +54,14 @@ function HudPill({ children, style }) {
     display: "flex", alignItems: "center", gap: 6, ...style }}>{children}</div>;
 }
 
-// b4m: 勝利ステップの けいけんちバー（勝利前→後へ するっと伸びる。レベルアップした回は満タンまで）
+// b4m: 勝利ステップの けいけんちバー（勝利前→後へ伸びる。レベルアップした回は満タンまで）
+// b4p: 「かった!」→小さな間(SEQ.XPBAR.delay)→ゆっくり伸びる(SEQ.XPBAR.dur)＝“過程”として見せる
 function WinXpBar({ from, to }) {
   const [p, setP] = useState(from);
-  useEffect(() => { const t = setTimeout(() => setP(to), 400); return () => clearTimeout(t); }, [to]);
+  useEffect(() => { const t = setTimeout(() => setP(to), SEQ.XPBAR.delay); return () => clearTimeout(t); }, [to]);
   return (
     <div style={{ height: 14, border: `2px solid ${C.ink}`, borderRadius: 999, overflow: "hidden", background: "#fff", margin: "8px auto 0", maxWidth: 240 }}>
-      <div style={{ width: `${p}%`, height: "100%", background: C.leaf, transition: "width .9s" }} />
+      <div style={{ width: `${p}%`, height: "100%", background: C.leaf, transition: `width ${SEQ.XPBAR.dur}ms ease` }} />
     </div>
   );
 }
@@ -85,8 +86,13 @@ const SEQ = {
   DIM_BASE: 0.72,     // 薄幕の基本の暗さ（①かった/④たまご/⑤なかま）。b4o: 0.45→0.72＝後ろの戦闘/クイズが透けて被る問題の解消
   DIM_SOFT: 0.10,     // ②レベルアップで基本に足す暗さ（=0.82）
   DIM_EVOLVE: 0.85,   // ③進化の暗転（総量・最暗＝ドラマの暗転。1.2sかけてゆっくり暗く=背景transition）
-  HOLD_EVOLVE: 1500,  // 進化: 新すがた登場完了→「つぎへ」表示までのタメ(ms)
-  READY: { win: 550, levelup: 850, egg: 1500, hatch: 1750 }, // 各ステップの登場完了(ボタン表示)まで(ms)
+  HOLD_EVOLVE: 1500,  // 進化: 新すがた登場完了→「つぎへ」表示までのタメ(ms)＝最大の山場・一番ためる
+  // b4p “間”: 各ステップ = 登場(LAND)が落ち着いてから ため(HOLD) の後に「つぎへ」。速く叩いても1つずつ味わえる
+  LAND: { win: 1700, levelup: 750, egg: 1300, hatch: 1530 }, // 登場が land するまで（win=バー伸び終わり）
+  HOLD: { win: 1000, levelup: 1200, egg: 1000, hatch: 1200 }, // land 後の“ため”（進化は HOLD_EVOLVE）
+  FADE_OUT: 250,      // つぎへ押下→現ステップがふわっと消える
+  STEP_GAP: 300,      // 消えたあと薄幕だけの“ひと呼吸”→次ステップ登場
+  XPBAR: { delay: 400, dur: 1300 }, // ①のけいけんちバー: かった!→小さな間→ゆっくり伸びる（過程として見せる）
   EVOLVE: { burst: 2400, reveal: 2820, riseDur: 600 },       // 進化の内部タイムライン（明滅1.2s×2→光→せり上がり）
   EGG: { drop: 600, title: 1300 },                            // ④: ささやき→ころん→大文字
   HATCH: { burst: 560, reveal: 980 },                         // ⑤: ぷるぷる×2→光→ぽんっ
@@ -130,6 +136,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
   // b4n 演出リデザイン: ステップ内の段階（進化/たまご/孵化の多段演出）と「登場完了→つぎへ表示」のゲート
   const [seqPhase, setSeqPhase] = useState(0);
   const [seqReady, setSeqReady] = useState(false);
+  const [seqTrans, setSeqTrans] = useState(null); // b4p: ステップ切替の“ひと呼吸”（"out"=ふわっと消え中→薄幕だけの間）
   const buildWinSteps = () => {
     const r = winRes.current || {};
     const steps = ["win"];
@@ -182,13 +189,13 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
     } else if (kind === "egg") {
       at(SEQ.EGG.drop, () => setSeqPhase(1));       // ころんと落ちる
       at(SEQ.EGG.title, () => setSeqPhase(2));      // 大文字
-      at(SEQ.READY.egg, () => setSeqReady(true));
+      at(SEQ.LAND.egg + SEQ.HOLD.egg, () => setSeqReady(true));
     } else if (kind === "hatch") {
       at(SEQ.HATCH.burst, () => setSeqPhase(1));    // ぷるぷる×2→光
       at(SEQ.HATCH.reveal, () => setSeqPhase(2));   // ぽんっと登場
-      at(SEQ.READY.hatch, () => setSeqReady(true));
+      at(SEQ.LAND.hatch + SEQ.HOLD.hatch, () => setSeqReady(true));
     } else {
-      at(SEQ.READY[kind] || 550, () => setSeqReady(true));
+      at((SEQ.LAND[kind] || 550) + (SEQ.HOLD[kind] || 0), () => setSeqReady(true)); // b4p: land＋ため の後に「つぎへ」
     }
     return () => ts.forEach(clearTimeout);
   }, [overlay, winStep, reducedMotion]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -201,6 +208,14 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
   const later = (ms, fn) => { timers.current.push(setTimeout(fn, ms)); };
   const clearTimers = () => { timers.current.forEach(clearTimeout); timers.current = []; };
   useEffect(() => clearTimers, []);
+
+  // b4p: つぎへ＝現ステップをふわっと消す(FADE_OUT)→薄幕だけの間(STEP_GAP)→次ステップ登場
+  const seqNext = () => {
+    if (seqTrans) return; // 連打ガード
+    SFX.tap(sound);
+    setSeqTrans("out");
+    later(SEQ.FADE_OUT + SEQ.STEP_GAP, () => { setWinStep(i => i + 1); setSeqTrans(null); });
+  };
 
   function startWin() {
     setPhase("down"); SFX.down(sound);
@@ -239,7 +254,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
       }
     }
     later(T.downEnd, () => { setPhase("victory"); setFx(f => ({ ...f, sparkle: true, won: true })); SFX.win(sound); });
-    later(T.overlay + SEQ.BREATH, () => { setWinStep(0); setOverlay("win"); }); // b4n: 勝利アニメのあと0.8s“何も出さない”余韻
+    later(T.overlay + SEQ.BREATH, () => { setWinStep(0); setSeqTrans(null); setOverlay("win"); }); // b4n: 勝利アニメのあと0.8s“何も出さない”余韻
   }
   function startLose() {
     setPhase("lose"); // 罰なし: セーブは何も変えない（タワーは到達フロアのベストだけ記録）
@@ -516,7 +531,8 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
         return (
           <div style={{ position: "fixed", inset: 0, zIndex: 110, background: `rgba(20,15,25,${dim})`, transition: "background 1.2s ease",
             display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-            <div key={winStep} style={{ textAlign: "center", maxWidth: 420, width: "100%", position: "relative" }}>
+            <div key={winStep} style={{ textAlign: "center", maxWidth: 420, width: "100%", position: "relative",
+              opacity: seqTrans ? 0 : 1, transition: `opacity ${SEQ.FADE_OUT}ms ease` }}>{/* b4p: 切替はふわっと消えてひと呼吸 */}
 
               {kind === "win" && (
                 <div className="seqFloatUp">{/* ①軽く・テンポよく: 下からふわっ */}
@@ -616,7 +632,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
               <div style={{ minHeight: 58, display: "flex", gap: 10, justifyContent: "center", alignItems: "center", flexWrap: "wrap", marginTop: 18 }}>
                 {seqReady && (
                   !isLast
-                    ? <span className="fadein"><Btn bg={C.sun} onClick={() => { SFX.tap(sound); setWinStep(i => i + 1); }} style={{ fontSize: 15, padding: "8px 18px" }}>つぎへ ▶</Btn></span>
+                    ? <span className="fadein"><Btn bg={C.sun} onClick={seqNext} style={{ fontSize: 15, padding: "8px 18px" }}>つぎへ ▶</Btn></span>
                     : (
                       <span className="fadein" style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
                         {tower
