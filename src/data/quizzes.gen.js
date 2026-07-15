@@ -4761,25 +4761,120 @@ export const GEN_QUIZZES = [
  },
  {
   "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
+  "difficulty": "easy",
+  "q": "おもちゃの なかまは どれ？",
   "opts": [
-   "🖍️ クレヨン",
-   "✏️ えんぴつ",
-   "📏 じょうぎ"
+   "🔪 ほうちょう",
+   "🐮 うし",
+   "🧸 ぬいぐるみ"
   ],
   "a": 2,
-  "why": "えんぴつと クレヨンは「かく・ぬる」なかま。📏 じょうぎだけ ちがうね",
+  "why": "🧸 ぬいぐるみは おもちゃの なかまだね。ほかは ちがうよ",
   "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "📏 じょうぎ",
+   "kind": "nakama-axis",
+   "axisKind": "cat",
+   "axis": "toy",
+   "axisType": "concrete",
+   "correct": "🧸 ぬいぐるみ",
    "items": [
     {
-     "label": "🖍️ クレヨン",
-     "cat": "stationery",
+     "label": "🔪 ほうちょう",
+     "cat": "tool",
      "props": [
-      "draw"
+      "cut"
+     ]
+    },
+    {
+     "label": "🐮 うし",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "🧸 ぬいぐるみ",
+     "cat": "toy",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-e-25"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "easy",
+  "q": "がっきの なかまは どれ？",
+  "opts": [
+   "🪚 のこぎり",
+   "🥁 たいこ",
+   "👖 ズボン"
+  ],
+  "a": 1,
+  "why": "🥁 たいこは がっきの なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "cat",
+   "axis": "instrument",
+   "axisType": "concrete",
+   "correct": "🥁 たいこ",
+   "items": [
+    {
+     "label": "🪚 のこぎり",
+     "cat": "tool",
+     "props": [
+      "cut"
+     ]
+    },
+    {
+     "label": "🥁 たいこ",
+     "cat": "instrument",
+     "props": [
+      "sound"
+     ]
+    },
+    {
+     "label": "👖 ズボン",
+     "cat": "clothing",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-e-26"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "easy",
+  "q": "どうぶつの なかまは どれ？",
+  "opts": [
+   "🐮 うし",
+   "🍑 もも",
+   "✏️ えんぴつ"
+  ],
+  "a": 0,
+  "why": "🐮 うしは どうぶつの なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "cat",
+   "axis": "animal",
+   "axisType": "concrete",
+   "correct": "🐮 うし",
+   "items": [
+    {
+     "label": "🐮 うし",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "🍑 もも",
+     "cat": "fruit",
+     "props": [
+      "food",
+      "sweet",
+      "natural"
      ]
     },
     {
@@ -4788,11 +4883,266 @@ export const GEN_QUIZZES = [
      "props": [
       "draw"
      ]
+    }
+   ]
+  },
+  "id": "nakama-e-27"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "easy",
+  "q": "かぐの なかまは どれ？",
+  "opts": [
+   "🦁 ライオン",
+   "🧦 くつした",
+   "🪑 いす"
+  ],
+  "a": 2,
+  "why": "🪑 いすは かぐの なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "cat",
+   "axis": "furniture",
+   "axisType": "concrete",
+   "correct": "🪑 いす",
+   "items": [
+    {
+     "label": "🦁 ライオン",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
     },
     {
-     "label": "📏 じょうぎ",
-     "cat": "stationery",
+     "label": "🧦 くつした",
+     "cat": "clothing",
      "props": []
+    },
+    {
+     "label": "🪑 いす",
+     "cat": "furniture",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-e-28"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "easy",
+  "q": "のりものの なかまは どれ？",
+  "opts": [
+   "🍫 チョコレート",
+   "🎹 ピアノ",
+   "🚗 くるま"
+  ],
+  "a": 2,
+  "why": "🚗 くるまは のりものの なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "cat",
+   "axis": "vehicle",
+   "axisType": "concrete",
+   "correct": "🚗 くるま",
+   "items": [
+    {
+     "label": "🍫 チョコレート",
+     "cat": "sweets",
+     "props": [
+      "food",
+      "sweet"
+     ]
+    },
+    {
+     "label": "🎹 ピアノ",
+     "cat": "instrument",
+     "props": [
+      "sound"
+     ]
+    },
+    {
+     "label": "🚗 くるま",
+     "cat": "vehicle",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-e-29"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "easy",
+  "q": "くだものの なかまは どれ？",
+  "opts": [
+   "🍅 トマト",
+   "🍉 すいか",
+   "🧅 たまねぎ"
+  ],
+  "a": 1,
+  "why": "🍉 すいかは くだものの なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "cat",
+   "axis": "fruit",
+   "axisType": "concrete",
+   "correct": "🍉 すいか",
+   "items": [
+    {
+     "label": "🍅 トマト",
+     "cat": "vegetable",
+     "props": [
+      "food",
+      "red",
+      "natural"
+     ]
+    },
+    {
+     "label": "🍉 すいか",
+     "cat": "fruit",
+     "props": [
+      "food",
+      "sweet",
+      "natural"
+     ]
+    },
+    {
+     "label": "🧅 たまねぎ",
+     "cat": "vegetable",
+     "props": [
+      "food",
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-e-30"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "easy",
+  "q": "がっきの なかまは どれ？",
+  "opts": [
+   "🎸 ギター",
+   "🐱 ねこ",
+   "🐳 くじら"
+  ],
+  "a": 0,
+  "why": "🎸 ギターは がっきの なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "cat",
+   "axis": "instrument",
+   "axisType": "concrete",
+   "correct": "🎸 ギター",
+   "items": [
+    {
+     "label": "🎸 ギター",
+     "cat": "instrument",
+     "props": [
+      "sound"
+     ]
+    },
+    {
+     "label": "🐱 ねこ",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "🐳 くじら",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-e-31"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "easy",
+  "q": "しょくぶつの なかまは どれ？",
+  "opts": [
+   "🌳 き",
+   "⛵ ふね",
+   "🥕 にんじん"
+  ],
+  "a": 0,
+  "why": "🌳 きは しょくぶつの なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "cat",
+   "axis": "flower",
+   "axisType": "concrete",
+   "correct": "🌳 き",
+   "items": [
+    {
+     "label": "🌳 き",
+     "cat": "flower",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "⛵ ふね",
+     "cat": "vehicle",
+     "props": [
+      "water"
+     ]
+    },
+    {
+     "label": "🥕 にんじん",
+     "cat": "vegetable",
+     "props": [
+      "food",
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-e-32"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🔨 かなづち",
+   "🔪 ほうちょう",
+   "🪚 のこぎり"
+  ],
+  "a": 0,
+  "why": "ほうちょうと のこぎりは「ものを きる」なかま。🔨 かなづちだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "🔨 かなづち",
+   "items": [
+    {
+     "label": "🔨 かなづち",
+     "cat": "tool",
+     "props": []
+    },
+    {
+     "label": "🔪 ほうちょう",
+     "cat": "tool",
+     "props": [
+      "cut"
+     ]
+    },
+    {
+     "label": "🪚 のこぎり",
+     "cat": "tool",
+     "props": [
+      "cut"
+     ]
     }
    ]
   },
@@ -4803,36 +5153,41 @@ export const GEN_QUIZZES = [
   "difficulty": "normal",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "✈️ ひこうき",
-   "🚒 しょうぼうしゃ",
-   "🚁 ヘリコプター"
+   "🐳 くじら",
+   "🐟 さかな",
+   "🐮 うし"
   ],
-  "a": 1,
-  "why": "ヘリコプターと ひこうきは「そらを とぶ」なかま。🚒 しょうぼうしゃだけ ちがうね",
+  "a": 2,
+  "why": "さかなと くじらは「みずの なかで くらす（つかう）」なかま。🐮 うしだけ ちがうね",
   "meta": {
    "kind": "nakama",
    "axisType": "functional",
-   "odd": "🚒 しょうぼうしゃ",
+   "odd": "🐮 うし",
    "items": [
     {
-     "label": "✈️ ひこうき",
-     "cat": "vehicle",
+     "label": "🐳 くじら",
+     "cat": "animal",
      "props": [
-      "flies"
+      "living",
+      "natural",
+      "water"
      ]
     },
     {
-     "label": "🚒 しょうぼうしゃ",
-     "cat": "vehicle",
+     "label": "🐟 さかな",
+     "cat": "animal",
      "props": [
-      "red"
+      "living",
+      "natural",
+      "water"
      ]
     },
     {
-     "label": "🚁 ヘリコプター",
-     "cat": "vehicle",
+     "label": "🐮 うし",
+     "cat": "animal",
      "props": [
-      "flies"
+      "living",
+      "natural"
      ]
     }
    ]
@@ -4844,111 +5199,17 @@ export const GEN_QUIZZES = [
   "difficulty": "normal",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🐟 さかな",
-   "🐙 たこ",
-   "🐱 ねこ"
-  ],
-  "a": 2,
-  "why": "たこと さかなは「みずの なかで くらす（つかう）」なかま。🐱 ねこだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "🐱 ねこ",
-   "items": [
-    {
-     "label": "🐟 さかな",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🐙 たこ",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🐱 ねこ",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-n-3"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🔪 ほうちょう",
-   "🔨 かなづち",
-   "🪚 のこぎり"
-  ],
-  "a": 1,
-  "why": "ほうちょうと のこぎりは「ものを きる」なかま。🔨 かなづちだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "🔨 かなづち",
-   "items": [
-    {
-     "label": "🔪 ほうちょう",
-     "cat": "tool",
-     "props": [
-      "cut"
-     ]
-    },
-    {
-     "label": "🔨 かなづち",
-     "cat": "tool",
-     "props": []
-    },
-    {
-     "label": "🪚 のこぎり",
-     "cat": "tool",
-     "props": [
-      "cut"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-n-4"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🐙 たこ",
    "🐝 はち",
-   "🐟 さかな"
+   "🐟 さかな",
+   "🦋 ちょう"
   ],
   "a": 1,
-  "why": "たこと さかなは「みずの なかで くらす（つかう）」なかま。🐝 はちだけ ちがうね",
+  "why": "ちょうと はちは「そらを とぶ」なかま。🐟 さかなだけ ちがうね",
   "meta": {
    "kind": "nakama",
    "axisType": "functional",
-   "odd": "🐝 はち",
+   "odd": "🐟 さかな",
    "items": [
-    {
-     "label": "🐙 たこ",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
     {
      "label": "🐝 はち",
      "cat": "animal",
@@ -4960,183 +5221,6 @@ export const GEN_QUIZZES = [
     },
     {
      "label": "🐟 さかな",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-n-5"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🐟 さかな",
-   "🐦 ことり",
-   "🐙 たこ"
-  ],
-  "a": 1,
-  "why": "たこと さかなは「みずの なかで くらす（つかう）」なかま。🐦 ことりだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "🐦 ことり",
-   "items": [
-    {
-     "label": "🐟 さかな",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🐦 ことり",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "flies"
-     ]
-    },
-    {
-     "label": "🐙 たこ",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-n-6"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🐮 うし",
-   "🐟 さかな",
-   "🐙 たこ"
-  ],
-  "a": 0,
-  "why": "たこと さかなは「みずの なかで くらす（つかう）」なかま。🐮 うしだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "🐮 うし",
-   "items": [
-    {
-     "label": "🐮 うし",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural"
-     ]
-    },
-    {
-     "label": "🐟 さかな",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🐙 たこ",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-n-7"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🦁 ライオン",
-   "🐟 さかな",
-   "🐳 くじら"
-  ],
-  "a": 0,
-  "why": "くじらと さかなは「みずの なかで くらす（つかう）」なかま。🦁 ライオンだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "🦁 ライオン",
-   "items": [
-    {
-     "label": "🦁 ライオン",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural"
-     ]
-    },
-    {
-     "label": "🐟 さかな",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🐳 くじら",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-n-8"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🐳 くじら",
-   "🐙 たこ",
-   "🦋 ちょう"
-  ],
-  "a": 2,
-  "why": "たこと くじらは「みずの なかで くらす（つかう）」なかま。🦋 ちょうだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "🦋 ちょう",
-   "items": [
-    {
-     "label": "🐳 くじら",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🐙 たこ",
      "cat": "animal",
      "props": [
       "living",
@@ -5155,24 +5239,204 @@ export const GEN_QUIZZES = [
     }
    ]
   },
-  "id": "nakama-n-9"
+  "id": "nakama-n-3"
  },
  {
   "category": "nakama",
   "difficulty": "normal",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "✈️ ひこうき",
-   "🚗 くるま",
-   "🚁 ヘリコプター"
+   "🖍️ クレヨン",
+   "✏️ えんぴつ",
+   "✂️ はさみ"
   ],
-  "a": 1,
-  "why": "ヘリコプターと ひこうきは「そらを とぶ」なかま。🚗 くるまだけ ちがうね",
+  "a": 2,
+  "why": "えんぴつと クレヨンは「かく・ぬる」なかま。✂️ はさみだけ ちがうね",
   "meta": {
    "kind": "nakama",
    "axisType": "functional",
-   "odd": "🚗 くるま",
+   "odd": "✂️ はさみ",
    "items": [
+    {
+     "label": "🖍️ クレヨン",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    },
+    {
+     "label": "✏️ えんぴつ",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    },
+    {
+     "label": "✂️ はさみ",
+     "cat": "stationery",
+     "props": [
+      "cut"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-4"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "📓 ノート",
+   "✏️ えんぴつ",
+   "🖍️ クレヨン"
+  ],
+  "a": 0,
+  "why": "えんぴつと クレヨンは「かく・ぬる」なかま。📓 ノートだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "📓 ノート",
+   "items": [
+    {
+     "label": "📓 ノート",
+     "cat": "stationery",
+     "props": []
+    },
+    {
+     "label": "✏️ えんぴつ",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    },
+    {
+     "label": "🖍️ クレヨン",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-5"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🦋 ちょう",
+   "🦁 ライオン",
+   "🐦 ことり"
+  ],
+  "a": 1,
+  "why": "ちょうと ことりは「そらを とぶ」なかま。🦁 ライオンだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "🦁 ライオン",
+   "items": [
+    {
+     "label": "🦋 ちょう",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    },
+    {
+     "label": "🦁 ライオン",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "🐦 ことり",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-6"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🐳 くじら",
+   "🐟 さかな",
+   "🐝 はち"
+  ],
+  "a": 2,
+  "why": "さかなと くじらは「みずの なかで くらす（つかう）」なかま。🐝 はちだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "🐝 はち",
+   "items": [
+    {
+     "label": "🐳 くじら",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
+     ]
+    },
+    {
+     "label": "🐟 さかな",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
+     ]
+    },
+    {
+     "label": "🐝 はち",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-7"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🚁 ヘリコプター",
+   "✈️ ひこうき",
+   "🚂 きしゃ"
+  ],
+  "a": 2,
+  "why": "ヘリコプターと ひこうきは「そらを とぶ」なかま。🚂 きしゃだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "🚂 きしゃ",
+   "items": [
+    {
+     "label": "🚁 ヘリコプター",
+     "cat": "vehicle",
+     "props": [
+      "flies"
+     ]
+    },
     {
      "label": "✈️ ひこうき",
      "cat": "vehicle",
@@ -5181,15 +5445,94 @@ export const GEN_QUIZZES = [
      ]
     },
     {
-     "label": "🚗 くるま",
+     "label": "🚂 きしゃ",
      "cat": "vehicle",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-n-8"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🖌️ ふで",
+   "📓 ノート",
+   "✏️ えんぴつ"
+  ],
+  "a": 1,
+  "why": "えんぴつと ふでは「かく・ぬる」なかま。📓 ノートだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "📓 ノート",
+   "items": [
+    {
+     "label": "🖌️ ふで",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    },
+    {
+     "label": "📓 ノート",
+     "cat": "stationery",
      "props": []
     },
     {
-     "label": "🚁 ヘリコプター",
-     "cat": "vehicle",
+     "label": "✏️ えんぴつ",
+     "cat": "stationery",
      "props": [
+      "draw"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-9"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🐳 くじら",
+   "🐝 はち",
+   "🐙 たこ"
+  ],
+  "a": 1,
+  "why": "くじらと たこは「みずの なかで くらす（つかう）」なかま。🐝 はちだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "🐝 はち",
+   "items": [
+    {
+     "label": "🐳 くじら",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
+     ]
+    },
+    {
+     "label": "🐝 はち",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
       "flies"
+     ]
+    },
+    {
+     "label": "🐙 たこ",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
      ]
     }
    ]
@@ -5202,15 +5545,15 @@ export const GEN_QUIZZES = [
   "q": "なかまはずれは どれ？",
   "opts": [
    "✏️ えんぴつ",
-   "📓 ノート",
-   "🖍️ クレヨン"
+   "🖌️ ふで",
+   "📏 じょうぎ"
   ],
-  "a": 1,
-  "why": "えんぴつと クレヨンは「かく・ぬる」なかま。📓 ノートだけ ちがうね",
+  "a": 2,
+  "why": "えんぴつと ふでは「かく・ぬる」なかま。📏 じょうぎだけ ちがうね",
   "meta": {
    "kind": "nakama",
    "axisType": "functional",
-   "odd": "📓 ノート",
+   "odd": "📏 じょうぎ",
    "items": [
     {
      "label": "✏️ えんぴつ",
@@ -5220,16 +5563,16 @@ export const GEN_QUIZZES = [
      ]
     },
     {
-     "label": "📓 ノート",
-     "cat": "stationery",
-     "props": []
-    },
-    {
-     "label": "🖍️ クレヨン",
+     "label": "🖌️ ふで",
      "cat": "stationery",
      "props": [
       "draw"
      ]
+    },
+    {
+     "label": "📏 じょうぎ",
+     "cat": "stationery",
+     "props": []
     }
    ]
   },
@@ -5240,28 +5583,19 @@ export const GEN_QUIZZES = [
   "difficulty": "normal",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🐳 くじら",
-   "🐶 いぬ",
-   "🐟 さかな"
+   "🐘 ぞう",
+   "🐟 さかな",
+   "🐳 くじら"
   ],
-  "a": 1,
-  "why": "さかなと くじらは「みずの なかで くらす（つかう）」なかま。🐶 いぬだけ ちがうね",
+  "a": 0,
+  "why": "くじらと さかなは「みずの なかで くらす（つかう）」なかま。🐘 ぞうだけ ちがうね",
   "meta": {
    "kind": "nakama",
    "axisType": "functional",
-   "odd": "🐶 いぬ",
+   "odd": "🐘 ぞう",
    "items": [
     {
-     "label": "🐳 くじら",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🐶 いぬ",
+     "label": "🐘 ぞう",
      "cat": "animal",
      "props": [
       "living",
@@ -5270,6 +5604,15 @@ export const GEN_QUIZZES = [
     },
     {
      "label": "🐟 さかな",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
+     ]
+    },
+    {
+     "label": "🐳 くじら",
      "cat": "animal",
      "props": [
       "living",
@@ -5286,41 +5629,34 @@ export const GEN_QUIZZES = [
   "difficulty": "normal",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🐜 あり",
-   "🐙 たこ",
-   "🐟 さかな"
+   "📓 ノート",
+   "🖌️ ふで",
+   "🖍️ クレヨン"
   ],
   "a": 0,
-  "why": "さかなと たこは「みずの なかで くらす（つかう）」なかま。🐜 ありだけ ちがうね",
+  "why": "ふでと クレヨンは「かく・ぬる」なかま。📓 ノートだけ ちがうね",
   "meta": {
    "kind": "nakama",
    "axisType": "functional",
-   "odd": "🐜 あり",
+   "odd": "📓 ノート",
    "items": [
     {
-     "label": "🐜 あり",
-     "cat": "animal",
+     "label": "📓 ノート",
+     "cat": "stationery",
+     "props": []
+    },
+    {
+     "label": "🖌️ ふで",
+     "cat": "stationery",
      "props": [
-      "living",
-      "natural"
+      "draw"
      ]
     },
     {
-     "label": "🐙 たこ",
-     "cat": "animal",
+     "label": "🖍️ クレヨン",
+     "cat": "stationery",
      "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🐟 さかな",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
+      "draw"
      ]
     }
    ]
@@ -5332,138 +5668,12 @@ export const GEN_QUIZZES = [
   "difficulty": "normal",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🐳 くじら",
-   "🐟 さかな",
-   "🐜 あり"
+   "🖌️ ふで",
+   "🖍️ クレヨン",
+   "✂️ はさみ"
   ],
   "a": 2,
-  "why": "くじらと さかなは「みずの なかで くらす（つかう）」なかま。🐜 ありだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "🐜 あり",
-   "items": [
-    {
-     "label": "🐳 くじら",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🐟 さかな",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🐜 あり",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-n-14"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🖌️ ふで",
-   "✏️ えんぴつ",
-   "📓 ノート"
-  ],
-  "a": 2,
-  "why": "ふでと えんぴつは「かく・ぬる」なかま。📓 ノートだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "📓 ノート",
-   "items": [
-    {
-     "label": "🖌️ ふで",
-     "cat": "stationery",
-     "props": [
-      "draw"
-     ]
-    },
-    {
-     "label": "✏️ えんぴつ",
-     "cat": "stationery",
-     "props": [
-      "draw"
-     ]
-    },
-    {
-     "label": "📓 ノート",
-     "cat": "stationery",
-     "props": []
-    }
-   ]
-  },
-  "id": "nakama-n-15"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "✈️ ひこうき",
-   "⛵ ふね",
-   "🚁 ヘリコプター"
-  ],
-  "a": 1,
-  "why": "ひこうきと ヘリコプターは「そらを とぶ」なかま。⛵ ふねだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "⛵ ふね",
-   "items": [
-    {
-     "label": "✈️ ひこうき",
-     "cat": "vehicle",
-     "props": [
-      "flies"
-     ]
-    },
-    {
-     "label": "⛵ ふね",
-     "cat": "vehicle",
-     "props": [
-      "water"
-     ]
-    },
-    {
-     "label": "🚁 ヘリコプター",
-     "cat": "vehicle",
-     "props": [
-      "flies"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-n-16"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🖌️ ふで",
-   "✂️ はさみ",
-   "🖍️ クレヨン"
-  ],
-  "a": 1,
-  "why": "ふでと クレヨンは「かく・ぬる」なかま。✂️ はさみだけ ちがうね",
+  "why": "クレヨンと ふでは「かく・ぬる」なかま。✂️ はさみだけ ちがうね",
   "meta": {
    "kind": "nakama",
    "axisType": "functional",
@@ -5477,86 +5687,39 @@ export const GEN_QUIZZES = [
      ]
     },
     {
-     "label": "✂️ はさみ",
-     "cat": "stationery",
-     "props": [
-      "cut"
-     ]
-    },
-    {
      "label": "🖍️ クレヨン",
      "cat": "stationery",
      "props": [
       "draw"
      ]
+    },
+    {
+     "label": "✂️ はさみ",
+     "cat": "stationery",
+     "props": [
+      "cut"
+     ]
     }
    ]
   },
-  "id": "nakama-n-17"
+  "id": "nakama-n-14"
  },
  {
   "category": "nakama",
   "difficulty": "normal",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🚁 ヘリコプター",
-   "✈️ ひこうき",
-   "🚲 じてんしゃ"
-  ],
-  "a": 2,
-  "why": "ひこうきと ヘリコプターは「そらを とぶ」なかま。🚲 じてんしゃだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "🚲 じてんしゃ",
-   "items": [
-    {
-     "label": "🚁 ヘリコプター",
-     "cat": "vehicle",
-     "props": [
-      "flies"
-     ]
-    },
-    {
-     "label": "✈️ ひこうき",
-     "cat": "vehicle",
-     "props": [
-      "flies"
-     ]
-    },
-    {
-     "label": "🚲 じてんしゃ",
-     "cat": "vehicle",
-     "props": []
-    }
-   ]
-  },
-  "id": "nakama-n-18"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🐘 ぞう",
    "🐳 くじら",
-   "🐙 たこ"
+   "🦋 ちょう",
+   "🐝 はち"
   ],
   "a": 0,
-  "why": "たこと くじらは「みずの なかで くらす（つかう）」なかま。🐘 ぞうだけ ちがうね",
+  "why": "はちと ちょうは「そらを とぶ」なかま。🐳 くじらだけ ちがうね",
   "meta": {
    "kind": "nakama",
    "axisType": "functional",
-   "odd": "🐘 ぞう",
+   "odd": "🐳 くじら",
    "items": [
-    {
-     "label": "🐘 ぞう",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural"
-     ]
-    },
     {
      "label": "🐳 くじら",
      "cat": "animal",
@@ -5566,121 +5729,6 @@ export const GEN_QUIZZES = [
       "water"
      ]
     },
-    {
-     "label": "🐙 たこ",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-n-19"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🐟 さかな",
-   "🦋 ちょう",
-   "🐳 くじら"
-  ],
-  "a": 1,
-  "why": "くじらと さかなは「みずの なかで くらす（つかう）」なかま。🦋 ちょうだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "🦋 ちょう",
-   "items": [
-    {
-     "label": "🐟 さかな",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🦋 ちょう",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "flies"
-     ]
-    },
-    {
-     "label": "🐳 くじら",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-n-20"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🖌️ ふで",
-   "📏 じょうぎ",
-   "✏️ えんぴつ"
-  ],
-  "a": 1,
-  "why": "えんぴつと ふでは「かく・ぬる」なかま。📏 じょうぎだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "📏 じょうぎ",
-   "items": [
-    {
-     "label": "🖌️ ふで",
-     "cat": "stationery",
-     "props": [
-      "draw"
-     ]
-    },
-    {
-     "label": "📏 じょうぎ",
-     "cat": "stationery",
-     "props": []
-    },
-    {
-     "label": "✏️ えんぴつ",
-     "cat": "stationery",
-     "props": [
-      "draw"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-n-21"
- },
- {
-  "category": "nakama",
-  "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🦋 ちょう",
-   "🐝 はち",
-   "🐰 うさぎ"
-  ],
-  "a": 2,
-  "why": "ちょうと はちは「そらを とぶ」なかま。🐰 うさぎだけ ちがうね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "functional",
-   "odd": "🐰 うさぎ",
-   "items": [
     {
      "label": "🦋 ちょう",
      "cat": "animal",
@@ -5698,13 +5746,317 @@ export const GEN_QUIZZES = [
       "natural",
       "flies"
      ]
+    }
+   ]
+  },
+  "id": "nakama-n-15"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🐦 ことり",
+   "🦋 ちょう",
+   "🐮 うし"
+  ],
+  "a": 2,
+  "why": "ことりと ちょうは「そらを とぶ」なかま。🐮 うしだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "🐮 うし",
+   "items": [
+    {
+     "label": "🐦 ことり",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
     },
     {
-     "label": "🐰 うさぎ",
+     "label": "🦋 ちょう",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    },
+    {
+     "label": "🐮 うし",
      "cat": "animal",
      "props": [
       "living",
       "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-16"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🖌️ ふで",
+   "✂️ はさみ",
+   "✏️ えんぴつ"
+  ],
+  "a": 1,
+  "why": "ふでと えんぴつは「かく・ぬる」なかま。✂️ はさみだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "✂️ はさみ",
+   "items": [
+    {
+     "label": "🖌️ ふで",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    },
+    {
+     "label": "✂️ はさみ",
+     "cat": "stationery",
+     "props": [
+      "cut"
+     ]
+    },
+    {
+     "label": "✏️ えんぴつ",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-17"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🐳 くじら",
+   "🦋 ちょう",
+   "🐟 さかな"
+  ],
+  "a": 1,
+  "why": "さかなと くじらは「みずの なかで くらす（つかう）」なかま。🦋 ちょうだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "🦋 ちょう",
+   "items": [
+    {
+     "label": "🐳 くじら",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
+     ]
+    },
+    {
+     "label": "🦋 ちょう",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    },
+    {
+     "label": "🐟 さかな",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-18"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🦋 ちょう",
+   "🐦 ことり",
+   "🐱 ねこ"
+  ],
+  "a": 2,
+  "why": "ちょうと ことりは「そらを とぶ」なかま。🐱 ねこだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "🐱 ねこ",
+   "items": [
+    {
+     "label": "🦋 ちょう",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    },
+    {
+     "label": "🐦 ことり",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    },
+    {
+     "label": "🐱 ねこ",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-19"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "✏️ えんぴつ",
+   "📏 じょうぎ",
+   "🖍️ クレヨン"
+  ],
+  "a": 1,
+  "why": "クレヨンと えんぴつは「かく・ぬる」なかま。📏 じょうぎだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "📏 じょうぎ",
+   "items": [
+    {
+     "label": "✏️ えんぴつ",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    },
+    {
+     "label": "📏 じょうぎ",
+     "cat": "stationery",
+     "props": []
+    },
+    {
+     "label": "🖍️ クレヨン",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-20"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🐦 ことり",
+   "🐙 たこ",
+   "🐝 はち"
+  ],
+  "a": 1,
+  "why": "ことりと はちは「そらを とぶ」なかま。🐙 たこだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "🐙 たこ",
+   "items": [
+    {
+     "label": "🐦 ことり",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    },
+    {
+     "label": "🐙 たこ",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
+     ]
+    },
+    {
+     "label": "🐝 はち",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-21"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🐱 ねこ",
+   "🐝 はち",
+   "🦋 ちょう"
+  ],
+  "a": 0,
+  "why": "はちと ちょうは「そらを とぶ」なかま。🐱 ねこだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "🐱 ねこ",
+   "items": [
+    {
+     "label": "🐱 ねこ",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "🐝 はち",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    },
+    {
+     "label": "🦋 ちょう",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
      ]
     }
    ]
@@ -5716,19 +6068,276 @@ export const GEN_QUIZZES = [
   "difficulty": "normal",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "✏️ えんぴつ",
+   "📏 じょうぎ",
+   "🖍️ クレヨン",
+   "🖌️ ふで"
+  ],
+  "a": 0,
+  "why": "クレヨンと ふでは「かく・ぬる」なかま。📏 じょうぎだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "📏 じょうぎ",
+   "items": [
+    {
+     "label": "📏 じょうぎ",
+     "cat": "stationery",
+     "props": []
+    },
+    {
+     "label": "🖍️ クレヨン",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    },
+    {
+     "label": "🖌️ ふで",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-23"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🦋 ちょう",
+   "🐙 たこ",
+   "🐝 はち"
+  ],
+  "a": 1,
+  "why": "はちと ちょうは「そらを とぶ」なかま。🐙 たこだけ ちがうね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "functional",
+   "odd": "🐙 たこ",
+   "items": [
+    {
+     "label": "🦋 ちょう",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    },
+    {
+     "label": "🐙 たこ",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
+     ]
+    },
+    {
+     "label": "🐝 はち",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-24"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "そらを とぶ なかまは どれ？",
+  "opts": [
+   "🐝 はち",
+   "🐳 くじら",
+   "🐱 ねこ"
+  ],
+  "a": 0,
+  "why": "🐝 はちは「そらを とぶ」なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "flies",
+   "axisType": "functional",
+   "correct": "🐝 はち",
+   "items": [
+    {
+     "label": "🐝 はち",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    },
+    {
+     "label": "🐳 くじら",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
+     ]
+    },
+    {
+     "label": "🐱 ねこ",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-25"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "みずの なかや うえに いる なかまは どれ？",
+  "opts": [
+   "🚒 しょうぼうしゃ",
+   "⛵ ふね",
+   "🚗 くるま"
+  ],
+  "a": 1,
+  "why": "⛵ ふねは「みずの なかや うえに いる」なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "water",
+   "axisType": "functional",
+   "correct": "⛵ ふね",
+   "items": [
+    {
+     "label": "🚒 しょうぼうしゃ",
+     "cat": "vehicle",
+     "props": [
+      "red"
+     ]
+    },
+    {
+     "label": "⛵ ふね",
+     "cat": "vehicle",
+     "props": [
+      "water"
+     ]
+    },
+    {
+     "label": "🚗 くるま",
+     "cat": "vehicle",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-n-26"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "そらを とぶ なかまは どれ？",
+  "opts": [
+   "🚌 バス",
+   "✈️ ひこうき",
+   "🚲 じてんしゃ"
+  ],
+  "a": 1,
+  "why": "✈️ ひこうきは「そらを とぶ」なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "flies",
+   "axisType": "functional",
+   "correct": "✈️ ひこうき",
+   "items": [
+    {
+     "label": "🚌 バス",
+     "cat": "vehicle",
+     "props": []
+    },
+    {
+     "label": "✈️ ひこうき",
+     "cat": "vehicle",
+     "props": [
+      "flies"
+     ]
+    },
+    {
+     "label": "🚲 じてんしゃ",
+     "cat": "vehicle",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-n-27"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "そらを とぶ なかまは どれ？",
+  "opts": [
+   "🚒 しょうぼうしゃ",
+   "🚂 きしゃ",
+   "✈️ ひこうき"
+  ],
+  "a": 2,
+  "why": "✈️ ひこうきは「そらを とぶ」なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "flies",
+   "axisType": "functional",
+   "correct": "✈️ ひこうき",
+   "items": [
+    {
+     "label": "🚒 しょうぼうしゃ",
+     "cat": "vehicle",
+     "props": [
+      "red"
+     ]
+    },
+    {
+     "label": "🚂 きしゃ",
+     "cat": "vehicle",
+     "props": []
+    },
+    {
+     "label": "✈️ ひこうき",
+     "cat": "vehicle",
+     "props": [
+      "flies"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-28"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "ものを きる なかまは どれ？",
+  "opts": [
+   "🖌️ ふで",
    "✂️ はさみ",
    "🖍️ クレヨン"
   ],
   "a": 1,
-  "why": "クレヨンと えんぴつは「かく・ぬる」なかま。✂️ はさみだけ ちがうね",
+  "why": "✂️ はさみは「ものを きる」なかまだね。ほかは ちがうよ",
   "meta": {
-   "kind": "nakama",
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "cut",
    "axisType": "functional",
-   "odd": "✂️ はさみ",
+   "correct": "✂️ はさみ",
    "items": [
     {
-     "label": "✏️ えんぴつ",
+     "label": "🖌️ ふで",
      "cat": "stationery",
      "props": [
       "draw"
@@ -5750,26 +6359,148 @@ export const GEN_QUIZZES = [
     }
    ]
   },
-  "id": "nakama-n-23"
+  "id": "nakama-n-29"
  },
  {
   "category": "nakama",
   "difficulty": "normal",
-  "q": "なかまはずれは どれ？",
+  "q": "ものを きる なかまは どれ？",
   "opts": [
-   "🐳 くじら",
-   "🐮 うし",
-   "🐙 たこ"
+   "✂️ はさみ",
+   "🖍️ クレヨン",
+   "📓 ノート"
   ],
-  "a": 1,
-  "why": "くじらと たこは「みずの なかで くらす（つかう）」なかま。🐮 うしだけ ちがうね",
+  "a": 0,
+  "why": "✂️ はさみは「ものを きる」なかまだね。ほかは ちがうよ",
   "meta": {
-   "kind": "nakama",
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "cut",
    "axisType": "functional",
-   "odd": "🐮 うし",
+   "correct": "✂️ はさみ",
    "items": [
     {
-     "label": "🐳 くじら",
+     "label": "✂️ はさみ",
+     "cat": "stationery",
+     "props": [
+      "cut"
+     ]
+    },
+    {
+     "label": "🖍️ クレヨン",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    },
+    {
+     "label": "📓 ノート",
+     "cat": "stationery",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-n-30"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "ものを きる なかまは どれ？",
+  "opts": [
+   "📓 ノート",
+   "🖌️ ふで",
+   "✂️ はさみ"
+  ],
+  "a": 2,
+  "why": "✂️ はさみは「ものを きる」なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "cut",
+   "axisType": "functional",
+   "correct": "✂️ はさみ",
+   "items": [
+    {
+     "label": "📓 ノート",
+     "cat": "stationery",
+     "props": []
+    },
+    {
+     "label": "🖌️ ふで",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    },
+    {
+     "label": "✂️ はさみ",
+     "cat": "stationery",
+     "props": [
+      "cut"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-n-31"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "normal",
+  "q": "みずの なかや うえに いる なかまは どれ？",
+  "opts": [
+   "🚗 くるま",
+   "⛵ ふね",
+   "🚲 じてんしゃ"
+  ],
+  "a": 1,
+  "why": "⛵ ふねは「みずの なかや うえに いる」なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "water",
+   "axisType": "functional",
+   "correct": "⛵ ふね",
+   "items": [
+    {
+     "label": "🚗 くるま",
+     "cat": "vehicle",
+     "props": []
+    },
+    {
+     "label": "⛵ ふね",
+     "cat": "vehicle",
+     "props": [
+      "water"
+     ]
+    },
+    {
+     "label": "🚲 じてんしゃ",
+     "cat": "vehicle",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-n-32"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🐟 さかな",
+   "🐰 うさぎ",
+   "🎹 ピアノ",
+   "🌻 ひまわり"
+  ],
+  "a": 2,
+  "why": "🎹 ピアノだけ いきものじゃ ないね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "🎹 ピアノ",
+   "items": [
+    {
+     "label": "🐟 さかな",
      "cat": "animal",
      "props": [
       "living",
@@ -5778,7 +6509,7 @@ export const GEN_QUIZZES = [
      ]
     },
     {
-     "label": "🐮 うし",
+     "label": "🐰 うさぎ",
      "cat": "animal",
      "props": [
       "living",
@@ -5786,38 +6517,106 @@ export const GEN_QUIZZES = [
      ]
     },
     {
-     "label": "🐙 たこ",
-     "cat": "animal",
+     "label": "🎹 ピアノ",
+     "cat": "instrument",
+     "props": [
+      "sound"
+     ]
+    },
+    {
+     "label": "🌻 ひまわり",
+     "cat": "flower",
      "props": [
       "living",
       "natural",
-      "water"
+      "yellow"
      ]
     }
    ]
   },
-  "id": "nakama-n-24"
+  "id": "nakama-h-1"
  },
  {
   "category": "nakama",
   "difficulty": "hard",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🐜 あり",
-   "🌻 ひまわり",
-   "🔔 すず",
-   "🐟 さかな"
+   "🍉 すいか",
+   "🍬 あめ",
+   "🛏️ ベッド",
+   "🍌 バナナ"
   ],
   "a": 2,
-  "why": "🔔 すずだけ いきものじゃ ないね",
+  "why": "🛏️ ベッドだけ たべられないね",
   "meta": {
    "kind": "nakama",
    "axisType": "abstract",
-   "odd": "🔔 すず",
+   "odd": "🛏️ ベッド",
    "items": [
     {
-     "label": "🐜 あり",
+     "label": "🍉 すいか",
+     "cat": "fruit",
+     "props": [
+      "food",
+      "sweet",
+      "natural"
+     ]
+    },
+    {
+     "label": "🍬 あめ",
+     "cat": "sweets",
+     "props": [
+      "food",
+      "sweet"
+     ]
+    },
+    {
+     "label": "🛏️ ベッド",
+     "cat": "furniture",
+     "props": []
+    },
+    {
+     "label": "🍌 バナナ",
+     "cat": "fruit",
+     "props": [
+      "food",
+      "yellow",
+      "sweet",
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-2"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🐘 ぞう",
+   "🌷 チューリップ",
+   "🌻 ひまわり",
+   "👖 ズボン"
+  ],
+  "a": 3,
+  "why": "👖 ズボンだけ いきものじゃ ないね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "👖 ズボン",
+   "items": [
+    {
+     "label": "🐘 ぞう",
      "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "🌷 チューリップ",
+     "cat": "flower",
      "props": [
       "living",
       "natural"
@@ -5833,60 +6632,60 @@ export const GEN_QUIZZES = [
      ]
     },
     {
-     "label": "🔔 すず",
-     "cat": "instrument",
-     "props": [
-      "sound"
-     ]
-    },
-    {
-     "label": "🐟 さかな",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
+     "label": "👖 ズボン",
+     "cat": "clothing",
+     "props": []
     }
    ]
   },
-  "id": "nakama-h-1"
+  "id": "nakama-h-3"
  },
  {
   "category": "nakama",
   "difficulty": "hard",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🍬 あめ",
-   "🍰 ケーキ",
-   "🍓 いちご",
-   "🐳 くじら"
+   "🍑 もも",
+   "🍅 トマト",
+   "🐙 たこ",
+   "🍎 りんご"
   ],
-  "a": 3,
-  "why": "🐳 くじらだけ たべられないね",
+  "a": 2,
+  "why": "🐙 たこだけ たべられないね",
   "meta": {
    "kind": "nakama",
    "axisType": "abstract",
-   "odd": "🐳 くじら",
+   "odd": "🐙 たこ",
    "items": [
     {
-     "label": "🍬 あめ",
-     "cat": "sweets",
+     "label": "🍑 もも",
+     "cat": "fruit",
      "props": [
       "food",
-      "sweet"
+      "sweet",
+      "natural"
      ]
     },
     {
-     "label": "🍰 ケーキ",
-     "cat": "sweets",
+     "label": "🍅 トマト",
+     "cat": "vegetable",
      "props": [
       "food",
-      "sweet"
+      "red",
+      "natural"
      ]
     },
     {
-     "label": "🍓 いちご",
+     "label": "🐙 たこ",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
+     ]
+    },
+    {
+     "label": "🍎 りんご",
      "cat": "fruit",
      "props": [
       "food",
@@ -5894,43 +6693,33 @@ export const GEN_QUIZZES = [
       "sweet",
       "natural"
      ]
-    },
-    {
-     "label": "🐳 くじら",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
     }
    ]
   },
-  "id": "nakama-h-2"
+  "id": "nakama-h-4"
  },
  {
   "category": "nakama",
   "difficulty": "hard",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🍉 すいか",
+   "🐜 あり",
    "🧅 たまねぎ",
-   "⚽ ボール",
-   "🥒 きゅうり"
+   "🪚 のこぎり",
+   "🍉 すいか"
   ],
   "a": 2,
-  "why": "⚽ ボールだけ たべられないね",
+  "why": "🪚 のこぎりだけ ひとが つくった ものだね",
   "meta": {
    "kind": "nakama",
    "axisType": "abstract",
-   "odd": "⚽ ボール",
+   "odd": "🪚 のこぎり",
    "items": [
     {
-     "label": "🍉 すいか",
-     "cat": "fruit",
+     "label": "🐜 あり",
+     "cat": "animal",
      "props": [
-      "food",
-      "sweet",
+      "living",
       "natural"
      ]
     },
@@ -5943,114 +6732,14 @@ export const GEN_QUIZZES = [
      ]
     },
     {
-     "label": "⚽ ボール",
-     "cat": "toy",
-     "props": []
-    },
-    {
-     "label": "🥒 きゅうり",
-     "cat": "vegetable",
+     "label": "🪚 のこぎり",
+     "cat": "tool",
      "props": [
-      "food",
-      "natural"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-h-3"
- },
- {
-  "category": "nakama",
-  "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🐜 あり",
-   "🌻 ひまわり",
-   "🐳 くじら",
-   "🥤 コップ"
-  ],
-  "a": 3,
-  "why": "🥤 コップだけ いきものじゃ ないね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "abstract",
-   "odd": "🥤 コップ",
-   "items": [
-    {
-     "label": "🐜 あり",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural"
+      "cut"
      ]
     },
     {
-     "label": "🌻 ひまわり",
-     "cat": "flower",
-     "props": [
-      "living",
-      "natural",
-      "yellow"
-     ]
-    },
-    {
-     "label": "🐳 くじら",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🥤 コップ",
-     "cat": "tableware",
-     "props": []
-    }
-   ]
-  },
-  "id": "nakama-h-4"
- },
- {
-  "category": "nakama",
-  "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🥒 きゅうり",
-   "📓 ノート",
-   "🍰 ケーキ",
-   "🍑 もも"
-  ],
-  "a": 1,
-  "why": "📓 ノートだけ たべられないね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "abstract",
-   "odd": "📓 ノート",
-   "items": [
-    {
-     "label": "🥒 きゅうり",
-     "cat": "vegetable",
-     "props": [
-      "food",
-      "natural"
-     ]
-    },
-    {
-     "label": "📓 ノート",
-     "cat": "stationery",
-     "props": []
-    },
-    {
-     "label": "🍰 ケーキ",
-     "cat": "sweets",
-     "props": [
-      "food",
-      "sweet"
-     ]
-    },
-    {
-     "label": "🍑 もも",
+     "label": "🍉 すいか",
      "cat": "fruit",
      "props": [
       "food",
@@ -6067,50 +6756,48 @@ export const GEN_QUIZZES = [
   "difficulty": "hard",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🍓 いちご",
-   "🍅 トマト",
-   "🍰 ケーキ",
-   "🔔 すず"
+   "🧅 たまねぎ",
+   "🍑 もも",
+   "🚒 しょうぼうしゃ",
+   "🥕 にんじん"
   ],
-  "a": 3,
-  "why": "🔔 すずだけ たべられないね",
+  "a": 2,
+  "why": "🚒 しょうぼうしゃだけ たべられないね",
   "meta": {
    "kind": "nakama",
    "axisType": "abstract",
-   "odd": "🔔 すず",
+   "odd": "🚒 しょうぼうしゃ",
    "items": [
     {
-     "label": "🍓 いちご",
+     "label": "🧅 たまねぎ",
+     "cat": "vegetable",
+     "props": [
+      "food",
+      "natural"
+     ]
+    },
+    {
+     "label": "🍑 もも",
      "cat": "fruit",
      "props": [
       "food",
-      "red",
       "sweet",
       "natural"
      ]
     },
     {
-     "label": "🍅 トマト",
+     "label": "🚒 しょうぼうしゃ",
+     "cat": "vehicle",
+     "props": [
+      "red"
+     ]
+    },
+    {
+     "label": "🥕 にんじん",
      "cat": "vegetable",
      "props": [
       "food",
-      "red",
       "natural"
-     ]
-    },
-    {
-     "label": "🍰 ケーキ",
-     "cat": "sweets",
-     "props": [
-      "food",
-      "sweet"
-     ]
-    },
-    {
-     "label": "🔔 すず",
-     "cat": "instrument",
-     "props": [
-      "sound"
      ]
     }
    ]
@@ -6122,27 +6809,18 @@ export const GEN_QUIZZES = [
   "difficulty": "hard",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🍉 すいか",
    "🐙 たこ",
-   "🍅 トマト",
-   "📏 じょうぎ"
+   "👖 ズボン",
+   "🌻 ひまわり",
+   "🌳 き"
   ],
-  "a": 3,
-  "why": "📏 じょうぎだけ ひとが つくった ものだね",
+  "a": 1,
+  "why": "👖 ズボンだけ いきものじゃ ないね",
   "meta": {
    "kind": "nakama",
    "axisType": "abstract",
-   "odd": "📏 じょうぎ",
+   "odd": "👖 ズボン",
    "items": [
-    {
-     "label": "🍉 すいか",
-     "cat": "fruit",
-     "props": [
-      "food",
-      "sweet",
-      "natural"
-     ]
-    },
     {
      "label": "🐙 たこ",
      "cat": "animal",
@@ -6153,18 +6831,26 @@ export const GEN_QUIZZES = [
      ]
     },
     {
-     "label": "🍅 トマト",
-     "cat": "vegetable",
+     "label": "👖 ズボン",
+     "cat": "clothing",
+     "props": []
+    },
+    {
+     "label": "🌻 ひまわり",
+     "cat": "flower",
      "props": [
-      "food",
-      "red",
-      "natural"
+      "living",
+      "natural",
+      "yellow"
      ]
     },
     {
-     "label": "📏 じょうぎ",
-     "cat": "stationery",
-     "props": []
+     "label": "🌳 き",
+     "cat": "flower",
+     "props": [
+      "living",
+      "natural"
+     ]
     }
    ]
   },
@@ -6175,40 +6861,31 @@ export const GEN_QUIZZES = [
   "difficulty": "hard",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🍫 チョコレート",
-   "🍰 ケーキ",
-   "✂️ はさみ",
-   "🍎 りんご"
+   "🐦 ことり",
+   "👕 シャツ",
+   "🍎 りんご",
+   "🍇 ぶどう"
   ],
-  "a": 2,
-  "why": "✂️ はさみだけ たべられないね",
+  "a": 1,
+  "why": "👕 シャツだけ ひとが つくった ものだね",
   "meta": {
    "kind": "nakama",
    "axisType": "abstract",
-   "odd": "✂️ はさみ",
+   "odd": "👕 シャツ",
    "items": [
     {
-     "label": "🍫 チョコレート",
-     "cat": "sweets",
+     "label": "🐦 ことり",
+     "cat": "animal",
      "props": [
-      "food",
-      "sweet"
+      "living",
+      "natural",
+      "flies"
      ]
     },
     {
-     "label": "🍰 ケーキ",
-     "cat": "sweets",
-     "props": [
-      "food",
-      "sweet"
-     ]
-    },
-    {
-     "label": "✂️ はさみ",
-     "cat": "stationery",
-     "props": [
-      "cut"
-     ]
+     "label": "👕 シャツ",
+     "cat": "clothing",
+     "props": []
     },
     {
      "label": "🍎 りんご",
@@ -6216,6 +6893,15 @@ export const GEN_QUIZZES = [
      "props": [
       "food",
       "red",
+      "sweet",
+      "natural"
+     ]
+    },
+    {
+     "label": "🍇 ぶどう",
+     "cat": "fruit",
+     "props": [
+      "food",
       "sweet",
       "natural"
      ]
@@ -6229,33 +6915,40 @@ export const GEN_QUIZZES = [
   "difficulty": "hard",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🐦 ことり",
-   "🐘 ぞう",
-   "🍬 あめ",
-   "🌳 き"
+   "🍦 アイスクリーム",
+   "🍇 ぶどう",
+   "🔪 ほうちょう",
+   "🍬 あめ"
   ],
   "a": 2,
-  "why": "🍬 あめだけ ひとが つくった ものだね",
+  "why": "🔪 ほうちょうだけ たべられないね",
   "meta": {
    "kind": "nakama",
    "axisType": "abstract",
-   "odd": "🍬 あめ",
+   "odd": "🔪 ほうちょう",
    "items": [
     {
-     "label": "🐦 ことり",
-     "cat": "animal",
+     "label": "🍦 アイスクリーム",
+     "cat": "sweets",
      "props": [
-      "living",
-      "natural",
-      "flies"
+      "food",
+      "sweet"
      ]
     },
     {
-     "label": "🐘 ぞう",
-     "cat": "animal",
+     "label": "🍇 ぶどう",
+     "cat": "fruit",
      "props": [
-      "living",
+      "food",
+      "sweet",
       "natural"
+     ]
+    },
+    {
+     "label": "🔪 ほうちょう",
+     "cat": "tool",
+     "props": [
+      "cut"
      ]
     },
     {
@@ -6264,14 +6957,6 @@ export const GEN_QUIZZES = [
      "props": [
       "food",
       "sweet"
-     ]
-    },
-    {
-     "label": "🌳 き",
-     "cat": "flower",
-     "props": [
-      "living",
-      "natural"
      ]
     }
    ]
@@ -6283,28 +6968,25 @@ export const GEN_QUIZZES = [
   "difficulty": "hard",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🍰 ケーキ",
-   "🍎 りんご",
-   "🤖 ロボット",
-   "🍅 トマト"
+   "🧸 ぬいぐるみ",
+   "🍓 いちご",
+   "🐶 いぬ",
+   "🥒 きゅうり"
   ],
-  "a": 2,
-  "why": "🤖 ロボットだけ たべられないね",
+  "a": 0,
+  "why": "🧸 ぬいぐるみだけ ひとが つくった ものだね",
   "meta": {
    "kind": "nakama",
    "axisType": "abstract",
-   "odd": "🤖 ロボット",
+   "odd": "🧸 ぬいぐるみ",
    "items": [
     {
-     "label": "🍰 ケーキ",
-     "cat": "sweets",
-     "props": [
-      "food",
-      "sweet"
-     ]
+     "label": "🧸 ぬいぐるみ",
+     "cat": "toy",
+     "props": []
     },
     {
-     "label": "🍎 りんご",
+     "label": "🍓 いちご",
      "cat": "fruit",
      "props": [
       "food",
@@ -6314,96 +6996,7 @@ export const GEN_QUIZZES = [
      ]
     },
     {
-     "label": "🤖 ロボット",
-     "cat": "toy",
-     "props": []
-    },
-    {
-     "label": "🍅 トマト",
-     "cat": "vegetable",
-     "props": [
-      "food",
-      "red",
-      "natural"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-h-10"
- },
- {
-  "category": "nakama",
-  "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🧅 たまねぎ",
-   "🍦 アイスクリーム",
-   "🍬 あめ",
-   "🌻 ひまわり"
-  ],
-  "a": 3,
-  "why": "🌻 ひまわりだけ たべられないね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "abstract",
-   "odd": "🌻 ひまわり",
-   "items": [
-    {
-     "label": "🧅 たまねぎ",
-     "cat": "vegetable",
-     "props": [
-      "food",
-      "natural"
-     ]
-    },
-    {
-     "label": "🍦 アイスクリーム",
-     "cat": "sweets",
-     "props": [
-      "food",
-      "sweet"
-     ]
-    },
-    {
-     "label": "🍬 あめ",
-     "cat": "sweets",
-     "props": [
-      "food",
-      "sweet"
-     ]
-    },
-    {
-     "label": "🌻 ひまわり",
-     "cat": "flower",
-     "props": [
-      "living",
-      "natural",
-      "yellow"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-h-11"
- },
- {
-  "category": "nakama",
-  "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🐰 うさぎ",
-   "🥒 きゅうり",
-   "🐜 あり",
-   "🚂 きしゃ"
-  ],
-  "a": 3,
-  "why": "🚂 きしゃだけ ひとが つくった ものだね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "abstract",
-   "odd": "🚂 きしゃ",
-   "items": [
-    {
-     "label": "🐰 うさぎ",
+     "label": "🐶 いぬ",
      "cat": "animal",
      "props": [
       "living",
@@ -6417,19 +7010,109 @@ export const GEN_QUIZZES = [
       "food",
       "natural"
      ]
-    },
+    }
+   ]
+  },
+  "id": "nakama-h-10"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "⭐ ほし",
+   "🍽️ おさら",
+   "🦋 ちょう",
+   "🥒 きゅうり"
+  ],
+  "a": 1,
+  "why": "🍽️ おさらだけ ひとが つくった ものだね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "🍽️ おさら",
+   "items": [
     {
-     "label": "🐜 あり",
-     "cat": "animal",
+     "label": "⭐ ほし",
+     "cat": "nature",
      "props": [
-      "living",
       "natural"
      ]
     },
     {
-     "label": "🚂 きしゃ",
-     "cat": "vehicle",
+     "label": "🍽️ おさら",
+     "cat": "tableware",
      "props": []
+    },
+    {
+     "label": "🦋 ちょう",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    },
+    {
+     "label": "🥒 きゅうり",
+     "cat": "vegetable",
+     "props": [
+      "food",
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-11"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🎸 ギター",
+   "🥒 きゅうり",
+   "🍅 トマト",
+   "🍫 チョコレート"
+  ],
+  "a": 0,
+  "why": "🎸 ギターだけ たべられないね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "🎸 ギター",
+   "items": [
+    {
+     "label": "🎸 ギター",
+     "cat": "instrument",
+     "props": [
+      "sound"
+     ]
+    },
+    {
+     "label": "🥒 きゅうり",
+     "cat": "vegetable",
+     "props": [
+      "food",
+      "natural"
+     ]
+    },
+    {
+     "label": "🍅 トマト",
+     "cat": "vegetable",
+     "props": [
+      "food",
+      "red",
+      "natural"
+     ]
+    },
+    {
+     "label": "🍫 チョコレート",
+     "cat": "sweets",
+     "props": [
+      "food",
+      "sweet"
+     ]
     }
    ]
   },
@@ -6440,22 +7123,237 @@ export const GEN_QUIZZES = [
   "difficulty": "hard",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🧸 ぬいぐるみ",
-   "🌳 き",
-   "🐮 うし",
-   "🐶 いぬ"
+   "🥒 きゅうり",
+   "🌙 つき",
+   "🍇 ぶどう",
+   "🥕 にんじん"
   ],
-  "a": 0,
-  "why": "🧸 ぬいぐるみだけ いきものじゃ ないね",
+  "a": 1,
+  "why": "🌙 つきだけ たべられないね",
   "meta": {
    "kind": "nakama",
    "axisType": "abstract",
-   "odd": "🧸 ぬいぐるみ",
+   "odd": "🌙 つき",
    "items": [
     {
-     "label": "🧸 ぬいぐるみ",
-     "cat": "toy",
+     "label": "🥒 きゅうり",
+     "cat": "vegetable",
+     "props": [
+      "food",
+      "natural"
+     ]
+    },
+    {
+     "label": "🌙 つき",
+     "cat": "nature",
+     "props": [
+      "natural"
+     ]
+    },
+    {
+     "label": "🍇 ぶどう",
+     "cat": "fruit",
+     "props": [
+      "food",
+      "sweet",
+      "natural"
+     ]
+    },
+    {
+     "label": "🥕 にんじん",
+     "cat": "vegetable",
+     "props": [
+      "food",
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-13"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🪨 いし",
+   "🧦 くつした",
+   "🦋 ちょう",
+   "🥕 にんじん"
+  ],
+  "a": 1,
+  "why": "🧦 くつしただけ ひとが つくった ものだね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "🧦 くつした",
+   "items": [
+    {
+     "label": "🪨 いし",
+     "cat": "nature",
+     "props": [
+      "natural"
+     ]
+    },
+    {
+     "label": "🧦 くつした",
+     "cat": "clothing",
      "props": []
+    },
+    {
+     "label": "🦋 ちょう",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    },
+    {
+     "label": "🥕 にんじん",
+     "cat": "vegetable",
+     "props": [
+      "food",
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-14"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🍎 りんご",
+   "🍦 アイスクリーム",
+   "🍅 トマト",
+   "⛵ ふね"
+  ],
+  "a": 3,
+  "why": "⛵ ふねだけ たべられないね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "⛵ ふね",
+   "items": [
+    {
+     "label": "🍎 りんご",
+     "cat": "fruit",
+     "props": [
+      "food",
+      "red",
+      "sweet",
+      "natural"
+     ]
+    },
+    {
+     "label": "🍦 アイスクリーム",
+     "cat": "sweets",
+     "props": [
+      "food",
+      "sweet"
+     ]
+    },
+    {
+     "label": "🍅 トマト",
+     "cat": "vegetable",
+     "props": [
+      "food",
+      "red",
+      "natural"
+     ]
+    },
+    {
+     "label": "⛵ ふね",
+     "cat": "vehicle",
+     "props": [
+      "water"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-15"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🎹 ピアノ",
+   "🐜 あり",
+   "🌻 ひまわり",
+   "🐮 うし"
+  ],
+  "a": 0,
+  "why": "🎹 ピアノだけ いきものじゃ ないね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "🎹 ピアノ",
+   "items": [
+    {
+     "label": "🎹 ピアノ",
+     "cat": "instrument",
+     "props": [
+      "sound"
+     ]
+    },
+    {
+     "label": "🐜 あり",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "🌻 ひまわり",
+     "cat": "flower",
+     "props": [
+      "living",
+      "natural",
+      "yellow"
+     ]
+    },
+    {
+     "label": "🐮 うし",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-16"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🐦 ことり",
+   "🌳 き",
+   "🍑 もも",
+   "🐮 うし"
+  ],
+  "a": 2,
+  "why": "🍑 ももだけ いきものじゃ ないね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "🍑 もも",
+   "items": [
+    {
+     "label": "🐦 ことり",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
     },
     {
      "label": "🌳 き",
@@ -6466,7 +7364,265 @@ export const GEN_QUIZZES = [
      ]
     },
     {
+     "label": "🍑 もも",
+     "cat": "fruit",
+     "props": [
+      "food",
+      "sweet",
+      "natural"
+     ]
+    },
+    {
      "label": "🐮 うし",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-17"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🍉 すいか",
+   "🚌 バス",
+   "🍎 りんご",
+   "🍰 ケーキ"
+  ],
+  "a": 1,
+  "why": "🚌 バスだけ たべられないね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "🚌 バス",
+   "items": [
+    {
+     "label": "🍉 すいか",
+     "cat": "fruit",
+     "props": [
+      "food",
+      "sweet",
+      "natural"
+     ]
+    },
+    {
+     "label": "🚌 バス",
+     "cat": "vehicle",
+     "props": []
+    },
+    {
+     "label": "🍎 りんご",
+     "cat": "fruit",
+     "props": [
+      "food",
+      "red",
+      "sweet",
+      "natural"
+     ]
+    },
+    {
+     "label": "🍰 ケーキ",
+     "cat": "sweets",
+     "props": [
+      "food",
+      "sweet"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-18"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🍅 トマト",
+   "📏 じょうぎ",
+   "🌷 チューリップ",
+   "⭐ ほし"
+  ],
+  "a": 1,
+  "why": "📏 じょうぎだけ ひとが つくった ものだね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "📏 じょうぎ",
+   "items": [
+    {
+     "label": "🍅 トマト",
+     "cat": "vegetable",
+     "props": [
+      "food",
+      "red",
+      "natural"
+     ]
+    },
+    {
+     "label": "📏 じょうぎ",
+     "cat": "stationery",
+     "props": []
+    },
+    {
+     "label": "🌷 チューリップ",
+     "cat": "flower",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "⭐ ほし",
+     "cat": "nature",
+     "props": [
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-19"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🎺 ラッパ",
+   "🌳 き",
+   "🦁 ライオン",
+   "🐰 うさぎ"
+  ],
+  "a": 0,
+  "why": "🎺 ラッパだけ いきものじゃ ないね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "🎺 ラッパ",
+   "items": [
+    {
+     "label": "🎺 ラッパ",
+     "cat": "instrument",
+     "props": [
+      "sound"
+     ]
+    },
+    {
+     "label": "🌳 き",
+     "cat": "flower",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "🦁 ライオン",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "🐰 うさぎ",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-20"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🐝 はち",
+   "📏 じょうぎ",
+   "🐳 くじら",
+   "🪨 いし"
+  ],
+  "a": 1,
+  "why": "📏 じょうぎだけ ひとが つくった ものだね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "📏 じょうぎ",
+   "items": [
+    {
+     "label": "🐝 はち",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    },
+    {
+     "label": "📏 じょうぎ",
+     "cat": "stationery",
+     "props": []
+    },
+    {
+     "label": "🐳 くじら",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "water"
+     ]
+    },
+    {
+     "label": "🪨 いし",
+     "cat": "nature",
+     "props": [
+      "natural"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-21"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "なかまはずれは どれ？",
+  "opts": [
+   "🌻 ひまわり",
+   "📺 テレビ",
+   "🐰 うさぎ",
+   "🐶 いぬ"
+  ],
+  "a": 1,
+  "why": "📺 テレビだけ いきものじゃ ないね",
+  "meta": {
+   "kind": "nakama",
+   "axisType": "abstract",
+   "odd": "📺 テレビ",
+   "items": [
+    {
+     "label": "🌻 ひまわり",
+     "cat": "flower",
+     "props": [
+      "living",
+      "natural",
+      "yellow"
+     ]
+    },
+    {
+     "label": "📺 テレビ",
+     "cat": "furniture",
+     "props": []
+    },
+    {
+     "label": "🐰 うさぎ",
      "cat": "animal",
      "props": [
       "living",
@@ -6483,254 +7639,25 @@ export const GEN_QUIZZES = [
     }
    ]
   },
-  "id": "nakama-h-13"
+  "id": "nakama-h-22"
  },
  {
   "category": "nakama",
   "difficulty": "hard",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🤖 ロボット",
-   "🐙 たこ",
-   "🌻 ひまわり",
-   "🌷 チューリップ"
-  ],
-  "a": 0,
-  "why": "🤖 ロボットだけ いきものじゃ ないね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "abstract",
-   "odd": "🤖 ロボット",
-   "items": [
-    {
-     "label": "🤖 ロボット",
-     "cat": "toy",
-     "props": []
-    },
-    {
-     "label": "🐙 たこ",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🌻 ひまわり",
-     "cat": "flower",
-     "props": [
-      "living",
-      "natural",
-      "yellow"
-     ]
-    },
-    {
-     "label": "🌷 チューリップ",
-     "cat": "flower",
-     "props": [
-      "living",
-      "natural"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-h-14"
- },
- {
-  "category": "nakama",
-  "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🐳 くじら",
-   "🪨 いし",
-   "✂️ はさみ",
-   "🍇 ぶどう"
-  ],
-  "a": 2,
-  "why": "✂️ はさみだけ ひとが つくった ものだね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "abstract",
-   "odd": "✂️ はさみ",
-   "items": [
-    {
-     "label": "🐳 くじら",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🪨 いし",
-     "cat": "nature",
-     "props": [
-      "natural"
-     ]
-    },
-    {
-     "label": "✂️ はさみ",
-     "cat": "stationery",
-     "props": [
-      "cut"
-     ]
-    },
-    {
-     "label": "🍇 ぶどう",
-     "cat": "fruit",
-     "props": [
-      "food",
-      "sweet",
-      "natural"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-h-15"
- },
- {
-  "category": "nakama",
-  "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🐟 さかな",
-   "🚲 じてんしゃ",
+   "🐱 ねこ",
+   "🦁 ライオン",
    "🌷 チューリップ",
-   "🐘 ぞう"
+   "⛰️ やま"
   ],
-  "a": 1,
-  "why": "🚲 じてんしゃだけ いきものじゃ ないね",
+  "a": 3,
+  "why": "⛰️ やまだけ いきものじゃ ないね",
   "meta": {
    "kind": "nakama",
    "axisType": "abstract",
-   "odd": "🚲 じてんしゃ",
+   "odd": "⛰️ やま",
    "items": [
-    {
-     "label": "🐟 さかな",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "water"
-     ]
-    },
-    {
-     "label": "🚲 じてんしゃ",
-     "cat": "vehicle",
-     "props": []
-    },
-    {
-     "label": "🌷 チューリップ",
-     "cat": "flower",
-     "props": [
-      "living",
-      "natural"
-     ]
-    },
-    {
-     "label": "🐘 ぞう",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-h-16"
- },
- {
-  "category": "nakama",
-  "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "👕 シャツ",
-   "🐮 うし",
-   "🐘 ぞう",
-   "🍅 トマト"
-  ],
-  "a": 0,
-  "why": "👕 シャツだけ ひとが つくった ものだね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "abstract",
-   "odd": "👕 シャツ",
-   "items": [
-    {
-     "label": "👕 シャツ",
-     "cat": "clothing",
-     "props": []
-    },
-    {
-     "label": "🐮 うし",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural"
-     ]
-    },
-    {
-     "label": "🐘 ぞう",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural"
-     ]
-    },
-    {
-     "label": "🍅 トマト",
-     "cat": "vegetable",
-     "props": [
-      "food",
-      "red",
-      "natural"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-h-17"
- },
- {
-  "category": "nakama",
-  "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🌳 き",
-   "⚽ ボール",
-   "🌻 ひまわり",
-   "🐱 ねこ"
-  ],
-  "a": 1,
-  "why": "⚽ ボールだけ いきものじゃ ないね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "abstract",
-   "odd": "⚽ ボール",
-   "items": [
-    {
-     "label": "🌳 き",
-     "cat": "flower",
-     "props": [
-      "living",
-      "natural"
-     ]
-    },
-    {
-     "label": "⚽ ボール",
-     "cat": "toy",
-     "props": []
-    },
-    {
-     "label": "🌻 ひまわり",
-     "cat": "flower",
-     "props": [
-      "living",
-      "natural",
-      "yellow"
-     ]
-    },
     {
      "label": "🐱 ねこ",
      "cat": "animal",
@@ -6738,38 +7665,53 @@ export const GEN_QUIZZES = [
       "living",
       "natural"
      ]
+    },
+    {
+     "label": "🦁 ライオン",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "🌷 チューリップ",
+     "cat": "flower",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "⛰️ やま",
+     "cat": "nature",
+     "props": [
+      "natural"
+     ]
     }
    ]
   },
-  "id": "nakama-h-18"
+  "id": "nakama-h-23"
  },
  {
   "category": "nakama",
   "difficulty": "hard",
   "q": "なかまはずれは どれ？",
   "opts": [
-   "🍬 あめ",
-   "🥒 きゅうり",
-   "🍉 すいか",
-   "🚂 きしゃ"
+   "🥕 にんじん",
+   "🐘 ぞう",
+   "🎺 ラッパ",
+   "🦁 ライオン"
   ],
-  "a": 3,
-  "why": "🚂 きしゃだけ たべられないね",
+  "a": 2,
+  "why": "🎺 ラッパだけ ひとが つくった ものだね",
   "meta": {
    "kind": "nakama",
    "axisType": "abstract",
-   "odd": "🚂 きしゃ",
+   "odd": "🎺 ラッパ",
    "items": [
     {
-     "label": "🍬 あめ",
-     "cat": "sweets",
-     "props": [
-      "food",
-      "sweet"
-     ]
-    },
-    {
-     "label": "🥒 きゅうり",
+     "label": "🥕 にんじん",
      "cat": "vegetable",
      "props": [
       "food",
@@ -6777,42 +7719,15 @@ export const GEN_QUIZZES = [
      ]
     },
     {
-     "label": "🍉 すいか",
-     "cat": "fruit",
+     "label": "🐘 ぞう",
+     "cat": "animal",
      "props": [
-      "food",
-      "sweet",
+      "living",
       "natural"
      ]
     },
     {
-     "label": "🚂 きしゃ",
-     "cat": "vehicle",
-     "props": []
-    }
-   ]
-  },
-  "id": "nakama-h-19"
- },
- {
-  "category": "nakama",
-  "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🎸 ギター",
-   "🦁 ライオン",
-   "🪨 いし",
-   "🐝 はち"
-  ],
-  "a": 0,
-  "why": "🎸 ギターだけ ひとが つくった ものだね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "abstract",
-   "odd": "🎸 ギター",
-   "items": [
-    {
-     "label": "🎸 ギター",
+     "label": "🎺 ラッパ",
      "cat": "instrument",
      "props": [
       "sound"
@@ -6825,46 +7740,136 @@ export const GEN_QUIZZES = [
       "living",
       "natural"
      ]
-    },
-    {
-     "label": "🪨 いし",
-     "cat": "nature",
-     "props": [
-      "natural"
-     ]
-    },
-    {
-     "label": "🐝 はち",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural",
-      "flies"
-     ]
     }
    ]
   },
-  "id": "nakama-h-20"
+  "id": "nakama-h-24"
  },
  {
   "category": "nakama",
   "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
+  "q": "しぜんに ある なかまは どれ？",
   "opts": [
-   "🧅 たまねぎ",
-   "🍎 りんご",
-   "🐦 ことり",
-   "🍓 いちご"
+   "🐮 うし",
+   "⛵ ふね",
+   "📏 じょうぎ",
+   "🖌️ ふで"
   ],
-  "a": 2,
-  "why": "🐦 ことりだけ たべられないね",
+  "a": 0,
+  "why": "🐮 うしは「しぜんに ある」なかまだね。ほかは ちがうよ",
   "meta": {
-   "kind": "nakama",
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "natural",
    "axisType": "abstract",
-   "odd": "🐦 ことり",
+   "correct": "🐮 うし",
    "items": [
     {
-     "label": "🧅 たまねぎ",
+     "label": "🐮 うし",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural"
+     ]
+    },
+    {
+     "label": "⛵ ふね",
+     "cat": "vehicle",
+     "props": [
+      "water"
+     ]
+    },
+    {
+     "label": "📏 じょうぎ",
+     "cat": "stationery",
+     "props": []
+    },
+    {
+     "label": "🖌️ ふで",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-25"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "いきている なかまは どれ？",
+  "opts": [
+   "🧸 ぬいぐるみ",
+   "🧦 くつした",
+   "🌻 ひまわり",
+   "📏 じょうぎ"
+  ],
+  "a": 2,
+  "why": "🌻 ひまわりは「いきている」なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "living",
+   "axisType": "abstract",
+   "correct": "🌻 ひまわり",
+   "items": [
+    {
+     "label": "🧸 ぬいぐるみ",
+     "cat": "toy",
+     "props": []
+    },
+    {
+     "label": "🧦 くつした",
+     "cat": "clothing",
+     "props": []
+    },
+    {
+     "label": "🌻 ひまわり",
+     "cat": "flower",
+     "props": [
+      "living",
+      "natural",
+      "yellow"
+     ]
+    },
+    {
+     "label": "📏 じょうぎ",
+     "cat": "stationery",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-h-26"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "たべられる なかまは どれ？",
+  "opts": [
+   "🚁 ヘリコプター",
+   "🥕 にんじん",
+   "🖍️ クレヨン",
+   "📺 テレビ"
+  ],
+  "a": 1,
+  "why": "🥕 にんじんは「たべられる」なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "food",
+   "axisType": "abstract",
+   "correct": "🥕 にんじん",
+   "items": [
+    {
+     "label": "🚁 ヘリコプター",
+     "cat": "vehicle",
+     "props": [
+      "flies"
+     ]
+    },
+    {
+     "label": "🥕 にんじん",
      "cat": "vegetable",
      "props": [
       "food",
@@ -6872,12 +7877,100 @@ export const GEN_QUIZZES = [
      ]
     },
     {
-     "label": "🍎 りんご",
-     "cat": "fruit",
+     "label": "🖍️ クレヨン",
+     "cat": "stationery",
+     "props": [
+      "draw"
+     ]
+    },
+    {
+     "label": "📺 テレビ",
+     "cat": "furniture",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-h-27"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "たべられる なかまは どれ？",
+  "opts": [
+   "🧦 くつした",
+   "⛰️ やま",
+   "🍦 アイスクリーム",
+   "🥄 スプーン"
+  ],
+  "a": 2,
+  "why": "🍦 アイスクリームは「たべられる」なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "food",
+   "axisType": "abstract",
+   "correct": "🍦 アイスクリーム",
+   "items": [
+    {
+     "label": "🧦 くつした",
+     "cat": "clothing",
+     "props": []
+    },
+    {
+     "label": "⛰️ やま",
+     "cat": "nature",
+     "props": [
+      "natural"
+     ]
+    },
+    {
+     "label": "🍦 アイスクリーム",
+     "cat": "sweets",
      "props": [
       "food",
-      "red",
-      "sweet",
+      "sweet"
+     ]
+    },
+    {
+     "label": "🥄 スプーン",
+     "cat": "tableware",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-h-28"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "たべられる なかまは どれ？",
+  "opts": [
+   "🔪 ほうちょう",
+   "🐰 うさぎ",
+   "🐦 ことり",
+   "🍓 いちご"
+  ],
+  "a": 3,
+  "why": "🍓 いちごは「たべられる」なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "food",
+   "axisType": "abstract",
+   "correct": "🍓 いちご",
+   "items": [
+    {
+     "label": "🔪 ほうちょう",
+     "cat": "tool",
+     "props": [
+      "cut"
+     ]
+    },
+    {
+     "label": "🐰 うさぎ",
+     "cat": "animal",
+     "props": [
+      "living",
       "natural"
      ]
     },
@@ -6902,132 +7995,39 @@ export const GEN_QUIZZES = [
     }
    ]
   },
-  "id": "nakama-h-21"
+  "id": "nakama-h-29"
  },
  {
   "category": "nakama",
   "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
+  "q": "たべられる なかまは どれ？",
   "opts": [
-   "🍰 ケーキ",
-   "🍬 あめ",
-   "🍎 りんご",
-   "🪨 いし"
-  ],
-  "a": 3,
-  "why": "🪨 いしだけ たべられないね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "abstract",
-   "odd": "🪨 いし",
-   "items": [
-    {
-     "label": "🍰 ケーキ",
-     "cat": "sweets",
-     "props": [
-      "food",
-      "sweet"
-     ]
-    },
-    {
-     "label": "🍬 あめ",
-     "cat": "sweets",
-     "props": [
-      "food",
-      "sweet"
-     ]
-    },
-    {
-     "label": "🍎 りんご",
-     "cat": "fruit",
-     "props": [
-      "food",
-      "red",
-      "sweet",
-      "natural"
-     ]
-    },
-    {
-     "label": "🪨 いし",
-     "cat": "nature",
-     "props": [
-      "natural"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-h-22"
- },
- {
-  "category": "nakama",
-  "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
-  "opts": [
-   "🐘 ぞう",
-   "🧅 たまねぎ",
-   "🍦 アイスクリーム",
-   "🍰 ケーキ"
-  ],
-  "a": 0,
-  "why": "🐘 ぞうだけ たべられないね",
-  "meta": {
-   "kind": "nakama",
-   "axisType": "abstract",
-   "odd": "🐘 ぞう",
-   "items": [
-    {
-     "label": "🐘 ぞう",
-     "cat": "animal",
-     "props": [
-      "living",
-      "natural"
-     ]
-    },
-    {
-     "label": "🧅 たまねぎ",
-     "cat": "vegetable",
-     "props": [
-      "food",
-      "natural"
-     ]
-    },
-    {
-     "label": "🍦 アイスクリーム",
-     "cat": "sweets",
-     "props": [
-      "food",
-      "sweet"
-     ]
-    },
-    {
-     "label": "🍰 ケーキ",
-     "cat": "sweets",
-     "props": [
-      "food",
-      "sweet"
-     ]
-    }
-   ]
-  },
-  "id": "nakama-h-23"
- },
- {
-  "category": "nakama",
-  "difficulty": "hard",
-  "q": "なかまはずれは どれ？",
-  "opts": [
+   "⛵ ふね",
+   "🧤 てぶくろ",
    "🍑 もも",
-   "🥕 にんじん",
-   "🍬 あめ",
-   "🚒 しょうぼうしゃ"
+   "🧦 くつした"
   ],
-  "a": 3,
-  "why": "🚒 しょうぼうしゃだけ たべられないね",
+  "a": 2,
+  "why": "🍑 ももは「たべられる」なかまだね。ほかは ちがうよ",
   "meta": {
-   "kind": "nakama",
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "food",
    "axisType": "abstract",
-   "odd": "🚒 しょうぼうしゃ",
+   "correct": "🍑 もも",
    "items": [
+    {
+     "label": "⛵ ふね",
+     "cat": "vehicle",
+     "props": [
+      "water"
+     ]
+    },
+    {
+     "label": "🧤 てぶくろ",
+     "cat": "clothing",
+     "props": []
+    },
     {
      "label": "🍑 もも",
      "cat": "fruit",
@@ -7038,11 +8038,102 @@ export const GEN_QUIZZES = [
      ]
     },
     {
-     "label": "🥕 にんじん",
-     "cat": "vegetable",
+     "label": "🧦 くつした",
+     "cat": "clothing",
+     "props": []
+    }
+   ]
+  },
+  "id": "nakama-h-30"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "しぜんに ある なかまは どれ？",
+  "opts": [
+   "🖍️ クレヨン",
+   "👖 ズボン",
+   "🥁 たいこ",
+   "🐝 はち"
+  ],
+  "a": 3,
+  "why": "🐝 はちは「しぜんに ある」なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "natural",
+   "axisType": "abstract",
+   "correct": "🐝 はち",
+   "items": [
+    {
+     "label": "🖍️ クレヨン",
+     "cat": "stationery",
      "props": [
-      "food",
+      "draw"
+     ]
+    },
+    {
+     "label": "👖 ズボン",
+     "cat": "clothing",
+     "props": []
+    },
+    {
+     "label": "🥁 たいこ",
+     "cat": "instrument",
+     "props": [
+      "sound"
+     ]
+    },
+    {
+     "label": "🐝 はち",
+     "cat": "animal",
+     "props": [
+      "living",
+      "natural",
+      "flies"
+     ]
+    }
+   ]
+  },
+  "id": "nakama-h-31"
+ },
+ {
+  "category": "nakama",
+  "difficulty": "hard",
+  "q": "たべられる なかまは どれ？",
+  "opts": [
+   "🧤 てぶくろ",
+   "🐱 ねこ",
+   "✏️ えんぴつ",
+   "🍬 あめ"
+  ],
+  "a": 3,
+  "why": "🍬 あめは「たべられる」なかまだね。ほかは ちがうよ",
+  "meta": {
+   "kind": "nakama-axis",
+   "axisKind": "prop",
+   "axis": "food",
+   "axisType": "abstract",
+   "correct": "🍬 あめ",
+   "items": [
+    {
+     "label": "🧤 てぶくろ",
+     "cat": "clothing",
+     "props": []
+    },
+    {
+     "label": "🐱 ねこ",
+     "cat": "animal",
+     "props": [
+      "living",
       "natural"
+     ]
+    },
+    {
+     "label": "✏️ えんぴつ",
+     "cat": "stationery",
+     "props": [
+      "draw"
      ]
     },
     {
@@ -7052,32 +8143,25 @@ export const GEN_QUIZZES = [
       "food",
       "sweet"
      ]
-    },
-    {
-     "label": "🚒 しょうぼうしゃ",
-     "cat": "vehicle",
-     "props": [
-      "red"
-     ]
     }
    ]
   },
-  "id": "nakama-h-24"
+  "id": "nakama-h-32"
  },
  {
-  "q": "➡️ みぎを むいている ロボットが「ひだりを むく」。どっちを むく？",
+  "q": "⬇️ したを むいている ロボットが「みぎを むく」。どっちを むく？",
   "opts": [
    "⬅️ ひだり",
-   "⬇️ した",
+   "➡️ みぎ",
    "⬆️ うえ"
   ],
-  "a": 2,
-  "why": "➡️ みぎから くるっと まわると ⬆️ うえだね",
+  "a": 0,
+  "why": "⬇️ したから くるっと まわると ⬅️ ひだりだね",
   "meta": {
    "kind": "robot-turn",
-   "start": 0,
+   "start": 1,
    "turns": [
-    "left"
+    "right"
    ]
   },
   "category": "robot",
@@ -7087,11 +8171,11 @@ export const GEN_QUIZZES = [
  {
   "q": "「まえへ」を 4かい。なんマス すすむ？",
   "opts": [
-   "5マス",
    "3マス",
-   "4マス"
+   "4マス",
+   "5マス"
   ],
-  "a": 2,
+  "a": 1,
   "why": "1かいで 1マス。4かいなら 4マスだね",
   "meta": {
    "kind": "robot-steps",
@@ -7107,227 +8191,31 @@ export const GEN_QUIZZES = [
   "id": "robot-e-2"
  },
  {
-  "q": "⬇️ したを むいている ロボットが「まえへ 2マス」。スタートから みて どこに いる？",
+  "q": "➡️ みぎを むいている ロボットが「まえへ 3マス」。スタートから みて どこに いる？",
   "opts": [
-   "ひだりに 2マス",
-   "したに 2マス",
+   "みぎに 3マス",
+   "みぎに 4マス",
    "したに 3マス"
   ],
-  "a": 1,
-  "why": "むいている ほうこうに 2マス すすむよ",
+  "a": 0,
+  "why": "むいている ほうこうに 3マス すすむよ",
   "meta": {
    "kind": "robot-move",
-   "start": 1,
-   "n": 2
+   "start": 0,
+   "n": 3
   },
   "category": "robot",
   "difficulty": "easy",
   "id": "robot-e-3"
  },
  {
-  "q": "⬇️ したを むいている ロボットが「みぎを むく」。どっちを むく？",
+  "q": "⬆️ うえを むいている ロボットが「ひだりを むく」。どっちを むく？",
   "opts": [
-   "➡️ みぎ",
+   "⬇️ した",
    "⬆️ うえ",
    "⬅️ ひだり"
   ],
   "a": 2,
-  "why": "⬇️ したから くるっと まわると ⬅️ ひだりだね",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 1,
-   "turns": [
-    "right"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-4"
- },
- {
-  "q": "「まえへ」を 5かい。なんマス すすむ？",
-  "opts": [
-   "4マス",
-   "5マス",
-   "6マス"
-  ],
-  "a": 1,
-  "why": "1かいで 1マス。5かいなら 5マスだね",
-  "meta": {
-   "kind": "robot-steps",
-   "steps": [
-    1,
-    1,
-    1,
-    1,
-    1
-   ]
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-5"
- },
- {
-  "q": "➡️ みぎを むいている ロボットが「まえへ 2マス」。スタートから みて どこに いる？",
-  "opts": [
-   "みぎに 3マス",
-   "したに 2マス",
-   "みぎに 2マス"
-  ],
-  "a": 2,
-  "why": "むいている ほうこうに 2マス すすむよ",
-  "meta": {
-   "kind": "robot-move",
-   "start": 0,
-   "n": 2
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-6"
- },
- {
-  "q": "⬆️ うえを むいている ロボットが「みぎを むく」。どっちを むく？",
-  "opts": [
-   "⬅️ ひだり",
-   "➡️ みぎ",
-   "⬇️ した"
-  ],
-  "a": 1,
-  "why": "⬆️ うえから くるっと まわると ➡️ みぎだね",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 3,
-   "turns": [
-    "right"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-7"
- },
- {
-  "q": "「まえへ」を 3かい。なんマス すすむ？",
-  "opts": [
-   "3マス",
-   "2マス",
-   "4マス"
-  ],
-  "a": 0,
-  "why": "1かいで 1マス。3かいなら 3マスだね",
-  "meta": {
-   "kind": "robot-steps",
-   "steps": [
-    1,
-    1,
-    1
-   ]
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-8"
- },
- {
-  "q": "⬅️ ひだりを むいている ロボットが「まえへ 2マス」。スタートから みて どこに いる？",
-  "opts": [
-   "ひだりに 2マス",
-   "ひだりに 3マス",
-   "うえに 2マス"
-  ],
-  "a": 0,
-  "why": "むいている ほうこうに 2マス すすむよ",
-  "meta": {
-   "kind": "robot-move",
-   "start": 2,
-   "n": 2
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-9"
- },
- {
-  "q": "⬆️ うえを むいている ロボットが「みぎを むく」。どっちを むく？",
-  "opts": [
-   "⬆️ うえ",
-   "➡️ みぎ",
-   "⬇️ した"
-  ],
-  "a": 1,
-  "why": "⬆️ うえから くるっと まわると ➡️ みぎだね",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 3,
-   "turns": [
-    "right"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-10"
- },
- {
-  "q": "⬅️ ひだりを むいている ロボットが「まえへ 4マス」。スタートから みて どこに いる？",
-  "opts": [
-   "ひだりに 4マス",
-   "ひだりに 5マス",
-   "うえに 4マス"
-  ],
-  "a": 0,
-  "why": "むいている ほうこうに 4マス すすむよ",
-  "meta": {
-   "kind": "robot-move",
-   "start": 2,
-   "n": 4
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-11"
- },
- {
-  "q": "➡️ みぎを むいている ロボットが「みぎを むく」。どっちを むく？",
-  "opts": [
-   "⬆️ うえ",
-   "⬅️ ひだり",
-   "⬇️ した"
-  ],
-  "a": 2,
-  "why": "➡️ みぎから くるっと まわると ⬇️ しただね",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 0,
-   "turns": [
-    "right"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-12"
- },
- {
-  "q": "⬆️ うえを むいている ロボットが「まえへ 4マス」。スタートから みて どこに いる？",
-  "opts": [
-   "うえに 5マス",
-   "みぎに 4マス",
-   "うえに 4マス"
-  ],
-  "a": 2,
-  "why": "むいている ほうこうに 4マス すすむよ",
-  "meta": {
-   "kind": "robot-move",
-   "start": 3,
-   "n": 4
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-13"
- },
- {
-  "q": "⬆️ うえを むいている ロボットが「ひだりを むく」。どっちを むく？",
-  "opts": [
-   "⬆️ うえ",
-   "⬅️ ひだり",
-   "⬇️ した"
-  ],
-  "a": 1,
   "why": "⬆️ うえから くるっと まわると ⬅️ ひだりだね",
   "meta": {
    "kind": "robot-turn",
@@ -7338,16 +8226,16 @@ export const GEN_QUIZZES = [
   },
   "category": "robot",
   "difficulty": "easy",
-  "id": "robot-e-14"
+  "id": "robot-e-4"
  },
  {
   "q": "「まえへ」を 2かい。なんマス すすむ？",
   "opts": [
    "3マス",
-   "1マス",
-   "2マス"
+   "2マス",
+   "1マス"
   ],
-  "a": 2,
+  "a": 1,
   "why": "1かいで 1マス。2かいなら 2マスだね",
   "meta": {
    "kind": "robot-steps",
@@ -7358,67 +8246,7 @@ export const GEN_QUIZZES = [
   },
   "category": "robot",
   "difficulty": "easy",
-  "id": "robot-e-15"
- },
- {
-  "q": "⬅️ ひだりを むいている ロボットが「ひだりを むく」。どっちを むく？",
-  "opts": [
-   "⬆️ うえ",
-   "⬇️ した",
-   "➡️ みぎ"
-  ],
-  "a": 1,
-  "why": "⬅️ ひだりから くるっと まわると ⬇️ しただね",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 2,
-   "turns": [
-    "left"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-16"
- },
- {
-  "q": "➡️ みぎを むいている ロボットが「ひだりを むく」。どっちを むく？",
-  "opts": [
-   "➡️ みぎ",
-   "⬆️ うえ",
-   "⬅️ ひだり"
-  ],
-  "a": 1,
-  "why": "➡️ みぎから くるっと まわると ⬆️ うえだね",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 0,
-   "turns": [
-    "left"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-17"
- },
- {
-  "q": "⬇️ したを むいている ロボットが「ひだりを むく」。どっちを むく？",
-  "opts": [
-   "⬇️ した",
-   "⬅️ ひだり",
-   "➡️ みぎ"
-  ],
-  "a": 2,
-  "why": "⬇️ したから くるっと まわると ➡️ みぎだね",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 1,
-   "turns": [
-    "left"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "easy",
-  "id": "robot-e-18"
+  "id": "robot-e-5"
  },
  {
   "q": "➡️ みぎを むいている ロボットが「まえへ 4マス」。スタートから みて どこに いる？",
@@ -7436,20 +8264,274 @@ export const GEN_QUIZZES = [
   },
   "category": "robot",
   "difficulty": "easy",
-  "id": "robot-e-19"
+  "id": "robot-e-6"
  },
  {
-  "q": "⬅️ ひだりを むいている ロボットが「ひだりを むく」。どっちを むく？",
+  "q": "⬆️ うえを むいている ロボットが「みぎを むく」。どっちを むく？",
   "opts": [
+   "⬇️ した",
    "⬅️ ひだり",
-   "➡️ みぎ",
-   "⬇️ した"
+   "➡️ みぎ"
   ],
   "a": 2,
-  "why": "⬅️ ひだりから くるっと まわると ⬇️ しただね",
+  "why": "⬆️ うえから くるっと まわると ➡️ みぎだね",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 3,
+   "turns": [
+    "right"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-7"
+ },
+ {
+  "q": "「まえへ」を 5かい。なんマス すすむ？",
+  "opts": [
+   "5マス",
+   "6マス",
+   "4マス"
+  ],
+  "a": 0,
+  "why": "1かいで 1マス。5かいなら 5マスだね",
+  "meta": {
+   "kind": "robot-steps",
+   "steps": [
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-8"
+ },
+ {
+  "q": "⬆️ うえを むいている ロボットが「まえへ 3マス」。スタートから みて どこに いる？",
+  "opts": [
+   "うえに 4マス",
+   "うえに 3マス",
+   "みぎに 3マス"
+  ],
+  "a": 1,
+  "why": "むいている ほうこうに 3マス すすむよ",
+  "meta": {
+   "kind": "robot-move",
+   "start": 3,
+   "n": 3
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-9"
+ },
+ {
+  "q": "⬆️ うえを むいている ロボットが「まえへ 4マス」。スタートから みて どこに いる？",
+  "opts": [
+   "うえに 4マス",
+   "うえに 5マス",
+   "みぎに 4マス"
+  ],
+  "a": 0,
+  "why": "むいている ほうこうに 4マス すすむよ",
+  "meta": {
+   "kind": "robot-move",
+   "start": 3,
+   "n": 4
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-10"
+ },
+ {
+  "q": "⬅️ ひだりを むいている ロボットが「みぎを むく」。どっちを むく？",
+  "opts": [
+   "➡️ みぎ",
+   "⬆️ うえ",
+   "⬇️ した"
+  ],
+  "a": 1,
+  "why": "⬅️ ひだりから くるっと まわると ⬆️ うえだね",
   "meta": {
    "kind": "robot-turn",
    "start": 2,
+   "turns": [
+    "right"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-11"
+ },
+ {
+  "q": "⬇️ したを むいている ロボットが「まえへ 3マス」。スタートから みて どこに いる？",
+  "opts": [
+   "ひだりに 3マス",
+   "したに 3マス",
+   "したに 4マス"
+  ],
+  "a": 1,
+  "why": "むいている ほうこうに 3マス すすむよ",
+  "meta": {
+   "kind": "robot-move",
+   "start": 1,
+   "n": 3
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-12"
+ },
+ {
+  "q": "⬆️ うえを むいている ロボットが「みぎを むく」。どっちを むく？",
+  "opts": [
+   "⬅️ ひだり",
+   "➡️ みぎ",
+   "⬆️ うえ"
+  ],
+  "a": 1,
+  "why": "⬆️ うえから くるっと まわると ➡️ みぎだね",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 3,
+   "turns": [
+    "right"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-13"
+ },
+ {
+  "q": "「まえへ」を 3かい。なんマス すすむ？",
+  "opts": [
+   "4マス",
+   "2マス",
+   "3マス"
+  ],
+  "a": 2,
+  "why": "1かいで 1マス。3かいなら 3マスだね",
+  "meta": {
+   "kind": "robot-steps",
+   "steps": [
+    1,
+    1,
+    1
+   ]
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-14"
+ },
+ {
+  "q": "⬆️ うえを むいている ロボットが「まえへ 2マス」。スタートから みて どこに いる？",
+  "opts": [
+   "うえに 3マス",
+   "うえに 2マス",
+   "みぎに 2マス"
+  ],
+  "a": 1,
+  "why": "むいている ほうこうに 2マス すすむよ",
+  "meta": {
+   "kind": "robot-move",
+   "start": 3,
+   "n": 2
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-15"
+ },
+ {
+  "q": "➡️ みぎを むいている ロボットが「ひだりを むく」。どっちを むく？",
+  "opts": [
+   "⬆️ うえ",
+   "➡️ みぎ",
+   "⬅️ ひだり"
+  ],
+  "a": 0,
+  "why": "➡️ みぎから くるっと まわると ⬆️ うえだね",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 0,
+   "turns": [
+    "left"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-16"
+ },
+ {
+  "q": "⬆️ うえを むいている ロボットが「ひだりを むく」。どっちを むく？",
+  "opts": [
+   "⬇️ した",
+   "⬅️ ひだり",
+   "➡️ みぎ"
+  ],
+  "a": 1,
+  "why": "⬆️ うえから くるっと まわると ⬅️ ひだりだね",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 3,
+   "turns": [
+    "left"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-17"
+ },
+ {
+  "q": "➡️ みぎを むいている ロボットが「ひだりを むく」。どっちを むく？",
+  "opts": [
+   "⬇️ した",
+   "⬅️ ひだり",
+   "⬆️ うえ"
+  ],
+  "a": 2,
+  "why": "➡️ みぎから くるっと まわると ⬆️ うえだね",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 0,
+   "turns": [
+    "left"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-18"
+ },
+ {
+  "q": "⬇️ したを むいている ロボットが「まえへ 4マス」。スタートから みて どこに いる？",
+  "opts": [
+   "ひだりに 4マス",
+   "したに 5マス",
+   "したに 4マス"
+  ],
+  "a": 2,
+  "why": "むいている ほうこうに 4マス すすむよ",
+  "meta": {
+   "kind": "robot-move",
+   "start": 1,
+   "n": 4
+  },
+  "category": "robot",
+  "difficulty": "easy",
+  "id": "robot-e-19"
+ },
+ {
+  "q": "⬇️ したを むいている ロボットが「ひだりを むく」。どっちを むく？",
+  "opts": [
+   "➡️ みぎ",
+   "⬇️ した",
+   "⬆️ うえ"
+  ],
+  "a": 0,
+  "why": "⬇️ したから くるっと まわると ➡️ みぎだね",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 1,
    "turns": [
     "left"
    ]
@@ -7459,19 +8541,19 @@ export const GEN_QUIZZES = [
   "id": "robot-e-20"
  },
  {
-  "q": "⬇️ したを むいている ロボットに「みぎを むく」→「ひだりを むく」。さいごに どっちを むいている？",
+  "q": "⬇️ したを むいている ロボットに「ひだりを むく」→「ひだりを むく」。さいごに どっちを むいている？",
   "opts": [
-   "➡️ みぎ",
+   "⬇️ した",
    "⬆️ うえ",
-   "⬇️ した"
+   "➡️ みぎ"
   ],
-  "a": 2,
+  "a": 1,
   "why": "1かいずつ じゅんばんに まわして かんがえよう",
   "meta": {
    "kind": "robot-turn",
    "start": 1,
    "turns": [
-    "right",
+    "left",
     "left"
    ]
   },
@@ -7480,17 +8562,17 @@ export const GEN_QUIZZES = [
   "id": "robot-n-1"
  },
  {
-  "q": "⬅️ ひだりを むいている ロボット。「まえへ 3マス」→「みぎを むく」→「まえへ 3マス」。スタートから みて どこに いる？",
+  "q": "⬆️ うえを むいている ロボット。「まえへ 3マス」→「みぎを むく」→「まえへ 3マス」。スタートから みて どこに いる？",
   "opts": [
-   "ひだりに 3マス・うえに 4マス",
-   "ひだりに 3マス・うえに 3マス",
-   "ひだりに 6マス"
+   "うえに 6マス",
+   "みぎに 4マス・うえに 3マス",
+   "みぎに 3マス・うえに 3マス"
   ],
-  "a": 1,
+  "a": 2,
   "why": "まがった あとは すすむ ほうこうが かわるよ",
   "meta": {
    "kind": "robot-goal",
-   "start": 2,
+   "start": 3,
    "cmds": [
     3,
     "R",
@@ -7504,7 +8586,7 @@ export const GEN_QUIZZES = [
  {
   "q": "➡️ みぎを むいている ロボットに「みぎを むく」→「ひだりを むく」。さいごに どっちを むいている？",
   "opts": [
-   "⬅️ ひだり",
+   "⬇️ した",
    "➡️ みぎ",
    "⬆️ うえ"
   ],
@@ -7523,17 +8605,17 @@ export const GEN_QUIZZES = [
   "id": "robot-n-3"
  },
  {
-  "q": "➡️ みぎを むいている ロボット。「まえへ 3マス」→「ひだりを むく」→「まえへ 1マス」。スタートから みて どこに いる？",
+  "q": "⬆️ うえを むいている ロボット。「まえへ 3マス」→「ひだりを むく」→「まえへ 1マス」。スタートから みて どこに いる？",
   "opts": [
-   "みぎに 3マス・うえに 1マス",
-   "みぎに 4マス",
-   "みぎに 3マス・うえに 2マス"
+   "ひだりに 2マス・うえに 3マス",
+   "うえに 4マス",
+   "ひだりに 1マス・うえに 3マス"
   ],
-  "a": 0,
+  "a": 2,
   "why": "まがった あとは すすむ ほうこうが かわるよ",
   "meta": {
    "kind": "robot-goal",
-   "start": 0,
+   "start": 3,
    "cmds": [
     3,
     "L",
@@ -7545,20 +8627,20 @@ export const GEN_QUIZZES = [
   "id": "robot-n-4"
  },
  {
-  "q": "⬅️ ひだりを むいている ロボットに「ひだりを むく」→「みぎを むく」。さいごに どっちを むいている？",
+  "q": "➡️ みぎを むいている ロボットに「みぎを むく」→「ひだりを むく」。さいごに どっちを むいている？",
   "opts": [
-   "⬆️ うえ",
-   "⬅️ ひだり",
-   "⬇️ した"
+   "➡️ みぎ",
+   "⬇️ した",
+   "⬅️ ひだり"
   ],
-  "a": 1,
+  "a": 0,
   "why": "1かいずつ じゅんばんに まわして かんがえよう",
   "meta": {
    "kind": "robot-turn",
-   "start": 2,
+   "start": 0,
    "turns": [
-    "left",
-    "right"
+    "right",
+    "left"
    ]
   },
   "category": "robot",
@@ -7566,21 +8648,21 @@ export const GEN_QUIZZES = [
   "id": "robot-n-5"
  },
  {
-  "q": "⬅️ ひだりを むいている ロボット。「まえへ 3マス」→「ひだりを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
+  "q": "➡️ みぎを むいている ロボット。「まえへ 1マス」→「ひだりを むく」→「まえへ 1マス」。スタートから みて どこに いる？",
   "opts": [
-   "ひだりに 5マス",
-   "ひだりに 3マス・したに 2マス",
-   "ひだりに 3マス・したに 3マス"
+   "みぎに 1マス・うえに 1マス",
+   "みぎに 2マス",
+   "みぎに 1マス・うえに 2マス"
   ],
-  "a": 1,
+  "a": 0,
   "why": "まがった あとは すすむ ほうこうが かわるよ",
   "meta": {
    "kind": "robot-goal",
-   "start": 2,
+   "start": 0,
    "cmds": [
-    3,
+    1,
     "L",
-    2
+    1
    ]
   },
   "category": "robot",
@@ -7588,211 +8670,17 @@ export const GEN_QUIZZES = [
   "id": "robot-n-6"
  },
  {
-  "q": "⬆️ うえを むいている ロボットに「みぎを むく」→「みぎを むく」。さいごに どっちを むいている？",
+  "q": "➡️ みぎを むいている ロボットに「ひだりを むく」→「みぎを むく」。さいごに どっちを むいている？",
   "opts": [
-   "⬆️ うえ",
+   "⬇️ した",
    "➡️ みぎ",
-   "⬇️ した"
-  ],
-  "a": 2,
-  "why": "1かいずつ じゅんばんに まわして かんがえよう",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 3,
-   "turns": [
-    "right",
-    "right"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "normal",
-  "id": "robot-n-7"
- },
- {
-  "q": "⬅️ ひだりを むいている ロボット。「まえへ 2マス」→「みぎを むく」→「まえへ 3マス」。スタートから みて どこに いる？",
-  "opts": [
-   "ひだりに 2マス・うえに 4マス",
-   "ひだりに 2マス・うえに 3マス",
-   "ひだりに 5マス"
+   "⬆️ うえ"
   ],
   "a": 1,
-  "why": "まがった あとは すすむ ほうこうが かわるよ",
-  "meta": {
-   "kind": "robot-goal",
-   "start": 2,
-   "cmds": [
-    2,
-    "R",
-    3
-   ]
-  },
-  "category": "robot",
-  "difficulty": "normal",
-  "id": "robot-n-8"
- },
- {
-  "q": "➡️ みぎを むいている ロボットに「みぎを むく」→「みぎを むく」。さいごに どっちを むいている？",
-  "opts": [
-   "➡️ みぎ",
-   "⬆️ うえ",
-   "⬅️ ひだり"
-  ],
-  "a": 2,
   "why": "1かいずつ じゅんばんに まわして かんがえよう",
   "meta": {
    "kind": "robot-turn",
    "start": 0,
-   "turns": [
-    "right",
-    "right"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "normal",
-  "id": "robot-n-9"
- },
- {
-  "q": "⬇️ したを むいている ロボット。「まえへ 3マス」→「みぎを むく」→「まえへ 3マス」。スタートから みて どこに いる？",
-  "opts": [
-   "したに 6マス",
-   "ひだりに 4マス・したに 3マス",
-   "ひだりに 3マス・したに 3マス"
-  ],
-  "a": 2,
-  "why": "まがった あとは すすむ ほうこうが かわるよ",
-  "meta": {
-   "kind": "robot-goal",
-   "start": 1,
-   "cmds": [
-    3,
-    "R",
-    3
-   ]
-  },
-  "category": "robot",
-  "difficulty": "normal",
-  "id": "robot-n-10"
- },
- {
-  "q": "⬅️ ひだりを むいている ロボットに「みぎを むく」→「ひだりを むく」。さいごに どっちを むいている？",
-  "opts": [
-   "⬅️ ひだり",
-   "⬇️ した",
-   "⬆️ うえ"
-  ],
-  "a": 0,
-  "why": "1かいずつ じゅんばんに まわして かんがえよう",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 2,
-   "turns": [
-    "right",
-    "left"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "normal",
-  "id": "robot-n-11"
- },
- {
-  "q": "⬇️ したを むいている ロボット。「まえへ 2マス」→「ひだりを むく」→「まえへ 3マス」。スタートから みて どこに いる？",
-  "opts": [
-   "みぎに 4マス・したに 2マス",
-   "したに 5マス",
-   "みぎに 3マス・したに 2マス"
-  ],
-  "a": 2,
-  "why": "まがった あとは すすむ ほうこうが かわるよ",
-  "meta": {
-   "kind": "robot-goal",
-   "start": 1,
-   "cmds": [
-    2,
-    "L",
-    3
-   ]
-  },
-  "category": "robot",
-  "difficulty": "normal",
-  "id": "robot-n-12"
- },
- {
-  "q": "➡️ みぎを むいている ロボット。「まえへ 3マス」→「みぎを むく」→「まえへ 1マス」。スタートから みて どこに いる？",
-  "opts": [
-   "みぎに 4マス",
-   "みぎに 3マス・したに 2マス",
-   "みぎに 3マス・したに 1マス"
-  ],
-  "a": 2,
-  "why": "まがった あとは すすむ ほうこうが かわるよ",
-  "meta": {
-   "kind": "robot-goal",
-   "start": 0,
-   "cmds": [
-    3,
-    "R",
-    1
-   ]
-  },
-  "category": "robot",
-  "difficulty": "normal",
-  "id": "robot-n-13"
- },
- {
-  "q": "⬅️ ひだりを むいている ロボットに「みぎを むく」→「ひだりを むく」。さいごに どっちを むいている？",
-  "opts": [
-   "⬅️ ひだり",
-   "➡️ みぎ",
-   "⬆️ うえ"
-  ],
-  "a": 0,
-  "why": "1かいずつ じゅんばんに まわして かんがえよう",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 2,
-   "turns": [
-    "right",
-    "left"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "normal",
-  "id": "robot-n-14"
- },
- {
-  "q": "⬇️ したを むいている ロボット。「まえへ 1マス」→「みぎを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
-  "opts": [
-   "したに 3マス",
-   "ひだりに 3マス・したに 1マス",
-   "ひだりに 2マス・したに 1マス"
-  ],
-  "a": 2,
-  "why": "まがった あとは すすむ ほうこうが かわるよ",
-  "meta": {
-   "kind": "robot-goal",
-   "start": 1,
-   "cmds": [
-    1,
-    "R",
-    2
-   ]
-  },
-  "category": "robot",
-  "difficulty": "normal",
-  "id": "robot-n-15"
- },
- {
-  "q": "⬇️ したを むいている ロボットに「ひだりを むく」→「みぎを むく」。さいごに どっちを むいている？",
-  "opts": [
-   "➡️ みぎ",
-   "⬅️ ひだり",
-   "⬇️ した"
-  ],
-  "a": 2,
-  "why": "1かいずつ じゅんばんに まわして かんがえよう",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 1,
    "turns": [
     "left",
     "right"
@@ -7800,29 +8688,7 @@ export const GEN_QUIZZES = [
   },
   "category": "robot",
   "difficulty": "normal",
-  "id": "robot-n-16"
- },
- {
-  "q": "➡️ みぎを むいている ロボット。「まえへ 1マス」→「みぎを むく」→「まえへ 1マス」。スタートから みて どこに いる？",
-  "opts": [
-   "みぎに 1マス・したに 2マス",
-   "みぎに 2マス",
-   "みぎに 1マス・したに 1マス"
-  ],
-  "a": 2,
-  "why": "まがった あとは すすむ ほうこうが かわるよ",
-  "meta": {
-   "kind": "robot-goal",
-   "start": 0,
-   "cmds": [
-    1,
-    "R",
-    1
-   ]
-  },
-  "category": "robot",
-  "difficulty": "normal",
-  "id": "robot-n-17"
+  "id": "robot-n-7"
  },
  {
   "q": "⬆️ うえを むいている ロボット。「まえへ 2マス」→「みぎを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
@@ -7844,22 +8710,237 @@ export const GEN_QUIZZES = [
   },
   "category": "robot",
   "difficulty": "normal",
-  "id": "robot-n-18"
+  "id": "robot-n-8"
  },
  {
-  "q": "⬇️ したを むいている ロボットに「みぎを むく」→「みぎを むく」。さいごに どっちを むいている？",
+  "q": "➡️ みぎを むいている ロボットに「ひだりを むく」→「ひだりを むく」。さいごに どっちを むいている？",
   "opts": [
-   "➡️ みぎ",
    "⬆️ うえ",
+   "⬅️ ひだり",
    "⬇️ した"
   ],
   "a": 1,
   "why": "1かいずつ じゅんばんに まわして かんがえよう",
   "meta": {
    "kind": "robot-turn",
-   "start": 1,
+   "start": 0,
+   "turns": [
+    "left",
+    "left"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "normal",
+  "id": "robot-n-9"
+ },
+ {
+  "q": "⬅️ ひだりを むいている ロボット。「まえへ 3マス」→「みぎを むく」→「まえへ 1マス」。スタートから みて どこに いる？",
+  "opts": [
+   "ひだりに 3マス・うえに 2マス",
+   "ひだりに 4マス",
+   "ひだりに 3マス・うえに 1マス"
+  ],
+  "a": 2,
+  "why": "まがった あとは すすむ ほうこうが かわるよ",
+  "meta": {
+   "kind": "robot-goal",
+   "start": 2,
+   "cmds": [
+    3,
+    "R",
+    1
+   ]
+  },
+  "category": "robot",
+  "difficulty": "normal",
+  "id": "robot-n-10"
+ },
+ {
+  "q": "⬆️ うえを むいている ロボットに「みぎを むく」→「みぎを むく」。さいごに どっちを むいている？",
+  "opts": [
+   "➡️ みぎ",
+   "⬇️ した",
+   "⬅️ ひだり"
+  ],
+  "a": 1,
+  "why": "1かいずつ じゅんばんに まわして かんがえよう",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 3,
    "turns": [
     "right",
+    "right"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "normal",
+  "id": "robot-n-11"
+ },
+ {
+  "q": "⬆️ うえを むいている ロボット。「まえへ 2マス」→「みぎを むく」→「まえへ 3マス」。スタートから みて どこに いる？",
+  "opts": [
+   "うえに 5マス",
+   "みぎに 4マス・うえに 2マス",
+   "みぎに 3マス・うえに 2マス"
+  ],
+  "a": 2,
+  "why": "まがった あとは すすむ ほうこうが かわるよ",
+  "meta": {
+   "kind": "robot-goal",
+   "start": 3,
+   "cmds": [
+    2,
+    "R",
+    3
+   ]
+  },
+  "category": "robot",
+  "difficulty": "normal",
+  "id": "robot-n-12"
+ },
+ {
+  "q": "⬆️ うえを むいている ロボットに「みぎを むく」→「ひだりを むく」。さいごに どっちを むいている？",
+  "opts": [
+   "⬇️ した",
+   "➡️ みぎ",
+   "⬆️ うえ"
+  ],
+  "a": 2,
+  "why": "1かいずつ じゅんばんに まわして かんがえよう",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 3,
+   "turns": [
+    "right",
+    "left"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "normal",
+  "id": "robot-n-13"
+ },
+ {
+  "q": "➡️ みぎを むいている ロボット。「まえへ 3マス」→「みぎを むく」→「まえへ 3マス」。スタートから みて どこに いる？",
+  "opts": [
+   "みぎに 6マス",
+   "みぎに 3マス・したに 3マス",
+   "みぎに 3マス・したに 4マス"
+  ],
+  "a": 1,
+  "why": "まがった あとは すすむ ほうこうが かわるよ",
+  "meta": {
+   "kind": "robot-goal",
+   "start": 0,
+   "cmds": [
+    3,
+    "R",
+    3
+   ]
+  },
+  "category": "robot",
+  "difficulty": "normal",
+  "id": "robot-n-14"
+ },
+ {
+  "q": "⬆️ うえを むいている ロボットに「ひだりを むく」→「みぎを むく」。さいごに どっちを むいている？",
+  "opts": [
+   "⬆️ うえ",
+   "⬅️ ひだり",
+   "⬇️ した"
+  ],
+  "a": 0,
+  "why": "1かいずつ じゅんばんに まわして かんがえよう",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 3,
+   "turns": [
+    "left",
+    "right"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "normal",
+  "id": "robot-n-15"
+ },
+ {
+  "q": "⬇️ したを むいている ロボット。「まえへ 1マス」→「みぎを むく」→「まえへ 3マス」。スタートから みて どこに いる？",
+  "opts": [
+   "ひだりに 4マス・したに 1マス",
+   "ひだりに 3マス・したに 1マス",
+   "したに 4マス"
+  ],
+  "a": 1,
+  "why": "まがった あとは すすむ ほうこうが かわるよ",
+  "meta": {
+   "kind": "robot-goal",
+   "start": 1,
+   "cmds": [
+    1,
+    "R",
+    3
+   ]
+  },
+  "category": "robot",
+  "difficulty": "normal",
+  "id": "robot-n-16"
+ },
+ {
+  "q": "⬅️ ひだりを むいている ロボットに「みぎを むく」→「ひだりを むく」。さいごに どっちを むいている？",
+  "opts": [
+   "➡️ みぎ",
+   "⬅️ ひだり",
+   "⬇️ した"
+  ],
+  "a": 1,
+  "why": "1かいずつ じゅんばんに まわして かんがえよう",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 2,
+   "turns": [
+    "right",
+    "left"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "normal",
+  "id": "robot-n-17"
+ },
+ {
+  "q": "⬆️ うえを むいている ロボット。「まえへ 2マス」→「みぎを むく」→「まえへ 1マス」。スタートから みて どこに いる？",
+  "opts": [
+   "うえに 3マス",
+   "みぎに 1マス・うえに 2マス",
+   "みぎに 2マス・うえに 2マス"
+  ],
+  "a": 1,
+  "why": "まがった あとは すすむ ほうこうが かわるよ",
+  "meta": {
+   "kind": "robot-goal",
+   "start": 3,
+   "cmds": [
+    2,
+    "R",
+    1
+   ]
+  },
+  "category": "robot",
+  "difficulty": "normal",
+  "id": "robot-n-18"
+ },
+ {
+  "q": "➡️ みぎを むいている ロボットに「ひだりを むく」→「みぎを むく」。さいごに どっちを むいている？",
+  "opts": [
+   "⬅️ ひだり",
+   "⬇️ した",
+   "➡️ みぎ"
+  ],
+  "a": 2,
+  "why": "1かいずつ じゅんばんに まわして かんがえよう",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 0,
+   "turns": [
+    "left",
     "right"
    ]
   },
@@ -7868,19 +8949,19 @@ export const GEN_QUIZZES = [
   "id": "robot-n-19"
  },
  {
-  "q": "➡️ みぎを むいている ロボット。「まえへ 2マス」→「みぎを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
+  "q": "⬆️ うえを むいている ロボット。「まえへ 1マス」→「みぎを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
   "opts": [
-   "みぎに 4マス",
-   "みぎに 2マス・したに 2マス",
-   "みぎに 2マス・したに 3マス"
+   "みぎに 2マス・うえに 1マス",
+   "うえに 3マス",
+   "みぎに 3マス・うえに 1マス"
   ],
-  "a": 1,
+  "a": 0,
   "why": "まがった あとは すすむ ほうこうが かわるよ",
   "meta": {
    "kind": "robot-goal",
-   "start": 0,
+   "start": 3,
    "cmds": [
-    2,
+    1,
     "R",
     2
    ]
@@ -7908,17 +8989,81 @@ export const GEN_QUIZZES = [
   "id": "robot-h-1"
  },
  {
-  "q": "➡️ みぎを むいている ロボットが「ひだりを むく」を 4かい。さいごに どっちを むく？",
+  "q": "⬇️ したを むいている ロボットが「みぎを むく」を 3かい。さいごに どっちを むく？",
   "opts": [
    "➡️ みぎ",
-   "⬆️ うえ",
-   "⬅️ ひだり"
+   "⬅️ ひだり",
+   "⬇️ した"
   ],
   "a": 0,
+  "why": "4かい まわると もとに もどるよ。3かいなら…？",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 1,
+   "turns": [
+    "right",
+    "right",
+    "right"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "hard",
+  "id": "robot-h-2"
+ },
+ {
+  "q": "⬅️ ひだりを むいている ロボット。「まえへ 2マス」→「みぎを むく」→「まえへ 2マス」→「みぎを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
+  "opts": [
+   "したに 2マス",
+   "ひだりに 6マス",
+   "うえに 2マス"
+  ],
+  "a": 2,
+  "why": "むきが かわるたびに すすむ ほうこうも かわるよ。1こずつ たどろう",
+  "meta": {
+   "kind": "robot-goal",
+   "start": 2,
+   "cmds": [
+    2,
+    "R",
+    2,
+    "R",
+    2
+   ]
+  },
+  "category": "robot",
+  "difficulty": "hard",
+  "id": "robot-h-3"
+ },
+ {
+  "q": "「🔁3かい くりかえし［まえへ・まえへ・まえへ］」。ぜんぶで なんマス すすむ？",
+  "opts": [
+   "12マス",
+   "6マス",
+   "9マス"
+  ],
+  "a": 2,
+  "why": "1かいで 3マス。3かい くりかえすと 9マスだね",
+  "meta": {
+   "kind": "robot-steps",
+   "repeat": 3,
+   "body": 3
+  },
+  "category": "robot",
+  "difficulty": "hard",
+  "id": "robot-h-4"
+ },
+ {
+  "q": "⬅️ ひだりを むいている ロボットが「ひだりを むく」を 4かい。さいごに どっちを むく？",
+  "opts": [
+   "⬆️ うえ",
+   "⬅️ ひだり",
+   "➡️ みぎ"
+  ],
+  "a": 1,
   "why": "4かい まわると もとに もどるよ。4かいなら…？",
   "meta": {
    "kind": "robot-turn",
-   "start": 0,
+   "start": 2,
    "turns": [
     "left",
     "left",
@@ -7928,38 +9073,38 @@ export const GEN_QUIZZES = [
   },
   "category": "robot",
   "difficulty": "hard",
-  "id": "robot-h-2"
+  "id": "robot-h-5"
  },
  {
-  "q": "⬆️ うえを むいている ロボット。「まえへ 1マス」→「みぎを むく」→「まえへ 2マス」→「みぎを むく」→「まえへ 1マス」。スタートから みて どこに いる？",
+  "q": "⬆️ うえを むいている ロボット。「まえへ 3マス」→「みぎを むく」→「まえへ 3マス」→「みぎを むく」→「まえへ 1マス」。スタートから みて どこに いる？",
   "opts": [
-   "みぎに 2マス",
-   "うえに 4マス",
-   "ひだりに 2マス"
+   "ひだりに 3マス・うえに 2マス",
+   "うえに 7マス",
+   "みぎに 3マス・うえに 2マス"
   ],
-  "a": 0,
+  "a": 2,
   "why": "むきが かわるたびに すすむ ほうこうも かわるよ。1こずつ たどろう",
   "meta": {
    "kind": "robot-goal",
    "start": 3,
    "cmds": [
-    1,
+    3,
     "R",
-    2,
+    3,
     "R",
     1
    ]
   },
   "category": "robot",
   "difficulty": "hard",
-  "id": "robot-h-3"
+  "id": "robot-h-6"
  },
  {
   "q": "「🔁2かい くりかえし［まえへ・まえへ・まえへ］」。ぜんぶで なんマス すすむ？",
   "opts": [
    "6マス",
-   "5マス",
-   "9マス"
+   "9マス",
+   "5マス"
   ],
   "a": 0,
   "why": "1かいで 3マス。2かい くりかえすと 6マスだね",
@@ -7970,80 +9115,16 @@ export const GEN_QUIZZES = [
   },
   "category": "robot",
   "difficulty": "hard",
-  "id": "robot-h-4"
- },
- {
-  "q": "⬅️ ひだりを むいている ロボットが「みぎを むく」を 3かい。さいごに どっちを むく？",
-  "opts": [
-   "⬇️ した",
-   "⬆️ うえ",
-   "⬅️ ひだり"
-  ],
-  "a": 0,
-  "why": "4かい まわると もとに もどるよ。3かいなら…？",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 2,
-   "turns": [
-    "right",
-    "right",
-    "right"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "hard",
-  "id": "robot-h-5"
- },
- {
-  "q": "⬆️ うえを むいている ロボット。「まえへ 2マス」→「みぎを むく」→「まえへ 1マス」→「ひだりを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
-  "opts": [
-   "ひだりに 1マス・うえに 4マス",
-   "みぎに 1マス・うえに 4マス",
-   "うえに 5マス"
-  ],
-  "a": 1,
-  "why": "むきが かわるたびに すすむ ほうこうも かわるよ。1こずつ たどろう",
-  "meta": {
-   "kind": "robot-goal",
-   "start": 3,
-   "cmds": [
-    2,
-    "R",
-    1,
-    "L",
-    2
-   ]
-  },
-  "category": "robot",
-  "difficulty": "hard",
-  "id": "robot-h-6"
- },
- {
-  "q": "「🔁4かい くりかえし［まえへ・まえへ・まえへ］」。ぜんぶで なんマス すすむ？",
-  "opts": [
-   "7マス",
-   "15マス",
-   "12マス"
-  ],
-  "a": 2,
-  "why": "1かいで 3マス。4かい くりかえすと 12マスだね",
-  "meta": {
-   "kind": "robot-steps",
-   "repeat": 4,
-   "body": 3
-  },
-  "category": "robot",
-  "difficulty": "hard",
   "id": "robot-h-7"
  },
  {
   "q": "➡️ みぎを むいている ロボットが「みぎを むく」を 5かい。さいごに どっちを むく？",
   "opts": [
-   "⬆️ うえ",
    "➡️ みぎ",
-   "⬇️ した"
+   "⬇️ した",
+   "⬅️ ひだり"
   ],
-  "a": 2,
+  "a": 1,
   "why": "4かい まわると もとに もどるよ。5かいなら…？",
   "meta": {
    "kind": "robot-turn",
@@ -8061,11 +9142,11 @@ export const GEN_QUIZZES = [
   "id": "robot-h-8"
  },
  {
-  "q": "⬆️ うえを むいている ロボット。「まえへ 3マス」→「みぎを むく」→「まえへ 1マス」→「みぎを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
+  "q": "⬆️ うえを むいている ロボット。「まえへ 2マス」→「みぎを むく」→「まえへ 1マス」→「ひだりを むく」→「まえへ 1マス」。スタートから みて どこに いる？",
   "opts": [
-   "うえに 6マス",
-   "ひだりに 1マス・うえに 1マス",
-   "みぎに 1マス・うえに 1マス"
+   "ひだりに 1マス・うえに 3マス",
+   "うえに 4マス",
+   "みぎに 1マス・うえに 3マス"
   ],
   "a": 2,
   "why": "むきが かわるたびに すすむ ほうこうも かわるよ。1こずつ たどろう",
@@ -8073,11 +9154,11 @@ export const GEN_QUIZZES = [
    "kind": "robot-goal",
    "start": 3,
    "cmds": [
-    3,
+    2,
     "R",
     1,
-    "R",
-    2
+    "L",
+    1
    ]
   },
   "category": "robot",
@@ -8085,17 +9166,17 @@ export const GEN_QUIZZES = [
   "id": "robot-h-9"
  },
  {
-  "q": "「🔁3かい くりかえし［まえへ・まえへ・まえへ］」。ぜんぶで なんマス すすむ？",
+  "q": "「🔁4かい くりかえし［まえへ・まえへ・まえへ］」。ぜんぶで なんマス すすむ？",
   "opts": [
-   "6マス",
-   "9マス",
-   "12マス"
+   "12マス",
+   "15マス",
+   "7マス"
   ],
-  "a": 1,
-  "why": "1かいで 3マス。3かい くりかえすと 9マスだね",
+  "a": 0,
+  "why": "1かいで 3マス。4かい くりかえすと 12マスだね",
   "meta": {
    "kind": "robot-steps",
-   "repeat": 3,
+   "repeat": 4,
    "body": 3
   },
   "category": "robot",
@@ -8103,23 +9184,22 @@ export const GEN_QUIZZES = [
   "id": "robot-h-10"
  },
  {
-  "q": "⬅️ ひだりを むいている ロボットが「ひだりを むく」を 5かい。さいごに どっちを むく？",
+  "q": "⬇️ したを むいている ロボットが「みぎを むく」を 4かい。さいごに どっちを むく？",
   "opts": [
-   "⬇️ した",
    "⬆️ うえ",
-   "➡️ みぎ"
+   "⬇️ した",
+   "⬅️ ひだり"
   ],
-  "a": 0,
-  "why": "4かい まわると もとに もどるよ。5かいなら…？",
+  "a": 1,
+  "why": "4かい まわると もとに もどるよ。4かいなら…？",
   "meta": {
    "kind": "robot-turn",
-   "start": 2,
+   "start": 1,
    "turns": [
-    "left",
-    "left",
-    "left",
-    "left",
-    "left"
+    "right",
+    "right",
+    "right",
+    "right"
    ]
   },
   "category": "robot",
@@ -8127,19 +9207,19 @@ export const GEN_QUIZZES = [
   "id": "robot-h-11"
  },
  {
-  "q": "⬇️ したを むいている ロボット。「まえへ 2マス」→「みぎを むく」→「まえへ 2マス」→「みぎを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
+  "q": "⬆️ うえを むいている ロボット。「まえへ 3マス」→「みぎを むく」→「まえへ 2マス」→「みぎを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
   "opts": [
-   "ひだりに 2マス",
-   "したに 6マス",
-   "みぎに 2マス"
+   "みぎに 2マス・うえに 1マス",
+   "ひだりに 2マス・うえに 1マス",
+   "うえに 7マス"
   ],
   "a": 0,
   "why": "むきが かわるたびに すすむ ほうこうも かわるよ。1こずつ たどろう",
   "meta": {
    "kind": "robot-goal",
-   "start": 1,
+   "start": 3,
    "cmds": [
-    2,
+    3,
     "R",
     2,
     "R",
@@ -8151,13 +9231,109 @@ export const GEN_QUIZZES = [
   "id": "robot-h-12"
  },
  {
+  "q": "⬇️ したを むいている ロボットが「みぎを むく」を 5かい。さいごに どっちを むく？",
+  "opts": [
+   "⬆️ うえ",
+   "⬇️ した",
+   "⬅️ ひだり"
+  ],
+  "a": 2,
+  "why": "4かい まわると もとに もどるよ。5かいなら…？",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 1,
+   "turns": [
+    "right",
+    "right",
+    "right",
+    "right",
+    "right"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "hard",
+  "id": "robot-h-13"
+ },
+ {
+  "q": "⬅️ ひだりを むいている ロボット。「まえへ 2マス」→「ひだりを むく」→「まえへ 2マス」→「みぎを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
+  "opts": [
+   "ひだりに 4マス・うえに 2マス",
+   "ひだりに 4マス・したに 2マス",
+   "ひだりに 6マス"
+  ],
+  "a": 1,
+  "why": "むきが かわるたびに すすむ ほうこうも かわるよ。1こずつ たどろう",
+  "meta": {
+   "kind": "robot-goal",
+   "start": 2,
+   "cmds": [
+    2,
+    "L",
+    2,
+    "R",
+    2
+   ]
+  },
+  "category": "robot",
+  "difficulty": "hard",
+  "id": "robot-h-14"
+ },
+ {
+  "q": "➡️ みぎを むいている ロボットが「みぎを むく」を 5かい。さいごに どっちを むく？",
+  "opts": [
+   "⬅️ ひだり",
+   "⬇️ した",
+   "⬆️ うえ"
+  ],
+  "a": 1,
+  "why": "4かい まわると もとに もどるよ。5かいなら…？",
+  "meta": {
+   "kind": "robot-turn",
+   "start": 0,
+   "turns": [
+    "right",
+    "right",
+    "right",
+    "right",
+    "right"
+   ]
+  },
+  "category": "robot",
+  "difficulty": "hard",
+  "id": "robot-h-15"
+ },
+ {
+  "q": "➡️ みぎを むいている ロボット。「まえへ 3マス」→「みぎを むく」→「まえへ 2マス」→「みぎを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
+  "opts": [
+   "みぎに 1マス・うえに 2マス",
+   "みぎに 7マス",
+   "みぎに 1マス・したに 2マス"
+  ],
+  "a": 2,
+  "why": "むきが かわるたびに すすむ ほうこうも かわるよ。1こずつ たどろう",
+  "meta": {
+   "kind": "robot-goal",
+   "start": 0,
+   "cmds": [
+    3,
+    "R",
+    2,
+    "R",
+    2
+   ]
+  },
+  "category": "robot",
+  "difficulty": "hard",
+  "id": "robot-h-16"
+ },
+ {
   "q": "「🔁3かい くりかえし［まえへ・まえへ］」。ぜんぶで なんマス すすむ？",
   "opts": [
-   "6マス",
    "5マス",
-   "8マス"
+   "8マス",
+   "6マス"
   ],
-  "a": 0,
+  "a": 2,
   "why": "1かいで 2マス。3かい くりかえすと 6マスだね",
   "meta": {
    "kind": "robot-steps",
@@ -8166,20 +9342,20 @@ export const GEN_QUIZZES = [
   },
   "category": "robot",
   "difficulty": "hard",
-  "id": "robot-h-13"
+  "id": "robot-h-17"
  },
  {
-  "q": "⬅️ ひだりを むいている ロボットが「ひだりを むく」を 3かい。さいごに どっちを むく？",
+  "q": "⬆️ うえを むいている ロボットが「ひだりを むく」を 3かい。さいごに どっちを むく？",
   "opts": [
-   "⬇️ した",
    "⬆️ うえ",
-   "➡️ みぎ"
+   "➡️ みぎ",
+   "⬅️ ひだり"
   ],
   "a": 1,
   "why": "4かい まわると もとに もどるよ。3かいなら…？",
   "meta": {
    "kind": "robot-turn",
-   "start": 2,
+   "start": 3,
    "turns": [
     "left",
     "left",
@@ -8188,117 +9364,25 @@ export const GEN_QUIZZES = [
   },
   "category": "robot",
   "difficulty": "hard",
-  "id": "robot-h-14"
- },
- {
-  "q": "⬆️ うえを むいている ロボット。「まえへ 2マス」→「みぎを むく」→「まえへ 3マス」→「みぎを むく」→「まえへ 1マス」。スタートから みて どこに いる？",
-  "opts": [
-   "ひだりに 3マス・うえに 1マス",
-   "みぎに 3マス・うえに 1マス",
-   "うえに 6マス"
-  ],
-  "a": 1,
-  "why": "むきが かわるたびに すすむ ほうこうも かわるよ。1こずつ たどろう",
-  "meta": {
-   "kind": "robot-goal",
-   "start": 3,
-   "cmds": [
-    2,
-    "R",
-    3,
-    "R",
-    1
-   ]
-  },
-  "category": "robot",
-  "difficulty": "hard",
-  "id": "robot-h-15"
- },
- {
-  "q": "➡️ みぎを むいている ロボットが「みぎを むく」を 3かい。さいごに どっちを むく？",
-  "opts": [
-   "⬅️ ひだり",
-   "⬇️ した",
-   "⬆️ うえ"
-  ],
-  "a": 2,
-  "why": "4かい まわると もとに もどるよ。3かいなら…？",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 0,
-   "turns": [
-    "right",
-    "right",
-    "right"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "hard",
-  "id": "robot-h-16"
- },
- {
-  "q": "⬆️ うえを むいている ロボット。「まえへ 1マス」→「みぎを むく」→「まえへ 2マス」→「ひだりを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
-  "opts": [
-   "ひだりに 2マス・うえに 3マス",
-   "みぎに 2マス・うえに 3マス",
-   "うえに 5マス"
-  ],
-  "a": 1,
-  "why": "むきが かわるたびに すすむ ほうこうも かわるよ。1こずつ たどろう",
-  "meta": {
-   "kind": "robot-goal",
-   "start": 3,
-   "cmds": [
-    1,
-    "R",
-    2,
-    "L",
-    2
-   ]
-  },
-  "category": "robot",
-  "difficulty": "hard",
-  "id": "robot-h-17"
- },
- {
-  "q": "⬅️ ひだりを むいている ロボットが「みぎを むく」を 3かい。さいごに どっちを むく？",
-  "opts": [
-   "⬇️ した",
-   "➡️ みぎ",
-   "⬅️ ひだり"
-  ],
-  "a": 0,
-  "why": "4かい まわると もとに もどるよ。3かいなら…？",
-  "meta": {
-   "kind": "robot-turn",
-   "start": 2,
-   "turns": [
-    "right",
-    "right",
-    "right"
-   ]
-  },
-  "category": "robot",
-  "difficulty": "hard",
   "id": "robot-h-18"
  },
  {
-  "q": "⬅️ ひだりを むいている ロボット。「まえへ 1マス」→「ひだりを むく」→「まえへ 2マス」→「みぎを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
+  "q": "⬆️ うえを むいている ロボット。「まえへ 3マス」→「ひだりを むく」→「まえへ 3マス」→「ひだりを むく」→「まえへ 2マス」。スタートから みて どこに いる？",
   "opts": [
-   "ひだりに 3マス・うえに 2マス",
-   "ひだりに 3マス・したに 2マス",
-   "ひだりに 5マス"
+   "うえに 8マス",
+   "ひだりに 3マス・うえに 1マス",
+   "みぎに 3マス・うえに 1マス"
   ],
   "a": 1,
   "why": "むきが かわるたびに すすむ ほうこうも かわるよ。1こずつ たどろう",
   "meta": {
    "kind": "robot-goal",
-   "start": 2,
+   "start": 3,
    "cmds": [
-    1,
+    3,
     "L",
-    2,
-    "R",
+    3,
+    "L",
     2
    ]
   },
@@ -8307,18 +9391,19 @@ export const GEN_QUIZZES = [
   "id": "robot-h-19"
  },
  {
-  "q": "⬅️ ひだりを むいている ロボットが「ひだりを むく」を 3かい。さいごに どっちを むく？",
+  "q": "➡️ みぎを むいている ロボットが「ひだりを むく」を 4かい。さいごに どっちを むく？",
   "opts": [
-   "⬅️ ひだり",
    "⬆️ うえ",
-   "⬇️ した"
+   "➡️ みぎ",
+   "⬅️ ひだり"
   ],
   "a": 1,
-  "why": "4かい まわると もとに もどるよ。3かいなら…？",
+  "why": "4かい まわると もとに もどるよ。4かいなら…？",
   "meta": {
    "kind": "robot-turn",
-   "start": 2,
+   "start": 0,
    "turns": [
+    "left",
     "left",
     "left",
     "left"
@@ -8329,13 +9414,36 @@ export const GEN_QUIZZES = [
   "id": "robot-h-20"
  },
  {
-  "q": "「たんじょうびかい」の フローチャートだよ。\n\nはじめ\n ↓\n🎈 かざりつけを する\n ↓\n🎂 ケーキを だす\n ↓\n🎵 うたを うたう\n ↓\n🎁 プレゼントを あける\n ↓\nおわり\n\n4ばんめに することは？",
+  "q": "「カレーづくり」の フローチャートだよ。\n\nはじめ\n ↓\n🔪 やさいを きる\n ↓\n🍳 いためる\n ↓\n💧 みずを いれて にこむ\n ↓\n🍛 ルーを いれる\n ↓\nおわり\n\n3ばんめに することは？",
   "opts": [
-   "🎈 かざりつけを する",
-   "🎁 プレゼントを あける",
-   "🎂 ケーキを だす"
+   "🔪 やさいを きる",
+   "🍳 いためる",
+   "💧 みずを いれて にこむ"
   ],
-  "a": 1,
+  "a": 2,
+  "why": "やじるしを うえから じゅんばんに たどろう",
+  "meta": {
+   "kind": "yomitori-seq",
+   "steps": [
+    "🔪 やさいを きる",
+    "🍳 いためる",
+    "💧 みずを いれて にこむ",
+    "🍛 ルーを いれる"
+   ],
+   "askIndex": 2
+  },
+  "category": "yomitori",
+  "difficulty": "easy",
+  "id": "yomitori-e-1"
+ },
+ {
+  "q": "「たんじょうびかい」の フローチャートだよ。\n\nはじめ\n ↓\n🎈 かざりつけを する\n ↓\n🎂 ケーキを だす\n ↓\n🎵 うたを うたう\n ↓\n🎁 プレゼントを あける\n ↓\nおわり\n\n2ばんめに することは？",
+  "opts": [
+   "🎂 ケーキを だす",
+   "🎵 うたを うたう",
+   "🎁 プレゼントを あける"
+  ],
+  "a": 0,
   "why": "やじるしを うえから じゅんばんに たどろう",
   "meta": {
    "kind": "yomitori-seq",
@@ -8345,29 +9453,6 @@ export const GEN_QUIZZES = [
     "🎵 うたを うたう",
     "🎁 プレゼントを あける"
    ],
-   "askIndex": 3
-  },
-  "category": "yomitori",
-  "difficulty": "easy",
-  "id": "yomitori-e-1"
- },
- {
-  "q": "「おでかけの じゅんび」の フローチャートだよ。\n\nはじめ\n ↓\n🧢 ぼうしを かぶる\n ↓\n🎒 リュックを せおう\n ↓\n🚪 いえの かぎを しめる\n ↓\n🚶 しゅっぱつ！\n ↓\nおわり\n\n2ばんめに することは？",
-  "opts": [
-   "🧢 ぼうしを かぶる",
-   "🚪 いえの かぎを しめる",
-   "🎒 リュックを せおう"
-  ],
-  "a": 2,
-  "why": "やじるしを うえから じゅんばんに たどろう",
-  "meta": {
-   "kind": "yomitori-seq",
-   "steps": [
-    "🧢 ぼうしを かぶる",
-    "🎒 リュックを せおう",
-    "🚪 いえの かぎを しめる",
-    "🚶 しゅっぱつ！"
-   ],
    "askIndex": 1
   },
   "category": "yomitori",
@@ -8375,11 +9460,11 @@ export const GEN_QUIZZES = [
   "id": "yomitori-e-2"
  },
  {
-  "q": "「キャンプ」の フローチャートだよ。\n\nはじめ\n ↓\n⛺ テントを はる\n ↓\n🔥 ひを おこす\n ↓\n🍖 ごはんを つくる\n ↓\n🌙 ねる\n ↓\nおわり\n\n1ばんめに することは？",
+  "q": "「キャンプ」の フローチャートだよ。\n\nはじめ\n ↓\n⛺ テントを はる\n ↓\n🔥 ひを おこす\n ↓\n🍖 ごはんを つくる\n ↓\n🌙 ねる\n ↓\nおわり\n\n2ばんめに することは？",
   "opts": [
+   "🍖 ごはんを つくる",
    "🔥 ひを おこす",
-   "⛺ テントを はる",
-   "🍖 ごはんを つくる"
+   "🌙 ねる"
   ],
   "a": 1,
   "why": "やじるしを うえから じゅんばんに たどろう",
@@ -8391,76 +9476,76 @@ export const GEN_QUIZZES = [
     "🍖 ごはんを つくる",
     "🌙 ねる"
    ],
-   "askIndex": 0
+   "askIndex": 1
   },
   "category": "yomitori",
   "difficulty": "easy",
   "id": "yomitori-e-3"
  },
  {
-  "q": "「おでかけの じゅんび」の フローチャートだよ。\n\nはじめ\n ↓\n🧢 ぼうしを かぶる\n ↓\n🎒 リュックを せおう\n ↓\n🚪 いえの かぎを しめる\n ↓\n🚶 しゅっぱつ！\n ↓\nおわり\n\n4ばんめに することは？",
+  "q": "「カレーづくり」の フローチャートだよ。\n\nはじめ\n ↓\n🔪 やさいを きる\n ↓\n🍳 いためる\n ↓\n💧 みずを いれて にこむ\n ↓\n🍛 ルーを いれる\n ↓\nおわり\n\n3ばんめに することは？",
   "opts": [
-   "🧢 ぼうしを かぶる",
-   "🚶 しゅっぱつ！",
-   "🚪 いえの かぎを しめる"
-  ],
-  "a": 1,
-  "why": "やじるしを うえから じゅんばんに たどろう",
-  "meta": {
-   "kind": "yomitori-seq",
-   "steps": [
-    "🧢 ぼうしを かぶる",
-    "🎒 リュックを せおう",
-    "🚪 いえの かぎを しめる",
-    "🚶 しゅっぱつ！"
-   ],
-   "askIndex": 3
-  },
-  "category": "yomitori",
-  "difficulty": "easy",
-  "id": "yomitori-e-4"
- },
- {
-  "q": "「おそうじ」の フローチャートだよ。\n\nはじめ\n ↓\n🧹 ほうきで はく\n ↓\n🧽 ぞうきんで ふく\n ↓\n🗑️ ごみを すてる\n ↓\n🧼 てを あらう\n ↓\nおわり\n\n4ばんめに することは？",
-  "opts": [
-   "🗑️ ごみを すてる",
-   "🧽 ぞうきんで ふく",
-   "🧼 てを あらう"
+   "🔪 やさいを きる",
+   "🍛 ルーを いれる",
+   "💧 みずを いれて にこむ"
   ],
   "a": 2,
   "why": "やじるしを うえから じゅんばんに たどろう",
   "meta": {
    "kind": "yomitori-seq",
    "steps": [
-    "🧹 ほうきで はく",
-    "🧽 ぞうきんで ふく",
-    "🗑️ ごみを すてる",
-    "🧼 てを あらう"
+    "🔪 やさいを きる",
+    "🍳 いためる",
+    "💧 みずを いれて にこむ",
+    "🍛 ルーを いれる"
    ],
-   "askIndex": 3
+   "askIndex": 2
+  },
+  "category": "yomitori",
+  "difficulty": "easy",
+  "id": "yomitori-e-4"
+ },
+ {
+  "q": "「やさいの みずやり」の フローチャートだよ。\n\nはじめ\n ↓\n🚰 じょうろに みずを いれる\n ↓\n🚶 はたけに いく\n ↓\n💧 みずを かける\n ↓\n🏠 じょうろを かたづける\n ↓\nおわり\n\n1ばんめに することは？",
+  "opts": [
+   "🏠 じょうろを かたづける",
+   "💧 みずを かける",
+   "🚰 じょうろに みずを いれる"
+  ],
+  "a": 2,
+  "why": "やじるしを うえから じゅんばんに たどろう",
+  "meta": {
+   "kind": "yomitori-seq",
+   "steps": [
+    "🚰 じょうろに みずを いれる",
+    "🚶 はたけに いく",
+    "💧 みずを かける",
+    "🏠 じょうろを かたづける"
+   ],
+   "askIndex": 0
   },
   "category": "yomitori",
   "difficulty": "easy",
   "id": "yomitori-e-5"
  },
  {
-  "q": "「あさの したく」の フローチャートだよ。\n\nはじめ\n ↓\n🧼 かおを あらう\n ↓\n🍞 あさごはんを たべる\n ↓\n🦷 はを みがく\n ↓\n🎒 じゅんびを する\n ↓\nおわり\n\n3ばんめに することは？",
+  "q": "「カレーづくり」の フローチャートだよ。\n\nはじめ\n ↓\n🔪 やさいを きる\n ↓\n🍳 いためる\n ↓\n💧 みずを いれて にこむ\n ↓\n🍛 ルーを いれる\n ↓\nおわり\n\n1ばんめに することは？",
   "opts": [
-   "🦷 はを みがく",
-   "🍞 あさごはんを たべる",
-   "🧼 かおを あらう"
+   "🍳 いためる",
+   "🔪 やさいを きる",
+   "🍛 ルーを いれる"
   ],
-  "a": 0,
+  "a": 1,
   "why": "やじるしを うえから じゅんばんに たどろう",
   "meta": {
    "kind": "yomitori-seq",
    "steps": [
-    "🧼 かおを あらう",
-    "🍞 あさごはんを たべる",
-    "🦷 はを みがく",
-    "🎒 じゅんびを する"
+    "🔪 やさいを きる",
+    "🍳 いためる",
+    "💧 みずを いれて にこむ",
+    "🍛 ルーを いれる"
    ],
-   "askIndex": 2
+   "askIndex": 0
   },
   "category": "yomitori",
   "difficulty": "easy",
@@ -8469,9 +9554,9 @@ export const GEN_QUIZZES = [
  {
   "q": "「あさの したく」の フローチャートだよ。\n\nはじめ\n ↓\n🧼 かおを あらう\n ↓\n🍞 あさごはんを たべる\n ↓\n🦷 はを みがく\n ↓\n🎒 じゅんびを する\n ↓\nおわり\n\n2ばんめに することは？",
   "opts": [
-   "🧼 かおを あらう",
+   "🦷 はを みがく",
    "🍞 あさごはんを たべる",
-   "🎒 じゅんびを する"
+   "🧼 かおを あらう"
   ],
   "a": 1,
   "why": "やじるしを うえから じゅんばんに たどろう",
@@ -8490,128 +9575,13 @@ export const GEN_QUIZZES = [
   "id": "yomitori-e-7"
  },
  {
-  "q": "「あさの したく」の フローチャートだよ。\n\nはじめ\n ↓\n🧼 かおを あらう\n ↓\n🍞 あさごはんを たべる\n ↓\n🦷 はを みがく\n ↓\n🎒 じゅんびを する\n ↓\nおわり\n\n3ばんめに することは？",
-  "opts": [
-   "🎒 じゅんびを する",
-   "🧼 かおを あらう",
-   "🦷 はを みがく"
-  ],
-  "a": 2,
-  "why": "やじるしを うえから じゅんばんに たどろう",
-  "meta": {
-   "kind": "yomitori-seq",
-   "steps": [
-    "🧼 かおを あらう",
-    "🍞 あさごはんを たべる",
-    "🦷 はを みがく",
-    "🎒 じゅんびを する"
-   ],
-   "askIndex": 2
-  },
-  "category": "yomitori",
-  "difficulty": "easy",
-  "id": "yomitori-e-8"
- },
- {
-  "q": "「おそうじ」の フローチャートだよ。\n\nはじめ\n ↓\n🧹 ほうきで はく\n ↓\n🧽 ぞうきんで ふく\n ↓\n🗑️ ごみを すてる\n ↓\n🧼 てを あらう\n ↓\nおわり\n\n1ばんめに することは？",
-  "opts": [
-   "🗑️ ごみを すてる",
-   "🧼 てを あらう",
-   "🧹 ほうきで はく"
-  ],
-  "a": 2,
-  "why": "やじるしを うえから じゅんばんに たどろう",
-  "meta": {
-   "kind": "yomitori-seq",
-   "steps": [
-    "🧹 ほうきで はく",
-    "🧽 ぞうきんで ふく",
-    "🗑️ ごみを すてる",
-    "🧼 てを あらう"
-   ],
-   "askIndex": 0
-  },
-  "category": "yomitori",
-  "difficulty": "easy",
-  "id": "yomitori-e-9"
- },
- {
-  "q": "「あさの したく」の フローチャートだよ。\n\nはじめ\n ↓\n🧼 かおを あらう\n ↓\n🍞 あさごはんを たべる\n ↓\n🦷 はを みがく\n ↓\n🎒 じゅんびを する\n ↓\nおわり\n\n3ばんめに することは？",
-  "opts": [
-   "🦷 はを みがく",
-   "🍞 あさごはんを たべる",
-   "🎒 じゅんびを する"
-  ],
-  "a": 0,
-  "why": "やじるしを うえから じゅんばんに たどろう",
-  "meta": {
-   "kind": "yomitori-seq",
-   "steps": [
-    "🧼 かおを あらう",
-    "🍞 あさごはんを たべる",
-    "🦷 はを みがく",
-    "🎒 じゅんびを する"
-   ],
-   "askIndex": 2
-  },
-  "category": "yomitori",
-  "difficulty": "easy",
-  "id": "yomitori-e-10"
- },
- {
-  "q": "「おでかけの じゅんび」の フローチャートだよ。\n\nはじめ\n ↓\n🧢 ぼうしを かぶる\n ↓\n🎒 リュックを せおう\n ↓\n🚪 いえの かぎを しめる\n ↓\n🚶 しゅっぱつ！\n ↓\nおわり\n\n2ばんめに することは？",
-  "opts": [
-   "🚶 しゅっぱつ！",
-   "🧢 ぼうしを かぶる",
-   "🎒 リュックを せおう"
-  ],
-  "a": 2,
-  "why": "やじるしを うえから じゅんばんに たどろう",
-  "meta": {
-   "kind": "yomitori-seq",
-   "steps": [
-    "🧢 ぼうしを かぶる",
-    "🎒 リュックを せおう",
-    "🚪 いえの かぎを しめる",
-    "🚶 しゅっぱつ！"
-   ],
-   "askIndex": 1
-  },
-  "category": "yomitori",
-  "difficulty": "easy",
-  "id": "yomitori-e-11"
- },
- {
-  "q": "「キャンプ」の フローチャートだよ。\n\nはじめ\n ↓\n⛺ テントを はる\n ↓\n🔥 ひを おこす\n ↓\n🍖 ごはんを つくる\n ↓\n🌙 ねる\n ↓\nおわり\n\n1ばんめに することは？",
-  "opts": [
-   "🍖 ごはんを つくる",
-   "⛺ テントを はる",
-   "🌙 ねる"
-  ],
-  "a": 1,
-  "why": "やじるしを うえから じゅんばんに たどろう",
-  "meta": {
-   "kind": "yomitori-seq",
-   "steps": [
-    "⛺ テントを はる",
-    "🔥 ひを おこす",
-    "🍖 ごはんを つくる",
-    "🌙 ねる"
-   ],
-   "askIndex": 0
-  },
-  "category": "yomitori",
-  "difficulty": "easy",
-  "id": "yomitori-e-12"
- },
- {
   "q": "「せんたく」の フローチャートだよ。\n\nはじめ\n ↓\n👕 ふくを あつめる\n ↓\n🫧 せんたくきを まわす\n ↓\n🌞 ほす\n ↓\n📦 たたんで しまう\n ↓\nおわり\n\n1ばんめに することは？",
   "opts": [
-   "👕 ふくを あつめる",
+   "📦 たたんで しまう",
    "🫧 せんたくきを まわす",
-   "🌞 ほす"
+   "👕 ふくを あつめる"
   ],
-  "a": 0,
+  "a": 2,
   "why": "やじるしを うえから じゅんばんに たどろう",
   "meta": {
    "kind": "yomitori-seq",
@@ -8625,82 +9595,36 @@ export const GEN_QUIZZES = [
   },
   "category": "yomitori",
   "difficulty": "easy",
-  "id": "yomitori-e-13"
+  "id": "yomitori-e-8"
  },
  {
-  "q": "「カレーづくり」の フローチャートだよ。\n\nはじめ\n ↓\n🔪 やさいを きる\n ↓\n🍳 いためる\n ↓\n💧 みずを いれて にこむ\n ↓\n🍛 ルーを いれる\n ↓\nおわり\n\n4ばんめに することは？",
+  "q": "「おでかけの じゅんび」の フローチャートだよ。\n\nはじめ\n ↓\n🧢 ぼうしを かぶる\n ↓\n🎒 リュックを せおう\n ↓\n🚪 いえの かぎを しめる\n ↓\n🚶 しゅっぱつ！\n ↓\nおわり\n\n1ばんめに することは？",
   "opts": [
-   "🍳 いためる",
-   "🍛 ルーを いれる",
-   "💧 みずを いれて にこむ"
+   "🎒 リュックを せおう",
+   "🧢 ぼうしを かぶる",
+   "🚶 しゅっぱつ！"
   ],
   "a": 1,
   "why": "やじるしを うえから じゅんばんに たどろう",
   "meta": {
    "kind": "yomitori-seq",
    "steps": [
-    "🔪 やさいを きる",
-    "🍳 いためる",
-    "💧 みずを いれて にこむ",
-    "🍛 ルーを いれる"
-   ],
-   "askIndex": 3
-  },
-  "category": "yomitori",
-  "difficulty": "easy",
-  "id": "yomitori-e-14"
- },
- {
-  "q": "「おそうじ」の フローチャートだよ。\n\nはじめ\n ↓\n🧹 ほうきで はく\n ↓\n🧽 ぞうきんで ふく\n ↓\n🗑️ ごみを すてる\n ↓\n🧼 てを あらう\n ↓\nおわり\n\n2ばんめに することは？",
-  "opts": [
-   "🧼 てを あらう",
-   "🗑️ ごみを すてる",
-   "🧽 ぞうきんで ふく"
-  ],
-  "a": 2,
-  "why": "やじるしを うえから じゅんばんに たどろう",
-  "meta": {
-   "kind": "yomitori-seq",
-   "steps": [
-    "🧹 ほうきで はく",
-    "🧽 ぞうきんで ふく",
-    "🗑️ ごみを すてる",
-    "🧼 てを あらう"
-   ],
-   "askIndex": 1
-  },
-  "category": "yomitori",
-  "difficulty": "easy",
-  "id": "yomitori-e-15"
- },
- {
-  "q": "「おかいもの」の フローチャートだよ。\n\nはじめ\n ↓\n📝 メモを かく\n ↓\n🚶 おみせに いく\n ↓\n🛒 かごに いれる\n ↓\n💰 おかねを はらう\n ↓\nおわり\n\n1ばんめに することは？",
-  "opts": [
-   "🛒 かごに いれる",
-   "📝 メモを かく",
-   "💰 おかねを はらう"
-  ],
-  "a": 1,
-  "why": "やじるしを うえから じゅんばんに たどろう",
-  "meta": {
-   "kind": "yomitori-seq",
-   "steps": [
-    "📝 メモを かく",
-    "🚶 おみせに いく",
-    "🛒 かごに いれる",
-    "💰 おかねを はらう"
+    "🧢 ぼうしを かぶる",
+    "🎒 リュックを せおう",
+    "🚪 いえの かぎを しめる",
+    "🚶 しゅっぱつ！"
    ],
    "askIndex": 0
   },
   "category": "yomitori",
   "difficulty": "easy",
-  "id": "yomitori-e-16"
+  "id": "yomitori-e-9"
  },
  {
   "q": "「カレーづくり」の フローチャートだよ。\n\nはじめ\n ↓\n🔪 やさいを きる\n ↓\n🍳 いためる\n ↓\n💧 みずを いれて にこむ\n ↓\n🍛 ルーを いれる\n ↓\nおわり\n\n4ばんめに することは？",
   "opts": [
    "🍛 ルーを いれる",
-   "🍳 いためる",
+   "💧 みずを いれて にこむ",
    "🔪 やさいを きる"
   ],
   "a": 0,
@@ -8717,58 +9641,257 @@ export const GEN_QUIZZES = [
   },
   "category": "yomitori",
   "difficulty": "easy",
-  "id": "yomitori-e-17"
+  "id": "yomitori-e-10"
  },
  {
-  "q": "「たんじょうびかい」の フローチャートだよ。\n\nはじめ\n ↓\n🎈 かざりつけを する\n ↓\n🎂 ケーキを だす\n ↓\n🎵 うたを うたう\n ↓\n🎁 プレゼントを あける\n ↓\nおわり\n\n1ばんめに することは？",
+  "q": "「やさいの みずやり」の フローチャートだよ。\n\nはじめ\n ↓\n🚰 じょうろに みずを いれる\n ↓\n🚶 はたけに いく\n ↓\n💧 みずを かける\n ↓\n🏠 じょうろを かたづける\n ↓\nおわり\n\n4ばんめに することは？",
   "opts": [
-   "🎁 プレゼントを あける",
-   "🎈 かざりつけを する",
-   "🎂 ケーキを だす"
+   "💧 みずを かける",
+   "🏠 じょうろを かたづける",
+   "🚰 じょうろに みずを いれる"
   ],
   "a": 1,
   "why": "やじるしを うえから じゅんばんに たどろう",
   "meta": {
    "kind": "yomitori-seq",
    "steps": [
-    "🎈 かざりつけを する",
-    "🎂 ケーキを だす",
-    "🎵 うたを うたう",
-    "🎁 プレゼントを あける"
+    "🚰 じょうろに みずを いれる",
+    "🚶 はたけに いく",
+    "💧 みずを かける",
+    "🏠 じょうろを かたづける"
+   ],
+   "askIndex": 3
+  },
+  "category": "yomitori",
+  "difficulty": "easy",
+  "id": "yomitori-e-11"
+ },
+ {
+  "q": "「おそうじ」の フローチャートだよ。\n\nはじめ\n ↓\n🧹 ほうきで はく\n ↓\n🧽 ぞうきんで ふく\n ↓\n🗑️ ごみを すてる\n ↓\n🧼 てを あらう\n ↓\nおわり\n\n2ばんめに することは？",
+  "opts": [
+   "🧼 てを あらう",
+   "🧹 ほうきで はく",
+   "🧽 ぞうきんで ふく"
+  ],
+  "a": 2,
+  "why": "やじるしを うえから じゅんばんに たどろう",
+  "meta": {
+   "kind": "yomitori-seq",
+   "steps": [
+    "🧹 ほうきで はく",
+    "🧽 ぞうきんで ふく",
+    "🗑️ ごみを すてる",
+    "🧼 てを あらう"
+   ],
+   "askIndex": 1
+  },
+  "category": "yomitori",
+  "difficulty": "easy",
+  "id": "yomitori-e-12"
+ },
+ {
+  "q": "「せんたく」の フローチャートだよ。\n\nはじめ\n ↓\n👕 ふくを あつめる\n ↓\n🫧 せんたくきを まわす\n ↓\n🌞 ほす\n ↓\n📦 たたんで しまう\n ↓\nおわり\n\n3ばんめに することは？",
+  "opts": [
+   "🌞 ほす",
+   "👕 ふくを あつめる",
+   "🫧 せんたくきを まわす"
+  ],
+  "a": 0,
+  "why": "やじるしを うえから じゅんばんに たどろう",
+  "meta": {
+   "kind": "yomitori-seq",
+   "steps": [
+    "👕 ふくを あつめる",
+    "🫧 せんたくきを まわす",
+    "🌞 ほす",
+    "📦 たたんで しまう"
+   ],
+   "askIndex": 2
+  },
+  "category": "yomitori",
+  "difficulty": "easy",
+  "id": "yomitori-e-13"
+ },
+ {
+  "q": "「おでかけの じゅんび」の フローチャートだよ。\n\nはじめ\n ↓\n🧢 ぼうしを かぶる\n ↓\n🎒 リュックを せおう\n ↓\n🚪 いえの かぎを しめる\n ↓\n🚶 しゅっぱつ！\n ↓\nおわり\n\n4ばんめに することは？",
+  "opts": [
+   "🚶 しゅっぱつ！",
+   "🧢 ぼうしを かぶる",
+   "🎒 リュックを せおう"
+  ],
+  "a": 0,
+  "why": "やじるしを うえから じゅんばんに たどろう",
+  "meta": {
+   "kind": "yomitori-seq",
+   "steps": [
+    "🧢 ぼうしを かぶる",
+    "🎒 リュックを せおう",
+    "🚪 いえの かぎを しめる",
+    "🚶 しゅっぱつ！"
+   ],
+   "askIndex": 3
+  },
+  "category": "yomitori",
+  "difficulty": "easy",
+  "id": "yomitori-e-14"
+ },
+ {
+  "q": "「おかいもの」の フローチャートだよ。\n\nはじめ\n ↓\n📝 メモを かく\n ↓\n🚶 おみせに いく\n ↓\n🛒 かごに いれる\n ↓\n💰 おかねを はらう\n ↓\nおわり\n\n2ばんめに することは？",
+  "opts": [
+   "💰 おかねを はらう",
+   "📝 メモを かく",
+   "🚶 おみせに いく"
+  ],
+  "a": 2,
+  "why": "やじるしを うえから じゅんばんに たどろう",
+  "meta": {
+   "kind": "yomitori-seq",
+   "steps": [
+    "📝 メモを かく",
+    "🚶 おみせに いく",
+    "🛒 かごに いれる",
+    "💰 おかねを はらう"
+   ],
+   "askIndex": 1
+  },
+  "category": "yomitori",
+  "difficulty": "easy",
+  "id": "yomitori-e-15"
+ },
+ {
+  "q": "「おかいもの」の フローチャートだよ。\n\nはじめ\n ↓\n📝 メモを かく\n ↓\n🚶 おみせに いく\n ↓\n🛒 かごに いれる\n ↓\n💰 おかねを はらう\n ↓\nおわり\n\n4ばんめに することは？",
+  "opts": [
+   "💰 おかねを はらう",
+   "📝 メモを かく",
+   "🚶 おみせに いく"
+  ],
+  "a": 0,
+  "why": "やじるしを うえから じゅんばんに たどろう",
+  "meta": {
+   "kind": "yomitori-seq",
+   "steps": [
+    "📝 メモを かく",
+    "🚶 おみせに いく",
+    "🛒 かごに いれる",
+    "💰 おかねを はらう"
+   ],
+   "askIndex": 3
+  },
+  "category": "yomitori",
+  "difficulty": "easy",
+  "id": "yomitori-e-16"
+ },
+ {
+  "q": "「カレーづくり」の フローチャートだよ。\n\nはじめ\n ↓\n🔪 やさいを きる\n ↓\n🍳 いためる\n ↓\n💧 みずを いれて にこむ\n ↓\n🍛 ルーを いれる\n ↓\nおわり\n\n1ばんめに することは？",
+  "opts": [
+   "🔪 やさいを きる",
+   "💧 みずを いれて にこむ",
+   "🍳 いためる"
+  ],
+  "a": 0,
+  "why": "やじるしを うえから じゅんばんに たどろう",
+  "meta": {
+   "kind": "yomitori-seq",
+   "steps": [
+    "🔪 やさいを きる",
+    "🍳 いためる",
+    "💧 みずを いれて にこむ",
+    "🍛 ルーを いれる"
    ],
    "askIndex": 0
+  },
+  "category": "yomitori",
+  "difficulty": "easy",
+  "id": "yomitori-e-17"
+ },
+ {
+  "q": "「おでかけの じゅんび」の フローチャートだよ。\n\nはじめ\n ↓\n🧢 ぼうしを かぶる\n ↓\n🎒 リュックを せおう\n ↓\n🚪 いえの かぎを しめる\n ↓\n🚶 しゅっぱつ！\n ↓\nおわり\n\n3ばんめに することは？",
+  "opts": [
+   "🎒 リュックを せおう",
+   "🚶 しゅっぱつ！",
+   "🚪 いえの かぎを しめる"
+  ],
+  "a": 2,
+  "why": "やじるしを うえから じゅんばんに たどろう",
+  "meta": {
+   "kind": "yomitori-seq",
+   "steps": [
+    "🧢 ぼうしを かぶる",
+    "🎒 リュックを せおう",
+    "🚪 いえの かぎを しめる",
+    "🚶 しゅっぱつ！"
+   ],
+   "askIndex": 2
   },
   "category": "yomitori",
   "difficulty": "easy",
   "id": "yomitori-e-18"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nてが よごれている？\n ├─ はい → 🧼 てを あらう\n └─ いいえ → 🍞 そのまま たべる\n\n「てが よごれている？」が「はい」のとき、どうする？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nへやが くらい？\n ├─ はい → 💡 でんきを つける\n └─ いいえ → そのまま あそぶ\n\n「へやが くらい？」が「いいえ」のとき、どうする？",
   "opts": [
-   "🍞 そのまま たべる",
-   "🌞 ほして かわかす",
-   "🧼 てを あらう"
+   "💡 でんきを つける",
+   "そのまま あそぶ",
+   "📚 ほんを よむ"
   ],
-  "a": 2,
-  "why": "「はい」の やじるしの さきを みよう",
+  "a": 1,
+  "why": "「いいえ」の やじるしの さきを みよう",
   "meta": {
    "kind": "yomitori-branch",
-   "askCond": true,
-   "yes": "🧼 てを あらう",
-   "no": "🍞 そのまま たべる"
+   "askCond": false,
+   "yes": "💡 でんきを つける",
+   "no": "そのまま あそぶ"
   },
   "category": "yomitori",
   "difficulty": "normal",
   "id": "yomitori-n-1"
  },
  {
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nねつが ある？\n ├─ はい → 🛏️ おうちで やすむ\n └─ いいえ → 🏫 がっこうに いく\n\n「ねつが ある？」が「いいえ」のとき、どうする？",
+  "opts": [
+   "そのまま あそぶ",
+   "🏫 がっこうに いく",
+   "🛏️ おうちで やすむ"
+  ],
+  "a": 1,
+  "why": "「いいえ」の やじるしの さきを みよう",
+  "meta": {
+   "kind": "yomitori-branch",
+   "askCond": false,
+   "yes": "🛏️ おうちで やすむ",
+   "no": "🏫 がっこうに いく"
+  },
+  "category": "yomitori",
+  "difficulty": "normal",
+  "id": "yomitori-n-2"
+ },
+ {
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nあめが ふっている？\n ├─ はい → ☂️ かさを もっていく\n └─ いいえ → 🧢 ぼうしを かぶる\n\n「あめが ふっている？」が「いいえ」のとき、どうする？",
+  "opts": [
+   "☂️ かさを もっていく",
+   "🧢 ぼうしを かぶる",
+   "📚 ほんを よむ"
+  ],
+  "a": 1,
+  "why": "「いいえ」の やじるしの さきを みよう",
+  "meta": {
+   "kind": "yomitori-branch",
+   "askCond": false,
+   "yes": "☂️ かさを もっていく",
+   "no": "🧢 ぼうしを かぶる"
+  },
+  "category": "yomitori",
+  "difficulty": "normal",
+  "id": "yomitori-n-3"
+ },
+ {
   "q": "フローチャートを よもう。\n\nはじめ\n ↓\nのどが かわいた？\n ├─ はい → 🥤 みずを のむ\n └─ いいえ → ⚽ あそびつづける\n\n「のどが かわいた？」が「いいえ」のとき、どうする？",
   "opts": [
-   "⚽ あそびつづける",
    "🥤 みずを のむ",
-   "🏫 がっこうに いく"
+   "⚽ あそびつづける",
+   "📚 ほんを よむ"
   ],
-  "a": 0,
+  "a": 1,
   "why": "「いいえ」の やじるしの さきを みよう",
   "meta": {
    "kind": "yomitori-branch",
@@ -8778,35 +9901,54 @@ export const GEN_QUIZZES = [
   },
   "category": "yomitori",
   "difficulty": "normal",
-  "id": "yomitori-n-2"
+  "id": "yomitori-n-4"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nてが よごれている？\n ├─ はい → 🧼 てを あらう\n └─ いいえ → 🍞 そのまま たべる\n\n「てが よごれている？」が「いいえ」のとき、どうする？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nおなかが すいた？\n ├─ はい → 🍙 おにぎりを たべる\n └─ いいえ → 📚 ほんを よむ\n\n「おなかが すいた？」が「はい」のとき、どうする？",
   "opts": [
-   "🧼 てを あらう",
-   "🚶 わたる",
-   "🍞 そのまま たべる"
+   "🛏️ おうちで やすむ",
+   "📚 ほんを よむ",
+   "🍙 おにぎりを たべる"
   ],
   "a": 2,
-  "why": "「いいえ」の やじるしの さきを みよう",
+  "why": "「はい」の やじるしの さきを みよう",
   "meta": {
    "kind": "yomitori-branch",
-   "askCond": false,
-   "yes": "🧼 てを あらう",
-   "no": "🍞 そのまま たべる"
+   "askCond": true,
+   "yes": "🍙 おにぎりを たべる",
+   "no": "📚 ほんを よむ"
   },
   "category": "yomitori",
   "difficulty": "normal",
-  "id": "yomitori-n-3"
+  "id": "yomitori-n-5"
+ },
+ {
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nねつが ある？\n ├─ はい → 🛏️ おうちで やすむ\n └─ いいえ → 🏫 がっこうに いく\n\n「ねつが ある？」が「はい」のとき、どうする？",
+  "opts": [
+   "🛑 とまって まつ",
+   "🏫 がっこうに いく",
+   "🛏️ おうちで やすむ"
+  ],
+  "a": 2,
+  "why": "「はい」の やじるしの さきを みよう",
+  "meta": {
+   "kind": "yomitori-branch",
+   "askCond": true,
+   "yes": "🛏️ おうちで やすむ",
+   "no": "🏫 がっこうに いく"
+  },
+  "category": "yomitori",
+  "difficulty": "normal",
+  "id": "yomitori-n-6"
  },
  {
   "q": "フローチャートを よもう。\n\nはじめ\n ↓\nさむい？\n ├─ はい → 🧥 うわぎを きる\n └─ いいえ → 👕 そのままで いい\n\n「さむい？」が「はい」のとき、どうする？",
   "opts": [
-   "🥤 みずを のむ",
-   "🧥 うわぎを きる",
-   "👕 そのままで いい"
+   "👕 そのままで いい",
+   "💡 でんきを つける",
+   "🧥 うわぎを きる"
   ],
-  "a": 1,
+  "a": 2,
   "why": "「はい」の やじるしの さきを みよう",
   "meta": {
    "kind": "yomitori-branch",
@@ -8816,35 +9958,111 @@ export const GEN_QUIZZES = [
   },
   "category": "yomitori",
   "difficulty": "normal",
-  "id": "yomitori-n-4"
+  "id": "yomitori-n-7"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nへやが くらい？\n ├─ はい → 💡 でんきを つける\n └─ いいえ → そのまま あそぶ\n\n「へやが くらい？」が「はい」のとき、どうする？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nしんごうが あか？\n ├─ はい → 🛑 とまって まつ\n └─ いいえ → 🚶 わたる\n\n「しんごうが あか？」が「いいえ」のとき、どうする？",
   "opts": [
-   "💡 でんきを つける",
-   "🌞 ほして かわかす",
-   "そのまま あそぶ"
+   "🚶 わたる",
+   "🏫 がっこうに いく",
+   "🛑 とまって まつ"
   ],
   "a": 0,
+  "why": "「いいえ」の やじるしの さきを みよう",
+  "meta": {
+   "kind": "yomitori-branch",
+   "askCond": false,
+   "yes": "🛑 とまって まつ",
+   "no": "🚶 わたる"
+  },
+  "category": "yomitori",
+  "difficulty": "normal",
+  "id": "yomitori-n-8"
+ },
+ {
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nくつが ぬれている？\n ├─ はい → 🌞 ほして かわかす\n └─ いいえ → 👟 そのまま はく\n\n「くつが ぬれている？」が「いいえ」のとき、どうする？",
+  "opts": [
+   "👟 そのまま はく",
+   "🌞 ほして かわかす",
+   "⚽ あそびつづける"
+  ],
+  "a": 0,
+  "why": "「いいえ」の やじるしの さきを みよう",
+  "meta": {
+   "kind": "yomitori-branch",
+   "askCond": false,
+   "yes": "🌞 ほして かわかす",
+   "no": "👟 そのまま はく"
+  },
+  "category": "yomitori",
+  "difficulty": "normal",
+  "id": "yomitori-n-9"
+ },
+ {
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nしんごうが あか？\n ├─ はい → 🛑 とまって まつ\n └─ いいえ → 🚶 わたる\n\n「しんごうが あか？」が「はい」のとき、どうする？",
+  "opts": [
+   "🥤 みずを のむ",
+   "🚶 わたる",
+   "🛑 とまって まつ"
+  ],
+  "a": 2,
   "why": "「はい」の やじるしの さきを みよう",
   "meta": {
    "kind": "yomitori-branch",
    "askCond": true,
-   "yes": "💡 でんきを つける",
-   "no": "そのまま あそぶ"
+   "yes": "🛑 とまって まつ",
+   "no": "🚶 わたる"
   },
   "category": "yomitori",
   "difficulty": "normal",
-  "id": "yomitori-n-5"
+  "id": "yomitori-n-10"
+ },
+ {
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nのどが かわいた？\n ├─ はい → 🥤 みずを のむ\n └─ いいえ → ⚽ あそびつづける\n\n「のどが かわいた？」が「いいえ」のとき、どうする？",
+  "opts": [
+   "🏫 がっこうに いく",
+   "🥤 みずを のむ",
+   "⚽ あそびつづける"
+  ],
+  "a": 2,
+  "why": "「いいえ」の やじるしの さきを みよう",
+  "meta": {
+   "kind": "yomitori-branch",
+   "askCond": false,
+   "yes": "🥤 みずを のむ",
+   "no": "⚽ あそびつづける"
+  },
+  "category": "yomitori",
+  "difficulty": "normal",
+  "id": "yomitori-n-11"
+ },
+ {
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nてが よごれている？\n ├─ はい → 🧼 てを あらう\n └─ いいえ → 🍞 そのまま たべる\n\n「てが よごれている？」が「いいえ」のとき、どうする？",
+  "opts": [
+   "⚽ あそびつづける",
+   "🍞 そのまま たべる",
+   "🧼 てを あらう"
+  ],
+  "a": 1,
+  "why": "「いいえ」の やじるしの さきを みよう",
+  "meta": {
+   "kind": "yomitori-branch",
+   "askCond": false,
+   "yes": "🧼 てを あらう",
+   "no": "🍞 そのまま たべる"
+  },
+  "category": "yomitori",
+  "difficulty": "normal",
+  "id": "yomitori-n-12"
  },
  {
   "q": "フローチャートを よもう。\n\nはじめ\n ↓\nのどが かわいた？\n ├─ はい → 🥤 みずを のむ\n └─ いいえ → ⚽ あそびつづける\n\n「のどが かわいた？」が「はい」のとき、どうする？",
   "opts": [
-   "⚽ あそびつづける",
    "🥤 みずを のむ",
-   "💡 でんきを つける"
+   "🛑 とまって まつ",
+   "⚽ あそびつづける"
   ],
-  "a": 1,
+  "a": 0,
   "why": "「はい」の やじるしの さきを みよう",
   "meta": {
    "kind": "yomitori-branch",
@@ -8854,109 +10072,14 @@ export const GEN_QUIZZES = [
   },
   "category": "yomitori",
   "difficulty": "normal",
-  "id": "yomitori-n-6"
- },
- {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nてが よごれている？\n ├─ はい → 🧼 てを あらう\n └─ いいえ → 🍞 そのまま たべる\n\n「てが よごれている？」が「はい」のとき、どうする？",
-  "opts": [
-   "🧼 てを あらう",
-   "🍞 そのまま たべる",
-   "☂️ かさを もっていく"
-  ],
-  "a": 0,
-  "why": "「はい」の やじるしの さきを みよう",
-  "meta": {
-   "kind": "yomitori-branch",
-   "askCond": true,
-   "yes": "🧼 てを あらう",
-   "no": "🍞 そのまま たべる"
-  },
-  "category": "yomitori",
-  "difficulty": "normal",
-  "id": "yomitori-n-7"
- },
- {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nしんごうが あか？\n ├─ はい → 🛑 とまって まつ\n └─ いいえ → 🚶 わたる\n\n「しんごうが あか？」が「はい」のとき、どうする？",
-  "opts": [
-   "🚶 わたる",
-   "🍙 おにぎりを たべる",
-   "🛑 とまって まつ"
-  ],
-  "a": 2,
-  "why": "「はい」の やじるしの さきを みよう",
-  "meta": {
-   "kind": "yomitori-branch",
-   "askCond": true,
-   "yes": "🛑 とまって まつ",
-   "no": "🚶 わたる"
-  },
-  "category": "yomitori",
-  "difficulty": "normal",
-  "id": "yomitori-n-8"
- },
- {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nしんごうが あか？\n ├─ はい → 🛑 とまって まつ\n └─ いいえ → 🚶 わたる\n\n「しんごうが あか？」が「はい」のとき、どうする？",
-  "opts": [
-   "🚶 わたる",
-   "🛏️ おうちで やすむ",
-   "🛑 とまって まつ"
-  ],
-  "a": 2,
-  "why": "「はい」の やじるしの さきを みよう",
-  "meta": {
-   "kind": "yomitori-branch",
-   "askCond": true,
-   "yes": "🛑 とまって まつ",
-   "no": "🚶 わたる"
-  },
-  "category": "yomitori",
-  "difficulty": "normal",
-  "id": "yomitori-n-9"
- },
- {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nあめが ふっている？\n ├─ はい → ☂️ かさを もっていく\n └─ いいえ → 🧢 ぼうしを かぶる\n\n「あめが ふっている？」が「はい」のとき、どうする？",
-  "opts": [
-   "🧢 ぼうしを かぶる",
-   "🧼 てを あらう",
-   "☂️ かさを もっていく"
-  ],
-  "a": 2,
-  "why": "「はい」の やじるしの さきを みよう",
-  "meta": {
-   "kind": "yomitori-branch",
-   "askCond": true,
-   "yes": "☂️ かさを もっていく",
-   "no": "🧢 ぼうしを かぶる"
-  },
-  "category": "yomitori",
-  "difficulty": "normal",
-  "id": "yomitori-n-10"
- },
- {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nあめが ふっている？\n ├─ はい → ☂️ かさを もっていく\n └─ いいえ → 🧢 ぼうしを かぶる\n\n「あめが ふっている？」が「はい」のとき、どうする？",
-  "opts": [
-   "🛑 とまって まつ",
-   "🧢 ぼうしを かぶる",
-   "☂️ かさを もっていく"
-  ],
-  "a": 2,
-  "why": "「はい」の やじるしの さきを みよう",
-  "meta": {
-   "kind": "yomitori-branch",
-   "askCond": true,
-   "yes": "☂️ かさを もっていく",
-   "no": "🧢 ぼうしを かぶる"
-  },
-  "category": "yomitori",
-  "difficulty": "normal",
-  "id": "yomitori-n-11"
+  "id": "yomitori-n-13"
  },
  {
   "q": "フローチャートを よもう。\n\nはじめ\n ↓\nねつが ある？\n ├─ はい → 🛏️ おうちで やすむ\n └─ いいえ → 🏫 がっこうに いく\n\n「ねつが ある？」が「はい」のとき、どうする？",
   "opts": [
    "🛏️ おうちで やすむ",
-   "🏫 がっこうに いく",
-   "🌞 ほして かわかす"
+   "🌞 ほして かわかす",
+   "🏫 がっこうに いく"
   ],
   "a": 0,
   "why": "「はい」の やじるしの さきを みよう",
@@ -8968,32 +10091,32 @@ export const GEN_QUIZZES = [
   },
   "category": "yomitori",
   "difficulty": "normal",
-  "id": "yomitori-n-12"
+  "id": "yomitori-n-14"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nしんごうが あか？\n ├─ はい → 🛑 とまって まつ\n └─ いいえ → 🚶 わたる\n\n「しんごうが あか？」が「いいえ」のとき、どうする？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nねつが ある？\n ├─ はい → 🛏️ おうちで やすむ\n └─ いいえ → 🏫 がっこうに いく\n\n「ねつが ある？」が「いいえ」のとき、どうする？",
   "opts": [
-   "⚽ あそびつづける",
-   "🚶 わたる",
-   "🛑 とまって まつ"
+   "🍞 そのまま たべる",
+   "🏫 がっこうに いく",
+   "🛏️ おうちで やすむ"
   ],
   "a": 1,
   "why": "「いいえ」の やじるしの さきを みよう",
   "meta": {
    "kind": "yomitori-branch",
    "askCond": false,
-   "yes": "🛑 とまって まつ",
-   "no": "🚶 わたる"
+   "yes": "🛏️ おうちで やすむ",
+   "no": "🏫 がっこうに いく"
   },
   "category": "yomitori",
   "difficulty": "normal",
-  "id": "yomitori-n-13"
+  "id": "yomitori-n-15"
  },
  {
   "q": "フローチャートを よもう。\n\nはじめ\n ↓\nくつが ぬれている？\n ├─ はい → 🌞 ほして かわかす\n └─ いいえ → 👟 そのまま はく\n\n「くつが ぬれている？」が「はい」のとき、どうする？",
   "opts": [
-   "🍙 おにぎりを たべる",
    "👟 そのまま はく",
+   "🛑 とまって まつ",
    "🌞 ほして かわかす"
   ],
   "a": 2,
@@ -9006,110 +10129,72 @@ export const GEN_QUIZZES = [
   },
   "category": "yomitori",
   "difficulty": "normal",
-  "id": "yomitori-n-14"
- },
- {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nくつが ぬれている？\n ├─ はい → 🌞 ほして かわかす\n └─ いいえ → 👟 そのまま はく\n\n「くつが ぬれている？」が「いいえ」のとき、どうする？",
-  "opts": [
-   "🌞 ほして かわかす",
-   "👟 そのまま はく",
-   "🏫 がっこうに いく"
-  ],
-  "a": 1,
-  "why": "「いいえ」の やじるしの さきを みよう",
-  "meta": {
-   "kind": "yomitori-branch",
-   "askCond": false,
-   "yes": "🌞 ほして かわかす",
-   "no": "👟 そのまま はく"
-  },
-  "category": "yomitori",
-  "difficulty": "normal",
-  "id": "yomitori-n-15"
- },
- {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nしんごうが あか？\n ├─ はい → 🛑 とまって まつ\n └─ いいえ → 🚶 わたる\n\n「しんごうが あか？」が「いいえ」のとき、どうする？",
-  "opts": [
-   "🛑 とまって まつ",
-   "🚶 わたる",
-   "📚 ほんを よむ"
-  ],
-  "a": 1,
-  "why": "「いいえ」の やじるしの さきを みよう",
-  "meta": {
-   "kind": "yomitori-branch",
-   "askCond": false,
-   "yes": "🛑 とまって まつ",
-   "no": "🚶 わたる"
-  },
-  "category": "yomitori",
-  "difficulty": "normal",
   "id": "yomitori-n-16"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nへやが くらい？\n ├─ はい → 💡 でんきを つける\n └─ いいえ → そのまま あそぶ\n\n「へやが くらい？」が「いいえ」のとき、どうする？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nおなかが すいた？\n ├─ はい → 🍙 おにぎりを たべる\n └─ いいえ → 📚 ほんを よむ\n\n「おなかが すいた？」が「はい」のとき、どうする？",
   "opts": [
-   "そのまま あそぶ",
-   "👕 そのままで いい",
-   "💡 でんきを つける"
+   "🍙 おにぎりを たべる",
+   "☂️ かさを もっていく",
+   "📚 ほんを よむ"
   ],
   "a": 0,
-  "why": "「いいえ」の やじるしの さきを みよう",
+  "why": "「はい」の やじるしの さきを みよう",
   "meta": {
    "kind": "yomitori-branch",
-   "askCond": false,
-   "yes": "💡 でんきを つける",
-   "no": "そのまま あそぶ"
+   "askCond": true,
+   "yes": "🍙 おにぎりを たべる",
+   "no": "📚 ほんを よむ"
   },
   "category": "yomitori",
   "difficulty": "normal",
   "id": "yomitori-n-17"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nあめが ふっている？\n ├─ はい → ☂️ かさを もっていく\n └─ いいえ → 🧢 ぼうしを かぶる\n\n「あめが ふっている？」が「いいえ」のとき、どうする？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\nてが よごれている？\n ├─ はい → 🧼 てを あらう\n └─ いいえ → 🍞 そのまま たべる\n\n「てが よごれている？」が「いいえ」のとき、どうする？",
   "opts": [
-   "☂️ かさを もっていく",
-   "そのまま あそぶ",
-   "🧢 ぼうしを かぶる"
+   "👟 そのまま はく",
+   "🍞 そのまま たべる",
+   "🧼 てを あらう"
   ],
-  "a": 2,
+  "a": 1,
   "why": "「いいえ」の やじるしの さきを みよう",
   "meta": {
    "kind": "yomitori-branch",
    "askCond": false,
-   "yes": "☂️ かさを もっていく",
-   "no": "🧢 ぼうしを かぶる"
+   "yes": "🧼 てを あらう",
+   "no": "🍞 そのまま たべる"
   },
   "category": "yomitori",
   "difficulty": "normal",
   "id": "yomitori-n-18"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ 🦘 ジャンプする\n ↓\nおわり\n\nジャンプ🦘は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 3かい くりかえす\n │ ⭐を かく\n │ ⭐を かく\n ↓\nおわり\n\nほし⭐は ぜんぶで なんかい？",
   "opts": [
-   "4かい",
-   "8かい",
+   "6かい",
+   "9かい",
    "5かい"
   ],
   "a": 0,
-  "why": "4かい くりかえすと 4かいだね",
+  "why": "1しゅうで 2かい。3しゅうで 6かいだね",
   "meta": {
    "kind": "yomitori-loop",
-   "count": 4,
-   "per": 1
+   "count": 3,
+   "per": 2
   },
   "category": "yomitori",
   "difficulty": "hard",
   "id": "yomitori-h-1"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 3かい くりかえす\n │ 👏 てを たたく\n │ ⭕を かく\n ↓\nおわり\n\nはくしゅ👏は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 3かい くりかえす\n │ 🦘 ジャンプする\n │ ⭐を かく\n ↓\nおわり\n\nジャンプ🦘は ぜんぶで なんかい？",
   "opts": [
-   "3かい",
    "5かい",
+   "3かい",
    "6かい"
   ],
-  "a": 0,
+  "a": 1,
   "why": "1しゅうに 1かいずつ。3しゅうで 3かいだね",
   "meta": {
    "kind": "yomitori-loop2",
@@ -9120,78 +10205,60 @@ export const GEN_QUIZZES = [
   "id": "yomitori-h-2"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 3かい くりかえす\n │ 👏 てを たたく\n │ 👏 てを たたく\n ↓\nおわり\n\nはくしゅ👏は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ ⭕を かく\n ↓\nおわり\n\nまる⭕は ぜんぶで なんかい？",
   "opts": [
-   "9かい",
+   "8かい",
    "5かい",
-   "6かい"
+   "4かい"
   ],
   "a": 2,
-  "why": "1しゅうで 2かい。3しゅうで 6かいだね",
+  "why": "4かい くりかえすと 4かいだね",
   "meta": {
    "kind": "yomitori-loop",
-   "count": 3,
-   "per": 2
+   "count": 4,
+   "per": 1
   },
   "category": "yomitori",
   "difficulty": "hard",
   "id": "yomitori-h-3"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 5かい くりかえす\n │ 👏 てを たたく\n │ 👏 てを たたく\n ↓\nおわり\n\nはくしゅ👏は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 5かい くりかえす\n │ ⭐を かく\n │ ⭕を かく\n ↓\nおわり\n\nほし⭐は ぜんぶで なんかい？",
   "opts": [
+   "10かい",
    "7かい",
-   "15かい",
-   "10かい"
+   "5かい"
   ],
   "a": 2,
-  "why": "1しゅうで 2かい。5しゅうで 10かいだね",
+  "why": "1しゅうに 1かいずつ。5しゅうで 5かいだね",
   "meta": {
-   "kind": "yomitori-loop",
-   "count": 5,
-   "per": 2
+   "kind": "yomitori-loop2",
+   "count": 5
   },
   "category": "yomitori",
   "difficulty": "hard",
   "id": "yomitori-h-4"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ 🦘 ジャンプする\n │ ⭐を かく\n ↓\nおわり\n\nジャンプ🦘は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 3かい くりかえす\n │ ⭐を かく\n ↓\nおわり\n\nほし⭐は ぜんぶで なんかい？",
   "opts": [
-   "8かい",
    "6かい",
+   "3かい",
    "4かい"
   ],
-  "a": 2,
-  "why": "1しゅうに 1かいずつ。4しゅうで 4かいだね",
+  "a": 1,
+  "why": "3かい くりかえすと 3かいだね",
   "meta": {
-   "kind": "yomitori-loop2",
-   "count": 4
+   "kind": "yomitori-loop",
+   "count": 3,
+   "per": 1
   },
   "category": "yomitori",
   "difficulty": "hard",
   "id": "yomitori-h-5"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 3かい くりかえす\n │ 🦘 ジャンプする\n │ 🦘 ジャンプする\n ↓\nおわり\n\nジャンプ🦘は ぜんぶで なんかい？",
-  "opts": [
-   "6かい",
-   "5かい",
-   "9かい"
-  ],
-  "a": 0,
-  "why": "1しゅうで 2かい。3しゅうで 6かいだね",
-  "meta": {
-   "kind": "yomitori-loop",
-   "count": 3,
-   "per": 2
-  },
-  "category": "yomitori",
-  "difficulty": "hard",
-  "id": "yomitori-h-6"
- },
- {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 5かい くりかえす\n │ ⭐を かく\n │ 🦘 ジャンプする\n ↓\nおわり\n\nほし⭐は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 5かい くりかえす\n │ 🔔を ならす\n │ 🦘 ジャンプする\n ↓\nおわり\n\nかね🔔は ぜんぶで なんかい？",
   "opts": [
    "10かい",
    "5かい",
@@ -9205,16 +10272,34 @@ export const GEN_QUIZZES = [
   },
   "category": "yomitori",
   "difficulty": "hard",
+  "id": "yomitori-h-6"
+ },
+ {
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ 👏 てを たたく\n ↓\nおわり\n\nはくしゅ👏は ぜんぶで なんかい？",
+  "opts": [
+   "8かい",
+   "4かい",
+   "5かい"
+  ],
+  "a": 1,
+  "why": "4かい くりかえすと 4かいだね",
+  "meta": {
+   "kind": "yomitori-loop",
+   "count": 4,
+   "per": 1
+  },
+  "category": "yomitori",
+  "difficulty": "hard",
   "id": "yomitori-h-7"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 5かい くりかえす\n │ 🔔を ならす\n │ 🔔を ならす\n ↓\nおわり\n\nかね🔔は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 5かい くりかえす\n │ 🦘 ジャンプする\n │ 🦘 ジャンプする\n ↓\nおわり\n\nジャンプ🦘は ぜんぶで なんかい？",
   "opts": [
-   "10かい",
    "7かい",
+   "10かい",
    "15かい"
   ],
-  "a": 0,
+  "a": 1,
   "why": "1しゅうで 2かい。5しゅうで 10かいだね",
   "meta": {
    "kind": "yomitori-loop",
@@ -9226,59 +10311,76 @@ export const GEN_QUIZZES = [
   "id": "yomitori-h-8"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 5かい くりかえす\n │ ⭐を かく\n │ ⭕を かく\n ↓\nおわり\n\nほし⭐は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ 🦘 ジャンプする\n │ ⭕を かく\n ↓\nおわり\n\nジャンプ🦘は ぜんぶで なんかい？",
   "opts": [
-   "10かい",
-   "5かい",
-   "7かい"
+   "4かい",
+   "8かい",
+   "6かい"
   ],
-  "a": 1,
-  "why": "1しゅうに 1かいずつ。5しゅうで 5かいだね",
+  "a": 0,
+  "why": "1しゅうに 1かいずつ。4しゅうで 4かいだね",
   "meta": {
    "kind": "yomitori-loop2",
-   "count": 5
+   "count": 4
   },
   "category": "yomitori",
   "difficulty": "hard",
   "id": "yomitori-h-9"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ 🔔を ならす\n │ 🔔を ならす\n ↓\nおわり\n\nかね🔔は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ ⭐を かく\n │ ⭕を かく\n ↓\nおわり\n\nほし⭐は ぜんぶで なんかい？",
   "opts": [
-   "6かい",
    "8かい",
-   "12かい"
+   "4かい",
+   "6かい"
   ],
   "a": 1,
-  "why": "1しゅうで 2かい。4しゅうで 8かいだね",
+  "why": "1しゅうに 1かいずつ。4しゅうで 4かいだね",
   "meta": {
-   "kind": "yomitori-loop",
-   "count": 4,
-   "per": 2
+   "kind": "yomitori-loop2",
+   "count": 4
   },
   "category": "yomitori",
   "difficulty": "hard",
   "id": "yomitori-h-10"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 5かい くりかえす\n │ 👏 てを たたく\n │ ⭕を かく\n ↓\nおわり\n\nはくしゅ👏は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 3かい くりかえす\n │ 🦘 ジャンプする\n ↓\nおわり\n\nジャンプ🦘は ぜんぶで なんかい？",
   "opts": [
-   "5かい",
-   "7かい",
-   "10かい"
+   "6かい",
+   "3かい",
+   "4かい"
   ],
-  "a": 0,
-  "why": "1しゅうに 1かいずつ。5しゅうで 5かいだね",
+  "a": 1,
+  "why": "3かい くりかえすと 3かいだね",
   "meta": {
-   "kind": "yomitori-loop2",
-   "count": 5
+   "kind": "yomitori-loop",
+   "count": 3,
+   "per": 1
   },
   "category": "yomitori",
   "difficulty": "hard",
   "id": "yomitori-h-11"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ ⭕を かく\n │ ⭕を かく\n ↓\nおわり\n\nまる⭕は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 3かい くりかえす\n │ ⭕を かく\n │ 👏 てを たたく\n ↓\nおわり\n\nまる⭕は ぜんぶで なんかい？",
+  "opts": [
+   "6かい",
+   "3かい",
+   "5かい"
+  ],
+  "a": 1,
+  "why": "1しゅうに 1かいずつ。3しゅうで 3かいだね",
+  "meta": {
+   "kind": "yomitori-loop2",
+   "count": 3
+  },
+  "category": "yomitori",
+  "difficulty": "hard",
+  "id": "yomitori-h-12"
+ },
+ {
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ 🦘 ジャンプする\n │ 🦘 ジャンプする\n ↓\nおわり\n\nジャンプ🦘は ぜんぶで なんかい？",
   "opts": [
    "8かい",
    "12かい",
@@ -9293,38 +10395,20 @@ export const GEN_QUIZZES = [
   },
   "category": "yomitori",
   "difficulty": "hard",
-  "id": "yomitori-h-12"
- },
- {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ ⭕を かく\n │ 🔔を ならす\n ↓\nおわり\n\nまる⭕は ぜんぶで なんかい？",
-  "opts": [
-   "6かい",
-   "8かい",
-   "4かい"
-  ],
-  "a": 2,
-  "why": "1しゅうに 1かいずつ。4しゅうで 4かいだね",
-  "meta": {
-   "kind": "yomitori-loop2",
-   "count": 4
-  },
-  "category": "yomitori",
-  "difficulty": "hard",
   "id": "yomitori-h-13"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 5かい くりかえす\n │ ⭕を かく\n │ ⭕を かく\n ↓\nおわり\n\nまる⭕は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 5かい くりかえす\n │ ⭐を かく\n │ 🔔を ならす\n ↓\nおわり\n\nほし⭐は ぜんぶで なんかい？",
   "opts": [
+   "5かい",
    "7かい",
-   "10かい",
-   "15かい"
+   "10かい"
   ],
-  "a": 1,
-  "why": "1しゅうで 2かい。5しゅうで 10かいだね",
+  "a": 0,
+  "why": "1しゅうに 1かいずつ。5しゅうで 5かいだね",
   "meta": {
-   "kind": "yomitori-loop",
-   "count": 5,
-   "per": 2
+   "kind": "yomitori-loop2",
+   "count": 5
   },
   "category": "yomitori",
   "difficulty": "hard",
@@ -9333,11 +10417,11 @@ export const GEN_QUIZZES = [
  {
   "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ ⭕を かく\n │ 🦘 ジャンプする\n ↓\nおわり\n\nまる⭕は ぜんぶで なんかい？",
   "opts": [
-   "4かい",
+   "6かい",
    "8かい",
-   "6かい"
+   "4かい"
   ],
-  "a": 0,
+  "a": 2,
   "why": "1しゅうに 1かいずつ。4しゅうで 4かいだね",
   "meta": {
    "kind": "yomitori-loop2",
@@ -9348,30 +10432,13 @@ export const GEN_QUIZZES = [
   "id": "yomitori-h-15"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ 🔔を ならす\n │ ⭐を かく\n ↓\nおわり\n\nかね🔔は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 5かい くりかえす\n │ 🦘 ジャンプする\n ↓\nおわり\n\nジャンプ🦘は ぜんぶで なんかい？",
   "opts": [
    "6かい",
-   "8かい",
-   "4かい"
+   "10かい",
+   "5かい"
   ],
   "a": 2,
-  "why": "1しゅうに 1かいずつ。4しゅうで 4かいだね",
-  "meta": {
-   "kind": "yomitori-loop2",
-   "count": 4
-  },
-  "category": "yomitori",
-  "difficulty": "hard",
-  "id": "yomitori-h-16"
- },
- {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 5かい くりかえす\n │ ⭐を かく\n ↓\nおわり\n\nほし⭐は ぜんぶで なんかい？",
-  "opts": [
-   "6かい",
-   "5かい",
-   "10かい"
-  ],
-  "a": 1,
   "why": "5かい くりかえすと 5かいだね",
   "meta": {
    "kind": "yomitori-loop",
@@ -9380,20 +10447,38 @@ export const GEN_QUIZZES = [
   },
   "category": "yomitori",
   "difficulty": "hard",
+  "id": "yomitori-h-16"
+ },
+ {
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 3かい くりかえす\n │ 🦘 ジャンプする\n │ 🦘 ジャンプする\n ↓\nおわり\n\nジャンプ🦘は ぜんぶで なんかい？",
+  "opts": [
+   "5かい",
+   "6かい",
+   "9かい"
+  ],
+  "a": 1,
+  "why": "1しゅうで 2かい。3しゅうで 6かいだね",
+  "meta": {
+   "kind": "yomitori-loop",
+   "count": 3,
+   "per": 2
+  },
+  "category": "yomitori",
+  "difficulty": "hard",
   "id": "yomitori-h-17"
  },
  {
-  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 3かい くりかえす\n │ ⭕を かく\n │ 🔔を ならす\n ↓\nおわり\n\nまる⭕は ぜんぶで なんかい？",
+  "q": "フローチャートを よもう。\n\nはじめ\n ↓\n🔁 4かい くりかえす\n │ 🔔を ならす\n │ ⭕を かく\n ↓\nおわり\n\nかね🔔は ぜんぶで なんかい？",
   "opts": [
-   "5かい",
-   "3かい",
-   "6かい"
+   "4かい",
+   "6かい",
+   "8かい"
   ],
-  "a": 1,
-  "why": "1しゅうに 1かいずつ。3しゅうで 3かいだね",
+  "a": 0,
+  "why": "1しゅうに 1かいずつ。4しゅうで 4かいだね",
   "meta": {
    "kind": "yomitori-loop2",
-   "count": 3
+   "count": 4
   },
   "category": "yomitori",
   "difficulty": "hard",

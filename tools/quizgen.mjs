@@ -17,7 +17,10 @@ if (!SAMPLE && !WRITE && !COUNT) { console.log("使い方: node tools/quizgen.mj
 // 本生産の各セル問数（⑤: セッション5問の5倍前後をストック）
 const N = SAMPLE
   ? { kimari: 3, robot: 2, yomitori: 2, junban: 3, nakama: 3 }
-  : { kimari: 26, robot: 20, yomitori: 18, junban: 24, nakama: 24 };
+  : { kimari: 26, robot: 20, yomitori: 18, junban: 24, nakama: 32 };
+// なかまわけの内訳（b4t）: 先頭 NAKAMA_ODD 問=仲間外れ探し（従来）・残り=軸名称形式「〇〇の なかまは どれ？」。
+// 24+8=32 は初期値（混在比率は実機で調整可）。出題プールでは混在＝セッション5問シャッフルで自然に混ざる。
+const NAKAMA_ODD = SAMPLE ? 2 : 24;
 
 function mulberry32(seed) {
   let a = seed >>> 0;
@@ -180,11 +183,14 @@ function genJunban(diff, idx) {
 }
 
 /* ================= なかまわけ =================
-   やさ=カテゴリ軸（同カテゴリ2＋別カテゴリ1）／ふつう=性質軸（同カテゴリ内で切る）／
-   むず=抽象軸4択（カテゴリをまたいで「いきもの・たべられる・しぜん」等で括る）
-   すべて quiz-criteria の全軸照合（軸競合の機械検証）を通った組だけ採用 */
+   2形式を同じ素材・同じ軸で混在させる（b4t・教育設計: 同じ素材で認知の操作を変える）:
+   ①仲間外れ探し「なかまはずれは どれ？」＝差を見つける操作（従来・全軸照合で軸競合を機械排除）
+   ②軸名称形式「〇〇の なかまは どれ？」＝与えられた基準を当てはめる操作（属性フィルタリング・
+     名指しした軸に当てはまる選択肢がちょうど1つ、を機械検証）
+   軸は両形式共通: やさ=カテゴリ軸／ふつう=はたらき軸（同カテゴリ内で切る）／むず=抽象軸4択 */
 const label = it => `${it.e} ${it.n}`;
-function genNakama(diff, idx) {
+function genNakama(diff, idx, made) {
+  if (made >= NAKAMA_ODD) return genNakamaAxis(diff, idx); // 25問め以降=軸名称形式（プールでは混在）
   for (let attempt = 0; attempt < 800; attempt++) {
     let items, odd, axisType, why;
     if (diff === "easy") {
@@ -230,6 +236,60 @@ function genNakama(diff, idx) {
     if (checkQuestion({ ...q, id: "t" }).length === 0) return q;
   }
   throw new Error(`nakama ${diff} ${idx} が収束しない`);
+}
+
+// 軸名称形式（b4t）: 「〇〇の なかまは どれ？」＝正解1つ＋当てはまらない選択肢。
+// qLabel（出題用の短い言い回し）があればそれを、なければ label を出題文に使う。
+const axisQLabel = axis => axis.qLabel || axis.label;
+function genNakamaAxis(diff, idx) {
+  for (let attempt = 0; attempt < 800; attempt++) {
+    let qText, correctIt, wrongIts, axisKind, axisKey, axisType, why;
+    if (diff === "easy") {
+      // カテゴリ軸: 「どうぶつの なかまは どれ？」（正解1＋別カテゴリ2）。
+      // nature は「しぜんの ものの なかま」と の が重なり読みにくいため出題名からは除外（仲間外れ形式では従来どおり使う）
+      const cats = [...new Set(NAKAMA_ITEMS.map(i => i.cat))].filter(c => c !== "nature");
+      const cat = pick(cats);
+      correctIt = pick(NAKAMA_ITEMS.filter(i => i.cat === cat));
+      wrongIts = shuffle(NAKAMA_ITEMS.filter(i => i.cat !== cat)).slice(0, 2);
+      axisKind = "cat"; axisKey = cat; axisType = "concrete";
+      qText = `${CAT_LABEL[cat]}の なかまは どれ？`;
+      why = `${correctIt.e} ${correctIt.n}は ${CAT_LABEL[cat]}の なかまだね。ほかは ちがうよ`;
+    } else if (diff === "normal") {
+      // はたらき軸: なるべく同カテゴリ内で切る（カテゴリで解けなくして性質で考えさせる＝仲間外れ形式と同じ思想）。
+      // 同カテゴリ内で切れない軸（例: sound=がっきが全部鳴る）はカテゴリまたぎで代替
+      const axes = Object.entries(PROP_AXES).filter(([, v]) => v.type === "functional");
+      const [prop, axis] = pick(axes);
+      const cats = [...new Set(NAKAMA_ITEMS.map(i => i.cat))].filter(c => {
+        const inCat = NAKAMA_ITEMS.filter(i => i.cat === c);
+        return inCat.some(i => i.props.includes(prop)) && inCat.filter(i => !i.props.includes(prop)).length >= 2;
+      });
+      const srcCat = cats.length ? pick(cats) : null; // ★カテゴリは先に1回だけ抽選（filter内でpickすると毎アイテム再抽選される）
+      const src = srcCat ? NAKAMA_ITEMS.filter(i => i.cat === srcCat) : NAKAMA_ITEMS;
+      correctIt = pick(src.filter(i => i.props.includes(prop)));
+      wrongIts = shuffle(src.filter(i => !i.props.includes(prop))).slice(0, 2);
+      axisKind = "prop"; axisKey = prop; axisType = "functional";
+      qText = `${axisQLabel(axis)} なかまは どれ？`;
+      why = `${correctIt.e} ${correctIt.n}は「${axisQLabel(axis)}」なかまだね。ほかは ちがうよ`;
+    } else {
+      // 抽象軸4択: 正解1＋当てはまらない3。誤答は2カテゴリ以上に散らす（カテゴリでは解けない＝抽象化が必要）
+      const axes = Object.entries(PROP_AXES).filter(([, v]) => v.type === "abstract");
+      const [prop, axis] = pick(axes);
+      correctIt = pick(NAKAMA_ITEMS.filter(i => i.props.includes(prop)));
+      wrongIts = shuffle(NAKAMA_ITEMS.filter(i => !i.props.includes(prop))).slice(0, 3);
+      if (new Set(wrongIts.map(w => w.cat)).size < 2) continue;
+      axisKind = "prop"; axisKey = prop; axisType = "abstract";
+      qText = `${axisQLabel(axis)} なかまは どれ？`;
+      why = `${correctIt.e} ${correctIt.n}は「${axisQLabel(axis)}」なかまだね。ほかは ちがうよ`;
+    }
+    if (!correctIt || wrongIts.length < (diff === "hard" ? 3 : 2)) continue;
+    const items = shuffle([correctIt, ...wrongIts]);
+    const opts = items.map(label);
+    const q = { category: "nakama", difficulty: diff, q: qText, opts, a: opts.indexOf(label(correctIt)), why,
+      meta: { kind: "nakama-axis", axisKind, axis: axisKey, axisType, correct: label(correctIt),
+        items: items.map(i => ({ label: label(i), cat: i.cat, props: i.props })) } };
+    if (checkQuestion({ ...q, id: "t" }).length === 0) return q;
+  }
+  throw new Error(`nakama-axis ${diff} ${idx} が収束しない`);
 }
 
 /* ================= ロボット命令 =================
@@ -405,7 +465,7 @@ for (const cat of ["junban", "kimari", "nakama", "robot", "yomitori"]) {
   for (const diff of ["easy", "normal", "hard"]) {
     let made = 0, i = 0;
     while (made < N[cat]) {
-      const q = GENS[cat](diff, i++);
+      const q = GENS[cat](diff, i++, made); // made=完成数（なかまわけの形式ディスパッチに使用・他カテゴリは無視）
       if (i > 4000) throw new Error(`${cat} ${diff}: 重複回避が収束しない（${made}/${N[cat]}）`);
       const key = q.q + "|" + [...q.opts].sort().join("|");
       if (seen.has(key)) continue;

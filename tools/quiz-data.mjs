@@ -135,16 +135,18 @@ export const CAT_LABEL = {
   toy: "おもちゃ", furniture: "かぐ",
 };
 export const PROP_AXES = {
+  // qLabel=出題文用の短い言い回し（軸名称形式「〇〇 なかまは どれ？」・b4t）。未指定の軸は label を使う。
+  // label は why 文用＝不変。qLabel は「その軸を持つ全アイテムに対して真」であること（どれが正解に選ばれてもよいように）。
   // functional（ふつう用）: 同じカテゴリの中を性質で切る
   flies: { label: "そらを とぶ", type: "functional" },
-  water: { label: "みずの なかで くらす（つかう）", type: "functional" },
+  water: { label: "みずの なかで くらす（つかう）", qLabel: "みずの なかや うえに いる", type: "functional" },
   cut: { label: "ものを きる", type: "functional" },
-  draw: { label: "かく・ぬる", type: "functional" },
+  draw: { label: "かく・ぬる", qLabel: "かいたり ぬったり する", type: "functional" },
   sound: { label: "おとを ならす", type: "functional" },
   // abstract（むずかしい用）: カテゴリをまたいで抽象概念で切る
   living: { label: "いきている", type: "abstract" },
   food: { label: "たべられる", type: "abstract" },
-  natural: { label: "しぜんに ある（ひとが つくって いない）", type: "abstract" },
+  natural: { label: "しぜんに ある（ひとが つくって いない）", qLabel: "しぜんに ある", type: "abstract" },
 };
 
 /* ================= きまり: 絵文字プール ================= */

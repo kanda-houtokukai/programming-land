@@ -8,8 +8,11 @@
    - ロボット・よみとり: シミュレーション／計算で答えを再導出。
    - じゅんばん: meta.steps（厳密因果チェーン）に対し、正解・誤答の位置関係を検証
      （誤答は必ず「問われた位置より後ろ」等、チェーン上で不成立の位置から取る）。
-   - なかまわけ: meta.items のタグ全軸を照合し、どの軸で2-1（4択は3-1）に割れても
+   - なかまわけ（仲間外れ探し）: meta.items のタグ全軸を照合し、どの軸で2-1（4択は3-1）に割れても
      なかまはずれが変わらないことをチェック（軸競合＝りんご・トマト・いちご事故の機械防止）。
+   - なかまわけ（軸名称形式・b4t 「〇〇の なかまは どれ？」）: 名指しした軸（cat または prop）に
+     当てはまる選択肢がちょうど1つであることをチェック（2つ当てはまる＝複数正解の事故を機械で弾く。
+     例「そらを とぶ」で ことり＋ひこうき が同時に並ぶ組は不採用）。軸を名指しするため全軸照合は不要。
 
    ■ 難易度タグ＝実難易度の照合（P6e・④対応）
    - expectedDifficulty(q) が meta の構造特徴（周期・命令数・チェーン長・軸種別）から
@@ -137,8 +140,9 @@ export function expectedDifficulty(q) {
     case "junban":
       if (m.ask === "first" || m.ask === "last") return m.steps.length === 3 ? "easy" : "normal";
       return "hard"; // middle / before / order
-    // なかまわけ: やさ=カテゴリ軸／ふつう=性質軸（同カテゴリ内）／むず=抽象軸4択
+    // なかまわけ: やさ=カテゴリ軸／ふつう=性質軸（同カテゴリ内）／むず=抽象軸4択（仲間外れ・軸名称の両形式共通）
     case "nakama":
+    case "nakama-axis":
       return m.axisType === "concrete" ? "easy" : m.axisType === "functional" ? "normal" : "hard";
   }
   return null;
@@ -254,6 +258,13 @@ export function checkQuestion(q) {
     if (correct !== m.odd) errs.push("なかまはずれの答え不一致");
     const conflicts = nakamaConflicts(m.items, m.odd);
     errs.push(...conflicts);
+  } else if (m.kind === "nakama-axis") {
+    // 軸名称形式（b4t）: 名指しした軸に当てはまる選択肢がちょうど1つ＝それが正解（必須条件）
+    if (!m.items || !m.axis || !m.axisKind) { errs.push("nakama-axis metaが不完全"); return errs; }
+    const matches = m.items.filter(it =>
+      m.axisKind === "cat" ? it.cat === m.axis : (it.props || []).includes(m.axis));
+    if (matches.length !== 1) errs.push(`軸「${m.axis}」に当てはまる選択肢が${matches.length}つ（1つでない＝複数正解の事故）`);
+    else if (matches[0].label !== correct) errs.push("軸名称形式の答え不一致");
   } else {
     errs.push(`未知のmeta.kind: ${m.kind}`);
   }
