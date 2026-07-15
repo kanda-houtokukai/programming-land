@@ -17,9 +17,10 @@ if (!SAMPLE && !WRITE && !COUNT) { console.log("使い方: node tools/quizgen.mj
 // 本生産の各セル問数（⑤: セッション5問の5倍前後をストック）
 const N = SAMPLE
   ? { kimari: 3, robot: 2, yomitori: 2, junban: 3, nakama: 3 }
-  : { kimari: 26, robot: 20, yomitori: 18, junban: 24, nakama: 32 };
+  : { kimari: 40, robot: 40, yomitori: 40, junban: 40, nakama: 44 }; // b4u: 在庫拡大（狙い40〜50・下限30）。b4t={26,20,18,24,32}
 // なかまわけの内訳（b4t）: 先頭 NAKAMA_ODD 問=仲間外れ探し（従来）・残り=軸名称形式「〇〇の なかまは どれ？」。
-// 24+8=32 は初期値（混在比率は実機で調整可）。出題プールでは混在＝セッション5問シャッフルで自然に混ざる。
+// b4u: 44=仲間外れ24＋軸名称20（軸が6→19に増えたぶん軸名称の比率を上げた・初期値）。
+// 出題プールでは混在＝セッション5問シャッフルで自然に混ざる。
 const NAKAMA_ODD = SAMPLE ? 2 : 24;
 
 function mulberry32(seed) {
@@ -227,7 +228,8 @@ function genNakama(diff, idx, made) {
       items = shuffle([...haves, oddIt]); odd = oddIt; axisType = "abstract";
       const whyBy = { living: `${oddIt.e} ${oddIt.n}だけ いきものじゃ ないね`,
         food: `${oddIt.e} ${oddIt.n}だけ たべられないね`,
-        natural: `${oddIt.e} ${oddIt.n}だけ ひとが つくった ものだね` };
+        natural: `${oddIt.e} ${oddIt.n}だけ ひとが つくった ものだね`,
+        made: `${oddIt.e} ${oddIt.n}だけ ひとが つくった ものじゃ ないね` }; // b4u: 抽象軸madeを追加（whyが無いと全滅する）
       why = whyBy[prop];
     }
     const opts = items.map(label);
@@ -245,15 +247,29 @@ function genNakamaAxis(diff, idx) {
   for (let attempt = 0; attempt < 800; attempt++) {
     let qText, correctIt, wrongIts, axisKind, axisKey, axisType, why;
     if (diff === "easy") {
-      // カテゴリ軸: 「どうぶつの なかまは どれ？」（正解1＋別カテゴリ2）。
-      // nature は「しぜんの ものの なかま」と の が重なり読みにくいため出題名からは除外（仲間外れ形式では従来どおり使う）
-      const cats = [...new Set(NAKAMA_ITEMS.map(i => i.cat))].filter(c => c !== "nature");
-      const cat = pick(cats);
-      correctIt = pick(NAKAMA_ITEMS.filter(i => i.cat === cat));
-      wrongIts = shuffle(NAKAMA_ITEMS.filter(i => i.cat !== cat)).slice(0, 2);
-      axisKind = "cat"; axisKey = cat; axisType = "concrete";
-      qText = `${CAT_LABEL[cat]}の なかまは どれ？`;
-      why = `${correctIt.e} ${correctIt.n}は ${CAT_LABEL[cat]}の なかまだね。ほかは ちがうよ`;
+      // カテゴリ軸 or 概念軸（concrete prop=いろ・かたち・b4u）を半々で（既存のカテゴリ軸経路は残す）
+      const conc = Object.entries(PROP_AXES).filter(([, v]) => v.type === "concrete");
+      if (conc.length && idx % 2 === 1) {
+        // 概念軸: 「あかい なかまは どれ？」。★誤答は同グループ（color/shape）の別propを持つ物だけ
+        // ＝色/形が曖昧な無タグアイテム（たこ・りんご・にじ等）はこの形式に一切登場しない（quiz-criteriaが機械検証）
+        const [prop, axis] = pick(conc);
+        correctIt = pick(NAKAMA_ITEMS.filter(i => i.props.includes(prop)));
+        wrongIts = shuffle(NAKAMA_ITEMS.filter(i => !i.props.includes(prop) &&
+          i.props.some(p => PROP_AXES[p] && PROP_AXES[p].group === axis.group))).slice(0, 2);
+        axisKind = "prop"; axisKey = prop; axisType = "concrete";
+        qText = `${axisQLabel(axis)} なかまは どれ？`;
+        why = `${correctIt.e} ${correctIt.n}は「${axisQLabel(axis)}」なかまだね。ほかは ちがうよ`;
+      } else {
+        // カテゴリ軸: 「どうぶつの なかまは どれ？」（正解1＋別カテゴリ2）。
+        // nature は「しぜんの ものの なかま」と の が重なり読みにくいため出題名からは除外（仲間外れ形式では従来どおり使う）
+        const cats = [...new Set(NAKAMA_ITEMS.map(i => i.cat))].filter(c => c !== "nature");
+        const cat = pick(cats);
+        correctIt = pick(NAKAMA_ITEMS.filter(i => i.cat === cat));
+        wrongIts = shuffle(NAKAMA_ITEMS.filter(i => i.cat !== cat)).slice(0, 2);
+        axisKind = "cat"; axisKey = cat; axisType = "concrete";
+        qText = `${CAT_LABEL[cat]}の なかまは どれ？`;
+        why = `${correctIt.e} ${correctIt.n}は ${CAT_LABEL[cat]}の なかまだね。ほかは ちがうよ`;
+      }
     } else if (diff === "normal") {
       // はたらき軸: なるべく同カテゴリ内で切る（カテゴリで解けなくして性質で考えさせる＝仲間外れ形式と同じ思想）。
       // 同カテゴリ内で切れない軸（例: sound=がっきが全部鳴る）はカテゴリまたぎで代替
@@ -308,14 +324,14 @@ function genRobot(diff, idx) {
         q = { q: `${DIRS[start].name}を むいている ロボットが「${side === "right" ? "みぎ" : "ひだり"}を むく」。どっちを むく？`,
           opts: o.opts, a: o.a, why: `${DIRS[start].name}から くるっと まわると ${ans}だね`,
           meta: { kind: "robot-turn", start, turns: [side] } };
-      } else if (mode === 1) { // まえへ n回 → 歩数
-        const n = 2 + ri(4);
+      } else if (mode === 1) { // まえへ n回 → 歩数（b4u: 範囲2〜5→2〜7に微拡張＝在庫増）
+        const n = 2 + ri(6);
         const o = options(`${n}マス`, [`${n - 1}マス`, `${n + 1}マス`]);
         q = { q: `「まえへ」を ${n}かい。なんマス すすむ？`, opts: o.opts, a: o.a,
           why: `1かいで 1マス。${n}かいなら ${n}マスだね`,
           meta: { kind: "robot-steps", steps: Array(n).fill(1) } };
-      } else { // 向き＋前へn → 位置
-        const start = ri(4), n = 2 + ri(3);
+      } else { // 向き＋前へn → 位置（b4u: n 2〜4→2〜5に微拡張）
+        const start = ri(4), n = 2 + ri(4);
         const ans = posLabel(DIRS[start].dx * n, DIRS[start].dy * n);
         const w1 = posLabel(DIRS[turn(start, "right")].dx * n, DIRS[turn(start, "right")].dy * n);
         const w2 = posLabel(DIRS[start].dx * (n + 1), DIRS[start].dy * (n + 1));
@@ -429,8 +445,8 @@ function genYomitori(diff, idx) {
         opts: o.opts, a: o.a, why: `「${askCond ? "はい" : "いいえ"}」の やじるしの さきを みよう`,
         meta: { kind: "yomitori-branch", askCond, yes: b.yes, no: b.no } };
     } else {
-      if (idx % 2 === 0) { // 1動作×くりかえし（動作行を per 回ならべる）
-        const count = 3 + ri(3), per = 1 + ri(2);
+      if (idx % 2 === 0) { // 1動作×くりかえし（動作行を per 回ならべる）（b4u: count 3〜5→3〜6に微拡張）
+        const count = 3 + ri(4), per = 1 + ri(2);
         const act = pick(LOOP_ACTS);
         const total = count * per;
         const o = options(`${total}かい`, [`${count + per}かい`, `${total + count}かい`]);
@@ -440,8 +456,8 @@ function genYomitori(diff, idx) {
         q = { q: `フローチャートを よもう。\n\nはじめ\n ↓\n🔁 ${count}かい くりかえす\n${bodyLines}\n ↓\nおわり\n\n${act.noun}は ぜんぶで なんかい？`,
           opts: o.opts, a: o.a, why: `${whyBody}だね`,
           meta: { kind: "yomitori-loop", count, per } };
-      } else { // 2動作×くりかえし → 片方の回数（各周1回ずつ＝答えは周回数）
-        const count = 3 + ri(3);
+      } else { // 2動作×くりかえし → 片方の回数（各周1回ずつ＝答えは周回数）（b4u: count 3〜5→3〜6）
+        const count = 3 + ri(4);
         const [act1, act2] = shuffle(LOOP_ACTS).slice(0, 2);
         const o = options(`${count}かい`, [`${count * 2}かい`, `${count + 2}かい`]);
         if (new Set(o.opts).size !== 3) continue;

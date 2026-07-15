@@ -1,3 +1,3 @@
 // リリースごとに手で上げる（Pages反映確認用）
-export const APP_VERSION = "v2.3-b4t";
-export const BUILD_DATE = "2026-07-15";
+export const APP_VERSION = "v2.3-b4u";
+export const BUILD_DATE = "2026-07-16";

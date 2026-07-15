@@ -22,6 +22,8 @@
    - カテゴリ・難易度・解説(why)・選択肢(3〜4・重複なし)・正解番号・ID一意
    - くりかえしの中身に回数表記を書かない（外側と二重になり人が読めない） */
 
+import { PROP_AXES } from "./quiz-data.mjs"; // b4u: 色/形グループの誤答検証に軸メタ（group）が必要（quiz-dataは純データ＝node安全）
+
 export const CATEGORIES = ["junban", "kimari", "nakama", "robot", "yomitori"];
 export const DIFFS = ["easy", "normal", "hard"];
 export const MAX_PERIOD = 5;
@@ -265,6 +267,16 @@ export function checkQuestion(q) {
       m.axisKind === "cat" ? it.cat === m.axis : (it.props || []).includes(m.axis));
     if (matches.length !== 1) errs.push(`軸「${m.axis}」に当てはまる選択肢が${matches.length}つ（1つでない＝複数正解の事故）`);
     else if (matches[0].label !== correct) errs.push("軸名称形式の答え不一致");
+    // b4u: 色/形（groupつきconcrete軸）の誤答は「同グループの別prop」を持つ物だけ
+    // ＝色/形が曖昧な無タグアイテムが誤答に混ざる事故（たこ=赤っぽい・りんご=丸っぽい）を機械で弾く
+    const axisDef = m.axisKind === "prop" ? PROP_AXES[m.axis] : null;
+    if (axisDef && axisDef.group) {
+      for (const it of m.items) {
+        if ((it.props || []).includes(m.axis)) continue; // 正解側
+        const hasGroupProp = (it.props || []).some(p => PROP_AXES[p] && PROP_AXES[p].group === axisDef.group);
+        if (!hasGroupProp) errs.push(`色/形軸「${m.axis}」の誤答「${it.label}」が同グループのpropを持たない（曖昧アイテム混入）`);
+      }
+    }
   } else {
     errs.push(`未知のmeta.kind: ${m.kind}`);
   }
