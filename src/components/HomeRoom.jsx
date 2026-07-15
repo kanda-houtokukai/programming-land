@@ -50,8 +50,12 @@ function EggIcon({ size = 40 }) {
     style={{ width: size, height: size, objectFit: "contain", display: "block" }} />;
 }
 
+// 床の上で読ませる文字（白＋ink白フチ）＝Battle.jsx の seqSubStyle と同作法。看板不要で床に馴染む（b4s: 卵欄の状態文）
+const seqSubStyle = { color: "#fff", fontWeight: 800,
+  textShadow: `1.5px 1.5px 0 ${C.ink}, -1.5px 1.5px 0 ${C.ink}, 1.5px -1.5px 0 ${C.ink}, -1.5px -1.5px 0 ${C.ink}` };
+
 export default function HomeRoom({ save, update, onClose, onEnter }) {
-  const [nested, setNested] = useState(null); // "profile" | "partner" | "chest" | "dressup" | null（部屋内のネストモーダル）
+  const [nested, setNested] = useState(null); // "profile" | "partner" | "chest" | "dressup" | "egg" | null（部屋内のネストモーダル）
   const [dressMsg, setDressMsg] = useState(null); // きせかえモーダル内のメッセージ（購入/コイン不足）
   // 実機FB③: スマホ（狭幅）ではアバター・相棒を比例して縮小。
   // 方式: 部屋の実幅（img駆動）に比例させる＝背景と同じ空間でスケールするため、
@@ -133,22 +137,26 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
           )}
 
           {/* 卵欄（b4j: stage3到達で届く→アクティブのEXPで孵化ゲージが進む→満ちたら自動でランダム孵化。
-              タップ操作なし＝見守る表示。相棒の左の床・卵が無いときは非表示 */}
+              b4s: 触れるtapzoneに（タップでたまごモーダル）／看板は「たまご」だけ（他ラベルと揃える）／
+              卵を大きく＋巣の名札風ゲージ＋床の状態文。相棒の左の床・卵が無いときは非表示 */}
           {partner && partner.egg && (
-            <div aria-label="たまご"
+            <button className="tapzone" onClick={() => tap("egg")} aria-label="たまご"
               style={{ position: "absolute", left: "24%", top: "72%", transform: "translate(-50%,-50%)",
-                display: "flex", flexDirection: "column", alignItems: "center", pointerEvents: "none" }}>
-              <span className="bubble pulse" style={{ marginBottom: 4, fontSize: "clamp(8px,1.9vw,12px)", animationDelay: ".4s" }}>
-                {eggMsg}</span>
+                width: "22%", border: "none", background: "transparent", cursor: "pointer", padding: 0,
+                display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <span className="bubble pulse" style={{ marginBottom: 5, fontSize: "clamp(8px,1.9vw,12px)", animationDelay: ".4s" }}>たまご</span>
               <span className="mapfloat" style={{ lineHeight: 0, animationDelay: ".8s", filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
-                <EggIcon size={Math.round(40 * sizeK)} />
+                <EggIcon size={Math.round(64 * sizeK)} />{/* b4s: 40→64（相棒より小さく・初期値） */}
               </span>
-              {/* 孵化ゲージ（★据わり・幅は実機調整） */}
-              <span style={{ display: "block", width: Math.round(52 * sizeK), height: 8, marginTop: 3,
-                border: `2px solid ${C.ink}`, borderRadius: 999, background: "#fff", overflow: "hidden" }}>
+              {/* 孵化ゲージ＝卵の足元の「巣の名札」風（幅は卵に合わせる・0%でも世界観色で裸の白棒に見せない） */}
+              <span style={{ display: "block", width: Math.round(64 * sizeK), height: 9, marginTop: 4,
+                border: "2px solid #BA7517", borderRadius: 999, background: "#FFF9EC", overflow: "hidden",
+                boxShadow: "0 1px 3px rgba(60,40,20,.3)" }}>
                 <span style={{ display: "block", width: `${eggPct}%`, height: "100%", background: "#FFD447", transition: "width .4s" }} />
               </span>
-            </div>
+              {/* 状態文＝ゲージ直下に小さく（白＋ink白フチ・床でも読める・看板は不要） */}
+              <span style={{ ...seqSubStyle, fontSize: "clamp(8px,1.7vw,11px)", marginTop: 3, textAlign: "center", lineHeight: 1.25 }}>{eggMsg}</span>
+            </button>
           )}
 
           {/* 自分のアバター（UI改修③: あいぼうの横＝プロフィールの入口。着せ替えが反映された姿） */}
@@ -262,6 +270,31 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
               ))}
             </div>
             <div style={{ textAlign: "center", marginTop: 14 }}>
+              <Btn big bg={C.leaf} onClick={() => setNested(null)}>とじる</Btn>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ネスト: たまご（b4s: タップで開く。卵の絵＋孵化ゲージ＋状態文＋案内。孵化はEXPで自動＝選択なし・growth.js不変） */}
+      {nested === "egg" && partner && partner.egg && (
+        <div role="dialog" aria-modal="true" onClick={() => setNested(null)}
+          style={{ position: "fixed", inset: 0, zIndex: 122, background: "rgba(58,51,53,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div className="panel softpop" onClick={e => e.stopPropagation()}
+            style={{ maxWidth: 340, width: "100%", padding: 20, textAlign: "center", background: "#FFFDF5" }}>
+            <div className="pl-display" style={{ fontSize: 20, marginBottom: 10 }}>たまご</div>
+            <span className="mapfloat" style={{ display: "inline-block", lineHeight: 0, filter: "drop-shadow(1px 4px 4px rgba(20,15,25,.35))" }}>
+              <EggIcon size={120} />
+            </span>
+            {/* 孵化ゲージ（巣の名札風・部屋の床と同じ配色） */}
+            <div style={{ width: 200, maxWidth: "82%", height: 12, margin: "16px auto 6px",
+              border: "2px solid #BA7517", borderRadius: 999, background: "#FFF9EC", overflow: "hidden",
+              boxShadow: "0 1px 3px rgba(60,40,20,.3)" }}>
+              <div style={{ width: `${eggPct}%`, height: "100%", background: "#FFD447", transition: "width .4s" }} />
+            </div>
+            <div style={{ fontWeight: 900, fontSize: 15, color: "#59300A" }}>{eggMsg}</div>
+            <div style={{ fontWeight: 700, fontSize: 13, color: "#6B6265", margin: "8px 0 2px" }}>あそぶと あたたまるよ</div>
+            <div style={{ marginTop: 14 }}>
               <Btn big bg={C.leaf} onClick={() => setNested(null)}>とじる</Btn>
             </div>
           </div>
