@@ -208,6 +208,17 @@ export const CSS = `
   @media (min-width: 700px) {
     .artgrid { grid-template-columns: 1fr 232px; }
   }
+  /* バトル画面の外枠（実機FB第3便・b5a: Battle.jsx の inline style から移設。
+     横画面で縦長の問題だと答えるときにバトルシーンが画面外に消える件の対策。
+     ★向きの判定は CSS @media に任せる＝JSの matchMedia(b4b誤発火)/ResizeObserver(b4l不発火)は使わない */
+  .battleWrap { max-width: 640px; margin: 0 auto; padding: 0 14px 30px; }
+  /* 横画面かつ十分な幅のときだけ2カラム（左=バトルシーン sticky・右=もんだい）。縦画面は何も効かない＝現状のまま */
+  @media (orientation: landscape) and (min-width: 820px) {
+    .battleWrap  { max-width: 1120px; }
+    .battleSplit { display: flex; align-items: flex-start; gap: 14px; }
+    .battleSplit > .bsLeft  { flex: 0 0 54%; position: sticky; top: 8px; }
+    .battleSplit > .bsRight { flex: 1 1 46%; min-width: 0; }
+  }
   /* ===== バトル後・結果シーケンスv2（b4n）＝すべて新名 pl-seq*。既存keyframeは不変。
      世界観: あたたかい・やわらかい・急かさない（光/ふわっ/ころん。稲妻やシェイクは使わない）。
      進化の“ゆっくり暗転1.2s”はオーバーレイ背景のtransitionで実装（pl-seqDim相当） ===== */

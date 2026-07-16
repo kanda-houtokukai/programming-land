@@ -367,7 +367,9 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
   const locked = phase !== "idle" || picked !== null;
 
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 14px 30px" }}>
+    /* 実機FB第3便（b5a）: 外枠は theme.js の .battleWrap へ移設（★inline の maxWidth は CSS より強く
+       横画面の2カラム化を殺すため必ず class で）。横画面では .battleSplit が2カラムにする（縦画面は不変） */
+    <div className="battleWrap">
       {/* バトル中の戻りは「◀ にげる」1つ（1階層＝てき選びへ。ヘッダーには置かない＝二重にしない） */}
       <Header save={save} title="⚔️ クイズバトル" onSound={() => {}} onOpenHome={openHome} />
       <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "8px 0" }}>
@@ -376,6 +378,9 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
         {tower && <div style={{ fontWeight: 900, fontSize: 13, background: "#EFE7FF", border: `2px solid ${C.ink}`, borderRadius: 999, padding: "2px 10px" }}><TowerMini /> {floor}かい</div>}
       </div>
 
+      {/* b5a: 横画面のみ2カラム（左=バトルシーン+メッセージ=sticky／右=アイテム+もんだい）。中身のJSXは不変＝包んだだけ */}
+      <div className="battleSplit">
+      <div className="bsLeft">
       {/* ===== バトルシーン（背景に切り抜きキャラが立つ） ===== */}
       <div className={shakeCls} style={{ border: `3px solid ${C.ink}`, borderRadius: 20, overflow: "hidden",
         boxShadow: "5px 5px 0 rgba(58,51,53,.9)" }}>
@@ -477,6 +482,8 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
       {/* たたかいメッセージ（演出磨き①: 1文字ずつ表示・タップで即全表示） */}
       {msg && <div className="panel slide" onClick={skipType} style={{ padding: "8px 12px", marginTop: 8, textAlign: "center", fontWeight: 900, fontSize: 14,
         background: fx.crit ? "#FFF0B3" : fx.hit === "partner" ? "#FFE6EA" : "#FFFDF5", minHeight: 21, cursor: "pointer" }}>{msg.slice(0, typedLen)}</div>}
+      </div>{/* /bsLeft（b5a） */}
+      <div className="bsRight">
 
       {/* アイテム（もっている ときだけ・1もんに 1こ） */}
       {ownedItems.length > 0 && !overlay && (
@@ -519,6 +526,8 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
           </div>
         )}
       </div>
+      </div>{/* /bsRight（b5a） */}
+      </div>{/* /battleSplit（b5a）。勝敗オーバーレイは fixed 全画面＝分割の外 */}
 
       {/* ===== 勝敗オーバーレイ ===== */}
       {overlay === "win" && (() => {
