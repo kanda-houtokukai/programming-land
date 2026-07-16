@@ -34,13 +34,14 @@ import titleLogo from "../assets/title_logo.webp";
 //   第3層（中のゲーム名・画面タイトル。例: ロボット パズル / クイズバトル / そだった ちから）は
 //   各画面側が持つ＝ここには書かない・変えない。
 export const AREAS = [
-  { key: "quiz", short: "クイズ", place: "クイズのひろば", img: buildingQuiz, tall: true, left: 27, top: 23 },
-  { key: "art", short: "おえかき", place: "おえかきのへや", img: iconArt, left: 18, top: 42 },
+  // 実機FB第1便（2026-07-16）: quiz 1pt上・art 0.5pt上・myhome 0.1pt2時方向・puzzle 0.2pt2時方向
+  { key: "quiz", short: "クイズ", place: "クイズのひろば", img: buildingQuiz, tall: true, left: 27, top: 22 },
+  { key: "art", short: "おえかき", place: "おえかきのへや", img: iconArt, left: 18, top: 41.5 },
   { key: "powers", short: "ちから", place: "そだちのもり", img: iconFlower, left: 19, top: 63 },
   { key: "shop", short: "おみせ", place: "おみせ", img: iconShop, left: 35, top: 72 },
-  { key: "myhome", short: "おうち", place: "おうち", img: buildingHome, tall: true, left: 58, top: 66 },
+  { key: "myhome", short: "おうち", place: "おうち", img: buildingHome, tall: true, left: 58.09, top: 65.95 },
   { key: "typing", short: "タイピング", place: "タイピングタワー", img: buildingTyping, tall: true, left: 47, top: 51 },
-  { key: "puzzle", short: "パズル", place: "パズルのしま", img: iconPuzzle, left: 85, top: 72 },
+  { key: "puzzle", short: "パズル", place: "パズルのしま", img: iconPuzzle, left: 85.17, top: 71.9 },
   { key: "battle", short: "バトル", place: "バトルのアリーナ", img: iconBattle, left: 88, top: 26 },
   // みなと（第2波 段階②）: プロファイル交代の一本化された入口。海側・島の端（拡張用の空き地3つは温存）。
   // 毎回使う場所ではないので small=やや控えめサイズ。「▶いく！」で起動時の選択画面へ（switchProfile経路）
@@ -59,9 +60,9 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
       {/* ヘッダー（相棒・⭐・🪙・音）。「きろく」ボタンは段階③で削除＝子どもの記録はおうちの机の日記へ一本化 */}
       <Header save={save} title="" onSound={onSound} onOpenHome={onOpenHome} />
       <div style={{ textAlign: "center", margin: "0 0 10px" }}>
-        {/* タイトルロゴ（title_logo.webp・透過・2026-07-11差し替え）。大きさは初期値＝実機で調整可 */}
+        {/* タイトルロゴ（title_logo.webp・透過）。実機FB第1便: 80%に縮小（90%,460→72%,368・3画面そろえる） */}
         <img src={titleLogo} alt="プログラミングランド" draggable="false"
-          style={{ width: "min(90%, 460px)", height: "auto", display: "block", margin: "0 auto" }} />
+          style={{ width: "min(72%, 368px)", height: "auto", display: "block", margin: "0 auto" }} />
         <div style={{ fontWeight: 700, fontSize: 13 }}>いきたい ばしょを タップしてね</div>
       </div>
 

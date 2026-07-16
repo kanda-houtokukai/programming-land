@@ -18,7 +18,7 @@ import {
   BATTLE_BG, ITEMS, enemiesFor, enemyUnlocked, equippedBgImg,
   TOWER_START_FLOOR, towerHp,
 } from "../data/battle.js";
-import { applyXp, addCoins, COIN, activeMon, xpToNext } from "../growth.js";
+import { applyXp, addCoins, COIN, activeMon, xpToNext, coinDay } from "../growth.js";
 import { today } from "../storage.js";
 import { SFX } from "../sound.js";
 import { stageForLevel, partnerStageScale, monsterName } from "../data/monsters.js";
@@ -127,7 +127,8 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
   const [fadedIdx, setFadedIdx] = useState(null);
   const [itemUsed, setItemUsed] = useState(false);
   const [overlay, setOverlay] = useState(null); // 'win' | 'lose'
-  const [firstKill, setFirstKill] = useState(false);
+  const [firstKill, setFirstKill] = useState(false);       // 生涯初撃破（ずかん登録の案内用・従来どおり）
+  const [dayFirstKill, setDayFirstKill] = useState(false); // きょう初撃破（コイン表示用・第2便②＝支払いと表示を一致させる）
   const [dmgPop, setDmgPop] = useState(null); // 演出磨き③: 浮遊ダメージ数字 {value, crit, id}（reduced-motionでは出さない）
   const timers = useRef([]);
   const granted = useRef(false);
@@ -241,15 +242,22 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
         });
       } else {
         setFirstKill(!save.battle.defeated.includes(enemy.id));
+        // きょう初撃破か（コイン表示用）。★save側は読み取りだけ＝coinDay(save,…)を呼ぶとupdateを通さず変異するため使わない
+        const dToday = today();
+        const cdRead = save.coinDay && save.coinDay.date === dToday ? save.coinDay : null;
+        setDayFirstKill(!(cdRead && cdRead.battle && cdRead.battle[enemy.id]));
         update(s => {
           grantXp(s);
-          const isFirstKill = !s.battle.defeated.includes(enemy.id);
-          if (isFirstKill) {
-            addCoins(s, COIN.battle[diff]); // 初撃破のみ（再戦は0・周回で稼げない・06-C）
-            s.battle.defeated.push(enemy.id);
+          const d = today();
+          // コインは「きょう はじめて たおした敵」だけ（第2便②: 日をまたげば同じ敵が再び払う）
+          const cd = coinDay(s, d);
+          if (!cd.battle[enemy.id]) {
+            addCoins(s, COIN.battle[diff]);
+            cd.battle[enemy.id] = true;
           }
+          if (!s.battle.defeated.includes(enemy.id)) s.battle.defeated.push(enemy.id); // ずかん登録は従来どおり（生涯）
           s.battle.best[diff] = (s.battle.best[diff] || 0) + 1;
-          const d = today(); s.log[d] = s.log[d] || {}; s.log[d].battle = (s.log[d].battle || 0) + 1;
+          s.log[d] = s.log[d] || {}; s.log[d].battle = (s.log[d].battle || 0) + 1;
           return s;
         });
       }
@@ -539,7 +547,7 @@ function BattleFight({ enemy, diff, save, update, go, onBack, openHome, tower = 
                 <div className="seqFloatUp">{/* ①軽く・テンポよく: 下からふわっ */}
                   <div className="pl-display" style={seqTitleStyle}>{tower ? `${floor}かいを クリア！` : `${enemy.name}に かった！`}</div>
                   <div style={{ ...seqSubStyle, marginTop: 10 }}>
-                    {tower ? <>けいけんち ＋{BATTLE_XP[diff]} XP</> : <>けいけんち ＋{BATTLE_XP[diff]} XP ／ 🪙 {firstKill ? `＋${COIN.battle[diff]}！` : "＋0（たおしたことのある あいて）"}</>}
+                    {tower ? <>けいけんち ＋{BATTLE_XP[diff]} XP</> : <>けいけんち ＋{BATTLE_XP[diff]} XP ／ 🪙 {dayFirstKill ? `＋${COIN.battle[diff]}！` : "＋0（きょう たおした あいて）"}</>}{/* 第2便②: コイン表示は「きょう」基準＝支払いと一致 */}
                     {!tower && firstKill && <><br />あたらしい あいてを ずかんに とうろく！</>}
                     {tower && <><br />うえの かいは てきが つよくなるよ！</>}
                   </div>

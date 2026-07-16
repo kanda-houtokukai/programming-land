@@ -37,6 +37,8 @@ p.cosmetics = { owned: ["deco_hat", "deco_crown", "bg_space"], equipped: { deco:
 p.shopUsed = true;
 // そだったちからF2: 前回%（差分演出の基準）
 p.powers = { prev: { junji: 66, repeat: 33, think: 40, keyboard: 45, create: 20 } };
+// 第2便②: 当日のコイン基準（coinDay）。※growth.js は画像import経由でnode不可のためヘルパー挙動はブラウザで確認・ここでは往復保持のみ
+p.coinDay = { date: "2026-07-16", quiz: { "junban:easy": 4 }, puzzle: { "e1-1": 3 }, battle: { slime: true }, typing: { kotoba: { acc: 98, kpm: 27 } } };
 // 第3波①: 主人公キャラクター＋着せ替え装備
 p.character = "girl";
 p.dressup = { head: "head_compass", face: null, neck: "neck_bandana", chest: null, waist: null, back: "back_keyboard" };
@@ -83,8 +85,10 @@ ok(JSON.stringify(q.battle) === JSON.stringify(p.battle), "討伐記録（defeat
     "06-A 旧セーブに towerBest が {} で補完される（デフォルト値マージ）");
 }
 // b4j 相棒移行の追加ケース: 旧ID各種＋b4f共有level形式＋最新形式の素通し
+let l2id; // 第2便②のcoinDayチェックでスロットを流用するため id を外に出す（上限4人＝新規作成できない）
 {
   const l2 = createProfile("うみのこ", "girl");
+  l2id = l2.id;
   const raw2 = JSON.parse(localStorage.getItem(`progland:v2:profile:${l2.id}`));
   raw2.partner = { species: "shizuku", xp: 1, level: 3 };
   raw2.dex = ["shizuku-1", "hoshi-1"];
@@ -121,6 +125,16 @@ ok(JSON.stringify(q.battle) === JSON.stringify(p.battle), "討伐記録（defeat
   ok(m4.partner === null, "b4j partner=null（スターター未選択）は null のまま");
 }
 ok(q.shopUsed === true, "ショップ利用フラグ");
+// 第2便②: coinDay（当日コイン基準）が往復で保持される・無い旧セーブは undefined のまま（初回アクセスでヘルパーが作る＝移行不要）
+ok(JSON.stringify(q.coinDay) === JSON.stringify(p.coinDay), "coinDay（当日コイン基準）の往復保持");
+{
+  // 旧セーブ（coinDayフィールド無し）: 既存スロット l2 を流用（プロファイル上限4のため新規作成しない）
+  const raw2b = JSON.parse(localStorage.getItem(`progland:v2:profile:${l2id}`));
+  delete raw2b.coinDay;
+  localStorage.setItem(`progland:v2:profile:${l2id}`, JSON.stringify(raw2b));
+  const mN = loadFresh(l2id);
+  ok(mN.coinDay === undefined, "coinDay の無い旧セーブは undefined のまま読める（初回アクセス時にヘルパーが生成）");
+}
 ok(JSON.stringify(q.powers) === JSON.stringify(p.powers), "そだったちからF2 前回%（powers.prev）");
 ok(q.character === "girl" && JSON.stringify(q.dressup) === JSON.stringify(p.dressup), "第3波 主人公キャラ＋着せ替え装備（character/dressup）");
 

@@ -8,7 +8,7 @@ import { BLOCK_DEFS } from "../data/blocks.js";
 import { parseStage, countBlocks, DX, DY, MAX_BLOCKS } from "../engine.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
-import { XP, applyXp, addCoins, COIN } from "../growth.js";
+import { XP, applyXp, addCoins, COIN, coinDay } from "../growth.js";
 import HowTo from "./HowTo.jsx";
 import ParentGuide from "./ParentGuide.jsx";
 import { BlockChip, PaletteBlock } from "./blocks.jsx";
@@ -206,9 +206,13 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
       setResult({ stars: starN, n });
       update(s => {
         const prevStars = s.puzzle.stars[stage.id] || 0;
-        s.puzzle.stars[stage.id] = Math.max(prevStars, starN);
+        s.puzzle.stars[stage.id] = Math.max(prevStars, starN); // ★記録（生涯）は従来どおり
         const d = today(); s.log[d] = s.log[d] || {}; s.log[d].puzzle = (s.log[d].puzzle || 0) + 1;
-        addCoins(s, Math.max(0, starN - prevStars) * COIN.puzzleStar); // 新しく増えた★のぶんだけ
+        // コインは「きょうの基準」を超えた★のぶんだけ（第2便②: 日をまたげば同じ面が再び払う）
+        const cd = coinDay(s, d);
+        const dayStars = cd.puzzle[stage.id] || 0;
+        addCoins(s, Math.max(0, starN - dayStars) * COIN.puzzleStar);
+        cd.puzzle[stage.id] = Math.max(dayStars, starN);
         applyXp(s, XP.puzzleWin(starN));
         return s;
       });
@@ -447,7 +451,7 @@ function IslandMap({ save, diff, onEnter, unlockAll }) {
             style={{
               position: "absolute", left: `${ISLAND_POS[i].left}%`, top: `${ISLAND_POS[i].top}%`,
               transform: "translate(-50%,-50%)",
-              width: "11%", aspectRatio: "1", borderRadius: "50%",
+              width: "9%", aspectRatio: "1", borderRadius: "50%", /* 実機FB第1便④: 11%→9%（隣の丸を覆わない・初期値） */
               border: `3px solid ${C.ink}`, cursor: un ? "pointer" : "not-allowed",
               background: un ? "rgba(255,253,245,.92)" : "rgba(210,204,192,.72)",
               display: "flex", alignItems: "center", justifyContent: "center",
@@ -473,7 +477,7 @@ function IslandMap({ save, diff, onEnter, unlockAll }) {
               <span style={{
                 whiteSpace: "nowrap", fontWeight: 800, fontSize: "clamp(7px, 1.5vw, 10px)",
                 color: "#6B6265", background: "rgba(255,255,255,.75)", borderRadius: 999, padding: "0 5px",
-              }}>🎓 {ISLANDS[i].grade}</span>
+              }}>{ISLANDS[i].grade.replace("生むけ", "")}</span>{/* 実機FB第1便④: 「1〜2年」表記・🎓廃止（絵文字不採用）＝横幅短縮でとなりを覆わない。データは不変 */}
             </span>
           </button>
         );

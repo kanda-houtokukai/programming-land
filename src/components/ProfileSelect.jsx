@@ -24,7 +24,7 @@ export default function ProfileSelect({ profiles, onPick, onNew }) {
       <div style={{ maxWidth: 520, margin: "0 auto", padding: "16px 20px 20px", textAlign: "center" }}>
         {/* タイトルロゴ（title_logo.webp・透過・2026-07-11差し替え・全画面で統一） */}
         <img src={titleLogo} alt="プログラミングランド" draggable="false"
-          style={{ width: "min(90%, 460px)", height: "auto", display: "block", margin: "0 auto" }} />
+          style={{ width: "min(72%, 368px)", height: "auto", display: "block", margin: "0 auto" }} />{/* 実機FB第1便: 80%（3画面そろえる） */}
         <p style={{ fontWeight: 900, fontSize: 16, margin: "0 0 14px", textShadow: outline }}>だれが あそぶ？</p>
         {/* カードは背景の桟橋デッキ（中央〜下部）に乗るよう、上の空を空けて配置 */}
         <div style={{ display: "grid", gap: 12, marginTop: "clamp(40px, 16vh, 150px)" }}>

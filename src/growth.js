@@ -86,7 +86,10 @@ export function partnerDisplayName(partner) {
 }
 
 /* ===== コイン（P6フェーズ2）。★入手レートはここに集約★（設計書§4） =====
-   コインは学習行動からのみ。時間配布・ログインボーナスは無し。 */
+   コインは学習行動からのみ。時間配布・ログインボーナスは無し。
+   ※ただし同じ実績は日をまたぐと再び払う（その日ごとの進歩ベース・実機FB第2便②）。
+   1日の中では同じ実績から二度払われない（荒稼ぎ不可＝06-Cの狙い維持）が、毎日遊べば貯まる（反復学習の動機）。
+   上限は設けない（上限は「もう終わり」の合図になり反復を止めるため。遊べる量そのものが自然な上限）。 */
 export const COIN = {
   puzzleStar: 2,          // パズルで「新しく」得た★1つにつき
   quizCorrect: 1,         // クイズ1問正解（セッション精算）
@@ -99,6 +102,15 @@ export const COIN = {
 export function addCoins(profile, n) {
   if (n > 0) profile.coins = (profile.coins || 0) + n;
   return n > 0 ? n : 0;
+}
+/* 当日のコイン基準（実機FB第2便②）。日付が変わると作り直し＝当日ぶんだけ保持でセーブが膨らまない。
+   既存セーブに coinDay が無くても初回アクセスでここが作る＝移行不要。
+   quiz={セルkey:当日ベスト点} / puzzle={面id:当日ベスト★} / battle={敵id:true} / typing={段階id:{acc,kpm}} */
+export function coinDay(profile, dateStr) {
+  if (!profile.coinDay || profile.coinDay.date !== dateStr) {
+    profile.coinDay = { date: dateStr, quiz: {}, puzzle: {}, battle: {}, typing: {} };
+  }
+  return profile.coinDay;
 }
 // おえかき保存のコイン（その日の上限内でのみ付与）。log[date].artCoins で当日分を管理
 export function awardArtCoins(profile, dateStr) {

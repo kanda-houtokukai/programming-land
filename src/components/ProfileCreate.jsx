@@ -14,13 +14,14 @@ export default function ProfileCreate({ onDone, onCancel }) {
   return (
     <div style={{ maxWidth: 520, margin: "0 auto", padding: 20, textAlign: "center" }}>
       <div className="bounce" style={{ fontSize: 64, marginTop: 30 }}>🤖</div>
-      {/* タイトルロゴ（title_logo.webp・透過・2026-07-11差し替え・全画面で統一） */}
+      {/* タイトルロゴ（title_logo.webp・透過・全画面で統一）。実機FB第1便: 80%（3画面そろえる） */}
       <img src={titleLogo} alt="プログラミングランド" draggable="false"
-        style={{ width: "min(90%, 460px)", height: "auto", display: "block", margin: "8px auto 4px" }} />
+        style={{ width: "min(72%, 368px)", height: "auto", display: "block", margin: "8px auto 4px" }} />
       <p style={{ fontWeight: 700, marginBottom: 20 }}>あそびながら プログラミングの あたまを きたえよう！</p>
       <div className="panel slide" style={{ padding: 22, textAlign: "left" }}>
-        <label style={{ fontWeight: 900, display: "block", marginBottom: 8 }}>なまえを いれてね</label>
-        <input value={name} maxLength={10} onChange={e => setName(e.target.value)}
+        <label style={{ fontWeight: 900, display: "block", marginBottom: 8 }}>なまえを いれてね<span style={{ fontWeight: 700, fontSize: 12, color: "#6B6265", marginLeft: 8 }}>（5もじまで）</span></label>
+        {/* 実機FB第1便③: 名前は5文字以内。maxLengthに加えIME確定後もsliceで担保 */}
+        <input value={name} maxLength={5} onChange={e => setName(e.target.value.slice(0, 5))}
           placeholder="れい：ひなた"
           style={{ width: "100%", boxSizing: "border-box", fontSize: 22, padding: "10px 14px", border: `3px solid ${C.ink}`, borderRadius: 14, fontFamily: "inherit", fontWeight: 700 }} />
         <div style={{ fontWeight: 900, margin: "18px 0 8px" }}>きみの ぼうけんかを えらんでね</div>

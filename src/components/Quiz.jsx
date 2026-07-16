@@ -6,7 +6,7 @@ import { Btn, Header } from "./common.jsx";
 import { QUIZ_CATEGORIES, QUIZ_DIFFS, SESSION_SIZE, buildSession, bestKey, poolFor } from "../data/quizzes.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
-import { XP, applyXp, addCoins, COIN } from "../growth.js";
+import { XP, applyXp, addCoins, COIN, coinDay } from "../growth.js";
 import HowTo from "./HowTo.jsx";
 import ParentGuide from "./ParentGuide.jsx";
 import { QUIZ_GUIDE } from "../data/parent-guide.js";
@@ -18,6 +18,7 @@ import iconKimari from "../assets/icon_quiz_kimari.png";
 import iconNakama from "../assets/icon_quiz_nakamawake.png";
 import iconRobot from "../assets/icon_quiz_robot.png";
 import iconYomitori from "../assets/icon_quiz_yomitori.png";
+import iconStatStar from "../assets/icon_stat_star.png"; // 実機FB第2便①: ひろばの満点マーク（金の星・絵文字不採用）
 
 // 難易度別のひろば背景（同一構図・時間帯違い。拠点座標 PLAZA_POS は3枚共通＝パズル島 MAP_BG と同方式）
 const PLAZA_BG = { easy: plazaDay, normal: plazaSunset, hard: plazaNight };
@@ -53,10 +54,14 @@ function QuizPlay({ session, save, update, onBack }) {
       const final = score;
       setDone(true); SFX.win(sound);
       update(s => {
-        const prevBest = s.quiz.best[session.key] || 0;
-        s.quiz.best[session.key] = Math.max(prevBest, final);
-        const d = today(); s.log[d] = s.log[d] || {}; s.log[d].quiz = (s.log[d].quiz || 0) + 1;
-        addCoins(s, Math.max(0, final - prevBest) * COIN.quizCorrect); // ベスト更新分だけ（周回で稼げない・06-C）
+        const d = today();
+        // コインは「きょうの基準」を超えたぶんだけ（第2便②: 日をまたげば同じ実績が再び払う・1日の中では荒稼ぎ不可）
+        const cd = coinDay(s, d);
+        const dayBest = cd.quiz[session.key] || 0;
+        addCoins(s, Math.max(0, final - dayBest) * COIN.quizCorrect);
+        cd.quiz[session.key] = Math.max(dayBest, final);
+        s.quiz.best[session.key] = Math.max(s.quiz.best[session.key] || 0, final); // ★記録（生涯ベスト）は従来どおり＝①の満点表示が成立
+        s.log[d] = s.log[d] || {}; s.log[d].quiz = (s.log[d].quiz || 0) + 1;
         applyXp(s, XP.quizSet(final));
         return s;
       });
@@ -169,6 +174,9 @@ export default function Quiz({ save, update, go, onSound, openHome }) {
                 const pos = PLAZA_POS[cat.id];
                 const floatDelay = `${((i * 0.53) % 2.4).toFixed(2)}s`;
                 const floatDur = `${(2.8 + (i % 3) * 0.5).toFixed(1)}s`;
+                // 実機FB第2便①: 満点（この難易度のベスト=5）は名前チップを金＋星に（入らなくてもクリア済みが分かる）。
+                // 満点でないときは何も出さない（3/5等の成績表示はしない＝ランダム5問なので減点の感触を与えるため）
+                const perfect = (save.quiz.best[bestKey(cat.id, diff)] || 0) === SESSION_SIZE;
                 return (
                   <button key={cat.id} className="mapicon" onClick={() => { SFX.tap(save.settings.sound); setPopup(cat.id); }}
                     aria-label={cat.name}
@@ -180,10 +188,13 @@ export default function Quiz({ save, update, go, onSound, openHome }) {
                       style={{ width: "72%", height: "72%", objectFit: "contain", display: "block",
                         animationDelay: floatDelay, animationDuration: floatDur,
                         filter: "drop-shadow(1px 2px 2px rgba(20,15,25,.45))" }} />
-                    {/* 短い名前チップ（白地・ひらがな＝パズル島のラベルと同じ作法） */}
+                    {/* 短い名前チップ（白地・ひらがな＝パズル島のラベルと同じ作法）。満点は金地＋星（第2便①） */}
                     <span style={{ whiteSpace: "nowrap", marginTop: 1, fontWeight: 900, fontSize: "clamp(8px,2vw,12px)",
-                      background: "rgba(255,255,255,.92)", border: `2px solid ${C.ink}`, borderRadius: 999,
-                      padding: "1px 7px", color: C.ink, lineHeight: 1.5 }}>{pos.short}</span>
+                      background: perfect ? "#FFD447" : "rgba(255,255,255,.92)", border: `2px solid ${C.ink}`, borderRadius: 999,
+                      padding: "1px 7px", color: C.ink, lineHeight: 1.5 }}>
+                      {perfect && <img src={iconStatStar} alt="まんてん" draggable="false"
+                        style={{ width: "1em", height: "1em", verticalAlign: "-0.15em", marginRight: 2 }} />}
+                      {pos.short}</span>
                   </button>
                 );
               })}

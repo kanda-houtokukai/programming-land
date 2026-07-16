@@ -11,7 +11,7 @@ import ParentGuide from "./ParentGuide.jsx";
 import { TYPING_GUIDE } from "../data/parent-guide.js";
 import { SFX } from "../sound.js";
 import { today } from "../storage.js";
-import { XP, applyXp, addCoins, COIN } from "../growth.js";
+import { XP, applyXp, addCoins, COIN, coinDay } from "../growth.js";
 
 function pickWords(list, n) {
   const a = [...list];
@@ -61,12 +61,16 @@ function TypingPlay({ stage, save, update, onBack }) {
         setResult({ acc, kpm });
         SFX.win(sound);
         update(s => {
-          const first = s.typing.best[stage.id] === undefined; // 初クリアか（best更新判定は現行のまま）
           const b = s.typing.best[stage.id] || {};
-          const isBest = kpm > (b.kpm || 0) || acc > (b.acc || 0); // 自己ベスト更新か
-          s.typing.best[stage.id] = { acc: Math.max(b.acc || 0, acc), kpm: Math.max(b.kpm || 0, kpm) };
+          s.typing.best[stage.id] = { acc: Math.max(b.acc || 0, acc), kpm: Math.max(b.kpm || 0, kpm) }; // ★記録（生涯ベスト）は従来どおり
           const d = today(); s.log[d] = s.log[d] || {}; s.log[d].typing = (s.log[d].typing || 0) + 1;
-          addCoins(s, first ? (COIN.typingClear + COIN.typingBest) : (isBest ? COIN.typingBest : 0)); // 初クリア=8/以後は更新時のみ+5（周回で稼げない・06-C）
+          // コインは「きょう はじめてクリア／きょうのベスト更新」（第2便②: 日をまたげば再び払う）
+          const cd = coinDay(s, d);
+          const dayFirst = cd.typing[stage.id] === undefined;
+          const db = cd.typing[stage.id] || {};
+          const isDayBest = kpm > (db.kpm || 0) || acc > (db.acc || 0);
+          cd.typing[stage.id] = { acc: Math.max(db.acc || 0, acc), kpm: Math.max(db.kpm || 0, kpm) };
+          addCoins(s, dayFirst ? (COIN.typingClear + COIN.typingBest) : (isDayBest ? COIN.typingBest : 0)); // きょう初=8/以後はきょうの更新時のみ+5
           applyXp(s, XP.typing());
           return s;
         });
