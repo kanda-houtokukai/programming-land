@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-16（v2.3-b4v 実機FB第1便+第2便=マップ/ロゴ/名前5字/島ラベル/おえかき壁・満点表示・コイン日次・実機確認待ち）
+最終更新: 2026-07-16（v2.3-b4w マップ座標もう一段・実機確認待ち）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,6 +12,7 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md` は b4v 時点へ追随済み（2026-07-16）・`roadmap.md` は b4t 時点
+- **v2.3-b4w（2026-07-16・マップ座標もう一段＝⚠️実機確認待ち）**: b4vの4点を同方向に当初移動量の倍だけ追加（quiz top20〔計3pt上〕・art top40.5〔計1.5pt上〕・myhome 58.26/65.85〔計0.3pt2時〕・puzzle 85.52/71.7〔計0.6pt2時〕）。他拠点不変。プレビュー=4点とも空き地に乗ったまま重なりなし
 - **v2.3-b4v（2026-07-16・実機FB第1便＋第2便＝⚠️実機確認待ち）**:
   - 指示書=`brushup/jikki_fb1_map_logo_name_puzzle_art.md`・`brushup/jikki_fb2_perfect_badge_coin_daily.md`（実装記録つき）。※③バトル横画面は別便（未着手）
   - **1便①**: マップ座標4点（quiz 1pt上・art 0.5pt上・myhome/puzzle 2時方向に0.1/0.2pt）。**1便②**: タイトルロゴ80%＝3画面とも `min(72%,368px)`（実測368px）。**1便③**: 名前5文字（maxLength+IME後slice+「5もじまで」・既存10文字名は折返しで崩れなし）
