@@ -15,13 +15,17 @@ const shortName = name => name.replace("の ちから", "").replace(" ちから"
 // 木の大きさ（シーン高さに対する%・段階順: たね/め/わかぎ/おおきな き）と立ち位置（%座標）。
 // ★初期値＝実機で微調整はこの2つだけ。足元を地面に乗せるため中心でなく“底”基準（bottom）で置く
 //   （中心アンカーだと段階でサイズが変わるたび足元が浮く＝アバターb3zで踏んだ罠）。
-const TREE_H = ["14%", "22%", "36%", "54%"];
+// ★5本は直線配置（bottom全部同じ）＝この設計の芯は「木の大きさ＝育ち」。奥行きを変えると遠近でも
+//   大きさが変わり意味が二重になるため、同じ奥行きに置いてこそ大きさの差＝育ちの差として読める（実機FB・b5c）。
+// ★高さは 10/17/27/40（1:1.7:2.7:4）: 54%は つくる大木（横広アスペクト1.01）が右端からはみ出し・隣と最大9%重なり破綻。
+//   40%なら はみ出し無し・重なり2%以下＝森として自然な接触（実測・b5c）。
+const TREE_H = ["10%", "17%", "27%", "40%"];
 const TREE_POS = {
-  junji: { left: 12, bottom: 22 },
-  repeat: { left: 31, bottom: 18 },
-  think: { left: 50, bottom: 22 },
-  keyboard: { left: 69, bottom: 18 },
-  create: { left: 88, bottom: 22 },
+  junji: { left: 12, bottom: 20 },
+  repeat: { left: 31, bottom: 20 },
+  think: { left: 50, bottom: 20 },
+  keyboard: { left: 69, bottom: 20 },
+  create: { left: 88, bottom: 20 },
 };
 
 export default function PowerPanel({ save, update, go, hideTitle }) {
@@ -80,9 +84,13 @@ export default function PowerPanel({ save, update, go, hideTitle }) {
               style={{ position: "absolute", left: `${pos.left}%`, bottom: `${pos.bottom}%`,
                 transform: "translateX(-50%)", height: TREE_H[idx],
                 border: "none", background: "transparent", cursor: "pointer", padding: 0, lineHeight: 0 }}>
-              {/* 看板（既存.bubble・おうちのラベルと同じ・木の上に浮かせる＝ボタンの高さ=木の高さを保つ） */}
-              <span className="bubble pulse" style={{ position: "absolute", left: "50%", bottom: "calc(100% + 6px)",
-                transform: "translateX(-50%)", fontSize: "clamp(8px,1.9vw,12px)",
+              {/* 看板＝木の足元（ボタンはbottom固定なので段階が変わっても看板は動かない＝5枚が一直線・b5c）。
+                  スタイルはクイズひろば/パズルの島と同じ白ピル（明るい草地に室内用.bubbleは合わない・実機FB） */}
+              <span className="pulse" style={{ position: "absolute", top: "100%", left: "50%",
+                transform: "translateX(-50%)", marginTop: 2,
+                whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(8px,1.9vw,12px)",
+                background: "rgba(255,255,255,.92)", border: `2px solid ${C.ink}`, borderRadius: 999,
+                padding: "1px 7px", color: C.ink, lineHeight: 1.5,
                 animationDelay: `${(i * 0.6).toFixed(1)}s` }}>{shortName(p.name)}</span>
               <img src={treeImg(p.id, idx)} alt={p.grow.stage} draggable="false"
                 style={{ height: "100%", width: "auto", display: "block",
