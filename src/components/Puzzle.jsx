@@ -400,13 +400,16 @@ function PuzzlePlay({ stage, save, update, onBack, onNext, hasNext }) {
 // 2026-07-04 実装時にブラウザで背景と照合して補正:
 //   絵の丸い空き地は道順に (14.4,77.5)→(28,65.5)→(32.8,49.5)→(58.6,40)→(75.3,45.3)→(78,26)。
 //   開始値の②③は上下が逆で、③(36,60)は水辺に乗るため、道順どおり②=下・③=上に割り当て直した
+// 実機FB（2026-07-16・b4y）: 丸を9%に縮めた副作用で空き地からずれたため全6拠点を3pt右へ（topは不変）。
+// up=true はラベルを丸の「上」に出す（上下に並んだ拠点で、上側のラベルが下の拠点の丸を覆うのを防ぐ:
+// 3もしも→2くりかえし ／ 6ちょうせん→5あたまのたいそう）。
 const ISLAND_POS = {
-  1: { left: 14.4, top: 77.5 },
-  2: { left: 28, top: 65.5 },
-  3: { left: 34, top: 47.5 },
-  4: { left: 58.7, top: 39.5 },
-  5: { left: 76, top: 44.8 },
-  6: { left: 79, top: 25.5 },
+  1: { left: 17.4, top: 77.5 },
+  2: { left: 31, top: 65.5 },
+  3: { left: 37, top: 47.5, up: true },
+  4: { left: 61.7, top: 39.5 },
+  5: { left: 79, top: 44.8 },
+  6: { left: 82, top: 25.5, up: true },
 };
 
 function IslandMap({ save, diff, onEnter, unlockAll }) {
@@ -460,10 +463,14 @@ function IslandMap({ save, diff, onEnter, unlockAll }) {
             }}>
             {un ? ISLANDS[i].emoji : "🔒"}
             {done && <span style={{ position: "absolute", top: "-12%", right: "-12%", fontSize: "clamp(11px,2.6vw,16px)" }}>✅</span>}
-            {/* 島名ラベル＋学年の目安（さりげなく・ロックはしない） */}
+            {/* 島名ラベル＋学年の目安（さりげなく・ロックはしない）。
+                b4y: up=true の拠点は丸の「上」に出す（下の拠点の丸を覆わない）。
+                column-reverse で、上配置でも「名前ピルが丸の近く・学年ピルが外側」の並びを保つ＝下配置と同じ読み順 */}
             <span style={{
-              position: "absolute", top: "104%", left: "50%", transform: "translateX(-50%)",
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 1,
+              position: "absolute", ...(ISLAND_POS[i].up ? { bottom: "104%" } : { top: "104%" }),
+              left: "50%", transform: "translateX(-50%)",
+              display: "flex", flexDirection: ISLAND_POS[i].up ? "column-reverse" : "column",
+              alignItems: "center", gap: 1,
             }}>
               <span style={{
                 whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(8px, 1.9vw, 12px)",
