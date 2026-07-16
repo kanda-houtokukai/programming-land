@@ -34,14 +34,15 @@ import titleLogo from "../assets/title_logo.webp";
 //   第3層（中のゲーム名・画面タイトル。例: ロボット パズル / クイズバトル / そだった ちから）は
 //   各画面側が持つ＝ここには書かない・変えない。
 export const AREAS = [
-  // 実機FB第1便（2026-07-16）→ b4w: 同方向にもう一段（当初移動量の倍を追加）。quiz計3pt上・art計1.5pt上・myhome計0.3pt2時・puzzle計0.6pt2時
-  { key: "quiz", short: "クイズ", place: "クイズのひろば", img: buildingQuiz, tall: true, left: 27, top: 20 },
-  { key: "art", short: "おえかき", place: "おえかきのへや", img: iconArt, left: 18, top: 40.5 },
+  // 実機FB第1便（2026-07-16）→ b4w → b4x: 同方向にもう一段ずつ（b4vの移動量の倍を毎回追加）。
+  // b4x累計: quiz 5pt上・art 2.5pt上・myhome 0.5pt2時・puzzle 1.0pt2時（元値 quiz23/art42/myhome58,66/puzzle85,72 から）
+  { key: "quiz", short: "クイズ", place: "クイズのひろば", img: buildingQuiz, tall: true, left: 27, top: 18 },
+  { key: "art", short: "おえかき", place: "おえかきのへや", img: iconArt, left: 18, top: 39.5 },
   { key: "powers", short: "ちから", place: "そだちのもり", img: iconFlower, left: 19, top: 63 },
   { key: "shop", short: "おみせ", place: "おみせ", img: iconShop, left: 35, top: 72 },
-  { key: "myhome", short: "おうち", place: "おうち", img: buildingHome, tall: true, left: 58.26, top: 65.85 },
+  { key: "myhome", short: "おうち", place: "おうち", img: buildingHome, tall: true, left: 58.43, top: 65.75 },
   { key: "typing", short: "タイピング", place: "タイピングタワー", img: buildingTyping, tall: true, left: 47, top: 51 },
-  { key: "puzzle", short: "パズル", place: "パズルのしま", img: iconPuzzle, left: 85.52, top: 71.7 },
+  { key: "puzzle", short: "パズル", place: "パズルのしま", img: iconPuzzle, left: 85.87, top: 71.5 },
   { key: "battle", short: "バトル", place: "バトルのアリーナ", img: iconBattle, left: 88, top: 26 },
   // みなと（第2波 段階②）: プロファイル交代の一本化された入口。海側・島の端（拡張用の空き地3つは温存）。
   // 毎回使う場所ではないので small=やや控えめサイズ。「▶いく！」で起動時の選択画面へ（switchProfile経路）
