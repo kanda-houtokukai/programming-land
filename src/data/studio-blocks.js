@@ -88,3 +88,18 @@ export function makeBlock(type) {
   if (d.shape === "c") b.children = [];
   return b;
 }
+
+// draft/作品を読み込んだとき、保存済みIDと新規IDが衝突しないよう採番を進める（段階1）
+export function claimBlockIds(list) {
+  const walk = l => { for (const b of l || []) { if (b.id >= nextId) nextId = b.id + 1; walk(b.children); } };
+  walk(list);
+}
+
+// ブロック束のディープコピー（長押しコピー用・IDは振り直す）
+export function cloneBlocks(list) {
+  return (list || []).map(b => {
+    const c = { ...b, id: nextId++ };
+    if (b.children) c.children = cloneBlocks(b.children);
+    return c;
+  });
+}

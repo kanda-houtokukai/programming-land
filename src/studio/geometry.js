@@ -36,9 +36,8 @@ export const ANIM = {
   land: 200,                                    // 着地のぷにっ(ms)
 };
 
-/* ============ 実行定数（段階1で使用・§11） ============ */
-export const TICK = 400;          // 1拍(ms)
-export const LCOLS = 12, LROWS = 8; // 論理ステージ（固定・全端末で同じ広さ）
+/* ============ 実行定数（§11・定義の正本は engine.js＝node単体テスト可能な側に一本化） ============ */
+export { TICK, LCOLS, LROWS } from "./engine.js";
 
 /* ============ パス生成（凸凹が必ずかみ合う共通ジオメトリ・1:1移植） ============ */
 function segTabR(x) { // 左→右方向の凸/凹（下向き）

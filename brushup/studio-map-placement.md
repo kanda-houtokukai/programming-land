@@ -12,8 +12,8 @@
 { key: "soon", short: "", place: "", img: signJunbichu, sign: true, left: 69.5, top: 34.13 },
 ```
 
-- import 追加: `import buildingStudio from "../assets/studio-building.png";`
-                `import signJunbichu from "../assets/sign-junbichu.png";`
+- import 追加: `import buildingStudio from "../assets/studio-assets/studio-building.png";`
+                `import signJunbichu from "../assets/studio-assets/sign-junbichu.png";`
 - 看板は導線ではないので button ではなく非対話の飾りとして描く（tapするとポップアップが出ないこと）。
   表示サイズは通常アイコンと同じ 62%。文字重畳の位置は板の中央（実機で微調整）。
 
@@ -48,8 +48,10 @@
 
 | ファイル | 置き場所 |
 |---|---|
-| studio-building.png (256px 透過・反転済) | src/assets/ |
-| sign-junbichu.png (256px 透過・反転済) | src/assets/ |
-| studio-interior.webp (1600×900 q75 / 69KB) | src/assets/ |
-| clapper.png (256px 透過) | src/assets/ |
-| card_icon_01〜18_*.png (256px 透過) | src/assets/ |
+| studio-building.png (256px 透過・反転済) | src/assets/studio-assets/ |
+| sign-junbichu.png (256px 透過・反転済) | src/assets/studio-assets/ |
+| studio-interior.webp (1600×900 q75 / 69KB) | src/assets/studio-assets/ |
+| clapper.png (256px 透過) | src/assets/studio-assets/ |
+| card_icon_01〜18_*.png (256px 透過) | src/assets/studio-assets/ |
+
+※全22点は段階0で `src/assets/studio-assets/` に搬入済み。段階3では置く作業は不要で参照するだけ（2026-07-17 追記）。

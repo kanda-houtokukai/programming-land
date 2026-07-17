@@ -1,17 +1,50 @@
-// つくるスタジオ（段階0: ブロック見本画面＝見た目ゲート）。
-// ★brushup/studio-block-prototype.html 第11版の1:1移植（studio-design.md §11 が数値の正本）。
-// 機能範囲: パレット / 掴むと下が束で外れる / 磁石スナップ / 救済スナップ / 入れ子深さ2 /
-// きっかけ各1本制限 / 数値ステッパー / おと切替 / たなへ捨てる / 効果音。上演ステージは段階1。
-// アクセスは #studio-dev の一時ルートのみ（main.jsx・マップ導線は段階3）。
-// DOM戦略もプロトタイプ準拠: ブロック=絶対配置div+SVGパス・位置はtransform・隙間はレイアウト再計算+CSS transition。
-// ドラッグはPointer Events直書き（D&Dライブラリ不使用）・touch-action:none・最初の1本指のみ・
-// 初回pointerdownでAudioContext解錠。★matchMedia/ResizeObserverは使わない（過去2件の障害実績）。
-import { useReducer, useRef, useState, useEffect, useCallback } from "react";
-import { DEFS, PALORDER, SOUNDS, isTrigger, isContainer, makeBlock } from "../data/studio-blocks.js";
+// つくるスタジオ（段階1: 3ペインエディタ＋実行エンジン＋かきかけ自動保存）。
+// 仕様の正本: brushup/studio-implementation-stage01.md §3 ／ 設計: brushup/studio-design.md。
+// ブロックの見た目・手触りは段階0（実機ゲート合格済み）の1:1移植コードをそのまま温存し、
+// 「選択中キャラのスタック」を対象にする形にだけ一般化した。§11の数値は変更禁止。
+// ★matchMedia/ResizeObserverは使わない（過去2件の障害実績）。縮尺は window resize＋同一式のみ。
+// ★実行エンジンは src/studio/engine.js（UI非依存）。この画面は TICK ごとに tick() を呼び、
+//   コールバック（位置更新/発光/効果音）を描画に反映するだけ。
+import { useReducer, useRef, useState, useEffect, useLayoutEffect, useCallback } from "react";
+import { DEFS, PALORDER, SOUNDS, isTrigger, isContainer, makeBlock, claimBlockIds, cloneBlocks } from "../data/studio-blocks.js";
 import { G, ANIM, pathBody, pathHat, pathC, chipY, blockH, stackH, containerDepth } from "../studio/geometry.js";
+import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../studio/engine.js";
+import { lastProfile, saveProfile } from "../storage.js";
+import { SPECIES, stageForLevel, monsterName, monsterImg } from "../data/monsters.js";
+import { ENEMIES, enemyById } from "../data/battle.js";
+import PlayerAvatar from "./PlayerAvatar.jsx";
 import StudioBlock from "./StudioBlock.jsx";
+import bgDaichi from "../assets/bg_battle_easy.webp";
+import bgJungle from "../assets/bg_battle_jungle.webp";
+import bgCanyon from "../assets/bg_battle_canyon.webp";
+import bgArena from "../assets/battle-arena.webp";
+import bgStudio from "../assets/studio-assets/studio-interior.webp";
 
-/* ============ サウンド（プロトタイプのWebAudio簡易音を1:1移植・Suno差し替えは段階3） ============ */
+/* ============ 調整値（マジックナンバー集約・憲章§4-4） ============ */
+const CFG = {
+  MAX_CHARS: 5,        // キャラ最大（設計§4）
+  STACK_MAX: 30,       // 1スタックのカード上限（設計§5）
+  UNDO: 20,            // とりけし履歴（設計§9）
+  DRAFT_DEBOUNCE: 500, // かきかけ自動保存のデバウンス(ms)
+  LONGPRESS: 500,      // 長押しコピー(ms)（指示書§3-3）
+  DRAG_START: 6,       // ドラッグ開始のしきい値(px)（プロトタイプ準拠）
+  ACTOR_K: 2.2,        // キャラ表示幅 = cellPx×これ（プロトタイプ実測値）
+  JUMP_K: 1.6,         // ジャンプ高さ = cellPx×これ（§11）
+  MOVE_MS: 340,        // 1マス移動のtransition(ms)（プロトタイプ .34s）
+  COPY_OFFSET: 26,     // コピーが「隣に出現」するずらし(px)
+  TOAST_MS: 3500,      // かきかけトーストの表示時間(ms)
+};
+
+// 背景5種（既存WebP流用・IDの配列で管理＝追加はここに足すだけ・設計§4）
+const BGS = [
+  { id: "daichi", name: "だいち", img: bgDaichi },
+  { id: "jungle", name: "ジャングル", img: bgJungle },
+  { id: "canyon", name: "キャニオン", img: bgCanyon },
+  { id: "arena", name: "アリーナ", img: bgArena },
+  { id: "studio", name: "スタジオ", img: bgStudio },
+];
+
+/* ============ サウンド（プロトタイプのWebAudio簡易音・Suno差し替えは段階3） ============ */
 let AC = null;
 function ac() { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); return AC; }
 function tone(freq, dur, type, vol, slide) {
@@ -30,31 +63,67 @@ const sndPick = () => tone(900, 0.05, "sine", 0.08);
 const sndPoof = () => tone(320, 0.16, "sine", 0.16, 90);
 const sndTick = () => tone(1100, 0.04, "square", 0.07);
 const sndNo = () => tone(180, 0.12, "sine", 0.15);
+const sndClap = () => { tone(1050, 0.06, "square", 0.12); setTimeout(() => tone(700, 0.08, "square", 0.1), 60); }; // ▶=カチンコ
+const sndCut = () => tone(500, 0.1, "sine", 0.14);                                                                // ■=カット!
 export const SND = [
   () => tone(440, 0.16, "sine", 0.2),
   () => { tone(880, 0.09, "sine", 0.16); setTimeout(() => tone(1320, 0.14, "sine", 0.16), 70); },
   () => tone(120, 0.22, "sine", 0.28),
 ];
 
-/* ============ 見本画面のCSS（プロトタイプのstyleを .studio-root 配下にスコープして移植） ============ */
+/* ============ 控え室（はいゆうひかえしつ）: ずかん連動の顔ぶれ ============ */
+// 主人公＋出会った相棒（現在の進化段階）＋倒した敵。最低保証=主人公+初期相棒+敵2体（設計§9）
+function buildCast(profile) {
+  const cast = [{ kind: { type: "player" }, name: "たんけんか" }];
+  const owned = (profile && profile.partner && profile.partner.owned) || [];
+  for (const m of owned) {
+    const stage = stageForLevel(m.level || 1);
+    cast.push({ kind: { type: "mon", id: m.id, stage }, name: monsterName(m.id, stage) });
+  }
+  if (!owned.length) cast.push({ kind: { type: "mon", id: "mori", stage: 1 }, name: monsterName("mori", 1) });
+  const defeated = new Set((profile && profile.battle && profile.battle.defeated) || []);
+  defeated.add("slime"); defeated.add("mushroom"); // 最低保証の敵2体
+  for (const e of ENEMIES) if (defeated.has(e.id)) cast.push({ kind: { type: "enemy", id: e.id }, name: e.name });
+  return cast;
+}
+function kindImg(kind) {
+  if (kind.type === "mon") return monsterImg(kind.id, kind.stage || 1);
+  if (kind.type === "enemy") { const e = enemyById(kind.id); return e ? e.img : null; }
+  return null; // player は PlayerAvatar で描く
+}
+function kindName(kind) {
+  if (kind.type === "mon") return monsterName(kind.id, kind.stage || 1);
+  if (kind.type === "enemy") { const e = enemyById(kind.id); return e ? e.name : ""; }
+  return "たんけんか";
+}
+function kindValid(kind) {
+  if (!kind || !kind.type) return false;
+  if (kind.type === "player") return true;
+  return !!kindImg(kind);
+}
+
+/* ============ CSS ============ */
 const STUDIO_CSS = `
   .studio-root { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column;
     background: #2e2237; user-select: none; -webkit-user-select: none; overflow: hidden;
     font-family: 'M PLUS Rounded 1c','Hiragino Maru Gothic ProN','Yu Gothic',sans-serif; }
-  .studio-root header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #241a2c; color: #f5eddf; }
-  .studio-root header .mark { width: 30px; height: 30px; border-radius: 8px; background: #f2b23a;
+  .studio-root header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #241a2c; color: #f5eddf; }
+  .studio-root header .mark { width: 30px; height: 30px; border-radius: 8px; background: #f2b23a; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
     box-shadow: inset 0 2px 0 rgba(255,255,255,.45), 0 2px 0 rgba(0,0,0,.35); }
-  .studio-root header h1 { font-size: 15px; font-weight: 900; letter-spacing: .06em; }
+  .studio-root header h1 { font-size: 15px; font-weight: 900; letter-spacing: .06em; white-space: nowrap; }
   .studio-root header .sub { font-size: 11px; opacity: .65; font-weight: 500; }
   .studio-root header button { font-family: inherit; font-weight: 700; font-size: 12px;
-    color: #f5eddf; background: #4a3a58; border: none; border-radius: 999px; padding: 7px 16px;
-    box-shadow: inset 0 1.5px 0 rgba(255,255,255,.18), 0 2px 0 rgba(0,0,0,.3); cursor: pointer; }
+    color: #f5eddf; background: #4a3a58; border: none; border-radius: 999px; padding: 7px 14px;
+    box-shadow: inset 0 1.5px 0 rgba(255,255,255,.18), 0 2px 0 rgba(0,0,0,.3); cursor: pointer; white-space: nowrap; }
   .studio-root header button:active { transform: translateY(1px); box-shadow: inset 0 1.5px 0 rgba(255,255,255,.18); }
+  .studio-root header button:disabled { opacity: .35; cursor: default; }
   .studio-wrap { flex: 1; display: flex; min-height: 0; }
+
+  /* --- 左: こうぐだな（段階0のまま） --- */
   .studio-pal { width: 300px; flex-shrink: 0; background: linear-gradient(180deg, #8a5a33, #6f4526);
     border-right: 4px solid #543317; padding: 10px 10px; position: relative; z-index: 5;
-    transition: background .15s; touch-action: none; }
+    transition: background .15s; touch-action: none; overflow-y: auto; }
   .studio-pal .shelf-title { color: #f7e6c8; font-size: 12px; font-weight: 900; text-align: center;
     letter-spacing: .12em; margin-bottom: 8px; text-shadow: 0 1px 0 rgba(0,0,0,.4); }
   .studio-pal .palgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
@@ -72,22 +141,30 @@ const STUDIO_CSS = `
   .studio-pal .pal.no { animation: sbPalNo .25s; }
   .studio-pal .pal svg { display: block; margin: 0 auto; }
   .studio-pal .pal .pname { text-align: center; color: #f7e6c8; font-size: 10px; font-weight: 700; margin-top: 2px; }
-  .studio-stage { flex: 1; position: relative; overflow: hidden;
+
+  /* --- 中央: 組み立てエリア（段階0のステージと同じ作法） --- */
+  .studio-asm { flex: 1; position: relative; overflow: hidden; min-width: 0;
     background:
       radial-gradient(circle at 50% -10%, rgba(255, 224, 150, .25), transparent 55%),
       repeating-linear-gradient(0deg, transparent 0 34px, rgba(120, 90, 60, .05) 34px 35px),
       repeating-linear-gradient(90deg, transparent 0 34px, rgba(120, 90, 60, .05) 34px 35px),
       #fdf6e8;
     touch-action: none; }
-  .studio-stage::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 10px;
+  .studio-asm::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 10px;
     background: linear-gradient(180deg, rgba(84, 51, 23, .0), rgba(84, 51, 23, .25)); pointer-events: none; }
-  .studio-stage .hint { position: absolute; left: 14px; bottom: 14px; right: 14px;
+  .studio-asm .hint { position: absolute; left: 14px; bottom: 14px; right: 14px;
     color: #8a6b4a; font-size: 11px; font-weight: 700; line-height: 1.7; pointer-events: none; }
+  .studio-asm .selchip { position: absolute; left: 10px; top: 10px; z-index: 55; pointer-events: none;
+    display: flex; align-items: center; gap: 7px; background: rgba(255,253,246,.92);
+    border: 2px solid rgba(84,51,23,.25); border-radius: 999px; padding: 4px 14px 4px 6px;
+    color: #6b4a26; font-size: 12px; font-weight: 900; }
+  .studio-asm .selchip img, .studio-asm .selchip .pav { width: 26px; height: 26px; object-fit: contain; display: block; }
   .studio-root .blk { position: absolute; left: 0; top: 0;
     transition: transform ${ANIM.shift}; touch-action: none; cursor: grab;
     filter: drop-shadow(0 1.5px 0 rgba(90, 60, 20, .28)); }
   .studio-root .blk.noanim { transition: none; }
   .studio-root .blk svg { display: block; overflow: visible; }
+  .studio-root .blk.exec svg { filter: drop-shadow(0 0 6px #ffd85e) drop-shadow(0 0 2px #ffb51e) brightness(1.12); }
   .studio-root .blk .lbl { position: absolute; display: flex; align-items: center; gap: 7px;
     color: #fff; font-weight: 900; font-size: 14px; text-shadow: 0 1.5px 0 rgba(0,0,0,.28);
     pointer-events: none; white-space: nowrap; }
@@ -118,25 +195,113 @@ const STUDIO_CSS = `
   .studio-pop .val { font-size: 26px; font-weight: 900; color: #4a3520; min-width: 40px; text-align: center; }
   .studio-pop::after { content: ""; position: absolute; left: 50%; bottom: -8px; width: 16px; height: 16px;
     background: #fffdf6; transform: translateX(-50%) rotate(45deg); border-radius: 3px; }
+  .copy-balloon { position: absolute; z-index: 95; background: #fffdf6; color: #6b4a26;
+    border-radius: 999px; padding: 8px 20px; font-size: 14px; font-weight: 900; border: none;
+    font-family: inherit; cursor: pointer; box-shadow: 0 6px 18px rgba(60, 30, 10, .3), inset 0 2px 0 #fff; }
+  .copy-balloon::after { content: ""; position: absolute; left: 50%; bottom: -7px; width: 14px; height: 14px;
+    background: #fffdf6; transform: translateX(-50%) rotate(45deg); border-radius: 3px; }
+  .copy-balloon:active { transform: scale(.95); }
+
+  /* --- 右: ステージペイン --- */
+  .studio-right { width: clamp(280px, 36vw, 620px); flex-shrink: 0; display: flex; flex-direction: column;
+    gap: 8px; padding: 10px; overflow-y: auto; }
+  .theater { position: relative; width: 100%; aspect-ratio: 3 / 2; flex-shrink: 0; border-radius: 14px;
+    border: 4px solid #241a2c; overflow: hidden; background: #1c1424; touch-action: none; }
+  .theater .bgimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+  .theater::before, .theater::after { content: ""; position: absolute; top: 0; bottom: 0; width: 14px; z-index: 40;
+    background: repeating-linear-gradient(90deg, #8e3040 0 6px, #6e2130 6px 12px);
+    box-shadow: 0 0 12px rgba(0,0,0,.5); pointer-events: none; }
+  .theater::before { left: 0; border-radius: 0 8px 8px 0; }
+  .theater::after { right: 0; border-radius: 8px 0 0 8px; }
+  .actor { position: absolute; bottom: 12px; left: 0; will-change: transform;
+    transition: transform ${CFG.MOVE_MS}ms cubic-bezier(.45, .05, .55, 1), opacity .25s; }
+  .actor.noanim { transition: opacity .25s; }
+  .actor .sp-spot { position: absolute; left: 50%; bottom: -5px; transform: translateX(-50%); z-index: -1;
+    border-radius: 50%; background: radial-gradient(ellipse at center, rgba(255,230,120,.7), rgba(255,230,120,0) 72%);
+    pointer-events: none; }
+  .actor .sp-in { transform-origin: 50% 100%; }
+  .actor .sp-spin { transform-origin: 50% 55%; }
+  .actor .sp-scale { transform-origin: 50% 100%; transition: transform .3s ease-out; }
+  @keyframes sbHop { 0% { transform: translateY(0); } 40% { transform: translateY(var(--hopH, -46px)) scaleY(1.06); }
+    72% { transform: translateY(0) scaleY(.88) scaleX(1.09); } 100% { transform: none; } }
+  .actor .sp-in.hopA { animation: sbHop ${TICK * 2}ms cubic-bezier(.35, 0, .35, 1); }
+  @keyframes sbStep { 0%, 100% { transform: none; } 50% { transform: scaleY(.93) translateY(1.5px); } }
+  .actor .sp-in.stepA { animation: sbStep .34s ease-out; }
+  @keyframes sbBump { 0%, 100% { transform: none; } 30% { transform: translateX(6px) rotate(2deg); }
+    60% { transform: translateX(-5px); } }
+  .actor .sp-in.bumpA { animation: sbBump .3s ease-out; }
+  @keyframes sbSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .actor .sp-spin.spinA { animation: sbSpin ${TICK * 2}ms linear; }
+  .theater .roundbtn { position: absolute; z-index: 50; width: 42px; height: 42px; border-radius: 50%;
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 3px 0 rgba(255,255,255,.35), inset 0 -4px 0 rgba(0,0,0,.25), 0 3px 0 rgba(0,0,0,.4); }
+  .theater .roundbtn:active { transform: translateY(2px); }
+  .theater .runbtn { right: 12px; top: 12px; background: #58a839; }
+  .theater .runbtn.stop { background: #d8553a; }
+  .theater .bigbtn { right: 60px; top: 12px; background: #4a7fc9; }
+
+  .bgrow, .castrow { flex-shrink: 0; }
+  .rowtitle { color: rgba(245, 237, 223, .75); font-size: 11px; font-weight: 900; letter-spacing: .08em; margin-bottom: 4px; }
+  .bgrow .thumbs { display: flex; gap: 6px; }
+  .bgrow .bgthumb { position: relative; border: 2.5px solid rgba(255,244,220,.25); border-radius: 8px; padding: 0;
+    background: none; cursor: pointer; overflow: hidden; flex: 1; min-width: 0; }
+  .bgrow .bgthumb img { display: block; width: 100%; aspect-ratio: 16/10; object-fit: cover; }
+  .bgrow .bgthumb .bgname { position: absolute; left: 0; right: 0; bottom: 0; font-family: inherit;
+    background: rgba(36,26,44,.72); color: #f5eddf; font-size: 9px; font-weight: 700; text-align: center; padding: 1px 0; }
+  .bgrow .bgthumb.on { border-color: #ffd447; box-shadow: 0 0 8px rgba(255,212,71,.5); }
+  .castrow .strip { display: flex; gap: 6px; overflow-x: auto; padding: 6px; border-radius: 12px;
+    background: rgba(255,244,220,.08); border: 2px solid rgba(255,244,220,.14); transition: background .15s; position: relative; }
+  .castrow .strip.del { background: rgba(160,58,53,.55); border-color: #a03a35; }
+  .castrow .strip.del .castchip { opacity: .3; }
+  .castrow .strip .stripdelmsg { display: none; position: absolute; inset: 0; align-items: center; justify-content: center;
+    color: #ffe9e2; font-size: 12px; font-weight: 900; pointer-events: none; }
+  .castrow .strip.del .stripdelmsg { display: flex; }
+  .castchip { flex-shrink: 0; width: 52px; border: 2px solid rgba(255,244,220,.2); border-radius: 10px;
+    background: rgba(255,253,246,.12); padding: 3px 2px 2px; cursor: pointer; font-family: inherit; }
+  .castchip:active { transform: scale(.94); }
+  .castchip.no { animation: sbPalNo .25s; }
+  .castchip img { display: block; width: 100%; height: 34px; object-fit: contain; }
+  .castchip .cname { color: #f7e6c8; font-size: 8px; font-weight: 700; text-align: center; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+  .rcap { color: rgba(245, 237, 223, .55); font-size: 10px; font-weight: 700; line-height: 1.6; flex-shrink: 0; }
+
+  /* --- 実行中: たな・組み立てを暗転＋操作ロック（発光追跡のみ動く） --- */
+  .studio-root.running .studio-pal, .studio-root.running .bgrow, .studio-root.running .castrow, .studio-root.running .rcap,
+  .studio-root.running .editbtn { filter: brightness(.55); pointer-events: none; }
+  .studio-root.running .studio-asm { filter: brightness(.55); }
+  .studio-root.running .studio-asm * { pointer-events: none; }
+  .studio-root.running .blk { cursor: default; }
+
+  /* --- ひろげる（全画面上演: 編集UI消灯） --- */
+  .studio-root.big .studio-pal, .studio-root.big .studio-asm, .studio-root.big .bgrow,
+  .studio-root.big .castrow, .studio-root.big .rcap, .studio-root.big .editbtn { display: none; }
+  .studio-root.big .studio-right { width: auto; flex: 1; align-items: center; justify-content: center; }
+  .studio-root.big .theater { width: min(100%, calc((100dvh - 110px) * 1.5)); }
+
+  /* --- 確認モーダル（キャラ削除のみ・設計§9「ここだけ確認」）とトースト --- */
+  .studio-confirm { position: absolute; inset: 0; z-index: 350; background: rgba(30,20,40,.55);
+    display: flex; align-items: center; justify-content: center; }
+  .studio-confirm .box { background: #fffdf6; border-radius: 18px; padding: 20px 24px; max-width: 320px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.4); text-align: center; }
+  .studio-confirm .msg { color: #4a3520; font-size: 14px; font-weight: 900; line-height: 1.8; margin-bottom: 14px; }
+  .studio-confirm button { font-family: inherit; font-weight: 900; font-size: 14px; border: none; cursor: pointer;
+    border-radius: 999px; padding: 9px 22px; margin: 0 6px; color: #fff;
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,.2), 0 2px 0 rgba(0,0,0,.15); }
+  .studio-confirm .yes { background: #e0704f; }
+  .studio-confirm .no { background: #8a9a55; }
+  .studio-toast { position: absolute; left: 50%; top: 64px; transform: translateX(-50%); z-index: 300;
+    background: rgba(36,26,44,.92); color: #ffe9b8; font-size: 13px; font-weight: 900;
+    border-radius: 999px; padding: 9px 22px; pointer-events: none; white-space: nowrap;
+    box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+
+  /* --- 狭い画面: 案内のみ（判定はCSS幅のみ・向き検出JS禁止） --- */
+  .studio-narrow { display: none; position: absolute; inset: 0; z-index: 400; background: #2e2237;
+    align-items: center; justify-content: center; color: #f5eddf; font-size: 16px; font-weight: 900;
+    text-align: center; line-height: 2; }
+  @media (max-width: 699px) { .studio-narrow { display: flex; } .studio-wrap { display: none; } }
 `;
 
-/* ============ 見本の初期シーン（プロトタイプ initialScene を1:1移植） ============ */
-function initialScene() {
-  const hat = makeBlock("hat");
-  const mv = makeBlock("move"); mv.n = 3;
-  const rep = makeBlock("repeat"); rep.n = 2;
-  const u = makeBlock("moveU"); u.n = 2;
-  const j = makeBlock("jump"); j.n = 1;
-  const dn = makeBlock("moveD"); dn.n = 2;
-  const so = makeBlock("sound"); so.s = 0;
-  rep.children = [u, j, dn, so];
-  return [
-    { x: 70, y: 40, blocks: [hat, mv, rep] },
-    { x: 400, y: 86, blocks: [makeBlock("forever")] },
-  ];
-}
-
-/* fly（持ち上げ中の束）の描画用: グループをフラットな配置リストに展開（プロトタイプ renderFly と同じ計算） */
+/* fly（持ち上げ中の束）の描画用: グループをフラットな配置リストに展開（段階0と同じ） */
 function flattenGroup(group) {
   const out = [];
   const walk = (list, x, y) => {
@@ -151,39 +316,175 @@ function flattenGroup(group) {
   walk(group, 0, 0);
   return out;
 }
+const countBlocks = list => (list || []).reduce((a, b) => a + 1 + (b.children ? countBlocks(b.children) : 0), 0);
+
+/* ============ キャラ1体のステージ描画 ============ */
+function CharSprite({ ch, disp, cellPx, base, selected, running, instant, profile, onRef }) {
+  const w = base;
+  const ax = 22 + disp.x * cellPx;   // プロトタイプ placeActor と同じ式（22はステージ左マージン）
+  const ay = -disp.y * cellPx;
+  return (
+    <div className={"actor" + (instant ? " noanim" : "")} data-cid={ch.cid} ref={onRef}
+      style={{ transform: `translate(${ax}px, ${ay}px)`, width: w, zIndex: 10 + ch.z,
+        opacity: disp.visible ? 1 : 0, pointerEvents: disp.visible ? "auto" : "none",
+        cursor: running ? "pointer" : "grab" }}>
+      {selected && !running && <div className="sp-spot" style={{ width: w * 1.25, height: cellPx * 0.62 }} />}
+      <div className="sp-in">
+        <div className="sp-spin">
+          <div className="sp-scale" style={{ transform: `scale(${SIZE_STEPS[disp.sizeIdx]})` }}>
+            {ch.kind.type === "player"
+              ? <PlayerAvatar character={(profile && profile.character) || "boy"} dressup={profile && profile.dressup} size={w} full />
+              : <img src={kindImg(ch.kind)} alt="" draggable="false"
+                  style={{ width: "100%", height: "auto", display: "block", filter: "drop-shadow(1px 2px 2px rgba(20,15,25,.35))" }} />}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Studio() {
   const [, force] = useReducer(x => x + 1, 0);
-  const stacksRef = useRef(initialScene());
-  const dragRef = useRef(null);      // { group, fromPalette, ox, oy, slot, groupH, committing }
-  const pendingRef = useRef(null);   // { x0, y0, id, grab, pointerId }
+
+  /* ==== 初期化（プロファイル＋draft復帰） ==== */
+  const initRef = useRef(null);
+  if (!initRef.current) {
+    const profile = lastProfile();
+    const draft = profile && profile.studio && profile.studio.draft;
+    let chars = null, bg = BGS[0].id, sel = 0, toast = null;
+    if (draft && Array.isArray(draft.chars) && draft.chars.length) {
+      chars = draft.chars.filter(c => kindValid(c.kind)).slice(0, CFG.MAX_CHARS).map((c, i) => ({
+        cid: "c" + (i + 1), kind: c.kind,
+        x: Math.max(0, Math.min(LCOLS - 1, c.x | 0)), y: Math.max(0, Math.min(LROWS - 1, c.y | 0)),
+        stacks: (c.stacks || []).map(s => ({ x: s.x || 20, y: s.y || 20, blocks: s.blocks || [] })),
+      }));
+      for (const c of chars) for (const s of c.stacks) claimBlockIds(s.blocks);
+      if (chars.length) {
+        bg = BGS.some(b => b.id === draft.bg) ? draft.bg : BGS[0].id;
+        sel = Math.max(0, Math.min(chars.length - 1, draft.sel | 0));
+        toast = "かきかけの さくひんが あるよ";  // 続きから再開（保存ダイアログは作らない・設計§7）
+      } else chars = null;
+    }
+    if (!chars) chars = [{ cid: "c1", kind: { type: "player" }, x: 5, y: 3, stacks: [] }];
+    initRef.current = { profile, chars, bg, sel, toast, cidSeq: chars.length, cast: buildCast(profile) };
+  }
+  const profileRef = useRef(initRef.current.profile);
+  const charsRef = useRef(initRef.current.chars);
+  const selRef = useRef(initRef.current.sel);
+  const bgRef = useRef(initRef.current.bg);
+  const cidSeqRef = useRef(initRef.current.cidSeq);
+  const castRef = useRef(initRef.current.cast);
+
+  /* ==== ブロックドラッグ（段階0の1:1移植・対象は選択中キャラのスタック） ==== */
+  const dragRef = useRef(null);
+  const pendingRef = useRef(null);
   const pointerIdRef = useRef(null); // 最初の1本指のみ有効（多点タッチ対策）
-  const nodesRef = useRef([]);       // 直近レイアウトのノード（救済スナップの重なり判定用）
+  const nodesRef = useRef([]);
   const slotsRef = useRef([]);
-  const stageRef = useRef(null);
+  const asmRef = useRef(null);
   const flyRef = useRef(null);
   const palRef = useRef(null);
-  const [flyGroup, setFlyGroup] = useState(null); // flyの中身（描画トリガ）
-  const [landId, setLandId] = useState(null);     // 着地ぷにっ対象
+  const [flyGroup, setFlyGroup] = useState(null);
+  const [landId, setLandId] = useState(null);
   const [delHover, setDelHover] = useState(false);
-  const [popTarget, setPopTarget] = useState(null); // { id, x, y } 数値ステッパー
+  const [popTarget, setPopTarget] = useState(null);
+  const [copyBalloon, setCopyBalloon] = useState(null); // { id, x, y }
+  const copyTimerRef = useRef(null);
 
-  /* ==== レイアウト（プロトタイプ layList/layoutAll の1:1移植） ==== */
+  /* ==== ステージ・実行 ==== */
+  const theaterRef = useRef(null);
+  const stripRef = useRef(null);
+  const charElsRef = useRef(new Map());
+  const [cellPx, setCellPx] = useState(22);
+  const [big, setBig] = useState(false);
+  const engineRef = useRef(null);
+  const runningRef = useRef(false);
+  const postRunRef = useRef(false);
+  const tickTimerRef = useRef(null);
+  const instantRef = useRef(new Set());   // 次の描画だけ transition なし（home/reset の瞬間移動）
+  const pendingCharRef = useRef(null);    // { idx, x0, y0, grab, orig, moved }
+  const [stripHover, setStripHover] = useState(false);
+  const [confirmDel, setConfirmDel] = useState(null); // { idx }
+  const [toast, setToast] = useState(initRef.current.toast);
+
+  /* ==== とりけし/やりなおし（履歴20手・ブロック木＋キャラ配置のスナップショット） ==== */
+  const histRef = useRef({ past: [], future: [] });
+  const serializeScene = () => JSON.parse(JSON.stringify({
+    bg: bgRef.current, sel: selRef.current,
+    chars: charsRef.current.map(c => ({ cid: c.cid, kind: c.kind, x: c.x, y: c.y, stacks: c.stacks })),
+  }));
+  const takeSnapshot = tag => {
+    const h = histRef.current;
+    if (tag && h.past.length && h.past[h.past.length - 1].tag === tag) return; // 連続ピル操作は1手にまとめる
+    h.past.push({ tag: tag || null, state: serializeScene() });
+    if (h.past.length > CFG.UNDO) h.past.shift();
+    h.future = [];
+  };
+  const dropLastSnapshot = () => { histRef.current.past.pop(); };
+  const restoreScene = st => {
+    bgRef.current = st.bg;
+    selRef.current = st.sel;
+    charsRef.current = st.chars.map(c => ({ ...c }));
+    setPopTarget(null); setCopyBalloon(null);
+  };
+  const undo = () => {
+    const h = histRef.current;
+    if (!h.past.length || runningRef.current) return;
+    h.future.push({ tag: null, state: serializeScene() });
+    restoreScene(h.past.pop().state);
+    afterEdit(); sndTick();
+  };
+  const redo = () => {
+    const h = histRef.current;
+    if (!h.future.length || runningRef.current) return;
+    h.past.push({ tag: null, state: serializeScene() });
+    restoreScene(h.future.pop().state);
+    afterEdit(); sndTick();
+  };
+
+  /* ==== かきかけ自動保存（編集のたびデバウンス・ダイアログなし） ==== */
+  const draftTimerRef = useRef(null);
+  const writeDraft = () => {
+    const prof = profileRef.current;
+    if (!prof) return; // プロファイル未作成の端末では保存なしで遊べる（開発ルートの割り切り）
+    if (!prof.studio) prof.studio = { works: [], draft: null };
+    const sc = serializeScene();
+    prof.studio.draft = { bg: sc.bg, sel: sc.sel, chars: sc.chars.map(c => ({ kind: c.kind, x: c.x, y: c.y, stacks: c.stacks })) };
+    saveProfile(prof);
+  };
+  const scheduleDraft = () => {
+    clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(writeDraft, CFG.DRAFT_DEBOUNCE);
+  };
+  useEffect(() => () => { clearTimeout(draftTimerRef.current); writeDraft(); }, []); // 離脱時フラッシュ
+
+  // 編集が確定したら: 実行後の表示を捨て、draftを予約し、再描画
+  const afterEdit = () => {
+    engineRef.current = null;
+    postRunRef.current = false;
+    scheduleDraft();
+    force();
+  };
+
+  const curChar = () => charsRef.current[selRef.current] || charsRef.current[0];
+  const curStacks = () => (curChar() ? curChar().stacks : []);
+
+  /* ==== レイアウト（段階0の1:1移植＋スタック上限30の容量つき） ==== */
   const layoutAll = () => {
     const nodes = [], slots = [];
     const drag = dragRef.current;
     const gapAt = (list, i) => drag && drag.slot && drag.slot.list === list && drag.slot.index === i;
-    const layList = (list, x, y, depth) => {
+    const layList = (list, x, y, depth, rootTotal) => {
       let cy = y;
       list.forEach((b, i) => {
         const allowSlot = depth > 0 || i > 0;
         const afterFlat = i > 0 && DEFS[list[i - 1].type].flat;
-        if (allowSlot && !afterFlat) slots.push({ list, index: i, x, y: cy, depth, len: list.length });
+        if (allowSlot && !afterFlat) slots.push({ list, index: i, x, y: cy, depth, len: list.length, rootTotal });
         if (gapAt(list, i)) cy += drag.groupH;
         const node = { b, x, y: cy, depth };
         nodes.push(node);
         if (isContainer(b.type)) {
-          const inner = layList(b.children, x + G.AW, cy + G.TB, depth + 1);
+          const inner = layList(b.children, x + G.AW, cy + G.TB, depth + 1, rootTotal);
           node.mouth = Math.max(inner, G.MOUTH);
           node.h = G.TB + node.mouth + G.BB;
         } else node.h = blockH(b);
@@ -191,29 +492,31 @@ export default function Studio() {
       });
       const endFlat = list.length && DEFS[list[list.length - 1].type].flat;
       if ((depth > 0 || list.length > 0) && !endFlat)
-        slots.push({ list, index: list.length, x, y: cy, depth, len: list.length });
+        slots.push({ list, index: list.length, x, y: cy, depth, len: list.length, rootTotal });
       if (gapAt(list, list.length)) cy += drag.groupH;
       return cy - y;
     };
-    for (const st of stacksRef.current) layList(st.blocks, st.x, st.y, 0);
+    for (const st of curStacks()) layList(st.blocks, st.x, st.y, 0, countBlocks(st.blocks));
     nodesRef.current = nodes;
     slotsRef.current = slots;
     return { nodes, slots };
   };
 
-  /* ==== スナップ先の探索（1:1移植・きっかけ型/flat容器へ一般化） ==== */
+  /* ==== スナップ先の探索（段階0の1:1移植＋上限30） ==== */
   const eligibleSlot = (px, py, range) => {
     const drag = dragRef.current;
     const head = drag.group[0].type;
-    if (isTrigger(head)) return null; // きっかけ（帽子型）は上に接続不可＝スロットに刺せない
+    if (isTrigger(head)) return null;
     const gDepth = containerDepth(drag.group);
+    const gCount = countBlocks(drag.group);
     const tailFlat = !!DEFS[drag.group[drag.group.length - 1].type].flat;
     const headFlat = !!DEFS[head].flat;
     let best = null, bestD = range || G.SNAP;
     for (const s of slotsRef.current) {
       if (s.depth + gDepth > G.MAXDEPTH) continue;
-      if ((headFlat || tailFlat) && s.index !== s.len) continue; // ずっと＝リスト末尾のみ
-      const dx = px - s.x, dy = (py - s.y) * G.SNAPWY; // 横ずれに寛容な楕円判定
+      if ((headFlat || tailFlat) && s.index !== s.len) continue;
+      if (s.rootTotal + gCount > CFG.STACK_MAX) continue; // 1スタック上限30
+      const dx = px - s.x, dy = (py - s.y) * G.SNAPWY;
       const dist = Math.hypot(dx, dy);
       if (dist < bestD) { bestD = dist; best = s; }
     }
@@ -228,9 +531,9 @@ export default function Studio() {
     return false;
   };
 
-  /* ==== ドラッグ本体（1:1移植） ==== */
-  const stagePos = e => {
-    const r = stageRef.current.getBoundingClientRect();
+  /* ==== ブロックドラッグ本体（段階0の1:1移植） ==== */
+  const asmPos = e => {
+    const r = asmRef.current.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   };
   const findBlock = (list, id) => {
@@ -242,13 +545,14 @@ export default function Studio() {
     return null;
   };
   const hasTrigger = type =>
-    stacksRef.current.some(st => st.blocks[0] && st.blocks[0].type === type)
+    curStacks().some(st => st.blocks[0] && st.blocks[0].type === type)
     || (dragRef.current && dragRef.current.group && dragRef.current.group[0] && dragRef.current.group[0].type === type);
 
   const beginDrag = (e, group, fromPalette, grabOffset) => {
     dragRef.current = { group, fromPalette, ox: grabOffset.x, oy: grabOffset.y, slot: null, groupH: stackH(group) };
     setFlyGroup(flattenGroup(group));
-    const p = stagePos(e);
+    setCopyBalloon(null);
+    const p = asmPos(e);
     const fly = flyRef.current;
     fly.style.display = "block";
     fly.style.transition = "";
@@ -262,7 +566,7 @@ export default function Studio() {
   const moveDrag = e => {
     const drag = dragRef.current;
     if (!drag) return;
-    const p = stagePos(e);
+    const p = asmPos(e);
     const fx = p.x - drag.ox, fy = p.y - drag.oy;
     flyRef.current.style.transform = `translate(${fx}px, ${fy}px)`;
     const pr = palRef.current.getBoundingClientRect();
@@ -273,7 +577,6 @@ export default function Studio() {
     if (drag.slot !== prevSlot) { force(); if (drag.slot) sndTick(); }
   };
   const commitTo = (slot, group) => {
-    // 磁石: 吸着アニメ → 挿入（1:1移植）
     const fly = flyRef.current;
     fly.classList.remove("lift");
     fly.style.transition = `transform ${ANIM.suck}ms ease-out, rotate ${ANIM.suck}ms, scale ${ANIM.suck}ms`;
@@ -285,7 +588,7 @@ export default function Studio() {
       slot.list.splice(slot.index, 0, ...group);
       dragRef.current = null;
       setFlyGroup(null);
-      force();
+      afterEdit();
       sndSnap();
       setLandId(group[0].id);
       setTimeout(() => setLandId(null), ANIM.land + 40);
@@ -294,13 +597,12 @@ export default function Studio() {
   const endDrag = e => {
     const d = dragRef.current;
     if (!d) return;
-    const p = stagePos(e);
+    const p = asmPos(e);
     setDelHover(false);
     const pr = palRef.current.getBoundingClientRect();
     const overPal = e.clientX < pr.right && !d.fromPalette;
 
     if (overPal) {
-      // たなへ捨てる: ポフッ
       const fly = flyRef.current;
       fly.classList.add("poof");
       sndPoof();
@@ -310,27 +612,65 @@ export default function Studio() {
         fly.style.display = "none";
         dragRef.current = null;
         setFlyGroup(null);
-        force();
+        afterEdit();
       }, 220);
       force();
       return;
     }
     if (d.slot) { commitTo(d.slot, d.group); return; }
-    // 感知圏外だがブロックに重なって落ちた → 近くの接続先へ救済スナップ
     const fx = p.x - d.ox, fy = p.y - d.oy;
     if (overlapsAnyBlock(fx, fy, d.group)) {
       const rescue = eligibleSlot(fx, fy, G.RESCUE);
       if (rescue) { d.slot = rescue; commitTo(rescue, d.group); return; }
     }
-    // どこでもない → 新しいスタックとして置く
     const nx = Math.max(6, fx), ny = Math.max(6, fy);
-    stacksRef.current.push({ x: nx, y: ny, blocks: d.group });
+    curStacks().push({ x: nx, y: ny, blocks: d.group });
     flyRef.current.style.display = "none";
     dragRef.current = null;
     setFlyGroup(null);
-    force();
+    afterEdit();
     setLandId(d.group[0].id);
     setTimeout(() => setLandId(null), ANIM.land + 40);
+  };
+
+  /* ==== キャラのドラッグ（ステージ上・見えない格子スナップ／控え室で削除） ==== */
+  const theaterPos = e => {
+    const r = theaterRef.current.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top, h: r.height };
+  };
+  const moveCharDrag = e => {
+    const pc = pendingCharRef.current;
+    if (!pc) return;
+    if (!pc.moved) {
+      if (Math.hypot(e.clientX - pc.x0, e.clientY - pc.y0) <= CFG.DRAG_START) return;
+      pc.moved = true;
+      takeSnapshot();
+      engineRef.current = null; postRunRef.current = false; // 上演後の表示を捨てて編集位置に切り替え（ドラッグが見えるように）
+    }
+    const ch = charsRef.current[pc.idx];
+    if (!ch) return;
+    const p = theaterPos(e);
+    const ax = p.x - pc.grab.dx;
+    const ayTop = p.y - pc.grab.dy;
+    ch.x = Math.max(0, Math.min(LCOLS - 1, Math.round((ax - 22) / cellPxRef.current)));
+    ch.y = Math.max(0, Math.min(LROWS - 1, Math.round((p.h - 12 - ayTop) / cellPxRef.current)));
+    const sr = stripRef.current && stripRef.current.getBoundingClientRect();
+    setStripHover(!!sr && e.clientY > sr.top - 4 && e.clientY < sr.bottom + 4 && e.clientX > sr.left && e.clientX < sr.right);
+    force();
+  };
+  const endCharDrag = e => {
+    const pc = pendingCharRef.current;
+    pendingCharRef.current = null;
+    if (!pc) return;
+    setStripHover(false);
+    if (!pc.moved) { // タップ=キャラ選択
+      if (selRef.current !== pc.idx) { selRef.current = pc.idx; sndPick(); force(); }
+      return;
+    }
+    const sr = stripRef.current && stripRef.current.getBoundingClientRect();
+    const overStrip = !!sr && e.clientY > sr.top - 4 && e.clientY < sr.bottom + 4 && e.clientX > sr.left && e.clientX < sr.right;
+    if (overStrip) { setConfirmDel({ idx: pc.idx, orig: pc.orig }); force(); return; } // ここだけ確認（設計§9）
+    afterEdit();
   };
 
   /* ==== ポインタ配線（documentへネイティブ登録・最初の1本指のみ） ==== */
@@ -339,35 +679,46 @@ export default function Studio() {
       if (pointerIdRef.current !== null && e.pointerId !== pointerIdRef.current) return;
       const pending = pendingRef.current;
       if (pending && !dragRef.current) {
-        if (Math.hypot(e.clientX - pending.x0, e.clientY - pending.y0) > 6) {
-          // 掴んだブロックから下をまとめて外す（束）
+        if (Math.hypot(e.clientX - pending.x0, e.clientY - pending.y0) > CFG.DRAG_START) {
+          clearTimeout(copyTimerRef.current);
+          takeSnapshot(); // 束を外す前の状態を1手として記録
           let found = null;
-          for (const st of stacksRef.current) { found = findBlock(st.blocks, pending.id); if (found) break; }
+          for (const st of curStacks()) { found = findBlock(st.blocks, pending.id); if (found) break; }
           if (found) {
             const group = found.list.splice(found.index);
-            stacksRef.current = stacksRef.current.filter(st => st.blocks.length);
+            const c = curChar();
+            c.stacks = c.stacks.filter(st => st.blocks.length);
             beginDrag(e, group, false, pending.grab);
-          }
+          } else dropLastSnapshot();
           pendingRef.current = null;
         }
       }
       if (dragRef.current && !dragRef.current.committing) moveDrag(e);
+      if (pendingCharRef.current) moveCharDrag(e);
     };
     const onUp = e => {
       if (pointerIdRef.current !== null && e.pointerId !== pointerIdRef.current) return;
       pointerIdRef.current = null;
       pendingRef.current = null;
+      clearTimeout(copyTimerRef.current);
       if (dragRef.current && !dragRef.current.committing) endDrag(e);
+      if (pendingCharRef.current) endCharDrag(e);
     };
     const onCancel = e => {
       if (pointerIdRef.current !== null && e.pointerId !== pointerIdRef.current) return;
       pointerIdRef.current = null;
+      clearTimeout(copyTimerRef.current);
       const d = dragRef.current;
-      if (d && !d.committing && d.group) stacksRef.current.push({ x: 60, y: 60, blocks: d.group });
+      if (d && !d.committing && d.group) curStacks().push({ x: 60, y: 60, blocks: d.group });
       pendingRef.current = null;
       dragRef.current = null;
+      const pc = pendingCharRef.current;
+      if (pc && pc.moved) { const ch = charsRef.current[pc.idx]; if (ch) { ch.x = pc.orig.x; ch.y = pc.orig.y; } dropLastSnapshot(); }
+      pendingCharRef.current = null;
+      setStripHover(false);
       if (flyRef.current) flyRef.current.style.display = "none";
       setFlyGroup(null);
+      scheduleDraft();
       force();
     };
     document.addEventListener("pointermove", onMove);
@@ -380,29 +731,57 @@ export default function Studio() {
     };
   }, []); // ハンドラはすべてrefを参照＝依存なしで安定
 
-  /* ==== ステージ上のブロックを掴む ==== */
-  const onStagePointerDown = e => {
+  /* ==== 組み立てエリア: ブロックを掴む＋長押しコピー ==== */
+  const onAsmPointerDown = e => {
     setPopTarget(null);
-    ac(); // 初回pointerdownでAudioContext解錠
-    if (pointerIdRef.current !== null) return; // 最初の1本指のみ
+    setCopyBalloon(null);
+    ac();
+    if (runningRef.current) return;
+    if (pointerIdRef.current !== null) return;
     const blkEl = e.target.closest(".blk");
     if (!blkEl || blkEl.closest(".studio-fly")) return;
     const id = +blkEl.dataset.id;
     const node = nodesRef.current.find(n => n.b.id === id);
     if (!node) return;
     pointerIdRef.current = e.pointerId;
-    const p = stagePos(e);
+    const p = asmPos(e);
     pendingRef.current = { x0: e.clientX, y0: e.clientY, id, grab: { x: p.x - node.x, y: p.y - node.y } };
+    clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => {
+      // 長押し0.5秒（動いたらドラッグ判定側でキャンセル済み）→「コピー」バルーン
+      // きっかけは各1本＝コピー対象外（バルーンを出さない・そのままドラッグは可能）
+      if (pendingRef.current && pendingRef.current.id === id && !dragRef.current && !isTrigger(node.b.type)) {
+        pendingRef.current = null;
+        pointerIdRef.current = null;
+        setCopyBalloon({ id, x: node.x + 30, y: node.y });
+        sndTick();
+      }
+    }, CFG.LONGPRESS);
+  };
+  const doCopy = id => {
+    setCopyBalloon(null);
+    let found = null, node = nodesRef.current.find(n => n.b.id === id);
+    for (const st of curStacks()) { found = findBlock(st.blocks, id); if (found) break; }
+    if (!found || !node) return;
+    const group = found.list.slice(found.index); // 掴んだブロックから下＝束（ドラッグと同義）
+    if (isTrigger(group[0].type)) { sndNo(); return; } // きっかけ各1本のためコピー不可
+    takeSnapshot();
+    const copy = cloneBlocks(group);
+    curStacks().push({ x: node.x + CFG.COPY_OFFSET, y: node.y + CFG.COPY_OFFSET, blocks: copy });
+    afterEdit();
+    sndSnap();
+    setLandId(copy[0].id);
+    setTimeout(() => setLandId(null), ANIM.land + 40);
   };
 
-  /* ==== パレットから新規ブロック ==== */
+  /* ==== パレットから新規ブロック（段階0の1:1移植） ==== */
   const onPalPointerDown = (e, type) => {
     e.preventDefault();
     ac();
+    if (runningRef.current) return;
     if (pointerIdRef.current !== null) return;
     if (isTrigger(type) && hasTrigger(type)) {
-      // きっかけは1キャラにつき各1本＝プルッと拒否（音付き）。
-      // プロトタイプと同じDOM直接操作（remove→reflow→add）＝拒否時は再レンダーが無いため安全
+      // きっかけは1キャラにつき各1本＝プルッと拒否（DOM直接操作＝段階0の実装知見）
       const item = e.currentTarget;
       item.classList.remove("no"); void item.offsetWidth; item.classList.add("no");
       setTimeout(() => item.classList.remove("no"), 300);
@@ -410,6 +789,7 @@ export default function Studio() {
       return;
     }
     pointerIdRef.current = e.pointerId;
+    takeSnapshot();
     const b = makeBlock(type);
     beginDrag(e, [b], true, { x: DEFS[type].w / 2, y: 20 });
   };
@@ -417,15 +797,17 @@ export default function Studio() {
   /* ==== ピル（数値ステッパー／おと切替） ==== */
   const onPill = useCallback((e, b) => {
     ac();
+    if (runningRef.current) return;
     const d = DEFS[b.type];
-    if (d.pill === "s") { // おとは タップで切り替え＋試聴
+    if (d.pill === "s") {
+      takeSnapshot("pill" + b.id);
       b.s = (b.s + 1) % SOUNDS.length;
       SND[b.s]();
-      force();
+      afterEdit();
       return;
     }
     const rect = e.currentTarget.getBoundingClientRect();
-    const sr = stageRef.current.getBoundingClientRect();
+    const sr = asmRef.current.getBoundingClientRect();
     const px = Math.max(8, Math.min(sr.width - 160, rect.left - sr.left + rect.width / 2 - 76));
     const py = Math.max(6, rect.top - sr.top - 76);
     setPopTarget({ id: b.id, x: px, y: py });
@@ -433,48 +815,218 @@ export default function Studio() {
   const stepVal = dir => {
     if (!popTarget) return;
     let found = null;
-    for (const st of stacksRef.current) { found = findBlock(st.blocks, popTarget.id); if (found) break; }
+    for (const st of curStacks()) { found = findBlock(st.blocks, popTarget.id); if (found) break; }
     if (!found) return;
     const b = found.list[found.index];
     const d = DEFS[b.type];
     const nv = Math.max(d.min, Math.min(d.max, b.n + dir));
-    if (nv !== b.n) { b.n = nv; sndTick(); }
-    force();
+    if (nv !== b.n) { takeSnapshot("pill" + b.id); b.n = nv; sndTick(); }
+    afterEdit();
   };
   const popVal = (() => {
     if (!popTarget) return null;
-    for (const st of stacksRef.current) { const f = findBlock(st.blocks, popTarget.id); if (f) return f.list[f.index].n; }
+    for (const st of curStacks()) { const f = findBlock(st.blocks, popTarget.id); if (f) return f.list[f.index].n; }
     return null;
   })();
 
+  /* ==== ステージ縮尺（window resize＋同一式のみ・向き検出JS禁止） ==== */
+  const cellPxRef = useRef(cellPx);
+  cellPxRef.current = cellPx;
+  const updateDims = useCallback(() => {
+    const t = theaterRef.current;
+    if (!t) return;
+    const w = t.clientWidth, h = t.clientHeight;
+    const c = Math.max(4, Math.min((w - 52) / LCOLS, (h - 44) / LROWS)); // プロトタイプ updateDims と同一式（下限は非表示時の負値ガード）
+    if (Math.abs(c - cellPxRef.current) > 0.01) setCellPx(c);
+  }, []);
+  useLayoutEffect(() => { updateDims(); }, [big, updateDims]);
+  useEffect(() => {
+    const onResize = () => updateDims();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [updateDims]);
+
+  /* ==== 実行（engine.js との配線） ==== */
+  const replayEl = (key, sel, cls, dur) => {
+    const root = charElsRef.current.get(key);
+    if (!root) return;
+    const el = sel ? root.querySelector(sel) : root;
+    if (!el) return;
+    el.classList.remove("hopA", "stepA", "bumpA", "spinA"); // アニメ衝突防止（後勝ち）
+    void el.offsetWidth;
+    if (dur) el.style.animationDuration = dur + "ms";
+    el.classList.add(cls);
+  };
+  const engineCbs = {
+    onUpdate: (ch, cause) => {
+      if (cause === "home" || cause === "reset") instantRef.current.add(ch.key);
+      if (cause === "move") replayEl(ch.key, ".sp-in", "stepA");
+      force();
+    },
+    onFx: (key, fx) => {
+      if (fx.type === "sound") SND[fx.s] ? SND[fx.s]() : SND[0]();
+      else if (fx.type === "bump") { replayEl(key, ".sp-in", "bumpA"); tone(200, 0.12, "sine", 0.15); }
+      else if (fx.type === "hop") {
+        const root = charElsRef.current.get(key);
+        if (root) { const el = root.querySelector(".sp-in"); if (el) el.style.setProperty("--hopH", (-cellPxRef.current * CFG.JUMP_K) + "px"); }
+        replayEl(key, ".sp-in", "hopA", TICK * 2);
+      }
+      else if (fx.type === "spin") replayEl(key, ".sp-spin", "spinA", TICK * 2);
+    },
+    onGlow: (id, on) => {
+      const el = asmRef.current && asmRef.current.querySelector(`[data-id="${id}"]`);
+      if (el) el.classList.toggle("exec", on);
+    },
+    onDone: natural => {
+      runningRef.current = false;
+      clearTimeout(tickTimerRef.current);
+      if (natural) postRunRef.current = true;   // 自然終了: 位置維持（次の▶で初期化）
+      else { engineRef.current = null; postRunRef.current = false; } // ■: 初期化済み
+      force();
+    },
+  };
+  const tickLoop = () => {
+    const eng = engineRef.current;
+    if (!eng || !runningRef.current) return;
+    eng.tick();
+    if (runningRef.current) tickTimerRef.current = setTimeout(tickLoop, TICK);
+  };
+  const startRun = () => {
+    if (runningRef.current) return;
+    const defs = charsRef.current.map(c => ({ key: c.cid, x: c.x, y: c.y, stacks: c.stacks }));
+    const eng = createEngine(defs, engineCbs);
+    if (!eng.hasAnyTrigger()) { sndNo(); return; } // きっかけブロックがない
+    setPopTarget(null); setCopyBalloon(null);
+    engineRef.current = eng;
+    postRunRef.current = false;
+    runningRef.current = true;
+    eng.start();
+    sndClap();
+    force();
+    clearTimeout(tickTimerRef.current);
+    tickTimerRef.current = setTimeout(tickLoop, TICK * 0.5); // プロトタイプ: はたの半拍おいて最初の拍
+  };
+  const stopRun = () => {
+    const eng = engineRef.current;
+    if (eng && runningRef.current) { eng.stop(); sndCut(); }
+    setBig(false); // ■で全画面からも復帰（指示書§3-1）
+  };
+  useEffect(() => () => { clearTimeout(tickTimerRef.current); }, []);
+  useEffect(() => { instantRef.current.clear(); }); // 瞬間移動フラグは1描画かぎり
+
+  /* ==== キャラの表示状態（実行中/自然終了後はエンジン・編集中は初期値） ==== */
+  const dispOf = c => {
+    const eng = engineRef.current;
+    if (eng && (runningRef.current || postRunRef.current)) {
+      const s = eng.getChar(c.cid);
+      if (s) return s;
+    }
+    return { x: c.x, y: c.y, sizeIdx: SIZE_INIT, visible: true };
+  };
+
+  /* ==== ステージ操作（キャラ選択/ドラッグ/実行中タップ） ==== */
+  const onTheaterPointerDown = e => {
+    ac();
+    const actorEl = e.target.closest(".actor");
+    if (runningRef.current) {
+      if (actorEl && engineRef.current) engineRef.current.tap(actorEl.dataset.cid); // タップされたら
+      return;
+    }
+    if (big) return; // 上演モードでは編集しない
+    if (pointerIdRef.current !== null) return;
+    if (!actorEl) return;
+    const cid = actorEl.dataset.cid;
+    const idx = charsRef.current.findIndex(c => c.cid === cid);
+    if (idx < 0) return;
+    pointerIdRef.current = e.pointerId;
+    const ch = charsRef.current[idx];
+    const p = theaterPos(e);
+    pendingCharRef.current = {
+      idx, x0: e.clientX, y0: e.clientY, moved: false, orig: { x: ch.x, y: ch.y },
+      grab: { dx: p.x - (22 + ch.x * cellPx), dy: p.y - (p.h - 12 - ch.y * cellPx) },
+    };
+  };
+
+  /* ==== 控え室: 追加/削除 ==== */
+  const addChar = (e, entry) => {
+    ac();
+    if (runningRef.current) return;
+    if (charsRef.current.length >= CFG.MAX_CHARS) {
+      const el = e.currentTarget;
+      el.classList.remove("no"); void el.offsetWidth; el.classList.add("no");
+      setTimeout(() => el.classList.remove("no"), 300);
+      sndNo();
+      return;
+    }
+    takeSnapshot();
+    const spots = [[2, 2], [9, 2], [5, 4], [2, 5], [9, 5], [6, 1], [4, 6]];
+    const used = new Set(charsRef.current.map(c => `${c.x},${c.y}`));
+    const spot = spots.find(s => !used.has(`${s[0]},${s[1]}`)) || [5, 3];
+    charsRef.current.push({
+      cid: "c" + (++cidSeqRef.current), kind: entry.kind,
+      x: spot[0], y: spot[1], stacks: [],
+    });
+    selRef.current = charsRef.current.length - 1;
+    afterEdit();
+    sndSnap();
+  };
+  const confirmRemove = yes => {
+    const cd = confirmDel;
+    setConfirmDel(null);
+    if (!cd) return;
+    const ch = charsRef.current[cd.idx];
+    if (!yes) { // やめる: ドラッグ前の位置へ戻し、ドラッグ開始時のスナップショットも捨てる
+      if (ch) { ch.x = cd.orig.x; ch.y = cd.orig.y; }
+      dropLastSnapshot();
+      force();
+      return;
+    }
+    charsRef.current.splice(cd.idx, 1);
+    if (!charsRef.current.length) charsRef.current.push({ cid: "c" + (++cidSeqRef.current), kind: { type: "player" }, x: 5, y: 3, stacks: [] });
+    selRef.current = Math.max(0, Math.min(selRef.current, charsRef.current.length - 1));
+    sndPoof();
+    afterEdit();
+  };
+
+  /* ==== トースト自動消灯 ==== */
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), CFG.TOAST_MS);
+    return () => clearTimeout(t);
+  }, [toast]);
+
   /* ==== 描画 ==== */
+  const running = runningRef.current;
   const { nodes } = layoutAll();
   const drag = dragRef.current;
   const ghost = drag && drag.slot ? {
-    w: DEFS[drag.group[0].type].w,
-    h: drag.groupH - 4,
-    x: drag.slot.x, y: drag.slot.y,
+    w: DEFS[drag.group[0].type].w, h: drag.groupH - 4, x: drag.slot.x, y: drag.slot.y,
   } : null;
+  const sel = selRef.current;
+  const selC = curChar();
+  const bgImg = (BGS.find(b => b.id === bgRef.current) || BGS[0]).img;
+  const actorBase = cellPx * CFG.ACTOR_K;
+  const hist = histRef.current;
 
   return (
-    <div className="studio-root">
+    <div className={"studio-root" + (running ? " running" : "") + (big ? " big" : "")}>
       <style>{STUDIO_CSS}</style>
       <header>
         <div className="mark">
           <svg width="17" height="17" viewBox="0 0 17 17"><path d="M2 15V2h9l-2.6 3.4L11 9H4.2" fill="none" stroke="#4a2c05" strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round" /></svg>
         </div>
-        <div>
-          <h1>つくるスタジオ ブロック見本（段階0）</h1>
-          <div className="sub">18種を つかむ・つなぐ・はずす（#studio-dev 開発用ルート）</div>
+        <div style={{ minWidth: 0 }}>
+          <h1>つくるスタジオ</h1>
+          <div className="sub">#studio-dev 開発用ルート（段階1）</div>
         </div>
-        <button style={{ marginLeft: "auto" }} onClick={() => {
-          stacksRef.current = initialScene();
-          dragRef.current = null; setFlyGroup(null); setPopTarget(null); force();
-        }}>さいしょから</button>
-        <button onClick={() => { window.location.hash = ""; }}>◀ アプリへ</button>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+          <button className="editbtn" disabled={!hist.past.length || running} onClick={undo}>とりけし</button>
+          <button className="editbtn" disabled={!hist.future.length || running} onClick={redo}>やりなおし</button>
+          <button onClick={() => { clearTimeout(draftTimerRef.current); writeDraft(); window.location.hash = ""; }}>◀ アプリへ</button>
+        </div>
       </header>
       <div className="studio-wrap">
-        {/* こうぐだな（18種・カテゴリ順）。プロトタイプの縦1列は18種で画面に収まらないため2列に（見た目・挙動は同一） */}
+        {/* 左: こうぐだな（18種・段階0のまま。プルッ拒否はDOM直接操作） */}
         <div className={"studio-pal" + (delHover ? " del" : "")} ref={palRef}>
           <div className="shelf-title">こうぐだな</div>
           <div className="delmsg">ここで はなすと<br />けせるよ</div>
@@ -503,24 +1055,32 @@ export default function Studio() {
             })}
           </div>
         </div>
-        {/* 組み立てステージ */}
-        <div className="studio-stage" ref={stageRef} onPointerDown={onStagePointerDown}>
-          <div className="hint">
-            かくにん: 18種のブロックを つかむ・つなぐ・はずす ／ 数字タップで −＋ ／ おとタップで切替 ／
-            けすときは たなへ ドラッグ ／ きっかけは 各1本まで
-          </div>
-          {/* スナップ先ゴースト（常設・transitionで滑る） */}
+
+        {/* 中央: 組み立てエリア（選択中キャラのプログラムのみ） */}
+        <div className="studio-asm" ref={asmRef} onPointerDown={onAsmPointerDown}>
+          {selC && (
+            <div className="selchip">
+              {selC.kind.type === "player"
+                ? <span className="pav"><PlayerAvatar character={(profileRef.current && profileRef.current.character) || "boy"} dressup={profileRef.current && profileRef.current.dressup} size={26} /></span>
+                : <img src={kindImg(selC.kind)} alt="" />}
+              <span>{kindName(selC.kind)}の プログラム</span>
+            </div>
+          )}
+          {!curStacks().length && (
+            <div className="hint">
+              たなから ブロックを ドラッグしてね ／ 「はたが おされたら」から はじめると ▶で うごくよ ／
+              ながおしで コピー ／ けすときは たなへ ドラッグ
+            </div>
+          )}
           <div className="studio-ghost" style={{
             display: ghost ? "block" : "none",
             width: ghost ? ghost.w : 0, height: ghost ? ghost.h : 0,
             transform: ghost ? `translate(${ghost.x}px, ${ghost.y}px)` : undefined,
           }} />
-          {/* ブロック（絶対配置・zIndexは並び順） */}
           {nodes.map((n, order) => (
             <StudioBlock key={n.b.id} b={n.b} mouth={n.mouth || 0} x={n.x} y={n.y} z={10 + order}
               land={landId === n.b.id} onPill={onPill} />
           ))}
-          {/* 数値ステッパー */}
           {popTarget && popVal !== null && (
             <div className="studio-pop" style={{ left: popTarget.x, top: popTarget.y }}
               onPointerDown={e => e.stopPropagation()}>
@@ -529,13 +1089,90 @@ export default function Studio() {
               <button className="plus" onClick={() => stepVal(1)}>＋</button>
             </div>
           )}
-          {/* 持ち上げ中の束 */}
+          {copyBalloon && (
+            <button className="copy-balloon" style={{ left: copyBalloon.x, top: Math.max(6, copyBalloon.y - 46) }}
+              onPointerDown={e => e.stopPropagation()} onClick={() => doCopy(copyBalloon.id)}>コピー</button>
+          )}
           <div className="studio-fly" ref={flyRef} style={{ display: "none" }}>
             {flyGroup && flyGroup.map(f => (
               <StudioBlock key={"fly" + f.b.id} b={f.b} mouth={f.mouth} x={f.x} y={f.y} z={1} inFly />
             ))}
           </div>
         </div>
+
+        {/* 右: ステージペイン（12×8を常に全体縮尺表示・3:2） */}
+        <div className="studio-right">
+          <div className="theater" ref={theaterRef} onPointerDown={onTheaterPointerDown}>
+            <img className="bgimg" src={bgImg} alt="" draggable="false" />
+            {charsRef.current.map((c, i) => {
+              const disp = dispOf(c);
+              return (
+                <CharSprite key={c.cid} ch={{ ...c, z: i }} disp={disp} cellPx={cellPx} base={actorBase}
+                  selected={i === sel} running={running} instant={instantRef.current.has(c.cid)}
+                  profile={profileRef.current}
+                  onRef={el => { if (el) charElsRef.current.set(c.cid, el); else charElsRef.current.delete(c.cid); }} />
+              );
+            })}
+            <button className="roundbtn bigbtn" aria-label={big ? "もどす" : "ひろげる"}
+              onPointerDown={e => e.stopPropagation()} onClick={() => { setPopTarget(null); setBig(b => !b); }}>
+              {big
+                ? <svg width="20" height="20" viewBox="0 0 20 20"><path d="M8 3 v5 H3 M12 3 v5 h5 M8 17 v-5 H3 M12 17 v-5 h5" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                : <svg width="20" height="20" viewBox="0 0 20 20"><path d="M3 8 V3 h5 M17 8 V3 h-5 M3 12 v5 h5 M17 12 v5 h-5" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+            </button>
+            <button className={"roundbtn runbtn" + (running ? " stop" : "")} aria-label={running ? "カット" : "うごかす"}
+              onPointerDown={e => e.stopPropagation()} onClick={() => { ac(); running ? stopRun() : startRun(); }}>
+              {running
+                ? <svg width="18" height="18" viewBox="0 0 18 18"><rect x="2" y="2" width="14" height="14" rx="3" fill="#fff" /></svg>
+                : <svg width="20" height="20" viewBox="0 0 20 20"><path d="M5 2 L18 10 L5 18 Z" fill="#fff" /></svg>}
+            </button>
+          </div>
+          <div className="bgrow">
+            <div className="rowtitle">ぶたい（はいけい）</div>
+            <div className="thumbs">
+              {BGS.map(b => (
+                <button key={b.id} className={"bgthumb" + (b.id === bgRef.current ? " on" : "")}
+                  onClick={() => { ac(); if (b.id !== bgRef.current) { takeSnapshot(); bgRef.current = b.id; afterEdit(); sndTick(); } }}>
+                  <img src={b.img} alt="" draggable="false" />
+                  <span className="bgname">{b.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="castrow">
+            <div className="rowtitle">はいゆうひかえしつ（タップで とうじょう・キャラは {CFG.MAX_CHARS}にんまで）</div>
+            <div className={"strip" + (stripHover ? " del" : "")} ref={stripRef}>
+              <div className="stripdelmsg">ここで はなすと けせるよ</div>
+              {castRef.current.map((entry, i) => (
+                <button key={i} className="castchip" onPointerDown={e => e.stopPropagation()} onClick={e => addChar(e, entry)}>
+                  {entry.kind.type === "player"
+                    ? <span style={{ display: "flex", justifyContent: "center", height: 34 }}>
+                        <PlayerAvatar character={(profileRef.current && profileRef.current.character) || "boy"} dressup={profileRef.current && profileRef.current.dressup} size={32} /></span>
+                    : <img src={kindImg(entry.kind)} alt="" draggable="false" />}
+                  <div className="cname">{entry.name}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="rcap">
+            さくひん ぜんたい（{LCOLS}×{LROWS}マス）を いつも表示 ／ キャラを タップ=えらぶ・ドラッグ=おく ／
+            ▶=うごかす ■=カット!
+          </div>
+        </div>
+      </div>
+
+      {/* キャラ削除の確認（アプリ内で唯一の確認・設計§9） */}
+      {confirmDel && (
+        <div className="studio-confirm">
+          <div className="box">
+            <div className="msg">この こと プログラムを けす？<br />——とりけしで もどせるよ</div>
+            <button className="yes" onClick={() => confirmRemove(true)}>けす</button>
+            <button className="no" onClick={() => confirmRemove(false)}>やめる</button>
+          </div>
+        </div>
+      )}
+      {toast && <div className="studio-toast">{toast}</div>}
+      <div className="studio-narrow">
+        この あそびは<br />タブレットか パソコンで<br />あそんでね
       </div>
     </div>
   );

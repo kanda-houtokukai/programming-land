@@ -4,7 +4,7 @@
      progland:v2:profile:<id>  … 各プロファイルの記録本体
    将来の項目追加でクラッシュしないよう、読み込みは常にデフォルト値マージで行う */
 
-export const SCHEMA_VERSION = 3; // b4j: partner を相棒ごとレベル {active, owned:[{id,level,xp}], egg} に
+export const SCHEMA_VERSION = 4; // b5e: つくるスタジオ studio {works, draft} を追加（3 = b4j: partner を相棒ごとレベルに）
 export const MAX_PROFILES = 4;
 const META_KEY = "progland:v2:meta";
 const profileKey = id => `progland:v2:profile:${id}`;
@@ -50,6 +50,7 @@ export function newProfileData(name = "", character = null) {
     cosmetics: { owned: [], equipped: { deco: null, bg: null } }, // きせかえ（所持ID・装備中）
     shopUsed: false,                      // ショップで一度でも買ったか（バッジ判定用）
     powers: { prev: {} },                 // そだったちからF2: 前回見たときの各ちから% { powerId: pct }。差分演出の基準（後方互換=空でマージ）
+    studio: { works: [], draft: null },   // つくるスタジオ（b5e）: works=保存作品（段階2でUI）/ draft=かきかけ自動保存。純データ（背景ID・キャラ配置・ブロック木）
   };
 }
 
@@ -128,6 +129,11 @@ export function listProfiles() {
   return loadMeta().ids.map(loadProfile).filter(Boolean);
 }
 export function setLastProfile(id) { const m = loadMeta(); m.lastProfileId = id; saveMeta(m); }
+// App の外の画面（#studio-dev 等）から「今の子」を取る: 最後に遊んだ子→いなければ先頭→いなければ null
+export function lastProfile() {
+  const m = loadMeta();
+  return (m.lastProfileId && loadProfile(m.lastProfileId)) || listProfiles()[0] || null;
+}
 
 export function createProfile(name, character) {
   const m = loadMeta();

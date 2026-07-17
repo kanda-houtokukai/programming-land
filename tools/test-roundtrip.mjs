@@ -42,6 +42,16 @@ p.coinDay = { date: "2026-07-16", quiz: { "junban:easy": 4 }, puzzle: { "e1-1": 
 // 第3波①: 主人公キャラクター＋着せ替え装備
 p.character = "girl";
 p.dressup = { head: "head_compass", face: null, neck: "neck_bandana", chest: null, waist: null, back: "back_keyboard" };
+// b5e つくるスタジオ: 作品（純データ＝背景ID・キャラ配置・ブロック木）と かきかけdraft
+p.studio = {
+  works: [{
+    id: "w1", name: "さくひん1", savedAt: "2026-07-17", remixOf: null, bg: "daichi",
+    chars: [{ kind: { type: "mon", id: "mori", stage: 1 }, x: 3, y: 2,
+      stacks: [{ x: 40, y: 30, blocks: [{ id: 1, type: "hat" }, { id: 2, type: "repeat", n: 2, children: [{ id: 3, type: "move", n: 3 }] }] }] }],
+  }],
+  draft: { bg: "arena", sel: 0,
+    chars: [{ kind: { type: "player" }, x: 5, y: 4, stacks: [{ x: 20, y: 20, blocks: [{ id: 9, type: "tap" }, { id: 10, type: "sound", s: 1 }] }] }] },
+};
 saveProfile(p);
 
 // 2) 書き出し
@@ -137,6 +147,16 @@ ok(JSON.stringify(q.coinDay) === JSON.stringify(p.coinDay), "coinDay（当日コ
 }
 ok(JSON.stringify(q.powers) === JSON.stringify(p.powers), "そだったちからF2 前回%（powers.prev）");
 ok(q.character === "girl" && JSON.stringify(q.dressup) === JSON.stringify(p.dressup), "第3波 主人公キャラ＋着せ替え装備（character/dressup）");
+// b5e つくるスタジオ: 入れ子ブロック木まで完全往復＋studioの無い旧セーブはデフォルト {works:[], draft:null} 補完
+ok(JSON.stringify(q.studio) === JSON.stringify(p.studio), "b5e つくるスタジオ（works+draft・入れ子ブロック木まで完全往復）");
+{
+  const rawS = JSON.parse(localStorage.getItem(`progland:v2:profile:${q.id}`));
+  delete rawS.studio;
+  localStorage.setItem(`progland:v2:profile:${q.id}`, JSON.stringify(rawS));
+  const mS = loadFresh(q.id);
+  ok(mS.studio && Array.isArray(mS.studio.works) && mS.studio.works.length === 0 && mS.studio.draft === null,
+    "b5e studio の無い旧セーブに {works:[], draft:null} が補完される（デフォルト値マージ）");
+}
 
 console.log(fail === 0 ? "\n✅ ラウンドトリップ 全項目一致（P5完了条件クリア）" : `\n❌ ${fail}件 不一致`);
 process.exit(fail === 0 ? 0 : 1);
