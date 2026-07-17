@@ -1162,7 +1162,8 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
             </div>
           </div>
           <div className="castrow">
-            <div className="rowtitle">はいゆうひかえしつ（タップで とうじょう・キャラは {CFG.MAX_CHARS}にんまで）</div>
+            {/* 実機FB(2026-07-17): ドラッグ削除の告知が無く発見不能だった→ラベルに明記（ブロック側hintと対) */}
+            <div className="rowtitle">はいゆうひかえしつ（タップで とうじょう・けすときは ここへ ドラッグ・キャラは {CFG.MAX_CHARS}にんまで）</div>
             <div className={"strip" + (stripHover ? " del" : "")} ref={stripRef}>
               <div className="stripdelmsg">ここで はなすと けせるよ</div>
               {castRef.current.map((entry, i) => (
