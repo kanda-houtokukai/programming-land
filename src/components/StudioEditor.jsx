@@ -11,7 +11,8 @@ import { G, ANIM, pathBody, pathHat, pathC, chipY, blockH, stackH, containerDept
 import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../studio/engine.js";
 import { lastProfile, saveProfile } from "../storage.js";
 import { buildCast, kindImg, kindName, kindValid } from "../studio/cast.js";
-import { saveWork, nextWorkName, NAME_MAX } from "../studio/works.js";
+import { saveWork, nextWorkName, NAME_MAX, MILESTONE_NAMES } from "../studio/works.js";
+import iconCoin from "../assets/icon_stat_coin.png";
 import { BGS } from "../data/studio-bgs.js";
 import PlayerAvatar from "./PlayerAvatar.jsx";
 import StudioBlock from "./StudioBlock.jsx";
@@ -390,6 +391,7 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
   const [toast, setToast] = useState(initRef.current.toast);
   const [saveOpen, setSaveOpen] = useState(false);    // ほぞんモーダル（段階2 §2）
   const [saveName, setSaveName] = useState("");
+  const [saveDone, setSaveDone] = useState(null);     // かんせい!演出（段階3 §3-2）: { name, grant:{xp,coins,hit} }
 
   /* ==== とりけし/やりなおし（履歴20手・ブロック木＋キャラ配置のスナップショット） ==== */
   const histRef = useRef({ past: [], future: [] });
@@ -472,8 +474,17 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
     originRef.current = { type: "work", id: r.id }; // 以後の ほぞん は同じ作品への上書き
     nameRef.current = w ? w.name : "";
     setSaveOpen(false);
-    setToast("フィルムだなに ほぞんした！");
-    sndSnap();
+    if (r.grant) {
+      // かんせい!演出（段階3 §3-2）: 新規保存のみ +XP/コイン/マイルストーン名。初回だけ賑やか・2回目以降はXPのみが自然に実現。
+      // 新規バッジ・ベレー解放の祝いは App 側の既存演出（もどった再読込時）が担う＝スタジオ内では作らない
+      setSaveDone({ name: nameRef.current, grant: r.grant });
+      sndSnap();
+      setTimeout(() => tone(660, 0.12, "sine", 0.16), 80);   // 簡易ファンファーレ（WebAudio・Suno差し替えは本線）
+      setTimeout(() => tone(880, 0.16, "sine", 0.16), 200);
+    } else {
+      setToast("フィルムだなに ほぞんした！"); // 上書き保存（作り直し）は付与なし＝静かに
+      sndSnap();
+    }
     scheduleDraft(); // origin/name の変化を draft にも反映
   };
 
@@ -1182,6 +1193,32 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
               placeholder={profileRef.current ? nextWorkName((profileRef.current.studio && profileRef.current.studio.works) || []) : "さくひん1"} />
             <button className="ok" onClick={doSaveWork}>ほぞんする</button>
             <button className="no" onClick={() => setSaveOpen(false)}>やめる</button>
+          </div>
+        </div>
+      )}
+      {/* かんせい!（段階3 §3-2・新規保存の完了演出） */}
+      {saveDone && (
+        <div className="studio-confirm">
+          <div className="box">
+            <div className="msg" style={{ fontSize: 20 }}>かんせい!</div>
+            <div style={{ color: "#6b4a26", fontSize: 13, fontWeight: 900, marginBottom: 10 }}>
+              「{saveDone.name}」を フィルムだなに ほぞんした</div>
+            <div style={{ color: "#4a3520", fontSize: 15, fontWeight: 900, marginBottom: 6 }}>
+              けいけんち +{saveDone.grant.xp}</div>
+            {saveDone.grant.coins > 0 && (
+              <div style={{ color: "#4a3520", fontSize: 15, fontWeight: 900, marginBottom: 6,
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                <img src={iconCoin} alt="コイン" style={{ width: 20, height: 20, objectFit: "contain" }} />
+                +{saveDone.grant.coins}
+              </div>
+            )}
+            {saveDone.grant.hit.map(id => (
+              <div key={id} style={{ background: "#FFF3D0", border: "2px solid #C77E0C", borderRadius: 999,
+                color: "#8F5606", fontSize: 13, fontWeight: 900, padding: "5px 14px", margin: "6px 0" }}>
+                {MILESTONE_NAMES[id] || id}
+              </div>
+            ))}
+            <button className="ok" style={{ marginTop: 8 }} onClick={() => setSaveDone(null)}>やったー!</button>
           </div>
         </div>
       )}

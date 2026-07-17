@@ -6,6 +6,12 @@ import { QUIZ_CATEGORIES, QUIZ_DIFFS, SESSION_SIZE, bestKey } from "./quizzes.js
 import { DIFFICULTIES } from "./islands.js";
 import { TYPING_STAGES } from "./typing.js";
 import { ENEMIES } from "./battle.js";
+import { workHasNestedContainer } from "./studio-blocks-defs.js";
+
+// つくるスタジオ: くりかえしの なかに くりかえし（容器の中の容器）を持つ作品があるか（段階3）
+function hasNestedContainer(s) {
+  return ((s.studio && s.studio.works) || []).some(workHasNestedContainer);
+}
 
 export function puzzleStarsTotal(s) { return Object.values(s.puzzle.stars).reduce((a, b) => a + b, 0); }
 export function daysPlayed(s) { return Object.keys(s.log).length; }
@@ -74,6 +80,16 @@ export const BADGES = [
   { id: "art1", emoji: "🎨", name: "みならい アーティスト", desc: "さくひんを 1つ ほぞんした", check: s => s.art.gallery.length >= 1 },
   { id: "art5", emoji: "🖼️", name: "びじゅつかんの たつじん", desc: "さくひんを 5つ ほぞんした", check: s => s.art.gallery.length >= 5 },
   { id: "art10", emoji: "🏛️", name: "だい げいじゅつか", desc: "さくひんを 10こ ほぞんした", check: s => s.art.gallery.length >= 10 },
+  // ── つくるスタジオ（段階3）。emoji は既存26個の宣言形式への準拠（絵文字禁止ルールの例外＝既存システムの継続）──
+  { id: "studio1", emoji: "🎬", name: "はじめての かんとく",
+    desc: "つくるスタジオで さくひんを 1つ つくった",
+    check: s => ((s.studio && s.studio.works) || []).length >= 1 },
+  { id: "studioRemix", emoji: "🎞️", name: "リミックスめいじん",
+    desc: "みほんを つくりかえて じぶんの さくひんに した",
+    check: s => ((s.studio && s.studio.works) || []).some(w => w.remixOf) },
+  { id: "studioNest", emoji: "🪆", name: "いれこの たつじん",
+    desc: "くりかえしの なかに くりかえしを いれた さくひんを つくった",
+    check: s => hasNestedContainer(s) },
   // ── クイズバトル・ショップ（P6）──
   { id: "battle1", emoji: "⚔️", name: "はじめての しょうり", desc: "バトルに 1かい かった", check: s => ((s.battle && s.battle.defeated) || []).length >= 1 },
   { id: "battleMaster", emoji: "🏟️", name: "バトルマスター", desc: "てき 9たいを ぜんぶ たおした", check: s => ((s.battle && s.battle.defeated) || []).length >= ENEMIES.length },

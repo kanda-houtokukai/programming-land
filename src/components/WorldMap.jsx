@@ -21,6 +21,9 @@ import buildingTyping from "../assets/building_typing.png";
 import buildingHome from "../assets/building_home.png";
 import iconHarbor from "../assets/icon_harbor.png";
 import titleLogo from "../assets/title_logo.webp";
+// つくるスタジオ（段階3・★studio-assets/ 配下＝直下ではない）
+import buildingStudio from "../assets/studio-assets/studio-building.png";
+import signJunbichu from "../assets/studio-assets/sign-junbichu.png";
 
 // 8エリアの%座標（1600×900の背景に対して）。ブラウザで背景に照らして微調整する。
 // 拡張用の空き地（今回は何も置かない・将来の新エリア用）: 中央上(46,30)・北(58,16)・右中(70,36)
@@ -47,7 +50,15 @@ export const AREAS = [
   // みなと（第2波 段階②）: プロファイル交代の一本化された入口。海側・島の端（拡張用の空き地3つは温存）。
   // 毎回使う場所ではないので small=やや控えめサイズ。「▶いく！」で起動時の選択画面へ（switchProfile経路）
   { key: "harbor", short: "みなと", place: "みなと", img: iconHarbor, small: true, left: 9, top: 86 },
+  // つくるスタジオ（段階3・北の空き地）。座標は studio-map-placement.md の確定値（神田さん実機調整済み）。
+  // 建物はほぼ正方形だが tall:true（82%）表示で承認済み。既存エリアの後ろに追加＝既存のふわふわ位相を変えない
+  { key: "studio", short: "つくる", place: "つくるスタジオ", img: buildingStudio, tall: true, left: 59.5, top: 12.4 },
 ];
+
+// じゅんびちゅう看板（段階3・右中の空き地・第2期の予告）。★非対話の飾り＝AREASに入れない（buttonにしない）。
+// 座標は studio-map-placement.md の確定値。文字は画像に描かずアプリのフォントで板の中央に重畳
+//（生成文字の品質不安定を回避・将来他の告知に流用可）。textTop=板の中央位置%（初期値・実機で微調整）
+const SIGN = { left: 69.5, top: 34.13, textTop: 40 };
 
 export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfile }) {
   const [popup, setPopup] = useState(null); // タップ中のエリア（場所名＋「へ いく」）
@@ -105,6 +116,21 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
             </button>
           );
         })}
+        {/* じゅんびちゅう看板（非対話の飾り・タップしても何も起きない）。ふわふわは他の建物と揃える＝
+            文字が板と一緒に揺れるよう、アニメは img でなく内側ラッパーに掛ける */}
+        <div aria-hidden="true" style={{ position: "absolute", left: `${SIGN.left}%`, top: `${SIGN.top}%`,
+          transform: "translate(-50%,-50%)", width: "13%", aspectRatio: "1", pointerEvents: "none",
+          display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div className="mapfloat" style={{ position: "relative", width: "62%", height: "62%",
+            animationDelay: "1.27s", animationDuration: "3.3s" }}>
+            <img src={signJunbichu} alt="" draggable="false"
+              style={{ width: "100%", height: "100%", objectFit: "contain", display: "block",
+                filter: "drop-shadow(1px 2px 2px rgba(20,15,25,.45))" }} />
+            <span style={{ position: "absolute", left: "50%", top: `${SIGN.textTop}%`, transform: "translate(-50%,-50%)",
+              whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(6px,1.35vw,11px)", color: "#4a2c05",
+              textShadow: "0 0 2px rgba(255,245,220,.8)" }}>じゅんびちゅう</span>
+          </div>
+        </div>
       </div>
 
       {/* マップ最下部「おうちのひとへ」（段階③・メモ09）: 保護者向けの入口。

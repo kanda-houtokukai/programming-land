@@ -9,6 +9,8 @@ import { BGS } from "../data/studio-bgs.js";
 import { SAMPLES } from "../data/studio-samples.js";
 import { stashDraft, deleteWork, WORKS_MAX, NAME_MAX } from "../studio/works.js";
 import StudioThumb from "./StudioThumb.jsx";
+import ParentGuide from "./ParentGuide.jsx";
+import { STUDIO_GUIDE } from "../data/parent-guide.js";
 import bgInterior from "../assets/studio-assets/studio-interior.webp";
 
 /* 効果音（エディタと同じWebAudio簡易音の最小セット） */
@@ -113,7 +115,8 @@ const CSS = `
   @media (max-width: 699px) { .sh-narrow { display: flex; } .sh-stage .sh-scroll { display: none; } }
 `;
 
-export default function StudioHome({ onOpen }) {
+/* onExitApp（段階3）: App経由（マップ→スタジオ）のときの戻り先。未指定（#studio-dev）は従来どおり hash="" */
+export default function StudioHome({ onOpen, onExitApp }) {
   const [, force] = useReducer(x => x + 1, 0);
   const profRef = useRef(undefined);
   if (profRef.current === undefined) profRef.current = lastProfile();
@@ -185,7 +188,9 @@ export default function StudioHome({ onOpen }) {
           <h1>つくるスタジオ</h1>
           <div className="sub">じぶんの さくひんを つくろう</div>
         </div>
-        <button style={{ marginLeft: "auto" }} onClick={() => { window.location.hash = ""; }}>◀ アプリへ</button>
+        <button style={{ marginLeft: "auto" }}
+          onClick={() => { onExitApp ? onExitApp() : (window.location.hash = ""); }}>
+          {onExitApp ? "◀ マップへ" : "◀ アプリへ"}</button>
       </header>
       <div className="sh-stage">
         <img className="sh-bg" src={bgInterior} alt="" draggable="false" />
@@ -228,6 +233,8 @@ export default function StudioHome({ onOpen }) {
                 ))}
               </div>
             </div>
+            {/* おうちの方へ（段階3 §3-1・他モードと同じ ParentGuide モーダルの作法） */}
+            <ParentGuide guide={STUDIO_GUIDE} />
           </div>
         </div>
         {toast && <div className="sh-toast">{toast}</div>}

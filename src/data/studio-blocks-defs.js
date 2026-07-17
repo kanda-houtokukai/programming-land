@@ -89,3 +89,29 @@ export function cloneBlocks(list) {
     return c;
   });
 }
+
+/* ===== 保存作品の走査ヘルパー（段階3・教育接続の判定を1か所に集約） =====
+   かんとくベレー（18種網羅）・そだったちから「つくる」・バッジ/マイルストーンの入れ子判定が共用する。
+   works の形: [{ chars: [{ stacks: [{ blocks: [...] }] }] }]（純データ・storage の studio.works） */
+
+// works 全体で使われたブロック type の集合
+export function usedBlockTypesInWorks(works) {
+  const set = new Set();
+  const walk = l => { for (const b of l || []) { set.add(b.type); walk(b.children); } };
+  for (const w of works || []) for (const c of w.chars || []) for (const st of c.stacks || []) walk(st.blocks);
+  return set;
+}
+
+// ブロック列の中の「容器の入れ子」最大深さ（repeat/forever が容器。1=容器あり・2=容器の中の容器）
+export function containerNestDepth(list) {
+  let max = 0;
+  for (const b of list || []) {
+    if (isContainer(b.type)) max = Math.max(max, 1 + containerNestDepth(b.children));
+    else if (b.children) max = Math.max(max, containerNestDepth(b.children));
+  }
+  return max;
+}
+// 1作品に「容器の中の容器」があるか（firstNest マイルストーン・いれこの たつじんバッジ）
+export function workHasNestedContainer(work) {
+  return (work.chars || []).some(c => (c.stacks || []).some(st => containerNestDepth(st.blocks) >= 2));
+}

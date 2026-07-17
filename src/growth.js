@@ -9,6 +9,7 @@ export const XP = {
   quizSet: score => 4 + 2 * score,     // 5問全問正解で14
   artSave: () => 8,
   typing: () => 10,                     // P4で使用
+  studioSave: () => 10,                 // つくるスタジオ: 新規作品の初回保存のみ（作り直し保存では出ない・設計§8）。初期値
 };
 
 // つぎのレベルまでに必要な経験値（レベルが上がるほど少しずつ増える）
@@ -96,6 +97,8 @@ export const COIN = {
   typingClear: 3, typingBest: 5, // タイピングクリア（自己ベスト更新は+5）
   artSave: 2, artDailyCap: 6,    // おえかき保存（1日の上限6枚＝乱発防止）
   battle: { easy: 5, normal: 8, hard: 12 }, // バトル勝利（難易度別）
+  // つくるスタジオ: 作品ごとの付与ゼロ・初回マイルストーンのみ（量産で稼げない・設計§8）。初期値
+  studio: { first: 15, works5: 20, works10: 30, firstNest: 15, firstCast3: 15 },
 };
 
 // コイン加算（負や0は無視）。返り値=実際に足した枚数

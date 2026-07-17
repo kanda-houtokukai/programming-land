@@ -79,7 +79,7 @@ export default function ParentHub({ save, profiles = [], go, onSound, onExport, 
   const diffs = diffBreakdown(save);
   const days = lastNDays(14);
   const counts = days.map(d => {
-    const l = save.log[d]; return l ? (l.puzzle || 0) + (l.quiz || 0) + (l.art || 0) + (l.battle || 0) : 0;
+    const l = save.log[d]; return l ? (l.puzzle || 0) + (l.quiz || 0) + (l.art || 0) + (l.battle || 0) + (l.studio || 0) : 0; // studio=つくるスタジオの保存数（段階3）
   });
   const maxC = Math.max(1, ...counts);
   const toggle = id => setOpenIds(ids => ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id]);

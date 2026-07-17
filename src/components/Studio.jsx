@@ -7,7 +7,9 @@ import { useState, useRef } from "react";
 import StudioHome from "./StudioHome.jsx";
 import StudioEditor from "./StudioEditor.jsx";
 
-export default function Studio() {
+/* onExit（段階3・正規導線）: App から渡される「マップへ戻る」。App 側が storage を再読込して
+   バッジ/実績/レベルアップの検知を1回だけ走らせる。#studio-dev（開発用バックドア）では未指定＝hash運用 */
+export default function Studio({ onExit }) {
   const [view, setView] = useState("home");
   const [target, setTarget] = useState(null); // { open, key }
   const seq = useRef(0);
@@ -19,7 +21,7 @@ export default function Studio() {
     setView(showOnly ? "show" : "edit");
   };
 
-  if (view === "home") return <StudioHome onOpen={openEditor} />;
+  if (view === "home") return <StudioHome onOpen={openEditor} onExitApp={onExit} />;
   return (
     <StudioEditor key={target.key} open={target.open} showOnly={view === "show"}
       onExit={() => { setView("home"); setTarget(null); }} />

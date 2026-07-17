@@ -48,6 +48,7 @@ import neckExplorerBandana from "../assets/neck_explorer_bandana.png";
 import chestGearBadge from "../assets/chest_gear_badge.png";
 import chestMagnifyingBadge from "../assets/chest_magnifying_badge.png";
 import waistToolBelt from "../assets/waist_tool_belt.png";
+import headKantokuBeret from "../assets/head_kantoku_beret.png";
 
 export const DRESSUP_ITEMS = [
   { id: "head_compass", slot: "head", name: "コンパスぼうし", skillTie: "junji", img: headCompassHat,
@@ -78,6 +79,16 @@ export const DRESSUP_ITEMS = [
     anchor: { top: 50.0, left: 50, width: 23.9 }, // 実機FBで52.5→50.0（少し低かった→上へ・2026-07-08）
     acquire: { type: "shop", price: 70 },
     flavor: "こまったとき なおす どうぐが つまった ベルト" },
+  { id: "head_kantoku", slot: "head", name: "かんとくベレー", skillTie: "create",
+    img: headKantokuBeret,  // src/assets/head_kantoku_beret.png（Chat支給・512×512・描画433x281）
+    // ★初期値（2026-07-17 Chatが主人公へ実合成して決定・神田さん承認済み）:
+    //   帽子系(top:1.6/width:31.3)では小さすぎたため 1.55倍に拡大し、つばの下端 19.98% は同じ位置に固定。
+    //   top が負なのは正常（画像の箱が上へ出るだけ・ベレーの絵自体は上端+0.08%でキャンバス内に収まる）。
+    //   これが下端固定で収まる上限（1.7倍は絵が上に1.84%はみ出すため不採用）。実機FBで調整可。
+    anchor: { top: -8.52, left: 50, width: 48.52 },
+    acquire: { type: "achievement", condition: "studio_all_cards",
+               label: "つくるスタジオで 18しゅるいの カードを ぜんぶ つかうと もらえる" },
+    flavor: "18まいの カードを つかいこなした かんとくの あかし" },
   // back はレイヤーでなくベース人物ごと切り替え（BASES）＝anchor なし
   { id: "back_keyboard", slot: "back", name: "キーボードリュック", skillTie: "keyboard", img: null,
     anchor: null, acquire: { type: "shop", price: 120 },
@@ -95,11 +106,17 @@ export const SHOP_DRESSUP = DRESSUP_ITEMS.filter(d => d.acquire.type === "shop")
 // 判定は App.update のバッジ判定と同じタイミングで呼ぶ。条件の実体はここに集約。
 import { STAGES } from "./stages.js";
 import { BADGES } from "./badges.js";
+import { DEFS as STUDIO_DEFS, usedBlockTypesInWorks } from "./studio-blocks-defs.js";
 const ACHIEVEMENT_CHECKS = {
   // はかせぼうし: 全パズル制覇（全162面クリア＝★1以上）
   all_puzzles_clear: save => STAGES.every(st => (save.puzzle.stars[st.id] || 0) > 0),
   // おうかん: 大きな節目＝バッジを全部あつめる
   all_badges: save => BADGES.every(b => save.badges.includes(b.id)),
+  // かんとくベレー: 保存済み works 全体で18種のカードをすべて使った＝学習範囲一巡の証（段階3・設計§8）
+  studio_all_cards: save => {
+    const used = usedBlockTypesInWorks((save.studio && save.studio.works) || []);
+    return Object.keys(STUDIO_DEFS).every(t => used.has(t));
+  },
 };
 // 未所持で条件を満たした achievement アイテムの配列を返す（付与は呼び出し側で）
 export function checkAchievementUnlocks(save) {

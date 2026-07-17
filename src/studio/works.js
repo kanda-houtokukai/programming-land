@@ -1,5 +1,5 @@
-// つくるスタジオ: 作品の保存モデル（段階2 §2・Chat決定の規則をここに集約）。
-// ★UI非依存・node安全（storage.js と studio-blocks-defs.js のみに依存）。
+// つくるスタジオ: 作品の保存モデル（段階2 §2）＋教育接続の付与（段階3 §1-3・保存の一本道に集約）。
+// ※段階3で growth.js（画像import連鎖あり）に依存するため node直importは不可になった（ブラウザ専用）。
 //
 // 規則（§2）:
 // - 何か（あたらしく つくる／みほん／つくりなおす／コピーして つくる）を開く前に、
@@ -7,8 +7,14 @@
 //   通らなければ黙って捨てる。→ かきかけは失われず、確認ダイアログも不要。
 // - draft.origin = {type:"new"|"work"|"sample", id}
 //   ほぞん時: work=その作品を上書き ／ new・sample=新規追加（sampleは remixOf を記録）
-import { isTrigger } from "../data/studio-blocks-defs.js";
+//
+// 付与（§1-3・設計§8「獲得は進歩ベース」）:
+// - XP: 空作品ガードを通った「新規追加」の保存のみ +XP.studioSave()（上書き=作り直し保存では出ない）
+// - コイン: 作品ごとの付与ゼロ。初回マイルストーンのみ（milestones フラグで永続化＝works を消しても再付与なし）
+// - きろく: log[today].studio を新規保存のみカウント（Art の log[d].art と同じ作法）
+import { isTrigger, workHasNestedContainer } from "../data/studio-blocks-defs.js";
 import { saveProfile, today } from "../storage.js";
+import { applyXp, addCoins, XP, COIN } from "../growth.js";
 
 export const WORKS_MAX = 30; // 上限30作品（設計§7・調整値）
 export const NAME_MAX = 8;   // 作品名ひらがな8文字（設計§7）
@@ -34,17 +40,51 @@ export function nextWorkName(works) {
 let seq = 0;
 export function newWorkId() { return "w" + Date.now().toString(36) + (seq++).toString(36); }
 
+// マイルストーンの表示名（ほぞん完了演出「かんせい!」用・§3-2）
+export const MILESTONE_NAMES = {
+  first: "はじめての さくひん",
+  works5: "さくひんが 5こ",
+  works10: "さくひんが 10こ",
+  firstNest: "はじめての いれこ",
+  firstCast3: "はじめて キャラ3にん",
+};
+
+/* 新規保存への付与（§1-3）。push 済みの状態で呼ぶ。空作品ガードを通らなければ null（付与なし）。
+   戻り: { xp, coins, hit:[達成id...] }（エディタの「かんせい!」演出が表示に使う） */
+function grantForNewSave(profile, work, studio) {
+  if (!sceneNonEmpty(work.chars)) return null; // 空作品ガード＝XP/コイン/きろくの対象外
+  const xp = XP.studioSave();
+  applyXp(profile, xp); // レベルアップ/進化/たまごの「検知と演出」は App 側（もどった再読込時）が担う既存分業
+  const m = studio.milestones || (studio.milestones = {});
+  const hit = [];
+  const tryHit = (id, cond) => { if (!m[id] && cond) { m[id] = true; hit.push(id); } };
+  tryHit("first", studio.works.length >= 1);
+  tryHit("works5", studio.works.length >= 5);
+  tryHit("works10", studio.works.length >= 10);
+  tryHit("firstNest", workHasNestedContainer(work));   // 容器の中の容器
+  tryHit("firstCast3", (work.chars || []).length >= 3); // キャラ3体以上
+  let coins = 0;
+  for (const id of hit) coins += addCoins(profile, COIN.studio[id]);
+  // きろく: 日別log（新規保存のみカウント・Art.jsx の log[d].art と同じ作法）
+  if (!profile.log) profile.log = {};
+  const d = today();
+  profile.log[d] = profile.log[d] || {};
+  profile.log[d].studio = (profile.log[d].studio || 0) + 1;
+  return { xp, coins, hit };
+}
+
 /* 作品を works へ書く。scene={bg, chars}（純データ・cid/実行状態を含まない）
-   戻り: {ok:true, id} ／ {ok:false, reason:"full"}（棚が満杯・設計§7「たなが いっぱい!」） */
+   戻り: {ok:true, id, grant} ／ {ok:false, reason:"full"}（棚が満杯・設計§7「たなが いっぱい!」）
+   grant: 新規追加で空作品ガードを通ったときだけ {xp, coins, hit}（上書き=作り直し保存では null） */
 export function saveWork(profile, scene, name, origin) {
   const studio = ensureStudio(profile);
   const nm = (name || "").trim().slice(0, NAME_MAX) || nextWorkName(studio.works);
   if (origin && origin.type === "work") {
     const w = studio.works.find(x => x.id === origin.id);
-    if (w) { // つくりなおし=上書き（remixOf は維持）
+    if (w) { // つくりなおし=上書き（remixOf は維持・付与なし）
       w.name = nm; w.bg = scene.bg; w.chars = scene.chars; w.savedAt = today();
       saveProfile(profile);
-      return { ok: true, id: w.id };
+      return { ok: true, id: w.id, grant: null };
     }
     // 編集中に元作品が消えていた → 新規として保存に落とす
   }
@@ -55,8 +95,9 @@ export function saveWork(profile, scene, name, origin) {
     bg: scene.bg, chars: scene.chars,
   };
   studio.works.push(w);
+  const grant = grantForNewSave(profile, w, studio); // 付与は「新規追加の一本道」だけ（自動退避も同じ道を通る）
   saveProfile(profile);
-  return { ok: true, id: w.id };
+  return { ok: true, id: w.id, grant };
 }
 
 /* 何かを開く前の draft 自動退避（§2）。

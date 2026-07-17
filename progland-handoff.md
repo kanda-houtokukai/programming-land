@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-17（v2.3-b5f つくるスタジオ段階2=フィルムだな+みほん+リミックス・実機確認待ち）
+最終更新: 2026-07-17（v2.3-b5g つくるスタジオ段階3=教育接続+マップ設置+正規導線＝★本モード最終段・実機確認待ち）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,7 +12,17 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md` は b4v 時点へ追随済み（2026-07-16）・`roadmap.md` は b4t 時点
-- **v2.3-b5f（2026-07-17・つくるスタジオ段階2=フィルムだな+みほん4本+リミックス+上演専用＝⚠️実機確認待ち・段階3へは合格後）**:
+- **★つくるスタジオ 完成サマリ（段階0〜3・2026-07-17）**: b5d見た目ゲート（18種ブロック1:1移植）→ b5e 3ペインエディタ+UI非依存エンジン+draft → b5f フィルムだな+みほん4本+リミックス+上演専用 → b5g 教育接続+マップ正規導線。正本=`brushup/studio-design.md`・指示書 stage01/2/3・プロトタイプ第11版。§11の24値は全段階不変。実機合格で本モード完成・本線合流
+- **v2.3-b5g（2026-07-17・つくるスタジオ段階3=教育接続+マップ設置+正規導線＝⚠️実機確認待ち・合格で本モード完成）**:
+  - 指示書=`brushup/studio-implementation-stage3.md`（§1〜§3全部）。段階2実機合格済み。**音の差し替えは除外**（本線とまとめて後日・WebAudio簡易音のまま）
+  - **SCHEMA_VERSION 4→5**: `studio.milestones {}`（コイン節目の永続化＝worksを消しても再付与なし）。roundtripに往復+旧2世代補完（b5e以前=studio無し/b5e〜f=milestones無し）追加=全PASS
+  - **§1 教育接続**: レバー=`growth.js` XP.studioSave()=10・COIN.studio{first15/works5 20/works10 30/firstNest15/firstCast3 15}（すべて初期値コメント付き）。**付与は works.js saveWork の「新規追加の一本道」に集約**（上書き=作り直し保存は対象外・自動退避も同じ道・空作品ガード再利用・戻り値 grant{xp,coins,hit}）。きろく=log[d].studio（新規のみ・Artと同作法）。**バッジ3種**（studio1/studioRemix/studioNest・既存26個のemoji宣言形式に準拠=絵文字例外）。**かんとくベレー**=`head_kantoku_beret.png`（画像は神田さん配置済み・anchor top:-8.52/left:50/width:48.52=Chat実合成の確定値）+`ACHIEVEMENT_CHECKS.studio_all_cards`（works全体で18種網羅）。**powers**: つくる=おえかき50+スタジオ50（作品数×6+網羅14×covered/18+入れ子6・初期値）／ループ=島2+loopWorks×2上限10。走査ヘルパーは`studio-blocks-defs.js`に集約（usedBlockTypesInWorks/containerNestDepth=node安全・ベレー/powers/バッジ/worksで共用）
+  - **§2 正規導線**: WorldMap AREAS末尾に studio（59.5/12.4・tall・**studio-assets/パス**・既存のふわふわ位相不変）＋**じゅんびちゅう看板**（69.5/34.13・非対話div pointer-events:none・「じゅんびちゅう」フォント重畳=SIGN.textTop 40%初期値・ふわふわは板と文字が一緒に揺れるようラッパーに）。App.jsx mode "studio"＋**exitStudio=loadProfile→update(()=>fresh)**（スタジオはstorage直書きのため戻りで再読込。prev vs next比較を1回通す=バッジ/ベレー解放/レベルアップ・進化・たまご検知が1回だけ・XP加算はworks.js側=二重付与なし）。#studio-dev はバックドアとして残置（main.jsxコメント明記・onExit無し=hash運用）。Studio/StudioHomeに onExit/onExitApp（「◀ マップへ」/dev時「◀ アプリへ」）
+  - **§3**: `STUDIO_GUIDE`（parent-guide.js・原稿一字一句そのまま4段落）+StudioHomeにParentGuideモーダル導線。**かんせい!演出**=saveWork戻り値から けいけんち+10/コイン（icon_stat_coin）/マイルストーン名（MILESTONE_NAMES）＝初回だけ賑やか・2回目以降XPのみが自然に実現。上書きは静かなトースト。バッジ/ベレーの祝いはApp側（戻り時）に一任
+  - **設計からの差異**: ①日記の初回系文言（「はじめて いれこを つかった」等）は実装しない（指示書§1-7の縮小指示どおり・節目はコイン/バッジ/ベレーが担う） ②日次の文章行の表示場所が無かったため Records（きろくのへや）に「きょうの きろく」パネルを新設（puzzle/quiz/typing/art/battle/studio の当日行・あそんだ日だけ表示）＝「さくひんを Nこ つくった」の受け入れ条件を満たす最小追加 ③ParentHubの14日合算に (l.studio||0) を追加（typingは従来から未集計のため触らず）
+  - 検証: **verify6本全PASS**・ビルドOK・ブラウザ実測（正規プロファイルでの通し）=マップに建物（つくる・タップ→スタジオ→◀マップへ）・看板（非対話・座標69.5/34.13・文字重畳）／みほんリミックス保存→**かんせい!**（+10XP・コイン+15・「はじめての さくひん」）→storage実測（coins15/milestones.first/xp+10/log.studio1/remixOf）／**上書き保存=付与ゼロ・演出なし**／戻りで**バッジトースト1回**→何もしない往復で**二重演出・二重付与なし**／3本目保存でXP30到達→**戻りで進化演出（モコ→モスガ）が1回だけ**・再往復で再発なし／18種網羅+入れ子作品→**studioNestバッジ+かんとくベレー解放トースト**・cosmetics.owned反映／そだちのもり=つくるの木が**め**（tree_tsukuru_2・38%相当）・grows文言に「つくるスタジオ」／きろくのへや=「つくるスタジオで さくひんを 3こ つくった」＋バッジ3種表示／works全消し→新規保存で**first再付与なし**（XPのみの静かな完成演出）／ガイド原稿6要素一致・**コンソールエラーゼロ**
+  - ⚠️次: **神田さんの実機確認**（建物と看板の据わり=SIGN.textTop・ベレーの被り具合=anchor・かんせい!のテンポ・コイン/XPレバーの体感）。**合格で本モード完成・本線合流**（残: Suno音源差し替え=本線の音作業と一括）
+- **v2.3-b5f（2026-07-17・つくるスタジオ段階2=フィルムだな+みほん4本+リミックス+上演専用＝実機確認合格済み）**:
   - 指示書=`brushup/studio-implementation-stage2.md`（§0〜§5全部）。段階1の実機ゲートは合格済み
   - **§0-1 背景名の是正**（Chatの設計ミス=同じ絵が別名・「だいち」が2つの絵を指していた）: ショップの既存命名を正とし **そうげん(bg_battle_easy・旧id daichi→sougen)/ジャングル/だいち(bg_battle_canyon・id canyonのまま名前のみ)/アリーナ/スタジオ** に統一。`studio-design.md`§4も是正済み。**§0-2 verifyチェーン拡張**: `npm run verify` = 従来3本 + **verify-studio + test-studio-engine + test-roundtrip**（以後deployのゲートに入った）
   - **§1 router化**: `Studio.jsx`=薄いルーター（view=home/edit/show・keyで再マウント）／**エディタ本体は`StudioEditor.jsx`へそのまま移動**（★実機合格済みの手触りコード=ドラッグ/スナップ/実行は不可触・props追加 open/showOnly/onExit と ほぞん のみ）。新規=`StudioHome.jsx`（入口）/`StudioThumb.jsx`（サムネ）/`studio-samples.js`（みほん）/`verify-studio.mjs`。**データ層分離**: `studio-blocks-defs.js`（node安全な純定義・STUDIO_BG_IDS含む）+`studio-blocks.js`（アイコン合成層・exportの形は不変）／`studio-bgs.js`（BGS共有）／`studio/cast.js`（控え室ヘルパー移動）／`studio/works.js`（保存モデル・WORKS_MAX30/NAME_MAX8）
@@ -22,7 +32,7 @@
   - **§5 みほん4本**=指示書の表のとおり（dance=ずっと並行/chase=まつ時間差/tap=タップみため/hide=ぶつかったら・キャラは最低保証4種のみ・★表のbg「daichi」は是正後の絵=id canyonとして実装）。`verify-studio.mjs`=bg実在/キャラ1..5/最低保証kind/座標範囲/型実在/パラメータ範囲/深さ≤2/ずっと末尾のみ/きっかけ種別1本/スタック≤30/**エンジン40拍スモーク**・FAILで終了コード1
   - 検証: **verify全PASS（6本チェーン）**・ブラウザ機械実測=Home表示（0/30空メッセージ・きらり）→みほんリミックス（5ブロック・▶発光・ほぞんprefill・**remixOf:"dance"記録**・origin→workへ切替）→あたらしく つくる（origin=work退避は上書き=棚増えず）→新規かきかけ→みほんを開くと**「さくひん1」自動退避**→みる（big+showonly固定・こうぐだな/組立/ひろげる非表示・ヘッダー「とじる」のみ・▶上演・■後もbig・**draft不変**）→つくりなおす（退避で「さくひん2」remixOf:chase・上書き保存で棚3本のまま内容更新）→コピー（新規4本目・9文字→8文字slice）→けす（やめる=残る/けす=消える）→つづきから（削除済みwork参照のdraftも安全に開く）→**上限30ブロック**（あたらしく/みほんとも「たなが いっぱい!」でHomeに留まる）→狭幅ガード（エディタ/Home両方）・**コンソールエラーゼロ**
   - ★実装知見: devサーバの接続断→自動リロードで location.hash が落ちて #studio-dev から本体に戻ることがある（開発環境事象・本番Pagesは無関係）。機械実測はステップごとに hash を確認して進める
-  - ⚠️次: **神田さんのiPad実機確認**（Home の見た目・みほんの手応え・サムネの見え方・4択メニューの操作感）。合格まで段階3（教育接続+マップ設置）に進まない
+  - 次: 実機確認**合格済み**（2026-07-17）→ 段階3（b5g）へ進行済み
 - **v2.3-b5e（2026-07-17・つくるスタジオ段階1=3ペインエディタ+実行エンジン+かきかけ自動保存＝実機ゲート合格済み）**:
   - 指示書=`brushup/studio-implementation-stage01.md` §3。段階0の実機ゲートは合格済み。§11の数値・段階0のドラッグ系コードは1:1のまま温存し「選択中キャラのスタック」対象に一般化
   - **新規**: `src/studio/engine.js`（実行エンジン=**UI非依存の純ロジック**・画像/DOM/React無依存でnode単体テスト可・拍ベースの同期ステッパー=UIがTICKごとにtick()）／`tools/test-studio-engine.mjs`（必須5項目+補7項目）。**Studio.jsx全面改装**: 左こうぐだな（段階0の2列grid）/中央組み立て（選択キャラのプログラムのみ・選択チップ表示）/右ステージ `clamp(280px,36vw,620px)`・3:2・論理12×8固定・常に全体縮尺（式=プロトタイプ同一 `min((w-52)/12,(h-44)/8)`・window resizeのみ）＋ひろげる全画面上演（■で復帰）

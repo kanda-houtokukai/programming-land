@@ -51,6 +51,7 @@ p.studio = {
   }],
   draft: { bg: "arena", sel: 0, origin: { type: "sample", id: "dance" }, name: "だんす", // b5f: origin/name（§2 保存モデル）
     chars: [{ kind: { type: "player" }, x: 5, y: 4, stacks: [{ x: 20, y: 20, blocks: [{ id: 9, type: "tap" }, { id: 10, type: "sound", s: 1 }] }] }] },
+  milestones: { first: true, firstNest: true }, // b5g: コイン節目の永続化（worksを消しても再付与されない）
 };
 saveProfile(p);
 
@@ -147,15 +148,23 @@ ok(JSON.stringify(q.coinDay) === JSON.stringify(p.coinDay), "coinDay（当日コ
 }
 ok(JSON.stringify(q.powers) === JSON.stringify(p.powers), "そだったちからF2 前回%（powers.prev）");
 ok(q.character === "girl" && JSON.stringify(q.dressup) === JSON.stringify(p.dressup), "第3波 主人公キャラ＋着せ替え装備（character/dressup）");
-// b5e つくるスタジオ: 入れ子ブロック木まで完全往復＋studioの無い旧セーブはデフォルト {works:[], draft:null} 補完
-ok(JSON.stringify(q.studio) === JSON.stringify(p.studio), "b5e つくるスタジオ（works+draft・入れ子ブロック木まで完全往復）");
+// b5e つくるスタジオ: 入れ子ブロック木まで完全往復＋studioの無い旧セーブはデフォルト補完
+ok(JSON.stringify(q.studio) === JSON.stringify(p.studio), "b5e/b5g つくるスタジオ（works+draft+milestones・入れ子ブロック木まで完全往復）");
 {
   const rawS = JSON.parse(localStorage.getItem(`progland:v2:profile:${q.id}`));
   delete rawS.studio;
   localStorage.setItem(`progland:v2:profile:${q.id}`, JSON.stringify(rawS));
   const mS = loadFresh(q.id);
-  ok(mS.studio && Array.isArray(mS.studio.works) && mS.studio.works.length === 0 && mS.studio.draft === null,
-    "b5e studio の無い旧セーブに {works:[], draft:null} が補完される（デフォルト値マージ）");
+  ok(mS.studio && Array.isArray(mS.studio.works) && mS.studio.works.length === 0 && mS.studio.draft === null
+    && mS.studio.milestones && typeof mS.studio.milestones === "object" && Object.keys(mS.studio.milestones).length === 0,
+    "b5e/b5g studio の無い旧セーブに {works:[], draft:null, milestones:{}} が補完される（デフォルト値マージ）");
+  // b5g: b5e〜b5f世代（studioはあるが milestones が無い）にも milestones:{} が補完される
+  const rawS2 = JSON.parse(localStorage.getItem(`progland:v2:profile:${q.id}`));
+  rawS2.studio = { works: [{ id: "w1", name: "さくひん1", savedAt: "2026-07-17", remixOf: null, bg: "sougen", chars: [] }], draft: null };
+  localStorage.setItem(`progland:v2:profile:${q.id}`, JSON.stringify(rawS2));
+  const mS2 = loadFresh(q.id);
+  ok(mS2.studio.works.length === 1 && mS2.studio.milestones && Object.keys(mS2.studio.milestones).length === 0,
+    "b5g b5e世代セーブ（milestonesなし）に milestones:{} が補完され works は保持される");
 }
 
 console.log(fail === 0 ? "\n✅ ラウンドトリップ 全項目一致（P5完了条件クリア）" : `\n❌ ${fail}件 不一致`);

@@ -5,6 +5,7 @@
 import { C } from "../theme.js";
 import { Header } from "./common.jsx";
 import { BADGES, puzzleStarsTotal, daysPlayed } from "../data/badges.js";
+import { today } from "../storage.js";
 import PartnerCard from "./PartnerCard.jsx";
 import PlayerAvatar from "./PlayerAvatar.jsx";
 import iconStatStar from "../assets/icon_stat_star.png";
@@ -39,6 +40,28 @@ export default function Records({ save, go, onSound, onBack, openHome }) {
           </div>
         </div>
         <PartnerCard partner={save.partner} size={80} />
+        {/* きょうの きろく（日記の行・段階3）: 日別logを子ども向けの一言に。あそんだ日だけ出る（空の日は出さない） */}
+        {(() => {
+          const l = save.log[today()];
+          if (!l) return null;
+          const lines = [
+            l.puzzle > 0 && `パズルを ${l.puzzle}かい クリアした`,
+            l.quiz > 0 && `クイズを ${l.quiz}セット やった`,
+            l.typing > 0 && `タイピングを ${l.typing}かい がんばった`,
+            l.art > 0 && `おえかきを ${l.art}まい かいた`,
+            l.battle > 0 && `バトルで ${l.battle}かい たたかった`,
+            l.studio > 0 && `つくるスタジオで さくひんを ${l.studio}こ つくった`, // §1-7（段階3）
+          ].filter(Boolean);
+          if (!lines.length) return null;
+          return (
+            <div className="panel" style={{ padding: 18 }}>
+              <div className="pl-display" style={{ fontSize: 20, marginBottom: 8 }}>きょうの きろく</div>
+              {lines.map(t => (
+                <div key={t} style={{ fontWeight: 800, fontSize: 14, padding: "5px 2px" }}>・{t}</div>
+              ))}
+            </div>
+          );
+        })()}
         <div className="panel" style={{ padding: 18 }}>
           <div className="pl-display" style={{ fontSize: 20, marginBottom: 10 }}>🏅 バッジ コレクション</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(140px,1fr))", gap: 10 }}>

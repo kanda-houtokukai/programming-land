@@ -5,7 +5,7 @@ import { BADGES } from "./data/badges.js";
 import { SFX } from "./sound.js";
 import {
   listProfiles, createProfile, saveProfile, deleteProfile, setLastProfile,
-  exportProfileJSON, importProfileJSON, today,
+  exportProfileJSON, importProfileJSON, today, loadProfile,
 } from "./storage.js";
 import { Btn, Toast } from "./components/common.jsx";
 import ProfileSelect from "./components/ProfileSelect.jsx";
@@ -24,6 +24,7 @@ import ParentHub from "./components/ParentHub.jsx";
 import PartnerSelect from "./components/PartnerSelect.jsx";
 import CharacterSelect from "./components/CharacterSelect.jsx";
 import Dex from "./components/Dex.jsx";
+import Studio from "./components/Studio.jsx";
 import EvolutionOverlay from "./components/EvolutionOverlay.jsx";
 import { stageForLevel, monsterName } from "./data/monsters.js";
 import { grantLegacyCoins, activeMon } from "./growth.js";
@@ -117,6 +118,16 @@ export default function App() {
   }
   const onSound = () => update(s => { s.settings.sound = !s.settings.sound; return s; });
 
+  // つくるスタジオから戻ったとき（段階3）: スタジオは App を経由せず storage へ直接書く（XP/コイン/works）ため、
+  // App の state を storage の最新で置き換える。update() の「prev vs next 比較」を1回通すことで、
+  // バッジ・実績解放（かんとくベレー）・相棒レベルアップ/進化/たまごの既存検知が“1回だけ”走る。
+  // XP/コインの加算そのものは works.js が保存時に済ませており、ここで起きるのは検知と演出だけ＝二重付与なし。
+  const exitStudio = () => {
+    const fresh = loadProfile(currentId);
+    if (fresh) update(() => fresh);
+    setScreen("home");
+  };
+
   function pickProfile(id) {
     setLastProfile(id);
     // 導入時の初回換算: このプロファイルが未換算なら、既存実績からコインをまとめて付与（1回だけ）
@@ -198,6 +209,8 @@ export default function App() {
       {save && screen === "typing" && <Typing save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
       {save && screen === "battle" && battleUnlocked(save) && <Battle save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
       {save && screen === "shop" && <Shop save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
+      {/* つくるスタジオ（段階3・正規導線）: 全画面固定レイヤーで開く。もどると exitStudio が storage を再読込 */}
+      {save && screen === "studio" && <Studio onExit={exitStudio} />}
       {/* きろく=子ども向けの日記（机から）。保護者向けは parenthub（マップ最下部→ゲート奥）に分離（段階③） */}
       {save && screen === "records" && (
         <Records save={save} go={setScreen} onSound={onSound} onBack={funcBack} openHome={openHome} />

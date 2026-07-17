@@ -3,6 +3,7 @@
 // 刷新: 5段階の鉢植え→ちから別の木4段階（たね/め/わかぎ/おおきな き）。称号title・%表示・絵文字は廃止。
 import { STAGES } from "./stages.js";
 import { QUIZ_CATEGORIES, QUIZ_DIFFS, SESSION_SIZE } from "./quizzes.js";
+import { usedBlockTypesInWorks } from "./studio-blocks-defs.js";
 import treeJunban1 from "../assets/tree_junban_1.png";
 import treeJunban2 from "../assets/tree_junban_2.png";
 import treeJunban3 from "../assets/tree_junban_3.png";
@@ -62,7 +63,7 @@ export const POWERS = [
   { id: "keyboard", name: "キーボードの ちから", go: "typing", goLabel: "タイピングタワー",
     grows: "「タイピングタワー」で そだつよ" },
   { id: "create", name: "つくる ちから", go: "art", goLabel: "おえかきのへや",
-    grows: "「おえかきのへや」で さくひんを つくると そだつよ" },
+    grows: "「おえかきのへや」や「つくるスタジオ」で さくひんを つくると そだつよ" },
 ];
 
 // 「できるように なったこと」（段階ごとに増える・%の代わりに具体的な成長を見せる）
@@ -123,10 +124,22 @@ function quizPct(save) {
 export function computePowers(save) {
   const think = Math.round((islandPct(save, 3) + quizPct(save)) / 2); // 分岐とクイズの平均
   const keyboard = Math.min(100, Math.round(100 * Math.max(0, ...Object.values(save.typing.best || {}).map(b => b.kpm || 0)) / 60));
-  const create = Math.min(100, (save.art.gallery || []).length * 20);
+  // つくる = おえかき(最大50) + スタジオ(最大50)。スタジオ側=作品数+カード網羅+入れ子（段階3・設計§8。係数はすべて初期値）
+  const sWorks = ((save.studio && save.studio.works) || []);
+  const covered = usedBlockTypesInWorks(sWorks).size; // works 全体で使ったブロックtype数（ベレー判定と同じ走査）
+  const createArt = Math.min(50, (save.art.gallery || []).length * 10);
+  const createStudio = Math.min(50, sWorks.length * 6 + Math.round(14 * covered / 18)
+                                    + ((save.studio && save.studio.milestones && save.studio.milestones.firstNest) ? 6 : 0));
+  const create = Math.min(100, createArt + createStudio);
+  // ループ = 島2 + スタジオでくりかえし/ずっとを使った作品数の少量加点（上限10・係数は初期値）
+  const loopWorks = sWorks.filter(w => {
+    const used = usedBlockTypesInWorks([w]);
+    return used.has("repeat") || used.has("forever");
+  }).length;
+  const repeat = Math.min(100, islandPct(save, 2) + Math.min(10, loopWorks * 2));
   const pctById = {
     junji: islandPct(save, 1),
-    repeat: islandPct(save, 2),
+    repeat,
     think, keyboard, create,
   };
   return POWERS.map(p => ({ ...p, pct: pctById[p.id], grow: growStage(pctById[p.id]) }));
