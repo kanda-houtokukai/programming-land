@@ -49,7 +49,7 @@ p.studio = {
     chars: [{ kind: { type: "mon", id: "mori", stage: 1 }, x: 3, y: 2,
       stacks: [{ x: 40, y: 30, blocks: [{ id: 1, type: "hat" }, { id: 2, type: "repeat", n: 2, children: [{ id: 3, type: "move", n: 3 }] }] }] }],
   }],
-  draft: { bg: "arena", sel: 0,
+  draft: { bg: "arena", sel: 0, origin: { type: "sample", id: "dance" }, name: "だんす", // b5f: origin/name（§2 保存モデル）
     chars: [{ kind: { type: "player" }, x: 5, y: 4, stacks: [{ x: 20, y: 20, blocks: [{ id: 9, type: "tap" }, { id: 10, type: "sound", s: 1 }] }] }] },
 };
 saveProfile(p);

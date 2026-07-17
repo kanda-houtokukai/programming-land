@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "verify": "node tools/verify.mjs && node tools/verify-quiz.mjs && node tools/verify-typing.mjs",
+    "verify": "node tools/verify.mjs && node tools/verify-quiz.mjs && node tools/verify-typing.mjs && node tools/verify-studio.mjs && node tools/test-studio-engine.mjs && node tools/test-roundtrip.mjs",
     "deploy": "npm run verify && npm run build && rm -rf docs && cp -r dist docs && git add -A && git commit -m deploy && git push"
   },
   "dependencies": {
