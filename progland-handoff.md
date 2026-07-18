@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-18（v2.3-b5i 実機FB第4便=難易度リセット/みなと拡大/相棒反転/チェック一本化/おえかき格子化/マップ最大化・実機確認待ち）
+最終更新: 2026-07-18（v2.3-b5j BGM 8曲実装=bgm.js新設＋App.jsx集約・場面連動・settings.sound相乗り・実機確認待ち）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,6 +12,14 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
+- **v2.3-b5j（2026-07-18・BGM 8曲実装＝⚠️実機確認待ち・音ロードマップ§2消化）**: 指示書=Chat支給（bgm_out加工済み・raw実測に基づく）
+  - **新規 `src/bgm.js`**: 場面ごと1曲を遅延生成してループ再生。**static import で URL 取得**（Vite が base補正・ハッシュ・buildコピー＝`/programming-land/` を直書きしない）。クロスフェード（FADE_MS 450）・自動再生解錠（iPad Safari対策=play()却下時 最初のpointerdown/touchstart/keydownで開始）。定数=**BGM_VOL 0.5 / FADE_MS 450**（初期値・調整は冒頭1箇所）
+  - **集約は App.jsx の effect 1本**（`useEffect([screen, home, save&&sound], () => setBgm(trackFor(...), sound))`）＝画面遷移／おうち開閉／スピーカーON・OFF すべてに追従。**各コンポーネントは一切不変**・onSound配線も現状のまま。`TRACK` map（screen→曲key・未割当null）＋`trackFor`（おうちオーバーレイは myhome 優先）
+  - **BGMは新スイッチを足さず既存 `settings.sound` に相乗り**＝スキーマ変更なし・**SCHEMA_VERSION据え置き**（roundtrip影響なし）
+  - 8曲=home(ワールドマップ)/myhome(おうち＋ずかん流用)/shop/puzzle/quiz/typing/art/powers。全曲 -19 LUFS 統一・**継ぎ目焼き込み済み**（HTML5 loop で回すだけ）・AAC 48kHz 96k・計13MB。**battle/studio は無音**（TRACK=null・曲が来たら bgm.js SRC と App TRACK に1行ずつ）
+  - 検証: verify6本全PASS・build後 **dist/assets に .m4a 8つ（ハッシュ付＝static import が効いている）**・ブラウザ実測（audio要素をprototype patchで観測）=①最初の実クリックで home 解錠再生（vol0.5/loop/paused false）②各場面で正しい曲が1本だけ（quiz/puzzle/art/typing/shop/powers）③おうち開=home→myhome の**クリーンなクロスフェード**（t200 home0.29+myhome0.21→t600 myhome単独0.5・他は全paused/0）④閉=home復帰⑤ずかん=myhome流用⑥バトル/スタジオ=無音（全paused/0・エラー無し）⑦スタジオ戻り=home復帰⑧スピーカーOFF=全フェードアウト(sound false)・ON=home復帰・**コンソールエラーゼロ**
+  - 実装注意: 「曲追加は bgm.js SRC と App.jsx TRACK に1行ずつ」「音源は -19 LUFS 統一・継ぎ目焼き込み済み（再生成時は指示書§6のレシピ=本編ループ点+2.0sクロスフェード→EBU R128 -19LUFS→AAC96k で同条件に揃える・battle/studioが来たらChatが同パイプラインで渡す）」。スキーマ・ID挙動・演出バウンダリいずれも不変＝[DECISION]不要
+  - ⚠️次: 神田さんの実機確認（BGM_VOL 0.5 のSFXとのバランス・FADE_MS 450・各曲ループの継ぎ目・おうち開閉の切替感・スピーカー一括ON/OFF）
 - **v2.3-b5i（2026-07-18・実機FB第4便=6件＝⚠️実機確認待ち）**: 指示書=Chat支給（jikki_fb4系・raw実測に基づく）
   - **①難易度は「入り直したら やさしい」に統一**: Quiz/Puzzle の difficulty をローカルstate化（バトルと同型）。モード内の行き来（ひろば↔出題・島↔ステージ）では保持・マップへ出て入り直すとリセット。[DECISION] **難易度は入場リセットに統一**（3モードで挙動一致）。storage の `quiz/puzzle.difficulty` フィールドは残存（もう読まない・スキーマ不変・roundtrip影響なし）
   - **②みなとアイコン 50%→85%**（width/height・初期値・タップ範囲13%不変）。実測=img/btn比0.85・クリップなし

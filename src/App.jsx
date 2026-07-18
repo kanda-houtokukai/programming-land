@@ -1,6 +1,7 @@
 // ルート（v1から移植・マルチプロファイル対応）
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CSS, C } from "./theme.js";
+import { setBgm } from "./bgm.js";
 import { BADGES } from "./data/badges.js";
 import { SFX } from "./sound.js";
 import {
@@ -31,6 +32,19 @@ import { grantLegacyCoins, activeMon } from "./growth.js";
 import { battleUnlocked, BATTLE_UNLOCK_LEVEL } from "./data/battle.js";
 import { checkAchievementUnlocks } from "./data/dressup.js";
 
+// BGM: screen → 曲key（未割当は null＝無音）。曲追加は bgm.js の SRC とここに1行ずつ（b5j）
+const TRACK = {
+  home: "home", powers: "powers", puzzle: "puzzle", quiz: "quiz",
+  art: "art", typing: "typing", shop: "shop", dex: "myhome",
+  battle: null, studio: null, records: null, parenthub: null,
+  select: null, create: null,
+};
+function trackFor(screen, home, save) {
+  if (!save) return null;
+  if (home && home.open) return "myhome";        // おうちオーバーレイ優先
+  return TRACK[screen] ?? null;
+}
+
 export default function App() {
   const [profiles, setProfiles] = useState(() => listProfiles());
   const [currentId, setCurrentId] = useState(null);
@@ -47,6 +61,12 @@ export default function App() {
   const [home, setHome] = useState(null);
 
   const save = profiles.find(p => p.id === currentId) || null;
+
+  // BGM（b5j）: 画面遷移／おうち開閉／スピーカーON・OFF に追従して曲を1本に集約制御。
+  // 各コンポーネントは不変＝ここ1本で全場面の音楽を切替（settings.sound 相乗り・スキーマ不変）
+  useEffect(() => {
+    setBgm(trackFor(screen, home, save), !!(save && save.settings.sound));
+  }, [screen, home, save && save.settings.sound]);
 
   // どの画面からでも呼べる（ヘッダーの名前タップ／マップの家）。現在画面を from に覚えて開く（画面は変えない＝呼び出し元の状態は保持）
   const openHome = () => setHome({ from: screen, open: true });
