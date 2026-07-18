@@ -11,7 +11,7 @@
 ### 今どこか
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
-- **設計書の版**: `feature-spec.md` は b4v 時点へ追随済み（2026-07-16）・`roadmap.md` は b4t 時点
+- **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
 - **v2.3-b5h（2026-07-18・つくるスタジオ実機FB 1件=文言のみ＝⚠️実機確認待ち）**:
   - 症状: キャラの消し方（控え室へドラッグ）の告知が画面に無く発見不能（機能は正常・ブロック側にはhintあり）
   - 修正: `StudioEditor.jsx` 控え室ラベルに「けすときは ここへ ドラッグ」を追記（1箇所・機能無変更）。右ペイン最小300pxでも2行折返しで崩れなしを実測・コンソールエラーなし
