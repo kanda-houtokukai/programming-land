@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-19（v2.3-b5l 実機FB第6便=b5kの追い込み4件〔看板位置/お店会話浮遊ボタン/フェード延長/音量レンジ拡大〕・実機OK）
+最終更新: 2026-07-19（v2.3-b5m 実機FB第7便=5件〔吹き出し木枠＋羊皮紙/お店ボタン羊皮紙化/スタジオ棚の光り削除/下書き保存の残留バグ修正/タイピング+75〕・⚠️実機確認待ち）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,6 +12,15 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
+- **v2.3-b5m（2026-07-19・実機FB第7便=5件＝⚠️実機確認待ち／deploy済み c8f5b4f）**: 指示書=Chat支給（raw実測＋モック承認済み）。スキーマ変更なし・新規画像アセットなし（吹き出し/ボタンはCSS）。神田さん承認事項=木枠＋羊皮紙・三角なし／お店ボタンも同じ羊皮紙／おうちラベル約1.5倍／お店ボタン横の絵文字削除／タイピング+75
+  - **①吹き出しを木枠＋羊皮紙・三角の尾なしに全面刷新**: `theme.js .bubble` 本体を差し替え・`.bubble::after`/`::before`（三角2枚）を**削除**（継ぎ目/ズレ/文字沈みの原因を撤去）。単一クラスなのでHomeRoom家具ラベル＋Shop吹き出しが1箇所で直る。border 3px #7a4f22・radius 8px・羊皮紙グラデ＋内側ハイライト。font-sizeは各使用箇所が持つ（未指定）
+  - **おうちラベルだけ1.5倍**: `theme.js .bubbleLg { font-size: clamp(12px,2.85vw,18px); padding:8px 18px }` 新設。`HomeRoom.jsx` のラベル5箇所（家具map/あいぼう/たまご/プロフィール）を `bubble pulse bubbleLg` に＋各inlineの `fontSize` 削除（bubbleLgが持つ）。他style(position/transform/marginBottom/animationDelay)は維持
+  - **②お店front-stageを羊皮紙ボタン化＋絵文字削除**: `theme.js .paperbtn`（＋`.small`/`:active`）新設＝冒険地図の掠れ紙・厚み(0 3px 0)＋押下でtranslateY(3px)。`Shop.jsx` の `{talking&&…}`（b5l浮遊ボタン）を `paperbtn` 3択に置換＝「バトルの どうぐ」「きせかえ」「やめる(small)」・🧃🎩削除・セリフは`.bubble`。items/dressupサブ画面のボタンは対象外
+  - **③スタジオみほん棚の光る演出を削除**: `StudioHome.jsx` L229 の `+(firstVisit?" sparkle":"")` を撤去＝`className="film"`固定。`@keyframes shSparkle`＋`.film.sparkle .film-frame`（枠グロー脈動）を削除。「端末で大きくなったり小さく見える」の正体。誘導テキスト `.sh-hint`「みほんを ひらいてみよう」は残す
+  - **④下書きが保存後も棚に残るバグ修正**: `StudioEditor.jsx` `doSaveWork` 末尾の `scheduleDraft()`（保存直後に現シーンを下書きへ書き戻し）を **`prof.studio.draft=null; clearTimeout(draftTimerRef); saveProfile(prof)`** に置換。加えて `writeDraft` に「開いているのが保存済み作品(origin.type=="work")で中身が同一(JSON一致)なら下書きを作らない/既存draftをnull化」ガードを追加＝離脱フラッシュ(L449/L1048)でも書き戻さない
+  - **⑤タイピング出題+75**: `data/typing.js` の3配列末尾に追記＝kotoba+40/tanbun+20/bunshou+15（合計75→150相当）。全ひらがな・両ローマ字方式で完走可能。`verify-typing` の完走チェックが最終ゲート
+  - 検証: **`npm run verify` 6本全PASS**（パズル162面/クイズ612問/タイピング**203件**/スタジオ4本/エンジン単体/roundtrip）・ビルドOK・ブラウザ実測=①`.bubble`は`::after/::before` content:none＝三角撤去・border 3px rgb(122,79,34)・radius8px・おうちラベルにbubbleLg適用(実測)②`.paperbtn`3択・**絵文字なし(実測)**・font18/16px・「バトルの どうぐ」→itemsサブ画面へ遷移OK③`.film`に`.sparkle`無し・film-frame animation-name=none・sh-hint保持④**実保存フローで storage 検証**＝ほぞん後 works=1「さくひん1」・**draft=null**／たなへ離脱後も draft=null維持（書きかけ棚が出ない）⑤203件PASS・**コンソールエラーゼロ**
+  - ⚠️次: 神田さんの実機確認（①吹き出しの木枠色/掠れ/角/影・おうちラベル1.5倍の大きさと位置②お店ボタンの紙質と厚み③みほん棚の光り無し④下書き保存で消えること⑤出題数の体感）。色/線/影/座標は初期値＝実機で微調整
 - **v2.3-b5l（2026-07-19・実機FB第6便=b5kの追い込み4件＝実機OK・神田さん実機確認合格）**: 指示書=Chat支給（raw実測）。スキーマ・アセット変更なし＝座標/CSS/定数/レイアウトのみ
   - **①看板2枚目を1.5pt「2時」方向へ**: `WorldMap.jsx SIGNS[1]` を (46,30)→**(47.3, 29.25)**（AREASの2時換算 単位ベクトル≈(+0.86,-0.50)/pt×1.5pt）。flip/位相は不変・1枚目(69.5/34.13)不変
   - **②お店の会話を「絵の上に浮かぶ中央寄せボタン」に**（b5kの塗りつぶし56%パネルを撤去）: `Shop.jsx` 会話ブロックを bottom4%・**width min(340px,82%)**・背景/borderなし・中央寄せの浮遊ボタン群に。セリフは小さな`.bubble`1つだけ。「はなしかける」は会話中消灯（既存維持）
