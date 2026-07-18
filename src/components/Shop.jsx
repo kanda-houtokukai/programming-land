@@ -83,11 +83,11 @@ export default function Shop({ save, update, go, onSound, openHome }) {
               {!talking && <span className="bubble pulse" style={{ position: "absolute", left: "50%", top: "6%",
                 transform: "translate(-50%,-100%)", fontSize: "clamp(9px,2vw,13px)" }}>はなしかける</span>}
             </button>
-            {/* 会話中は選択肢を「絵の上に浮かぶ中央寄せボタン」で出す（FB6便②: 塗りつぶさない・左右いっぱいにしない
-                ＝ゲームボタンが絵の上に浮く。セリフは小さな bubble を1つだけ。位置/幅は初期値・実機で微調整） */}
+            {/* スマホ(<700px)用: 絵の上にはセリフ吹き出しだけ（店主がまるごと見える・b5n②） */}
+            {talking && <span className="bubble shopSerifPhone">{SERIF.hello}</span>}
+            {/* タブレット/PC(≥700px)用オーバーレイ: 絵の上に3つ paperbtn（b5m と同一・表示はCSS .shopOverlay が制御） */}
             {talking && (
-              <div style={{ position: "absolute", left: "50%", bottom: "4%", transform: "translateX(-50%)",
-                width: "min(340px, 82%)", display: "grid", gap: 10, lineHeight: 1.2 }}>
+              <div className="shopOverlay">
                 <span className="bubble" style={{ justifySelf: "center", fontSize: "clamp(11px,2vw,14px)", whiteSpace: "nowrap" }}>{SERIF.hello}</span>
                 <button className="paperbtn" onClick={() => enter("items")}>バトルの どうぐ</button>
                 <button className="paperbtn" onClick={() => enter("dressup")}>きせかえ</button>
@@ -95,6 +95,17 @@ export default function Shop({ save, update, go, onSound, openHome }) {
               </div>
             )}
           </div>
+
+          {/* スマホ(<700px)用: 選択肢は絵の下に「売り場カード2枚＋やめる小」（≥700pxは .shopCards を display:none・b5n②） */}
+          {talking && (
+            <div className="shopCards">
+              <div className="shopCardRow">
+                <button className="shopCard" onClick={() => enter("items")}>バトルの どうぐ</button>
+                <button className="shopCard" onClick={() => enter("dressup")}>きせかえ</button>
+              </div>
+              <button className="shopCancel" onClick={() => { SFX.tap(sound); setTalking(false); setMsg(`💬 ${SERIF.bye}`); }}>やめる</button>
+            </div>
+          )}
 
           {/* 非会話時のヒントだけ画像の下に残す（選択肢パネルはオーバーレイへ移動＝FB5便④） */}
           {!talking && (

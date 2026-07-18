@@ -200,7 +200,11 @@ export const CSS = `
       inset 0 1px 2px rgba(255,250,230,.6), inset 0 -3px 6px rgba(150,110,60,.25);
     text-shadow: 0 1px 0 rgba(255,250,230,.55);
   }
-  .bubbleLg { font-size: clamp(12px, 2.85vw, 18px); padding: 8px 18px; }
+  /* おうちラベル: スマホ=元サイズ（b5m前と同等）・≥700pxのみ約1.5倍（b5n ①） */
+  .bubbleLg { font-size: clamp(8px, 1.9vw, 12px); padding: 5px 13px; }
+  @media (min-width: 700px) {
+    .bubbleLg { font-size: clamp(13px, 2.2vw, 18px); padding: 8px 18px; }
+  }
   /* お店front-stageの選択肢＝冒険地図の掠れた紙ボタン（b5m ②・絵文字なし） */
   .paperbtn { display: block; width: 100%; box-sizing: border-box; padding: 13px 16px; cursor: pointer;
     font-family: inherit; font-weight: 900; font-size: 18px; color: #4a3212; text-align: center; white-space: nowrap;
@@ -215,6 +219,33 @@ export const CSS = `
     box-shadow: 0 0 0 #6b4520, 0 2px 4px rgba(50,30,10,.28), inset 0 0 0 1.5px #bd9052; }
   .paperbtn.small { font-size: 16px; padding: 11px 16px;
     box-shadow: 0 3px 0 #6b4520, 0 4px 5px rgba(50,30,10,.25), inset 0 0 0 1.5px #bd9052; }
+  /* お店の選択肢: 既定=スマホ(<700px)。オーバーレイは隠し、セリフは絵の上、カードは絵の下＝店主がまるごと見える（b5n ②） */
+  .shopOverlay { display: none; }
+  .shopSerifPhone { position: absolute; left: 50%; top: 8px; transform: translateX(-50%);
+    font-size: clamp(11px, 2.6vw, 14px); white-space: nowrap; z-index: 3; }
+  .shopCards { width: min(360px, 92%); margin: 11px auto 0; display: grid; gap: 11px; justify-items: center; }
+  .shopCardRow { display: flex; gap: 12px; width: 100%; }
+  .shopCard { position: relative; flex: 1; min-height: 66px; border-radius: 14px; padding: 16px 6px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.25;
+    font-weight: 900; font-size: 16px; color: #4a3212;
+    background: radial-gradient(ellipse 130% 150% at 50% 32%, #F6E8C9 48%, #E1CB99 100%);
+    border: 3px solid #7a4f22;
+    box-shadow: 0 4px 0 #6b4520, 0 6px 7px rgba(50,30,10,.25), inset 0 0 0 1.5px #bd9052, inset 0 1px 2px rgba(255,250,230,.6); }
+  .shopCard::before, .shopCard::after { content: ""; position: absolute; top: 6px; width: 6px; height: 6px;
+    border-radius: 50%; background: radial-gradient(circle at 35% 30%, #9a6c38, #4a2f14); }
+  .shopCard::before { left: 6px; } .shopCard::after { right: 6px; }
+  .shopCard:active { transform: translateY(4px);
+    box-shadow: 0 0 0 #6b4520, 0 2px 4px rgba(50,30,10,.25), inset 0 0 0 1.5px #bd9052; }
+  .shopCancel { padding: 8px 22px; border-radius: 20px; font-weight: 900; font-size: 13px; color: #5b421f; cursor: pointer;
+    background: #efe2c4; border: 2.5px solid #7a4f22; box-shadow: 0 3px 0 #6b4520; }
+  .shopCancel:active { transform: translateY(3px); box-shadow: 0 0 0 #6b4520; }
+  @media (min-width: 700px) {
+    /* タブレット/PCは従来オーバーレイ（絵の上に3つ paperbtn・b5m と同一） */
+    .shopOverlay { display: grid; position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%);
+      width: min(340px, 82%); gap: 10px; line-height: 1.2; z-index: 3; }
+    .shopSerifPhone { display: none; }
+    .shopCards { display: none; }
+  }
   /* ラベル/ヒントの誘導＝うっすら優しい点滅（UI改修④・上下ふわふわから変更。キャラの揺れには使わない） */
   @keyframes pl-pulse { 0%,100% { opacity: 1 } 50% { opacity: .7 } }
   .pulse { animation: pl-pulse 2.6s ease-in-out infinite; }
