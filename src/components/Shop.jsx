@@ -87,12 +87,11 @@ export default function Shop({ save, update, go, onSound, openHome }) {
                 ＝ゲームボタンが絵の上に浮く。セリフは小さな bubble を1つだけ。位置/幅は初期値・実機で微調整） */}
             {talking && (
               <div style={{ position: "absolute", left: "50%", bottom: "4%", transform: "translateX(-50%)",
-                width: "min(340px, 82%)", display: "grid", gap: 8, lineHeight: 1.2 }}>
-                <span className="bubble" style={{ justifySelf: "center", fontWeight: 900,
-                  fontSize: "clamp(11px,2vw,14px)", padding: "5px 12px", whiteSpace: "nowrap" }}>{SERIF.hello}</span>
-                <Btn big bg={C.sky} onClick={() => enter("items")}>🧃 バトルの どうぐ</Btn>
-                <Btn big bg={C.sakura} onClick={() => enter("dressup")}>🎩 きせかえ</Btn>
-                <Btn bg="#fff" onClick={() => { SFX.tap(sound); setTalking(false); setMsg(`💬 ${SERIF.bye}`); }}>やめる</Btn>
+                width: "min(340px, 82%)", display: "grid", gap: 10, lineHeight: 1.2 }}>
+                <span className="bubble" style={{ justifySelf: "center", fontSize: "clamp(11px,2vw,14px)", whiteSpace: "nowrap" }}>{SERIF.hello}</span>
+                <button className="paperbtn" onClick={() => enter("items")}>バトルの どうぐ</button>
+                <button className="paperbtn" onClick={() => enter("dressup")}>きせかえ</button>
+                <button className="paperbtn small" onClick={() => { SFX.tap(sound); setTalking(false); setMsg(`💬 ${SERIF.bye}`); }}>やめる</button>
               </div>
             )}
           </div>

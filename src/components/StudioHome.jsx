@@ -82,8 +82,6 @@ const CSS = `
   .film-frame::after { bottom: 4px; }
   .film-name { color: #f5eddf; font-size: 12px; font-weight: 900; text-align: center; margin-top: 5px;
     max-width: 142px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  @keyframes shSparkle { 0%,100% { box-shadow: 0 0 0 rgba(255,212,71,0); } 50% { box-shadow: 0 0 16px rgba(255,212,71,.85); } }
-  .film.sparkle .film-frame { animation: shSparkle 1.6s ease-in-out infinite; }
   .sh-hint { color: #ffe9b8; font-size: 12px; font-weight: 900; margin: -2px 0 6px; }
   .sh-menu, .sh-confirm { position: absolute; inset: 0; z-index: 350; background: rgba(30,20,40,.55);
     display: flex; align-items: center; justify-content: center; }
@@ -175,7 +173,7 @@ export default function StudioHome({ onOpen, onExitApp }) {
     if (w && prof) { deleteWork(prof, w.id); sndPoof(); force(); }
   };
 
-  const firstVisit = works.length === 0; // 初回導入は控えめに（みほんが光る＋一言だけ・設計§7）
+  const firstVisit = works.length === 0; // 初回導入は控えめに（一言だけ・設計§7）
 
   return (
     <div className="sh-root">
@@ -226,7 +224,7 @@ export default function StudioHome({ onOpen, onExitApp }) {
               {firstVisit && <div className="sh-hint">みほんを ひらいてみよう</div>}
               <div className="sh-shelf">
                 {SAMPLES.map(s => (
-                  <button key={s.id} className={"film" + (firstVisit ? " sparkle" : "")} onClick={() => openSample(s)}>
+                  <button key={s.id} className="film" onClick={() => openSample(s)}>
                     <div className="film-frame"><StudioThumb bg={s.bg} chars={s.chars} width={HOME_CFG.THUMB_W} profile={prof} /></div>
                     <div className="film-name">{s.name}</div>
                   </button>

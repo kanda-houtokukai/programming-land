@@ -436,10 +436,16 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
     if (!prof) return; // プロファイル未作成の端末では保存なしで遊べる（開発ルートの割り切り）
     if (!prof.studio) prof.studio = { works: [], draft: null };
     const sc = serializeScene();
-    prof.studio.draft = {
-      bg: sc.bg, sel: sc.sel, origin: originRef.current, name: nameRef.current,
-      chars: sc.chars.map(c => ({ kind: c.kind, x: c.x, y: c.y, stacks: c.stacks })),
-    };
+    const scene = { bg: sc.bg, chars: sc.chars.map(c => ({ kind: c.kind, x: c.x, y: c.y, stacks: c.stacks })) };
+    const o = originRef.current;
+    if (o && o.type === "work") {                       // 保存済み作品と同一なら下書き不要（本FB）
+      const w = prof.studio.works.find(x => x.id === o.id);
+      if (w && JSON.stringify({ bg: w.bg, chars: w.chars }) === JSON.stringify(scene)) {
+        if (prof.studio.draft) { prof.studio.draft = null; saveProfile(prof); }
+        return;
+      }
+    }
+    prof.studio.draft = { bg: sc.bg, sel: sc.sel, origin: o, name: nameRef.current, chars: scene.chars };
     saveProfile(prof);
   };
   const scheduleDraft = () => {
@@ -485,7 +491,9 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
       setToast("フィルムだなに ほぞんした！"); // 上書き保存（作り直し）は付与なし＝静かに
       sndSnap();
     }
-    scheduleDraft(); // origin/name の変化を draft にも反映
+    prof.studio.draft = null;              // 保存した作品は下書きから消す（本FB）
+    clearTimeout(draftTimerRef.current);   // 予約済みの下書き書き込みを取消
+    saveProfile(prof);
   };
 
   const curChar = () => charsRef.current[selRef.current] || charsRef.current[0];

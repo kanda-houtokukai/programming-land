@@ -117,8 +117,8 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
               style={{ position: "absolute", left: `${f.left}%`, top: `${f.top}%`,
                 transform: "translate(-50%,-50%)", width: `${f.w}%`, height: `${f.h}%`,
                 border: "none", background: "transparent", cursor: "pointer", padding: 0 }}>
-              <span className="bubble pulse" style={{ position: "absolute", left: "50%", bottom: "calc(100% + 2px)",
-                transform: `translate(-50%, ${f.labelDy || 0}px)`, fontSize: "clamp(8px,1.9vw,12px)",
+              <span className="bubble pulse bubbleLg" style={{ position: "absolute", left: "50%", bottom: "calc(100% + 2px)",
+                transform: `translate(-50%, ${f.labelDy || 0}px)`,
                 animationDelay: `${(i * 0.7).toFixed(1)}s` }}>{f.label}</span>
             </button>
           ))}
@@ -129,7 +129,7 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
               style={{ position: "absolute", left: "42%", top: `${PARTNER_TOP[stage] || 66}%`, transform: "translate(-50%,-50%)",
                 width: "24%", border: "none", background: "transparent", cursor: "pointer", padding: 0,
                 display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <span className="bubble pulse" style={{ marginBottom: 5, fontSize: "clamp(8px,1.9vw,12px)" }}>あいぼう</span>
+              <span className="bubble pulse bubbleLg" style={{ marginBottom: 5 }}>あいぼう</span>
               <span className="mapfloat" style={{ lineHeight: 0, filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
                 <MonsterArt species={mon.id} stage={stage} size={partnerSize} />
               </span>
@@ -144,7 +144,7 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
               style={{ position: "absolute", left: "24%", top: "72%", transform: "translate(-50%,-50%)",
                 width: "22%", border: "none", background: "transparent", cursor: "pointer", padding: 0,
                 display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <span className="bubble pulse" style={{ marginBottom: 5, fontSize: "clamp(8px,1.9vw,12px)", animationDelay: ".4s" }}>たまご</span>
+              <span className="bubble pulse bubbleLg" style={{ marginBottom: 5, animationDelay: ".4s" }}>たまご</span>
               <span className="mapfloat" style={{ lineHeight: 0, animationDelay: ".8s", filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
                 <EggIcon size={Math.round(64 * sizeK)} />{/* b4s: 40→64（相棒より小さく・初期値） */}
               </span>
@@ -164,7 +164,7 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
             style={{ position: "absolute", left: "60%", top: "47%", transform: "translate(-50%,-50%)",
               width: "16%", border: "none", background: "transparent", cursor: "pointer", padding: 0,
               display: "flex", flexDirection: "column", alignItems: "center" }}>{/* b3z実機FB: top66→47＝156px化した背丈差ぶん上げて相棒と足元（床の線）を揃える */}
-            <span className="bubble pulse" style={{ marginBottom: 5, fontSize: "clamp(8px,1.9vw,12px)", animationDelay: "1.3s" }}>プロフィール</span>
+            <span className="bubble pulse bubbleLg" style={{ marginBottom: 5, animationDelay: "1.3s" }}>プロフィール</span>
             <span className="mapfloat" style={{ lineHeight: 0, animationDelay: "1.5s", filter: "drop-shadow(1px 3px 3px rgba(20,15,25,.4))" }}>
               <PlayerAvatar character={save.character} avatar={save.avatar} dressup={save.dressup} size={avatarSize} full />{/* b3y=156・狭幅はsizeKで縮小（実機FB③） */}
             </span>

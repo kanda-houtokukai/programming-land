@@ -190,16 +190,31 @@ export const CSS = `
      可読性の定石: 不透明で部屋より明るい地＋ドロップシャドウで分離＋文字の細い縁取り（太い縁は小字で潰れる）。
      おうち/お店の全ラベル共通 */
   .bubble {
-    position: relative; display: inline-block; background: #FFF9EC;
-    border: 2.5px solid #BA7517; border-radius: 9px; padding: 3px 11px;
-    font-weight: 900; color: #59300A; white-space: nowrap;
-    box-shadow: 0 2px 4px rgba(60,40,20,.35), inset 0 1px 0 rgba(255,255,255,.7);
-    text-shadow: 0 1px 0 rgba(255,255,255,.6), 0 1px 2px rgba(0,0,0,.25);
+    display: inline-block; padding: 5px 13px; font-weight: 900; color: #4a3212; white-space: nowrap;
+    background:
+      radial-gradient(ellipse 70% 55% at 22% 22%, rgba(180,140,80,.18), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 82% 80%, rgba(170,125,70,.20), transparent 60%),
+      radial-gradient(ellipse 130% 140% at 50% 42%, #F7ECD0 52%, #E7D3A8 100%);
+    border: 3px solid #7a4f22; border-radius: 8px;
+    box-shadow: 0 3px 5px rgba(50,30,10,.35), inset 0 0 0 1.5px #b98a4e,
+      inset 0 1px 2px rgba(255,250,230,.6), inset 0 -3px 6px rgba(150,110,60,.25);
+    text-shadow: 0 1px 0 rgba(255,250,230,.55);
   }
-  .bubble::after { content: ""; position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%);
-    border: 6px solid transparent; border-top: 7px solid #BA7517; }
-  .bubble::before { content: ""; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%);
-    border: 5px solid transparent; border-top: 6px solid #FFF9EC; z-index: 1; }
+  .bubbleLg { font-size: clamp(12px, 2.85vw, 18px); padding: 8px 18px; }
+  /* お店front-stageの選択肢＝冒険地図の掠れた紙ボタン（b5m ②・絵文字なし） */
+  .paperbtn { display: block; width: 100%; box-sizing: border-box; padding: 13px 16px; cursor: pointer;
+    font-family: inherit; font-weight: 900; font-size: 18px; color: #4a3212; text-align: center; white-space: nowrap;
+    background:
+      radial-gradient(ellipse 60% 55% at 18% 20%, rgba(180,140,80,.16), transparent 60%),
+      radial-gradient(ellipse 55% 50% at 85% 82%, rgba(165,120,65,.18), transparent 60%),
+      radial-gradient(ellipse 130% 150% at 50% 35%, #F6E8C9 50%, #E3CD9E 100%);
+    border: 3px solid #7a4f22; border-radius: 12px;
+    box-shadow: 0 3px 0 #6b4520, 0 5px 6px rgba(50,30,10,.28), inset 0 0 0 1.5px #bd9052,
+      inset 0 1px 2px rgba(255,250,230,.6), inset 0 -3px 7px rgba(150,110,60,.22); }
+  .paperbtn:active { transform: translateY(3px);
+    box-shadow: 0 0 0 #6b4520, 0 2px 4px rgba(50,30,10,.28), inset 0 0 0 1.5px #bd9052; }
+  .paperbtn.small { font-size: 16px; padding: 11px 16px;
+    box-shadow: 0 3px 0 #6b4520, 0 4px 5px rgba(50,30,10,.25), inset 0 0 0 1.5px #bd9052; }
   /* ラベル/ヒントの誘導＝うっすら優しい点滅（UI改修④・上下ふわふわから変更。キャラの揺れには使わない） */
   @keyframes pl-pulse { 0%,100% { opacity: 1 } 50% { opacity: .7 } }
   .pulse { animation: pl-pulse 2.6s ease-in-out infinite; }
