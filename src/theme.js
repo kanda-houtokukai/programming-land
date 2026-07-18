@@ -218,8 +218,8 @@ export const CSS = `
      --mapReserve=地図以外のUIの高さぶん（画面別に指定・初期値・実機で微調整）。1100pxも初期値 */
   /* 面（画面）切替のフェードイン（FB5便②）。App.jsx の keyed ラッパーに適用＝keyが変わるたび新画面がふわっと出る。
      往復の暗転（前画面アウト→新画面イン）は両画面同時マウントが必要で重いため今回はフェードインのみ。.32s は初期値 */
-  @keyframes pl-screenin { from { opacity: 0 } to { opacity: 1 } }
-  .screenIn { animation: pl-screenin .32s ease; }
+  @keyframes pl-screenin { 0% { opacity: 0 } 22% { opacity: 0 } 100% { opacity: 1 } }
+  .screenIn { animation: pl-screenin .7s ease; } /* FB6便③: .7s全体長・頭22%は"間"（背景が見えてから現れる＝ロード感）。長すぎればここを調整 */
   /* おうちモーダルの拡大（FB5便③）。.mapMax と同型＝16:9の部屋画像が画面の高さに収まる幅まで。
      150px=モーダル余白＋ヘッダー行＋枠・1100px上限とも初期値 */
   .homePanel { width: min(96vw, calc((100vh - 150px) * 16 / 9)); max-width: 1100px; }

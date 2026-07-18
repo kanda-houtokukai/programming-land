@@ -83,13 +83,13 @@ export default function Shop({ save, update, go, onSound, openHome }) {
               {!talking && <span className="bubble pulse" style={{ position: "absolute", left: "50%", top: "6%",
                 transform: "translate(-50%,-100%)", fontSize: "clamp(9px,2vw,13px)" }}>はなしかける</span>}
             </button>
-            {/* 会話中は選択肢を画像の下半分にオーバーレイ（FB5便④）。コンテナはoverflow:hiddenなので角丸にクリップ。
-                高さ56%・不透明度94%は初期値＝実機で微調整 */}
+            {/* 会話中は選択肢を「絵の上に浮かぶ中央寄せボタン」で出す（FB6便②: 塗りつぶさない・左右いっぱいにしない
+                ＝ゲームボタンが絵の上に浮く。セリフは小さな bubble を1つだけ。位置/幅は初期値・実機で微調整） */}
             {talking && (
-              <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, maxHeight: "56%", overflowY: "auto",
-                background: "rgba(255,253,245,.94)", borderTop: `3px solid ${C.ink}`, borderRadius: "0 0 13px 13px",
-                padding: 12, lineHeight: 1.3, display: "grid", gap: 8, alignContent: "start" }}>
-                <div style={{ fontWeight: 900, fontSize: 15 }}>💬 「{SERIF.hello}」</div>
+              <div style={{ position: "absolute", left: "50%", bottom: "4%", transform: "translateX(-50%)",
+                width: "min(340px, 82%)", display: "grid", gap: 8, lineHeight: 1.2 }}>
+                <span className="bubble" style={{ justifySelf: "center", fontWeight: 900,
+                  fontSize: "clamp(11px,2vw,14px)", padding: "5px 12px", whiteSpace: "nowrap" }}>{SERIF.hello}</span>
                 <Btn big bg={C.sky} onClick={() => enter("items")}>🧃 バトルの どうぐ</Btn>
                 <Btn big bg={C.sakura} onClick={() => enter("dressup")}>🎩 きせかえ</Btn>
                 <Btn bg="#fff" onClick={() => { SFX.tap(sound); setTalking(false); setMsg(`💬 ${SERIF.bye}`); }}>やめる</Btn>

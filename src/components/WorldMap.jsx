@@ -61,7 +61,7 @@ export const AREAS = [
 // 2枚が同位相で揺れないよう delay/dur を別値に（初期値）
 const SIGNS = [
   { left: 69.5, top: 34.13, textTop: 40, flip: false, delay: "1.27s", dur: "3.3s" },
-  { left: 46, top: 30, textTop: 40, flip: true, delay: "2.1s", dur: "3.6s" }, // 中央上・左右反転（座標は初期値）
+  { left: 47.3, top: 29.25, textTop: 40, flip: true, delay: "2.1s", dur: "3.6s" }, // 中央上・左右反転（FB6便①: 46,30 から1.5pt 2時方向へ・初期値）
 ];
 
 export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfile }) {
