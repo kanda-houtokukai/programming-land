@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-19（v2.3-b5n 実機FB第8便=2件〔お店スマホ=絵の下に売り場カード2枚/おうちラベルはスマホ元サイズ・PC/タブレット1.5倍〕・⚠️実機確認待ち。b5mは実機OK）
+最終更新: 2026-07-19（v2.3-b5o 実機FB第9便=2件〔おうちのずかん/きろくをPC・タブレットで少し下へ/お店の話しかけをPC・タブレットで少し大きく〕・⚠️実機確認待ち。b5nは実機OK）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,7 +12,12 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **v2.3-b5n（2026-07-19・実機FB第8便=2件＝⚠️実機確認待ち／deploy済み 3737899）**: 指示書=Chat支給（raw実測＋モック案1承認）。新規アセットなし・スキーマ変更なし＝CSS＋Shop.jsxのレイアウトのみ。分岐は **@media(700px)**（既存 `.artgrid` と同じBP・JS/matchMedia不使用）。神田さん承認=お店スマホ=案1（絵の下に売り場カード2枚横ならび＋やめる小）／PC・タブレットは従来オーバーレイのまま／おうちラベルはスマホ元サイズ・PC/タブレットのみ1.5倍
+- **v2.3-b5o（2026-07-19・実機FB第9便=2件＝⚠️実機確認待ち／deploy済み 386e99a）**: 指示書=Chat支給（raw実測）。新規アセットなし・スキーマ変更なし＝theme.js＋HomeRoom.jsxの微修正のみ。**両方 @media(min-width:700px)＝PC/タブレット限定・スマホ(<700px)は一切不変**。神田さん指示=PC/タブレットで①ずかん・きろくをもう少し下へ②お店の話しかけをもう少し大きく（スマホは全部そのまま）
+  - **①おうち ずかん(dex)/きろく(records)ラベルを≥700pxで少し下へ**（HomeRoom.jsx＋theme.js）: FURNITUREラベルspanの className に **`spot-{key}`** を追加＋transform を **`translate(-50%, calc({labelDy}px + var(--labelDown, 0px)))`** に。theme.js `@media(min-width:700px)` に **`.spot-dex, .spot-records { --labelDown: 12px }`**。CSS変数を同一spanに設定→同spanのinline transformが読む構造。既定=スマホは 0px（現状維持）・chestは対象外
+  - **②お店の話しかけ選択肢`.paperbtn`を≥700pxで少し大きく**（theme.js）: 既存の shop `@media(min-width:700px)` ブロックに **`.paperbtn { font-size:21px; padding:15px 20px }`**（18→21px）・**`.paperbtn.small { font-size:18px; padding:13px 20px }`**（16→18px）を追記。paperbtnは`.shopOverlay`内＝≥700pxのみ表示＝スマホ不変（スマホは`.shopCard`で別物）
+  - 検証: **`npm run verify` 6本全PASS**（CSS＋transform1行のみ＝engine/roundtrip/typing 影響なし）・ビルドOK・**幅別に computed 実測**（同一DOMを開いたまま resize して比較）＝**375px(<700)**: dexラベル transform ty=**16**（labelDy16+0）・records ty=**12**・chest ty=0・`--labelDown`未設定／paperbtn 18px・small16px（＝b5nと不変）。**1180px(≥700)**: dex `--labelDown:12px`・ty=**28**（16+12）・records ty=**24**（12+12）・chest ty=0（不変）／paperbtn **21px/15px 20px**・small **18px/13px 20px**・overlay=grid・cards=none。**コンソールエラーゼロ**
+  - ⚠️次: 神田さんの実機確認（PC/タブレット=ずかん・きろくの下げ幅12px／お店選択肢の大きさ21/18px・スマホ=変化がないこと）。値は初期値＝実機で微調整（下げ量はこの1値・大きさはこの2値）
+- **v2.3-b5n（2026-07-19・実機FB第8便=2件＝実機OK・神田さん実機確認合格／deploy 3737899）**: 指示書=Chat支給（raw実測＋モック案1承認）。新規アセットなし・スキーマ変更なし＝CSS＋Shop.jsxのレイアウトのみ。分岐は **@media(700px)**（既存 `.artgrid` と同じBP・JS/matchMedia不使用）。神田さん承認=お店スマホ=案1（絵の下に売り場カード2枚横ならび＋やめる小）／PC・タブレットは従来オーバーレイのまま／おうちラベルはスマホ元サイズ・PC/タブレットのみ1.5倍
   - **①おうちラベル`.bubbleLg`をレスポンシブ化**（theme.js）: 基底を **`clamp(8px,1.9vw,12px)`/padding 5px 13px**（＝スマホ=元の.bubbleラベル相当）に戻し、`@media(min-width:700px)` で **`clamp(13px,2.2vw,18px)`/padding 8px 18px**（約1.5倍）。HomeRoomのラベル5箇所は `bubbleLg` 付与済み＝変更不要
   - **②お店front-stageの選択肢をレスポンシブ化**（theme.js＋Shop.jsx）: **<700px=スマホ**＝絵の上にセリフ`.shopSerifPhone`だけ・選択肢は**絵の下**に `.shopCards`（`.shopCardRow`に売り場カード`.shopCard`2枚横ならび＋`.shopCancel`小）＝店主がまるごと見える・左右いっぱいにしない。`.shopCard` は角に小クギ`::before/::after`・min-height66pxで「バトルの どうぐ」も収まる。**≥700px=タブレット/PC**＝従来オーバーレイ`.shopOverlay`（絵の上に3 paperbtn・b5mと同一）を表示し `.shopCards`/`.shopSerifPhone` は display:none。Shop.jsx=旧オーバーレイdivに `className="shopOverlay"`（inline配置削除・中身の serif+paperbtn3つは不変）＋画像コンテナ内に shopSerifPhone＋コンテナ**外**に shopCards を追加。ハンドラ(enter/setTalking/setMsg)は全経路で不変
   - 検証: **`npm run verify` 6本全PASS**（CSS＋レイアウトのみ＝roundtrip/engine/typing 影響なし）・ビルドOK・**ブラウザ幅別に実測**＝375px: `.shopOverlay` display:none／`.shopCards` grid・売り場カード2枚(バトルの どうぐ/きせかえ)＋クギpseudo有・`.shopCancel`有・`.shopSerifPhone` block＝店主まるごと見える／カード「バトルの どうぐ」→itemsサブ画面へ遷移OK・おうちラベル `.bubbleLg` **font-size 8px**(元サイズ)。1180/768px(≥700): `.shopOverlay` grid(3 paperbtn 絵の上)／`.shopCards`・`.shopSerifPhone` display:none・おうちラベル `@media` で **clamp(13,2.2vw,18)** 適用(matchMedia(700)=true・CSSOM実測)＝約1.5倍。**コンソールエラーゼロ**
