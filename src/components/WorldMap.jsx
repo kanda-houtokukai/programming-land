@@ -68,7 +68,7 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
   const areaLocked = a => a.key === "battle" && !battleOk;
 
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
+    <div className="mapPage" style={{ paddingBottom: 30 }}>{/* FB4便⑥: maxWidth640→mapPage（min(96vw,1100px)） */}
       {/* ヘッダー（相棒・⭐・🪙・音）。「きろく」ボタンは段階③で削除＝子どもの記録はおうちの机の日記へ一本化 */}
       <Header save={save} title="" onSound={onSound} onOpenHome={onOpenHome} />
       <div style={{ textAlign: "center", margin: "0 0 10px" }}>
@@ -78,8 +78,10 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
         <div style={{ fontWeight: 700, fontSize: 13 }}>いきたい ばしょを タップしてね</div>
       </div>
 
-      {/* ワールドマップ本体 */}
-      <div style={{ margin: "0 14px", position: "relative", aspectRatio: "16 / 9",
+      {/* ワールドマップ本体（FB4便⑥: mapMax=高さに収まる幅まで拡大・--mapReserveは初期値）。
+          14pxの側余白は外側ラッパーへ（コンテナ自身のpaddingは%座標の基準を変えるため不可） */}
+      <div style={{ padding: "0 14px" }}>
+      <div className="mapMax" style={{ "--mapReserve": "250px", position: "relative", aspectRatio: "16 / 9",
         border: `3px solid ${C.ink}`, borderRadius: 22, boxShadow: "5px 5px 0 rgba(58,51,53,.9)",
         overflow: "hidden", background: "#8ED1F2" }}>
         <img src={bgUrl} alt="ワールドマップ" draggable="false"
@@ -103,7 +105,7 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
                   ふわふわは img だけに掛ける（ボタンの centering transform と衝突しない）。*/}
               {a.img
                 ? <img src={a.img} alt="" draggable="false" className={locked ? "" : "mapfloat"}
-                    style={{ width: a.tall ? "82%" : a.small ? "50%" : "62%", height: a.tall ? "82%" : a.small ? "50%" : "62%", objectFit: "contain", display: "block",
+                    style={{ width: a.tall ? "82%" : a.small ? "85%" : "62%", height: a.tall ? "82%" : a.small ? "85%" : "62%", objectFit: "contain", display: "block", /* FB4便②: みなと50→85%（初期値・タップ範囲13%は不変） */
                       animationDelay: floatDelay, animationDuration: floatDur,
                       filter: locked ? "grayscale(1) brightness(.75) drop-shadow(1px 2px 2px rgba(20,15,25,.45))" : "drop-shadow(1px 2px 2px rgba(20,15,25,.45))",
                       opacity: locked ? 0.7 : 1 }} />
@@ -131,6 +133,7 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
               textShadow: "0 0 2px rgba(255,245,220,.8)" }}>じゅんびちゅう</span>
           </div>
         </div>
+      </div>
       </div>
 
       {/* マップ最下部「おうちのひとへ」（段階③・メモ09）: 保護者向けの入口。

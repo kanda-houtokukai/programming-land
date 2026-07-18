@@ -212,6 +212,16 @@ export const CSS = `
      横画面で縦長の問題だと答えるときにバトルシーンが画面外に消える件の対策。
      ★向きの判定は CSS @media に任せる＝JSの matchMedia(b4b誤発火)/ResizeObserver(b4l不発火)は使わない */
   .battleWrap { max-width: 640px; margin: 0 auto; padding: 0 14px 30px; }
+  /* マップ3画面の最大化（FB4便⑥・ワールドマップ/クイズのひろば/パズルのしま）。
+     「横幅いっぱい。ただし画面の高さに収まる幅まで」＝地図(16:9)がスクロールなしで全体表示。
+     %座標オーバーレイはコンテナ基準なので拡大してもズレない（既定の堅牢パターンのまま）。
+     --mapReserve=地図以外のUIの高さぶん（画面別に指定・初期値・実機で微調整）。1100pxも初期値 */
+  .mapPage { max-width: min(96vw, 1100px); margin: 0 auto; }
+  .mapMax  { width: min(100%, calc((100vh - var(--mapReserve, 240px)) * 16 / 9));
+             margin-left: auto; margin-right: auto; }
+  @supports (height: 100dvh) {
+    .mapMax { width: min(100%, calc((100dvh - var(--mapReserve, 240px)) * 16 / 9)); }
+  }
   /* 横画面かつ十分な幅のときだけ2カラム（左=バトルシーン sticky・右=もんだい）。縦画面は何も効かない＝現状のまま */
   @media (orientation: landscape) and (min-width: 820px) {
     .battleWrap  { max-width: 1120px; }

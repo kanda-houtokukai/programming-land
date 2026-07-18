@@ -14,43 +14,46 @@ import { ART_GUIDE } from "../data/parent-guide.js";
 
 const CMD_LIMIT = 300; // B3: 命令の上限（2026-07-08 100→300）
 
-/* ② 固定キャンバス（自動フィット廃止・b3iで刷新）。
-   横長4:3でパネル枠いっぱいに使う。数値は初期値＝実機で微調整:
-   - CANVAS: viewBox の大きさ（4:3・端まで描ける）
-   - START: 開始位置（中央やや下・上向きスタートの据わり）
-   - WALL: カメが枠外に出ない内側マージン（カメの見た目ぶん） */
+/* ② 固定キャンバス＋34px格子（FB4便⑤・方眼紙方式＝斜めズレの根治）。
+   すべての位置を格子点上に固定する＝斜め45°の1歩はマスの対角線（±G,±G）になり、
+   縦横(34px)と斜め(24.04px)が混ざって格子と噛み合わなくなる旧方式の誤差を構造的に排除。
+   数値は初期値＝実機で微調整・1箇所に集約:
+   - CANVAS: viewBox の大きさ（4:3）
+   - G: 1マス（従来のSTEPと同値）／ GRID: 遊び場 12×9マス = 408×306px
+   - ORIGIN: 格子の左上（キャンバス中央に配置）／ START: 中央・やや下（従来220→231） */
 const CANVAS = { w: 480, h: 360 };
-const START = { x: 240, y: 220 };
-const WALL = 14;
-const STEP = 34;
+const G = 34;                       // 1マス（従来のSTEPと同値）
+const GRID = { cols: 12, rows: 9 }; // 遊び場 = 408×306px
+const ORIGIN = {                    // 格子の左上（キャンバス480×360の中央に配置）
+  x: (CANVAS.w - GRID.cols * G) / 2,  // = 36
+  y: (CANVAS.h - GRID.rows * G) / 2,  // = 27
+};
+const START = { x: ORIGIN.x + 6 * G, y: ORIGIN.y + 6 * G }; // = (240, 231) 中央・やや下
 
-/* 前進の壁クランプ: 次位置が枠を超えるなら、進行方向を保ったまま ふちで止める
-   （軸別クランプだと斜め45°の向きが変わるため、進める割合 t で縮める） */
-function clampStep(x, y, nx, ny) {
-  const lo = WALL, hiX = CANVAS.w - WALL, hiY = CANVAS.h - WALL;
-  let t = 1;
-  if (nx < lo) t = Math.min(t, (lo - x) / (nx - x));
-  if (nx > hiX) t = Math.min(t, (hiX - x) / (nx - x));
-  if (ny < lo) t = Math.min(t, (lo - y) / (ny - y));
-  if (ny > hiY) t = Math.min(t, (hiY - y) / (ny - y));
-  t = Math.max(0, t);
-  return { x: x + (nx - x) * t, y: y + (ny - y) * t };
-}
+// 45°刻みの向き→格子1歩（±G/0 に丸まる。斜め1歩=マスの対角線）
+const gridStep = ang => ({
+  dx: Math.round(Math.cos(ang * Math.PI / 180)) * G,
+  dy: Math.round(Math.sin(ang * Math.PI / 180)) * G,
+});
+// 格子範囲内か（格子点は常に整数座標＝厳密比較で安全）
+const inGrid = (px, py) =>
+  px >= ORIGIN.x && px <= ORIGIN.x + GRID.cols * G && py >= ORIGIN.y && py <= ORIGIN.y + GRID.rows * G;
 
-// 旧作品互換: 旧ID（fwd/right/left/color）の挙動は不変。新IDは追加のみ。
-// 実機FB第1便⑤（2026-07-16）: b3jの「壁で実行打ち切り（break）」を廃止。
-// クランプ（ふちまで描く・カメは常に画面内）は維持し、以降の命令もすべて実行する
-// ＝「まがる→すすむ」で再開できる。動けない「すすむ」はそもそも入口（add）で弾く。
+// 旧ID（fwd/right/left/color）のID互換は維持・新IDは追加のみ。
+// ★FB4便⑤の例外（[DECISION]・台帳参照）: 格子化により旧作品の「見え方」は変わる
+//   （①斜め線は長さ約1.41倍 ②壁ぎわの部分クランプ線は消える＝範囲外の歩はその場に留まる）。
+//   実機FB第1便⑤（壁打ち切り廃止）と同性質の変化として神田さん了承済みの前提。
 function turtleSegs(cmds) {
   let x = START.x, y = START.y, ang = -90, ci = 0, pen = true; // ペンは初期=下（B1）
   const segs = [];
   for (const t of cmds) {
     if (t === "fwd") {
-      const rawX = x + Math.cos(ang * Math.PI / 180) * STEP;
-      const rawY = y + Math.sin(ang * Math.PI / 180) * STEP;
-      const p = clampStep(x, y, rawX, rawY); // ② ふちで止まる＝カメは常に画面内
-      if (pen && (p.x !== x || p.y !== y)) segs.push({ x1: x, y1: y, x2: p.x, y2: p.y, c: ART_COLORS[ci] });
-      x = p.x; y = p.y;
+      const { dx, dy } = gridStep(ang);
+      const nx = x + dx, ny = y + dy;
+      if (inGrid(nx, ny)) { // 範囲外なら動かない（segも作らない・その場に留まる）
+        if (pen) segs.push({ x1: x, y1: y, x2: nx, y2: ny, c: ART_COLORS[ci] });
+        x = nx; y = ny;
+      }
     } else if (t === "right") ang += 90;
     else if (t === "left") ang -= 90;
     else if (t === "right45") ang += 45;
@@ -62,13 +65,11 @@ function turtleSegs(cmds) {
   return { segs, x, y, ang, ci, pen };
 }
 
-// 実機FB第1便⑤: いまの終端状態から「すすむ」1歩ぶんを試算し、少しでも動けるか（＝ふちで0移動でないか）
+// いまの終端状態から「すすむ」1歩の行き先が格子範囲内か（入口で弾く＋wallMsgの既存機構は不変）
 function canStepFrom(cmds) {
   const st = turtleSegs(cmds);
-  const rawX = st.x + Math.cos(st.ang * Math.PI / 180) * STEP;
-  const rawY = st.y + Math.sin(st.ang * Math.PI / 180) * STEP;
-  const p = clampStep(st.x, st.y, rawX, rawY);
-  return Math.abs(p.x - st.x) > 0.01 || Math.abs(p.y - st.y) > 0.01;
+  const { dx, dy } = gridStep(st.ang);
+  return inGrid(st.x + dx, st.y + dy);
 }
 
 /* ③ 命令リストの圧縮表示: 連続する同じ命令を ×N にまとめる（表示のみ・データ不変） */
@@ -82,7 +83,7 @@ function compressCmds(cmds) {
   return out;
 }
 
-function ArtSVG({ cmds, width = "100%", reveal = Infinity, showTurtle = true }) {
+function ArtSVG({ cmds, width = "100%", reveal = Infinity, showTurtle = true, grid = false }) {
   const { segs, x, y, ang } = turtleSegs(cmds);
   const shown = segs.slice(0, reveal);
   const cur = shown.length ? shown[shown.length - 1] : null;
@@ -94,6 +95,20 @@ function ArtSVG({ cmds, width = "100%", reveal = Infinity, showTurtle = true }) 
   return (
     <svg width={width} viewBox={`0 0 ${CANVAS.w} ${CANVAS.h}`} style={{ display: "block", maxWidth: "100%", height: "auto" }}>
       <rect x="0" y="0" width={CANVAS.w} height={CANVAS.h} fill="#FFFFFF" rx="14" />
+      {/* 薄い方眼ガイド（FB4便⑤・エディタのみ）。背景の上・線分の下。濃さ .08 は初期値。
+          作品はコマンド列で保存＝ガイドが保存物に乗ることは構造的にない */}
+      {grid && (
+        <g>
+          {Array.from({ length: GRID.cols + 1 }, (_, k) => (
+            <line key={"v" + k} x1={ORIGIN.x + k * G} y1={ORIGIN.y} x2={ORIGIN.x + k * G} y2={ORIGIN.y + GRID.rows * G}
+              stroke="rgba(58,51,53,.08)" strokeWidth="1" />
+          ))}
+          {Array.from({ length: GRID.rows + 1 }, (_, k) => (
+            <line key={"h" + k} x1={ORIGIN.x} y1={ORIGIN.y + k * G} x2={ORIGIN.x + GRID.cols * G} y2={ORIGIN.y + k * G}
+              stroke="rgba(58,51,53,.08)" strokeWidth="1" />
+          ))}
+        </g>
+      )}
       {shown.map((s, i) => (
         <line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke={s.c} strokeWidth="7" strokeLinecap="round" />
       ))}
@@ -226,7 +241,7 @@ export default function Art({ save, update, go, onSound, openHome }) {
         <div className="artgrid">
           {/* 左: キャンバス（パネル枠いっぱい・固定4:3） */}
           <div className="panel" style={{ padding: 8, position: "relative" }}>
-            <ArtSVG cmds={cmds} reveal={reveal === Infinity ? segsN : reveal} />
+            <ArtSVG cmds={cmds} reveal={reveal === Infinity ? segsN : reveal} grid />{/* FB4便⑤: 編集画面だけ薄い方眼 */}
             {wallMsg && (
               <div className="slide" style={{ position: "absolute", left: "50%", bottom: 16, transform: "translateX(-50%)",
                 background: "#FFF0D6", border: `2px solid ${C.ink}`, borderRadius: 999, padding: "5px 14px",

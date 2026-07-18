@@ -748,7 +748,7 @@ export default function Battle({ save, update, go, onSound, openHome }) {
               <EnemyIcon enemy={e} size={44} locked={!un} />
               <span style={{ flex: 1 }}>
                 <span className="pl-display" style={{ fontSize: 19, display: "block" }}>{un ? e.name : "？？？"}</span>
-                <span style={{ fontWeight: 700, fontSize: 13 }}>HP {HP_BY_DIFF[diff]}　{done ? "✅ たおした" : un ? "ちょうせんできる！" : "まだ あらわれない"}</span>
+                <span style={{ fontWeight: 700, fontSize: 13 }}>HP {HP_BY_DIFF[diff]}　{done ? "たおした" : un ? "ちょうせんできる！" : "まだ あらわれない"}</span>{/* FB4便④: チェックは右端の1つに一本化 */}
               </span>
               {done && <span style={{ fontSize: 22 }}>✅</span>}
             </button>

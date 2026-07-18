@@ -127,14 +127,16 @@ function QuizPlay({ session, save, update, onBack }) {
 }
 
 export default function Quiz({ save, update, go, onSound, openHome }) {
-  const diff = save.quiz.difficulty || "easy";
+  // FB4便①: 難易度は入場のたび「やさしい」から（バトルと同じローカルstate・モード内の行き来では保持）。
+  // save.quiz.difficulty はもう読まない（フィールドは残存してよい＝スキーマ不変・roundtrip影響なし）
+  const [diff, setDiffState] = useState("easy");
   const [session, setSession] = useState(null);
   const [popup, setPopup] = useState(null); // タップ中のカテゴリid（ポップアップ→はじめる）
 
   function setDiff(d) {
     SFX.tap(save.settings.sound);
     setSession(null);
-    update(s => { s.quiz.difficulty = d; return s; });
+    setDiffState(d);
   }
   function start(cat) {
     SFX.tap(save.settings.sound);
@@ -147,7 +149,7 @@ export default function Quiz({ save, update, go, onSound, openHome }) {
 
   const popCat = popup && QUIZ_CATEGORIES.find(c => c.id === popup);
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
+    <div className="mapPage" style={{ paddingBottom: 30 }}>{/* FB4便⑥: maxWidth640→mapPage */}
       {/* プレイ中の戻りは QuizPlay 内の「◀ もどる」1つ。一覧では ◀もどる=ワールドマップへ（1階層） */}
       <Header save={save} title="💡 かんがえる クイズ" onBack={session ? undefined : () => go("home")} onSound={onSound} onOpenHome={openHome} />
       {session
@@ -164,8 +166,10 @@ export default function Quiz({ save, update, go, onSound, openHome }) {
               ))}
             </div>
             <div style={{ fontWeight: 700, fontSize: 13, textAlign: "center", margin: "6px 0" }}>あそびたい クイズを タップしてね</div>
-            {/* クイズのひろば（背景＋%座標の拠点・ワールドマップ/パズル島と同じ作法） */}
-            <div style={{ margin: "0 14px", position: "relative", aspectRatio: "16 / 9",
+            {/* クイズのひろば（背景＋%座標の拠点・ワールドマップ/パズル島と同じ作法）。
+                FB4便⑥: mapMax=高さに収まる幅まで拡大（14pxの側余白は外側ラッパーへ） */}
+            <div style={{ padding: "0 14px" }}>
+            <div className="mapMax" style={{ "--mapReserve": "240px", position: "relative", aspectRatio: "16 / 9",
               border: `3px solid ${C.ink}`, borderRadius: 22, boxShadow: "5px 5px 0 rgba(58,51,53,.9)",
               overflow: "hidden", background: "#8ED1F2" }}>
               <img src={PLAZA_BG[diff] || plazaDay} alt="クイズのひろば" draggable="false"
@@ -198,6 +202,7 @@ export default function Quiz({ save, update, go, onSound, openHome }) {
                   </button>
                 );
               })}
+            </div>
             </div>
             {/* タップ時ポップアップ: フル名前＋説明＋問題数＋はじめて/ベスト → はじめる（1階層ずつ） */}
             {popCat && (() => {

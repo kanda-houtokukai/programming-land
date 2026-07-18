@@ -420,7 +420,9 @@ function IslandMap({ save, diff, onEnter, unlockAll }) {
   // SVGは％座標をそのまま使う（viewBox 100×56.25 = 16:9）
   const P = i => ({ x: ISLAND_POS[i].left, y: ISLAND_POS[i].top * 0.5625 });
   return (
-    <div style={{ margin: "14px 16px", position: "relative", aspectRatio: "16 / 9",
+    // FB4便⑥: mapMax=高さに収まる幅まで拡大（14/16pxの余白は外側ラッパーへ＝コンテナ自身のpaddingは%座標の基準を変えるため不可）
+    <div style={{ padding: "14px 16px" }}>
+    <div className="mapMax" style={{ "--mapReserve": "240px", position: "relative", aspectRatio: "16 / 9",
       border: `3px solid ${C.ink}`, borderRadius: 22, boxShadow: "5px 5px 0 rgba(58,51,53,.9)",
       overflow: "hidden", background: "#7FC8F8" }}>
       <img src={MAP_BG[diff] || worldmapDay} alt="ワールドマップ" draggable="false"
@@ -491,11 +493,14 @@ function IslandMap({ save, diff, onEnter, unlockAll }) {
         );
       })}
     </div>
+    </div>
   );
 }
 
 export default function Puzzle({ save, update, go, onSound, unlockAll }) {
-  const diff = save.puzzle.difficulty || "easy";
+  // FB4便①: 難易度は入場のたび「やさしい」から（バトルと同じローカルstate・島→ステージ→島では保持）。
+  // save.puzzle.difficulty はもう読まない（フィールドは残存してよい＝スキーマ不変・roundtrip影響なし）
+  const [diff, setDiffState] = useState("easy");
   const [island, setIsland] = useState(null);
   const [stageId, setStageId] = useState(null);
   const stages = island ? stagesFor(island, diff) : [];
@@ -509,7 +514,7 @@ export default function Puzzle({ save, update, go, onSound, unlockAll }) {
   function setDiff(d) {
     SFX.tap(save.settings.sound);
     setIsland(null); setStageId(null);
-    update(s => { s.puzzle.difficulty = d; return s; });
+    setDiffState(d);
   }
 
   if (stage) {
@@ -528,7 +533,7 @@ export default function Puzzle({ save, update, go, onSound, unlockAll }) {
   }
 
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
+    <div className="mapPage" style={{ paddingBottom: 30 }}>{/* FB4便⑥: maxWidth640→mapPage */}
       {/* ◀もどる=1階層: ステージ一覧→島マップ／島マップ→ワールドマップ */}
       <Header save={save} title="🤖 ロボット パズル" onSound={onSound}
         onBack={island !== null ? () => { SFX.tap(save.settings.sound); setIsland(null); } : () => go("home")} />
