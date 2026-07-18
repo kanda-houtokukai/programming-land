@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-19（v2.3-b5m 実機FB第7便=5件〔吹き出し木枠＋羊皮紙/お店ボタン羊皮紙化/スタジオ棚の光り削除/下書き保存の残留バグ修正/タイピング+75〕・⚠️実機確認待ち）
+最終更新: 2026-07-19（v2.3-b5n 実機FB第8便=2件〔お店スマホ=絵の下に売り場カード2枚/おうちラベルはスマホ元サイズ・PC/タブレット1.5倍〕・⚠️実機確認待ち。b5mは実機OK）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,7 +12,12 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **v2.3-b5m（2026-07-19・実機FB第7便=5件＝⚠️実機確認待ち／deploy済み c8f5b4f）**: 指示書=Chat支給（raw実測＋モック承認済み）。スキーマ変更なし・新規画像アセットなし（吹き出し/ボタンはCSS）。神田さん承認事項=木枠＋羊皮紙・三角なし／お店ボタンも同じ羊皮紙／おうちラベル約1.5倍／お店ボタン横の絵文字削除／タイピング+75
+- **v2.3-b5n（2026-07-19・実機FB第8便=2件＝⚠️実機確認待ち／deploy済み 3737899）**: 指示書=Chat支給（raw実測＋モック案1承認）。新規アセットなし・スキーマ変更なし＝CSS＋Shop.jsxのレイアウトのみ。分岐は **@media(700px)**（既存 `.artgrid` と同じBP・JS/matchMedia不使用）。神田さん承認=お店スマホ=案1（絵の下に売り場カード2枚横ならび＋やめる小）／PC・タブレットは従来オーバーレイのまま／おうちラベルはスマホ元サイズ・PC/タブレットのみ1.5倍
+  - **①おうちラベル`.bubbleLg`をレスポンシブ化**（theme.js）: 基底を **`clamp(8px,1.9vw,12px)`/padding 5px 13px**（＝スマホ=元の.bubbleラベル相当）に戻し、`@media(min-width:700px)` で **`clamp(13px,2.2vw,18px)`/padding 8px 18px**（約1.5倍）。HomeRoomのラベル5箇所は `bubbleLg` 付与済み＝変更不要
+  - **②お店front-stageの選択肢をレスポンシブ化**（theme.js＋Shop.jsx）: **<700px=スマホ**＝絵の上にセリフ`.shopSerifPhone`だけ・選択肢は**絵の下**に `.shopCards`（`.shopCardRow`に売り場カード`.shopCard`2枚横ならび＋`.shopCancel`小）＝店主がまるごと見える・左右いっぱいにしない。`.shopCard` は角に小クギ`::before/::after`・min-height66pxで「バトルの どうぐ」も収まる。**≥700px=タブレット/PC**＝従来オーバーレイ`.shopOverlay`（絵の上に3 paperbtn・b5mと同一）を表示し `.shopCards`/`.shopSerifPhone` は display:none。Shop.jsx=旧オーバーレイdivに `className="shopOverlay"`（inline配置削除・中身の serif+paperbtn3つは不変）＋画像コンテナ内に shopSerifPhone＋コンテナ**外**に shopCards を追加。ハンドラ(enter/setTalking/setMsg)は全経路で不変
+  - 検証: **`npm run verify` 6本全PASS**（CSS＋レイアウトのみ＝roundtrip/engine/typing 影響なし）・ビルドOK・**ブラウザ幅別に実測**＝375px: `.shopOverlay` display:none／`.shopCards` grid・売り場カード2枚(バトルの どうぐ/きせかえ)＋クギpseudo有・`.shopCancel`有・`.shopSerifPhone` block＝店主まるごと見える／カード「バトルの どうぐ」→itemsサブ画面へ遷移OK・おうちラベル `.bubbleLg` **font-size 8px**(元サイズ)。1180/768px(≥700): `.shopOverlay` grid(3 paperbtn 絵の上)／`.shopCards`・`.shopSerifPhone` display:none・おうちラベル `@media` で **clamp(13,2.2vw,18)** 適用(matchMedia(700)=true・CSSOM実測)＝約1.5倍。**コンソールエラーゼロ**
+  - ⚠️次: 神田さんの実機確認（スマホ=お店カード2枚の大きさ/クギ有無/やめるの位置/店主の見え方・おうちラベルの小ささ／PC・タブレット=従来オーバーレイのまま・おうちラベル1.5倍）。色/厚み/角/座標は初期値＝実機で微調整
+- **v2.3-b5m（2026-07-19・実機FB第7便=5件＝実機OK・神田さん実機確認合格／deploy c8f5b4f）**: 指示書=Chat支給（raw実測＋モック承認済み）。スキーマ変更なし・新規画像アセットなし（吹き出し/ボタンはCSS）。神田さん承認事項=木枠＋羊皮紙・三角なし／お店ボタンも同じ羊皮紙／おうちラベル約1.5倍／お店ボタン横の絵文字削除／タイピング+75
   - **①吹き出しを木枠＋羊皮紙・三角の尾なしに全面刷新**: `theme.js .bubble` 本体を差し替え・`.bubble::after`/`::before`（三角2枚）を**削除**（継ぎ目/ズレ/文字沈みの原因を撤去）。単一クラスなのでHomeRoom家具ラベル＋Shop吹き出しが1箇所で直る。border 3px #7a4f22・radius 8px・羊皮紙グラデ＋内側ハイライト。font-sizeは各使用箇所が持つ（未指定）
   - **おうちラベルだけ1.5倍**: `theme.js .bubbleLg { font-size: clamp(12px,2.85vw,18px); padding:8px 18px }` 新設。`HomeRoom.jsx` のラベル5箇所（家具map/あいぼう/たまご/プロフィール）を `bubble pulse bubbleLg` に＋各inlineの `fontSize` 削除（bubbleLgが持つ）。他style(position/transform/marginBottom/animationDelay)は維持
   - **②お店front-stageを羊皮紙ボタン化＋絵文字削除**: `theme.js .paperbtn`（＋`.small`/`:active`）新設＝冒険地図の掠れ紙・厚み(0 3px 0)＋押下でtranslateY(3px)。`Shop.jsx` の `{talking&&…}`（b5l浮遊ボタン）を `paperbtn` 3択に置換＝「バトルの どうぐ」「きせかえ」「やめる(small)」・🧃🎩削除・セリフは`.bubble`。items/dressupサブ画面のボタンは対象外
