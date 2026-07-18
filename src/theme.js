@@ -216,6 +216,20 @@ export const CSS = `
      「横幅いっぱい。ただし画面の高さに収まる幅まで」＝地図(16:9)がスクロールなしで全体表示。
      %座標オーバーレイはコンテナ基準なので拡大してもズレない（既定の堅牢パターンのまま）。
      --mapReserve=地図以外のUIの高さぶん（画面別に指定・初期値・実機で微調整）。1100pxも初期値 */
+  /* 面（画面）切替のフェードイン（FB5便②）。App.jsx の keyed ラッパーに適用＝keyが変わるたび新画面がふわっと出る。
+     往復の暗転（前画面アウト→新画面イン）は両画面同時マウントが必要で重いため今回はフェードインのみ。.32s は初期値 */
+  @keyframes pl-screenin { from { opacity: 0 } to { opacity: 1 } }
+  .screenIn { animation: pl-screenin .32s ease; }
+  /* おうちモーダルの拡大（FB5便③）。.mapMax と同型＝16:9の部屋画像が画面の高さに収まる幅まで。
+     150px=モーダル余白＋ヘッダー行＋枠・1100px上限とも初期値 */
+  .homePanel { width: min(96vw, calc((100vh - 150px) * 16 / 9)); max-width: 1100px; }
+  @supports (height: 100dvh) {
+    .homePanel { width: min(96vw, calc((100dvh - 150px) * 16 / 9)); }
+  }
+  /* お店の店内画像の拡大（FB5便④）。幅と高さの両方に収める（縦横比は画像naturalのまま保持）。
+     270px=ヘッダー＋下部（あそびかた等）ぶん・初期値 */
+  .shopImg { display: block; width: auto; height: auto; max-width: 100%; max-height: calc(100vh - 270px); }
+  @supports (height: 100dvh) { .shopImg { max-height: calc(100dvh - 270px); } }
   .mapPage { max-width: min(96vw, 1100px); margin: 0 auto; }
   .mapMax  { width: min(100%, calc((100vh - var(--mapReserve, 240px)) * 16 / 9));
              margin-left: auto; margin-right: auto; }

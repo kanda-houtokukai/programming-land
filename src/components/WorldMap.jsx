@@ -55,10 +55,14 @@ export const AREAS = [
   { key: "studio", short: "つくる", place: "つくるスタジオ", img: buildingStudio, tall: true, left: 59.5, top: 12.4 },
 ];
 
-// じゅんびちゅう看板（段階3・右中の空き地・第2期の予告）。★非対話の飾り＝AREASに入れない（buttonにしない）。
-// 座標は studio-map-placement.md の確定値。文字は画像に描かずアプリのフォントで板の中央に重畳
-//（生成文字の品質不安定を回避・将来他の告知に流用可）。textTop=板の中央位置%（初期値・実機で微調整）
-const SIGN = { left: 69.5, top: 34.13, textTop: 40 };
+// じゅんびちゅう看板（段階3で1枚目・FB5便⑤で2枚目追加）。★非対話の飾り＝AREASに入れない（buttonにしない）。
+// 1枚目の座標は studio-map-placement.md の確定値・2枚目（中央上の空き地≒46,30）は初期値＝実機で微調整。
+// 文字は画像に描かずアプリのフォントで板の中央に重畳。flip=imgだけCSSで左右反転（新規画像は作らない・文字は正立のまま）。
+// 2枚が同位相で揺れないよう delay/dur を別値に（初期値）
+const SIGNS = [
+  { left: 69.5, top: 34.13, textTop: 40, flip: false, delay: "1.27s", dur: "3.3s" },
+  { left: 46, top: 30, textTop: 40, flip: true, delay: "2.1s", dur: "3.6s" }, // 中央上・左右反転（座標は初期値）
+];
 
 export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfile }) {
   const [popup, setPopup] = useState(null); // タップ中のエリア（場所名＋「へ いく」）
@@ -119,20 +123,24 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
           );
         })}
         {/* じゅんびちゅう看板（非対話の飾り・タップしても何も起きない）。ふわふわは他の建物と揃える＝
-            文字が板と一緒に揺れるよう、アニメは img でなく内側ラッパーに掛ける */}
-        <div aria-hidden="true" style={{ position: "absolute", left: `${SIGN.left}%`, top: `${SIGN.top}%`,
-          transform: "translate(-50%,-50%)", width: "13%", aspectRatio: "1", pointerEvents: "none",
-          display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div className="mapfloat" style={{ position: "relative", width: "62%", height: "62%",
-            animationDelay: "1.27s", animationDuration: "3.3s" }}>
-            <img src={signJunbichu} alt="" draggable="false"
-              style={{ width: "100%", height: "100%", objectFit: "contain", display: "block",
-                filter: "drop-shadow(1px 2px 2px rgba(20,15,25,.45))" }} />
-            <span style={{ position: "absolute", left: "50%", top: `${SIGN.textTop}%`, transform: "translate(-50%,-50%)",
-              whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(6px,1.35vw,11px)", color: "#4a2c05",
-              textShadow: "0 0 2px rgba(255,245,220,.8)" }}>じゅんびちゅう</span>
+            文字が板と一緒に揺れるよう、アニメは img でなく内側ラッパーに掛ける。
+            FB5便⑤: 2枚に一般化（2枚目は img だけ scaleX(-1) で反転・.mapfloat は別要素なので無干渉・文字は正立） */}
+        {SIGNS.map((s, i) => (
+          <div key={i} aria-hidden="true" style={{ position: "absolute", left: `${s.left}%`, top: `${s.top}%`,
+            transform: "translate(-50%,-50%)", width: "13%", aspectRatio: "1", pointerEvents: "none",
+            display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div className="mapfloat" style={{ position: "relative", width: "62%", height: "62%",
+              animationDelay: s.delay, animationDuration: s.dur }}>
+              <img src={signJunbichu} alt="" draggable="false"
+                style={{ width: "100%", height: "100%", objectFit: "contain", display: "block",
+                  transform: s.flip ? "scaleX(-1)" : undefined,
+                  filter: "drop-shadow(1px 2px 2px rgba(20,15,25,.45))" }} />
+              <span style={{ position: "absolute", left: "50%", top: `${s.textTop}%`, transform: "translate(-50%,-50%)",
+                whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(6px,1.35vw,11px)", color: "#4a2c05",
+                textShadow: "0 0 2px rgba(255,245,220,.8)" }}>じゅんびちゅう</span>
+            </div>
           </div>
-        </div>
+        ))}
       </div>
       </div>
 

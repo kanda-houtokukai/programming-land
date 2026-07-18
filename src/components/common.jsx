@@ -59,7 +59,8 @@ export function Header({ save, onBack, onSound, title, onOpenHome }) {
           ? <button className="pbtn" onClick={onOpenHome} aria-label={`${save.name}の おうちを ひらく`}
               style={{ ...panelStyle, background: "#fff" }}>{profileInner}</button>
           : <div className="panel" style={panelStyle}>{profileInner}</div>}
-        <Btn bg={C.white} onClick={onSound} aria-label="おとの おんおふ">{save.settings.sound ? "🔊" : "🔇"}</Btn>
+        {/* FB5便①: タップで音量循環（大→中→小→ミュート→大）。絵文字4段=音量段にちょうど対応（既存絵文字の踏襲） */}
+        <Btn bg={C.white} onClick={onSound} aria-label="おとの おおきさ">{["🔇", "🔈", "🔉", "🔊"][save.settings.musicVol ?? 3]}</Btn>
       </div>
     </div>
   );

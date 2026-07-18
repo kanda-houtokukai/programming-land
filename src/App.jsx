@@ -62,11 +62,11 @@ export default function App() {
 
   const save = profiles.find(p => p.id === currentId) || null;
 
-  // BGM（b5j）: 画面遷移／おうち開閉／スピーカーON・OFF に追従して曲を1本に集約制御。
-  // 各コンポーネントは不変＝ここ1本で全場面の音楽を切替（settings.sound 相乗り・スキーマ不変）
+  // BGM（b5j・FB5便①で音量段連動に）: 画面遷移／おうち開閉／音量段の変更 すべてに追従して曲を1本に集約制御。
+  // 各コンポーネントは不変＝ここ1本で全場面の音楽を切替（level 0-3 を渡す・0=ミュート）
   useEffect(() => {
-    setBgm(trackFor(screen, home, save), !!(save && save.settings.sound));
-  }, [screen, home, save && save.settings.sound]);
+    setBgm(trackFor(screen, home, save), save ? (save.settings.musicVol ?? 3) : 0);
+  }, [screen, home, save && save.settings.musicVol]);
 
   // どの画面からでも呼べる（ヘッダーの名前タップ／マップの家）。現在画面を from に覚えて開く（画面は変えない＝呼び出し元の状態は保持）
   const openHome = () => setHome({ from: screen, open: true });
@@ -136,7 +136,13 @@ export default function App() {
       return next;
     }));
   }
-  const onSound = () => update(s => { s.settings.sound = !s.settings.sound; return s; });
+  // FB5便①: スピーカーは音量循環（大→中→小→ミュート→大）。musicVol=音楽の段・sound=既存SFXゲート（>0で同期）
+  const onSound = () => update(s => {
+    const v = (((s.settings.musicVol ?? 3) + 3) % 4);   // 3→2→1→0→3
+    s.settings.musicVol = v;
+    s.settings.sound = v > 0;                            // 既存SFXゲートを同期（呼び出し側は一切不変）
+    return s;
+  });
 
   // つくるスタジオから戻ったとき（段階3）: スタジオは App を経由せず storage へ直接書く（XP/コイン/works）ため、
   // App の state を storage の最新で置き換える。update() の「prev vs next 比較」を1回通すことで、
@@ -199,6 +205,9 @@ export default function App() {
     <div className="pl-root">
       <style>{CSS}</style>
       <Toast toast={toast} />
+      {/* 面フェード（FB5便②）: keyが変わる＝新画面がフェードインし直す。
+          おうちモーダル・EvolutionOverlay等のオーバーレイはこのラッパーの外（独自の出方を維持） */}
+      <div key={screen} className="screenIn">
       {screen === "select" && (noProfiles
         ? <ProfileCreate onDone={handleCreate} />
         : <ProfileSelect profiles={profiles} onPick={pickProfile} onNew={() => setScreen("create")} />)}
@@ -241,6 +250,7 @@ export default function App() {
           onDeleteRequest={() => setConfirmDelete(true)}
           unlockAll={unlockAll} setUnlockAll={setUnlockAll} />
       )}
+      </div>
       {/* おうち（RPG部屋・モーダル）: 呼び出し元の画面の上に開く。閉じたら from へ戻る（メモ01+04）。交代はマップの「みなと」へ一本化（段階②） */}
       {save && home && home.open && (
         <HomeRoom save={save} update={update} onClose={closeHome} onEnter={enterFromHome} />

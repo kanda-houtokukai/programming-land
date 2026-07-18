@@ -97,8 +97,8 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
     <div role="dialog" aria-modal="true" onClick={onClose} className="fadein"
       style={{ position: "fixed", inset: 0, zIndex: 118, background: "rgba(58,51,53,.55)",
         display: "flex", alignItems: "center", justifyContent: "center", padding: 14 }}>
-      <div className="panel softpop" onClick={e => e.stopPropagation()}
-        style={{ maxWidth: 640, width: "100%", padding: 12, background: "#FFFDF5" }}>
+      <div className="panel softpop homePanel" onClick={e => e.stopPropagation()}
+        style={{ padding: 12, background: "#FFFDF5" }}>{/* FB5便③: maxWidth640→homePanel（端末サイズまで拡大・16:9基準） */}
         {/* ヘッダー行: タイトル＋×（メモ03: 閉じる＝呼び出し元へ1階層） */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <span className="pl-display" style={{ fontSize: 20, flex: 1 }}>🏠 {save.name}の おうち</span>

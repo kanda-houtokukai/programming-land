@@ -148,6 +148,27 @@ ok(JSON.stringify(q.coinDay) === JSON.stringify(p.coinDay), "coinDay（当日コ
 }
 ok(JSON.stringify(q.powers) === JSON.stringify(p.powers), "そだったちからF2 前回%（powers.prev）");
 ok(q.character === "girl" && JSON.stringify(q.dressup) === JSON.stringify(p.dressup), "第3波 主人公キャラ＋着せ替え装備（character/dressup）");
+// b5k 音量段: musicVol の往復＋旧save（musicVol無し）は sound から導出
+p.settings = { sound: true, musicVol: 1 }; // 小
+saveProfile(p);
+{
+  const q2 = loadFresh(p.id);
+  ok(q2.settings.sound === true && q2.settings.musicVol === 1, "b5k settings.musicVol=1（小）が往復で保持される");
+  // 旧save再現①: musicVol を消す（sound:true）→ 3 に導出
+  const rawV = JSON.parse(localStorage.getItem(`progland:v2:profile:${p.id}`));
+  delete rawV.settings.musicVol;
+  localStorage.setItem(`progland:v2:profile:${p.id}`, JSON.stringify(rawV));
+  const mV = loadFresh(p.id);
+  ok(mV.settings.musicVol === 3 && mV.settings.sound === true, "b5k 旧save(sound:true, musicVol無し) → musicVol=3 に導出");
+  // 旧save再現②: sound:false → 0 に導出（★デフォルトマージ後でなく生データで判定していることの確認）
+  rawV.settings = { sound: false };
+  localStorage.setItem(`progland:v2:profile:${p.id}`, JSON.stringify(rawV));
+  const mV2 = loadFresh(p.id);
+  ok(mV2.settings.musicVol === 0 && mV2.settings.sound === false, "b5k 旧save(sound:false) → musicVol=0 に導出（ミュート維持）");
+  // 後続チェックのため元の状態へ戻す
+  rawV.settings = { sound: true, musicVol: 1 };
+  localStorage.setItem(`progland:v2:profile:${p.id}`, JSON.stringify(rawV));
+}
 // b5e つくるスタジオ: 入れ子ブロック木まで完全往復＋studioの無い旧セーブはデフォルト補完
 ok(JSON.stringify(q.studio) === JSON.stringify(p.studio), "b5e/b5g つくるスタジオ（works+draft+milestones・入れ子ブロック木まで完全往復）");
 {

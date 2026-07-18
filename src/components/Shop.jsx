@@ -61,7 +61,7 @@ export default function Shop({ save, update, go, onSound, openHome }) {
   const enter = st => { SFX.tap(sound); setTalking(false); setMsg(null); setStage(st); };
 
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
+    <div className="mapPage" style={{ paddingBottom: 30 }}>{/* FB5便④: maxWidth640→mapPage（min(96vw,1100px)） */}
       {/* もどる=1階層ずつ: 商品リスト→店内／店内→ワールドマップ（メモ03） */}
       <Header save={save} title="🪙 おみせ" onSound={onSound} onOpenHome={openHome}
         onBack={stage === "front" ? () => go("home") : () => enter("front")} />
@@ -69,32 +69,36 @@ export default function Shop({ save, update, go, onSound, openHome }) {
       {/* ===== 段階1: 店内（店員に はなしかける） ===== */}
       {stage === "front" && (
         <div style={{ padding: "0 16px", display: "grid", gap: 12 }}>
-          <div style={{ position: "relative", borderRadius: 16, lineHeight: 0,
+          {/* FB5便④: 店内画像を端末サイズまで拡大（.shopImg=高さにも収める）・コンテナは画像にフィットして中央寄せ
+              ＝img駆動のままタップ枠の%座標が絵と一致し続ける */}
+          <div style={{ position: "relative", borderRadius: 16, lineHeight: 0, width: "fit-content", maxWidth: "100%", margin: "0 auto",
             overflow: "hidden", border: `3px solid ${C.ink}`, background: "#e9c9a0" }}>
-            <img src={shopBg} alt="おみせの なか" draggable="false"
-              style={{ display: "block", width: "100%", height: "auto" }} />
+            <img src={shopBg} alt="おみせの なか" draggable="false" className="shopImg" />
             {/* 店員のタップ領域（透明）＋RPG風の吹き出し（おうちの家具ラベルと同じ作法）。
-                吹き出しは店主の頭の上に置く（話しかける相手の位置を指す） */}
+                吹き出しは店主の頭の上に置く（話しかける相手の位置を指す）。会話中は吹き出しを隠す（FB5便④） */}
             <button className="tapzone" onClick={() => { SFX.tap(sound); setTalking(true); }} aria-label="てんいんさんに はなしかける"
               style={{ position: "absolute", left: "51%", top: "40%", transform: "translate(-50%,-50%)",
                 width: "28%", height: "48%", border: "none", background: "transparent", cursor: "pointer", padding: 0 }}>
               {/* RPG看板ラベル＝店主の頭の「上」・しっぽで指す・うっすら点滅（UI改修①④） */}
-              <span className="bubble pulse" style={{ position: "absolute", left: "50%", top: "6%",
-                transform: "translate(-50%,-100%)", fontSize: "clamp(9px,2vw,13px)" }}>はなしかける</span>
+              {!talking && <span className="bubble pulse" style={{ position: "absolute", left: "50%", top: "6%",
+                transform: "translate(-50%,-100%)", fontSize: "clamp(9px,2vw,13px)" }}>はなしかける</span>}
             </button>
-          </div>
-
-          {/* 店員の吹き出し＋カテゴリ選択（店員タップで出る） */}
-          {talking ? (
-            <div className="panel softpop" style={{ padding: 16, background: "#FFFDF5" }}>
-              <div style={{ fontWeight: 900, fontSize: 16, marginBottom: 12 }}>💬 「{SERIF.hello}」</div>
-              <div style={{ display: "grid", gap: 8 }}>
+            {/* 会話中は選択肢を画像の下半分にオーバーレイ（FB5便④）。コンテナはoverflow:hiddenなので角丸にクリップ。
+                高さ56%・不透明度94%は初期値＝実機で微調整 */}
+            {talking && (
+              <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, maxHeight: "56%", overflowY: "auto",
+                background: "rgba(255,253,245,.94)", borderTop: `3px solid ${C.ink}`, borderRadius: "0 0 13px 13px",
+                padding: 12, lineHeight: 1.3, display: "grid", gap: 8, alignContent: "start" }}>
+                <div style={{ fontWeight: 900, fontSize: 15 }}>💬 「{SERIF.hello}」</div>
                 <Btn big bg={C.sky} onClick={() => enter("items")}>🧃 バトルの どうぐ</Btn>
                 <Btn big bg={C.sakura} onClick={() => enter("dressup")}>🎩 きせかえ</Btn>
                 <Btn bg="#fff" onClick={() => { SFX.tap(sound); setTalking(false); setMsg(`💬 ${SERIF.bye}`); }}>やめる</Btn>
               </div>
-            </div>
-          ) : (
+            )}
+          </div>
+
+          {/* 非会話時のヒントだけ画像の下に残す（選択肢パネルはオーバーレイへ移動＝FB5便④） */}
+          {!talking && (
             <div style={{ fontWeight: 700, fontSize: 13, textAlign: "center", color: "#6B6265" }}>
               てんいんさんを タップして はなしかけてみよう
             </div>

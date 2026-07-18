@@ -4,7 +4,7 @@
      progland:v2:profile:<id>  … 各プロファイルの記録本体
    将来の項目追加でクラッシュしないよう、読み込みは常にデフォルト値マージで行う */
 
-export const SCHEMA_VERSION = 5; // b5g: studio.milestones（コイン節目の永続化）。4 = b5e: studio {works, draft}／3 = b4j: partner 相棒ごとレベル
+export const SCHEMA_VERSION = 6; // b5k: settings.musicVol（音楽の音量3段階+ミュート）。5 = b5g: studio.milestones／4 = b5e: studio／3 = b4j: partner 相棒ごとレベル
 export const MAX_PROFILES = 4;
 const META_KEY = "progland:v2:meta";
 const profileKey = id => `progland:v2:profile:${id}`;
@@ -34,7 +34,7 @@ export function newProfileData(name = "", character = null) {
     character,                            // 主人公 "boy"|"girl"（第3波①）。旧avatar（動物絵文字）は廃止・既存セーブはnullのまま残りCharacterSelectで移行
     dressup: { head: null, face: null, neck: null, chest: null, waist: null, back: null }, // 着せ替え装備（各スロットのアイテムID・第3波）
     createdAt: today(),
-    settings: { sound: true },
+    settings: { sound: true, musicVol: 3 }, // musicVol: 0=ミュート/1=小/2=中/3=大（b5k・音量段は音楽のみ・soundは既存SFXゲート）
     puzzle: { stars: {}, difficulty: "easy" },
     quiz: { best: {}, difficulty: "easy" },
     art: { gallery: [] },
@@ -98,6 +98,11 @@ function mergeDefaults(parsed) {
     }
   }
   out.partner = migratePartner(out.partner);
+  // b5k: 旧save（musicVol未保存）は sound から導出。★デフォルトマージが先に musicVol:3 を埋めるため、
+  // 「保存データ側に musicVol が無かったか」は parsed（生データ）で判定する（out側判定だと sound:false の旧saveで音楽が鳴る）
+  if (!parsed || !parsed.settings || parsed.settings.musicVol === undefined) {
+    out.settings.musicVol = out.settings.sound ? 3 : 0;
+  }
   out.dex = [...new Set((out.dex || []).map(k => {
     const i = k.indexOf("-");
     return i > 0 ? `${mapSpeciesId(k.slice(0, i))}${k.slice(i)}` : k;
