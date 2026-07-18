@@ -204,6 +204,8 @@ export const CSS = `
   .bubbleLg { font-size: clamp(8px, 1.9vw, 12px); padding: 5px 13px; }
   @media (min-width: 700px) {
     .bubbleLg { font-size: clamp(13px, 2.2vw, 18px); padding: 8px 18px; }
+    /* PC/タブレットのみ ずかん(dex)・きろく(records) を少し下へ（b5o ①・chestは対象外・スマホは0px維持） */
+    .spot-dex, .spot-records { --labelDown: 12px; }
   }
   /* お店front-stageの選択肢＝冒険地図の掠れた紙ボタン（b5m ②・絵文字なし） */
   .paperbtn { display: block; width: 100%; box-sizing: border-box; padding: 13px 16px; cursor: pointer;
@@ -245,6 +247,9 @@ export const CSS = `
       width: min(340px, 82%); gap: 10px; line-height: 1.2; z-index: 3; }
     .shopSerifPhone { display: none; }
     .shopCards { display: none; }
+    /* PC/タブレットは話しかけの選択肢を少し大きく（b5o ②・スマホは .shopCard で別物＝不変） */
+    .paperbtn { font-size: 21px; padding: 15px 20px; }
+    .paperbtn.small { font-size: 18px; padding: 13px 20px; }
   }
   /* ラベル/ヒントの誘導＝うっすら優しい点滅（UI改修④・上下ふわふわから変更。キャラの揺れには使わない） */
   @keyframes pl-pulse { 0%,100% { opacity: 1 } 50% { opacity: .7 } }

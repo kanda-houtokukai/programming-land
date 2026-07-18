@@ -117,8 +117,8 @@ export default function HomeRoom({ save, update, onClose, onEnter }) {
               style={{ position: "absolute", left: `${f.left}%`, top: `${f.top}%`,
                 transform: "translate(-50%,-50%)", width: `${f.w}%`, height: `${f.h}%`,
                 border: "none", background: "transparent", cursor: "pointer", padding: 0 }}>
-              <span className="bubble pulse bubbleLg" style={{ position: "absolute", left: "50%", bottom: "calc(100% + 2px)",
-                transform: `translate(-50%, ${f.labelDy || 0}px)`,
+              <span className={"bubble pulse bubbleLg spot-" + f.key} style={{ position: "absolute", left: "50%", bottom: "calc(100% + 2px)",
+                transform: `translate(-50%, calc(${f.labelDy || 0}px + var(--labelDown, 0px)))`,
                 animationDelay: `${(i * 0.7).toFixed(1)}s` }}>{f.label}</span>
             </button>
           ))}
