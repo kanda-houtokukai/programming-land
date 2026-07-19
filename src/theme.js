@@ -254,6 +254,12 @@ export const CSS = `
   /* ラベル/ヒントの誘導＝うっすら優しい点滅（UI改修④・上下ふわふわから変更。キャラの揺れには使わない） */
   @keyframes pl-pulse { 0%,100% { opacity: 1 } 50% { opacity: .7 } }
   .pulse { animation: pl-pulse 2.6s ease-in-out infinite; }
+  /* 副題の「タップ」だけポップ＝オレンジ＋白8方向フチ＋少し大きめ＋やさしくバウンド（b5p ②） */
+  .tapPop { display: inline-block; vertical-align: middle; margin: 0 2px; font-weight: 900; font-size: 17px; color: #e07a15;
+    text-shadow: 1.5px 1.5px 0 #fff, -1.5px 1.5px 0 #fff, 1.5px -1.5px 0 #fff, -1.5px -1.5px 0 #fff,
+      0 1.5px 0 #fff, 0 -1.5px 0 #fff, 1.5px 0 0 #fff, -1.5px 0 0 #fff, 0 3px 2px rgba(150,80,10,.3);
+    animation: pl-tapbob 1.6s ease-in-out infinite; }
+  @keyframes pl-tapbob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
   /* おえかき: キャンバス左・操作右の2カラム（狭い画面は縦積みフォールバック・メモ08 b3i） */
   .artgrid { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
   @media (min-width: 700px) {

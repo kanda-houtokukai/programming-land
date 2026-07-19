@@ -79,7 +79,7 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
         {/* タイトルロゴ（title_logo.webp・透過）。実機FB第1便: 80%に縮小（90%,460→72%,368・3画面そろえる） */}
         <img src={titleLogo} alt="プログラミングランド" draggable="false"
           style={{ width: "min(72%, 368px)", height: "auto", display: "block", margin: "0 auto" }} />
-        <div style={{ fontWeight: 700, fontSize: 13 }}>いきたい ばしょを タップしてね</div>
+        <div style={{ fontWeight: 700, fontSize: 13 }}>いきたい ばしょを <span className="tapPop">タップ</span>してね</div>
       </div>
 
       {/* ワールドマップ本体（FB4便⑥: mapMax=高さに収まる幅まで拡大・--mapReserveは初期値）。
@@ -136,8 +136,8 @@ export default function WorldMap({ save, go, onSound, onOpenHome, onSwitchProfil
                   transform: s.flip ? "scaleX(-1)" : undefined,
                   filter: "drop-shadow(1px 2px 2px rgba(20,15,25,.45))" }} />
               <span style={{ position: "absolute", left: "50%", top: `${s.textTop}%`, transform: "translate(-50%,-50%)",
-                whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(6px,1.35vw,11px)", color: "#4a2c05",
-                textShadow: "0 0 2px rgba(255,245,220,.8)" }}>じゅんびちゅう</span>
+                whiteSpace: "nowrap", fontWeight: 900, fontSize: "clamp(6px,1.35vw,11px)", color: "#fff6e6",
+                textShadow: "1px 1px 0 #5a3410, -1px 1px 0 #5a3410, 1px -1px 0 #5a3410, -1px -1px 0 #5a3410, 0 1px 0 #5a3410, 0 -1px 0 #5a3410, 1px 0 0 #5a3410, -1px 0 0 #5a3410, 0 2px 3px rgba(40,20,5,.5)" }}>じゅんびちゅう</span>
             </div>
           </div>
         ))}
