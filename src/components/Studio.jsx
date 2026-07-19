@@ -1,11 +1,13 @@
-// つくるスタジオ: 薄いルーター（段階2 §1）。
+// つくるスタジオ: 薄いルーター（段階2 §1・段階Aでモード注入点を兼ねる）。
 // view = "home"（フィルムだな＋みほんのたな） | "edit"（エディタ） | "show"（上演専用）。
-// エディタ本体は StudioEditor.jsx（段階1の実機ゲート合格コードをそのまま移動）。
+// エディタ本体は共通部品 WorkshopEditor.jsx（段階AでStudioEditorから改名・mode注入化）。
+// スタジオ固有物は STUDIO_MODE（src/studio/mode.jsx）に集約し、共通部品へ渡すだけ。
 // 開く対象ごとに key を変えてエディタを再マウントする（initRef が正しく走る）。
 // draft の自動退避（§2）は Home 側（開く前）で行う＝ここは配線だけ。
 import { useState, useRef } from "react";
 import StudioHome from "./StudioHome.jsx";
-import StudioEditor from "./StudioEditor.jsx";
+import WorkshopEditor from "./WorkshopEditor.jsx";
+import { STUDIO_MODE } from "../studio/mode.jsx";
 
 /* onExit（段階3・正規導線）: App から渡される「マップへ戻る」。App 側が storage を再読込して
    バッジ/実績/レベルアップの検知を1回だけ走らせる。#studio-dev（開発用バックドア）では未指定＝hash運用 */
@@ -23,7 +25,7 @@ export default function Studio({ onExit }) {
 
   if (view === "home") return <StudioHome onOpen={openEditor} onExitApp={onExit} />;
   return (
-    <StudioEditor key={target.key} open={target.open} showOnly={view === "show"}
+    <WorkshopEditor key={target.key} mode={STUDIO_MODE} open={target.open} showOnly={view === "show"}
       onExit={() => { setView("home"); setTarget(null); }} />
   );
 }

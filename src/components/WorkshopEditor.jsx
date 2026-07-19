@@ -1,19 +1,19 @@
-// つくるスタジオ: エディタ本体（段階1の Studio.jsx を段階2でそのまま移動・実機ゲート合格済み）。
+// 共通部品: 作品エディタ本体（段階A §3-3 で StudioEditor.jsx から改名・モード注入化）。
+// つくるスタジオ／ゲームこうぼう（段階1〜）が共有する。スタジオ固有物（保存モデル・棚の語彙・
+// パレット構成・背景・文言・マーク）はすべて props の mode（src/studio/mode.jsx 等）経由で受ける。
 // 仕様の正本: brushup/studio-implementation-stage01.md §3 ＋ stage2.md §1/§2/§4 ／ 設計: brushup/studio-design.md。
-// ★段階2の変更は「移動と props 追加（open/showOnly/onExit）＋ほぞん」のみ。
-//   ドラッグ・スナップ・実行まわりの手触りコードには手を入れていない。§11の数値は変更禁止。
+// ★段階Aの変更は「mode 注入への置換」のみ。ドラッグ・スナップ・実行まわりの手触りコードには
+//   手を入れていない（等価変換・回帰ハーネスで機械保証）。§11の数値は変更禁止。
 // ★matchMedia/ResizeObserverは使わない（過去2件の障害実績）。縮尺は window resize＋同一式のみ。
-// ★実行エンジンは src/studio/engine.js（UI非依存）。この画面は TICK ごとに tick() を呼び、
+// ★実行エンジンは src/workshop/engine.js（UI非依存）。この画面は TICK ごとに tick() を呼び、
 //   コールバック（位置更新/発光/効果音）を描画に反映するだけ。
 import { useReducer, useRef, useState, useEffect, useLayoutEffect, useCallback } from "react";
-import { DEFS, PALORDER, SOUNDS, isTrigger, isContainer, makeBlock, cloneBlocks } from "../data/studio-blocks.js";
+import { isTrigger, isContainer, makeBlock, cloneBlocks } from "../data/studio-blocks.js";
 import { G, ANIM, pathBody, pathHat, pathC, chipY, blockH, stackH, containerDepth } from "../workshop/geometry.js";
 import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../workshop/engine.js";
 import { lastProfile, saveProfile } from "../storage.js";
 import { buildCast, kindImg, kindName, kindValid } from "../workshop/cast.js";
-import { saveWork, nextWorkName, NAME_MAX, MILESTONE_NAMES } from "../studio/works.js";
 import iconCoin from "../assets/icon_stat_coin.png";
-import { BGS } from "../data/studio-bgs.js";
 import PlayerAvatar from "./PlayerAvatar.jsx";
 import StudioBlock from "./StudioBlock.jsx";
 
@@ -60,7 +60,7 @@ export const SND = [
   () => tone(120, 0.22, "sine", 0.28),
 ];
 
-/* 控え室の顔ぶれ・キャラ種別ヘルパーは src/studio/cast.js に移動（段階2・Home/サムネと共有・ロジック不変） */
+/* 控え室の顔ぶれ・キャラ種別ヘルパーは src/workshop/cast.js（段階2で分離・段階Aでworkshopへ・Home/サムネと共有） */
 
 /* ============ CSS ============ */
 const STUDIO_CSS = `
@@ -310,12 +310,19 @@ function CharSprite({ ch, disp, cellPx, base, selected, running, instant, profil
   );
 }
 
-/* props（段階2 §1）:
+/* props（段階2 §1＋段階A §3-3）:
+   mode     … モード設定（src/studio/mode.jsx の STUDIO_MODE 等）。blocks/bgs/space/works/texts/mark
    open     … null=draftの続き ／ {bg, chars, name, origin} = 作品orみほんを開く（開いた瞬間コピー＝ID全振り直し・原本不変）
    showOnly … true=上演専用（編集UI非表示・big固定・draftに一切書かない・§4）
    onExit   … Home へ戻る */
-export default function StudioEditor({ open = null, showOnly = false, onExit }) {
+export default function WorkshopEditor({ mode, open = null, showOnly = false, onExit }) {
   const [, force] = useReducer(x => x + 1, 0);
+  // モード注入（段階A §3-3）: モード固有物はこの5行の先でだけ触る
+  const { DEFS, PALORDER, SOUNDS } = mode.blocks;
+  const BGS = mode.bgs;
+  const { saveWork, nextWorkName, NAME_MAX, MILESTONE_NAMES } = mode.works;
+  const space = mode.space;
+  const TXT = mode.texts;
 
   /* ==== 初期化（プロファイル＋open／draft復帰） ==== */
   const initRef = useRef(null);
@@ -334,7 +341,8 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
       origin = open.origin || { type: "new" };
       name = open.name || "";
     } else {
-      const draft = profile && profile.studio && profile.studio.draft;
+      const sp0 = profile && space.peek(profile);
+      const draft = sp0 && sp0.draft;
       if (draft && Array.isArray(draft.chars) && draft.chars.length) {
         chars = loadScene(draft);
         if (chars.length) {
@@ -434,18 +442,18 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
     if (showOnly) return; // 上演専用: 人の作品を見ただけでかきかけを壊さない（§4）
     const prof = profileRef.current;
     if (!prof) return; // プロファイル未作成の端末では保存なしで遊べる（開発ルートの割り切り）
-    if (!prof.studio) prof.studio = { works: [], draft: null };
+    const sp = space.ensure(prof);
     const sc = serializeScene();
     const scene = { bg: sc.bg, chars: sc.chars.map(c => ({ kind: c.kind, x: c.x, y: c.y, stacks: c.stacks })) };
     const o = originRef.current;
     if (o && o.type === "work") {                       // 保存済み作品と同一なら下書き不要（本FB）
-      const w = prof.studio.works.find(x => x.id === o.id);
+      const w = sp.works.find(x => x.id === o.id);
       if (w && JSON.stringify({ bg: w.bg, chars: w.chars }) === JSON.stringify(scene)) {
-        if (prof.studio.draft) { prof.studio.draft = null; saveProfile(prof); }
+        if (sp.draft) { sp.draft = null; saveProfile(prof); }
         return;
       }
     }
-    prof.studio.draft = { bg: sc.bg, sel: sc.sel, origin: o, name: nameRef.current, chars: scene.chars };
+    sp.draft = { bg: sc.bg, sel: sc.sel, origin: o, name: nameRef.current, chars: scene.chars };
     saveProfile(prof);
   };
   const scheduleDraft = () => {
@@ -476,7 +484,8 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
     const scene = { bg: sc.bg, chars: sc.chars.map(c => ({ kind: c.kind, x: c.x, y: c.y, stacks: c.stacks })) };
     const r = saveWork(prof, scene, saveName, originRef.current);
     if (!r.ok) { setSaveOpen(false); setToast("たなが いっぱい! どれか けしてから"); sndNo(); return; }
-    const w = prof.studio.works.find(x => x.id === r.id);
+    const sp = space.ensure(prof);
+    const w = sp.works.find(x => x.id === r.id);
     originRef.current = { type: "work", id: r.id }; // 以後の ほぞん は同じ作品への上書き
     nameRef.current = w ? w.name : "";
     setSaveOpen(false);
@@ -488,10 +497,10 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
       setTimeout(() => tone(660, 0.12, "sine", 0.16), 80);   // 簡易ファンファーレ（WebAudio・Suno差し替えは本線）
       setTimeout(() => tone(880, 0.16, "sine", 0.16), 200);
     } else {
-      setToast("フィルムだなに ほぞんした！"); // 上書き保存（作り直し）は付与なし＝静かに
+      setToast(TXT.savedToast); // 上書き保存（作り直し）は付与なし＝静かに
       sndSnap();
     }
-    prof.studio.draft = null;              // 保存した作品は下書きから消す（本FB）
+    sp.draft = null;                       // 保存した作品は下書きから消す（本FB）
     clearTimeout(draftTimerRef.current);   // 予約済みの下書き書き込みを取消
     saveProfile(prof);
   };
@@ -1042,12 +1051,10 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
     <div className={"studio-root" + (running ? " running" : "") + (big ? " big" : "") + (showOnly ? " showonly" : "")}>
       <style>{STUDIO_CSS}</style>
       <header>
-        <div className="mark">
-          <svg width="17" height="17" viewBox="0 0 17 17"><path d="M2 15V2h9l-2.6 3.4L11 9H4.2" fill="none" stroke="#4a2c05" strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round" /></svg>
-        </div>
+        <div className="mark">{mode.mark}</div>
         <div style={{ minWidth: 0 }}>
-          <h1>つくるスタジオ</h1>
-          <div className="sub">{showOnly ? "さくひんを みる" : "つくって ▶で うごかそう"}</div>
+          <h1>{TXT.title}</h1>
+          <div className="sub">{showOnly ? TXT.showSub : TXT.editSub}</div>
         </div>
         <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
           {!showOnly && <button className="editbtn" disabled={!hist.past.length || running} onClick={undo}>とりけし</button>}
@@ -1199,7 +1206,7 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
             <div className="msg">さくひんの なまえを つけてね<br />
               <span style={{ fontSize: 11, color: "#8a7a60" }}>（{NAME_MAX}もじまで・そのままでも いいよ）</span></div>
             <input value={saveName} maxLength={NAME_MAX} onChange={e => setSaveName(e.target.value.slice(0, NAME_MAX))}
-              placeholder={profileRef.current ? nextWorkName((profileRef.current.studio && profileRef.current.studio.works) || []) : "さくひん1"} />
+              placeholder={profileRef.current ? nextWorkName((space.peek(profileRef.current) || {}).works || []) : nextWorkName([])} />
             <button className="ok" onClick={doSaveWork}>ほぞんする</button>
             <button className="no" onClick={() => setSaveOpen(false)}>やめる</button>
           </div>
@@ -1211,7 +1218,7 @@ export default function StudioEditor({ open = null, showOnly = false, onExit }) 
           <div className="box">
             <div className="msg" style={{ fontSize: 20 }}>かんせい!</div>
             <div style={{ color: "#6b4a26", fontSize: 13, fontWeight: 900, marginBottom: 10 }}>
-              「{saveDone.name}」を フィルムだなに ほぞんした</div>
+              「{saveDone.name}」を {TXT.shelfName}に ほぞんした</div>
             <div style={{ color: "#4a3520", fontSize: 15, fontWeight: 900, marginBottom: 6 }}>
               けいけんち +{saveDone.grant.xp}</div>
             {saveDone.grant.coins > 0 && (
