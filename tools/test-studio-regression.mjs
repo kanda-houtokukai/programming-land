@@ -17,10 +17,10 @@ import { dirname, join } from "node:path";
 
 import { SAMPLES } from "../src/data/studio-samples.js";
 import { DEFS, PALORDER, SOUNDS, STUDIO_BG_IDS } from "../src/data/studio-blocks-defs.js";
-import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../src/studio/engine.js";
+import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../src/workshop/engine.js";
 import {
   G, ANIM, CHIP_STYLE, pathBody, pathHat, pathC, gloss, blockH, stackH, chipY, labelY,
-} from "../src/studio/geometry.js";
+} from "../src/workshop/geometry.js";
 import {
   ensureSpace, sceneNonEmpty, nextWorkName, saveWork, stashDraft, deleteWork,
 } from "../src/workshop/store.js";

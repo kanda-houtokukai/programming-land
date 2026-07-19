@@ -7,10 +7,10 @@
 //   コールバック（位置更新/発光/効果音）を描画に反映するだけ。
 import { useReducer, useRef, useState, useEffect, useLayoutEffect, useCallback } from "react";
 import { DEFS, PALORDER, SOUNDS, isTrigger, isContainer, makeBlock, cloneBlocks } from "../data/studio-blocks.js";
-import { G, ANIM, pathBody, pathHat, pathC, chipY, blockH, stackH, containerDepth } from "../studio/geometry.js";
-import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../studio/engine.js";
+import { G, ANIM, pathBody, pathHat, pathC, chipY, blockH, stackH, containerDepth } from "../workshop/geometry.js";
+import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../workshop/engine.js";
 import { lastProfile, saveProfile } from "../storage.js";
-import { buildCast, kindImg, kindName, kindValid } from "../studio/cast.js";
+import { buildCast, kindImg, kindName, kindValid } from "../workshop/cast.js";
 import { saveWork, nextWorkName, NAME_MAX, MILESTONE_NAMES } from "../studio/works.js";
 import iconCoin from "../assets/icon_stat_coin.png";
 import { BGS } from "../data/studio-bgs.js";

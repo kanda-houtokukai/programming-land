@@ -5,7 +5,7 @@
    ① 端で残り歩数を捨てて次へ ② 入れ子くりかえしの実行回数 ③ ずっとの停止
    ④ 並行2スタックの拍整合 ⑤ ぶつかりの再発火条件（重なり継続中は再発火せず・離れて再接触で発火） */
 
-import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../src/studio/engine.js";
+import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../src/workshop/engine.js";
 
 let fail = 0;
 const ok = (cond, msg) => { console.log(`${cond ? "✓" : "✗ FAIL"} ${msg}`); if (!cond) fail++; };

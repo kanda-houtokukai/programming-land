@@ -2,7 +2,7 @@
 // プロトタイプ第11版の makeShape/labelHTML の1:1移植（DOM戦略同一: 絶対配置div＋SVG・位置はtransform）。
 import { useLayoutEffect, useRef } from "react";
 import { DEFS, SOUNDS } from "../data/studio-blocks.js";
-import { G, CHIP_STYLE, pathBody, pathHat, pathC, gloss, chipY, labelY } from "../studio/geometry.js";
+import { G, CHIP_STYLE, pathBody, pathHat, pathC, gloss, chipY, labelY } from "../workshop/geometry.js";
 
 /* props:
    b=ブロックデータ / mouth=容器の口の高さ / x,y=ステージ座標 / z=zIndex

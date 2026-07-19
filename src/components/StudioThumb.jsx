@@ -3,9 +3,9 @@
 // 仮想ステージ（3:2）上でステージと同一式（論理12×8・cellPx=min((w-52)/12,(h-44)/8)・
 // translate(22+x*c, -y*c)・キャラ幅=c×2.2）で配置し、全体を transform:scale で縮小する
 // ＝本物のステージの正確なミニチュアになる。
-import { LCOLS, LROWS } from "../studio/engine.js";
+import { LCOLS, LROWS } from "../workshop/engine.js";
 import { bgById } from "../data/studio-bgs.js";
-import { kindImg } from "../studio/cast.js";
+import { kindImg } from "../workshop/cast.js";
 import PlayerAvatar from "./PlayerAvatar.jsx";
 
 const ACTOR_K = 2.2;          // キャラ表示幅 = cellPx×これ（エディタCFGと同値・プロトタイプ実測値）

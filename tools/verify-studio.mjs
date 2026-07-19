@@ -6,7 +6,7 @@
 
 import { SAMPLES } from "../src/data/studio-samples.js";
 import { DEFS, SOUNDS, STUDIO_BG_IDS, isTrigger, isContainer } from "../src/data/studio-blocks-defs.js";
-import { createEngine, LCOLS, LROWS } from "../src/studio/engine.js";
+import { createEngine, LCOLS, LROWS } from "../src/workshop/engine.js";
 
 let fail = 0;
 const ng = msg => { console.log(`✗ FAIL ${msg}`); fail++; };
