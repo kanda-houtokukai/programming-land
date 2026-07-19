@@ -329,7 +329,7 @@ export const CSS = `
     .idle,.idle2,.lunge,.hitflash,.shake2,.hitfx,.critpop,.heartbreak,.fall,.victory,.droop,.riseup,.aura,.shieldpop,.healglow { animation: none; }
     .dmgfloat,.anticip { animation: none; }
     .charge,.spinlight,.morph,.slam,.whiteflash,.confetti { animation: none; }
-    .fadein,.softpop,.mapfloat,.growpop,.sparkle,.pulse { animation: none; }
+    .fadein,.softpop,.mapfloat,.growpop,.sparkle,.pulse,.tapPop { animation: none; }
     .whiteflash { opacity: 0; }
     .pbtn { transition: none; }
   }
