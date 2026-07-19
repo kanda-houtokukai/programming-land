@@ -1,7 +1,10 @@
 // つくるスタジオ: 形状ジオメトリ＋SVGパス生成＋スナップ/アニメ定数。
 // ★brushup/studio-block-prototype.html 第11版からの1:1移植（studio-design.md §11 が数値の正本）。
 // 「改善」禁止。調整はすべてここの定数で行う（マジックナンバーを散らさない・憲章§4-4）。
-import { DEFS, isContainer } from "../data/studio-blocks.js";
+// ★段階A §2-0: import を blocks.js（アイコン合成層・画像import入り）→ defs（純データ層）に差し替え。
+//   geometry が DEFS から使うのは shape のみ＝完全に等価で、このファイルが node 安全になる
+//   （tools/test-studio-regression.mjs がパス文字列を機械検証できる）。
+import { DEFS, isContainer } from "../data/studio-blocks-defs.js";
 
 /* ============ ジオメトリ定数（px・変更禁止） ============ */
 export const G = {
