@@ -128,7 +128,7 @@ function TypingPlay({ stage, save, update, onBack }) {
   });
 
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 16px 30px" }}>
+    <div style={{ maxWidth: 880, margin: "0 auto", padding: "0 16px 30px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "8px 0" }}>
         <Btn bg="#fff" onClick={onBack}>◀ もどる</Btn>
         <div style={{ fontWeight: 900 }}>{stage.emoji} {stage.name}　{wi + 1} / {words.length}こめ</div>
@@ -178,7 +178,7 @@ export default function Typing({ save, update, go, onSound, openHome }) {
   const [stageId, setStageId] = useState(null);
   const stage = TYPING_STAGES.find(s => s.id === stageId);
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: 30 }}>
+    <div style={{ maxWidth: stage ? 880 : 640, margin: "0 auto", paddingBottom: 30 }}>
       {/* プレイ中の戻りは TypingPlay 内の「◀ もどる」1つ。一覧では ◀もどる=ワールドマップへ（1階層） */}
       <Header save={save} title="⌨️ タイピング" onBack={stage ? undefined : () => go("home")} onSound={onSound} onOpenHome={openHome} />
       {stage

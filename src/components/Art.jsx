@@ -83,7 +83,7 @@ function compressCmds(cmds) {
   return out;
 }
 
-function ArtSVG({ cmds, width = "100%", reveal = Infinity, showTurtle = true, grid = false }) {
+function ArtSVG({ cmds, width = "100%", reveal = Infinity, showTurtle = true, grid = false, fill = false }) {
   const { segs, x, y, ang } = turtleSegs(cmds);
   const shown = segs.slice(0, reveal);
   const cur = shown.length ? shown[shown.length - 1] : null;
@@ -92,9 +92,13 @@ function ArtSVG({ cmds, width = "100%", reveal = Infinity, showTurtle = true, gr
   const ty = done ? y : cur ? cur.y2 : START.y;
   // カメの向き: 完成形は実ang（ペン上げ移動でも向きが合う）・再生中は直前の線分の向き（45°刻み）
   const deg = done ? ang : cur ? Math.round(Math.atan2(cur.y2 - cur.y1, cur.x2 - cur.x1) * 180 / Math.PI / 45) * 45 : -90;
+  // 薄い塗り（b5r ①-c・ギャラリー/拡大のみ）: 始点と終点が1マス以内＝閉じた形のときだけ、その作品の色でうっすら塗る
+  const closed = fill && segs.length > 2 && Math.hypot(segs[0].x1 - x, segs[0].y1 - y) < G;
+  const fillPts = closed ? `${segs[0].x1},${segs[0].y1} ` + segs.map(s => `${s.x2},${s.y2}`).join(" ") : "";
   return (
     <svg width={width} viewBox={`0 0 ${CANVAS.w} ${CANVAS.h}`} style={{ display: "block", maxWidth: "100%", height: "auto" }}>
       <rect x="0" y="0" width={CANVAS.w} height={CANVAS.h} fill="#FFFFFF" rx="14" />
+      {closed && <polygon points={fillPts} fill={segs[0].c} fillOpacity="0.16" stroke="none" />}
       {/* 薄い方眼ガイド（FB4便⑤・エディタのみ）。背景の上・線分の下。濃さ .08 は初期値。
           作品はコマンド列で保存＝ガイドが保存物に乗ることは構造的にない */}
       {grid && (
@@ -163,6 +167,7 @@ export default function Art({ save, update, go, onSound, openHome }) {
   const [confirmDel, setConfirmDel] = useState(null);      // ② 削除確認（対象作品）
   const [viewWork, setViewWork] = useState(null);          // ③ 額縁ポップアップ（対象作品）
   const [wallMsg, setWallMsg] = useState(false);           // 実機FB第1便⑤: 壁で「すすむ」を弾いたときの入力時メッセージ
+  const [challengeOpen, setChallengeOpen] = useState(false); // b5r ①-b: ちょうせんの折りたたみ（初期閉＝あそびかたと統一）
   const playRef = useRef(0);
   const state = turtleSegs(cmds);
   const segsN = state.segs.length;
@@ -316,18 +321,25 @@ export default function Art({ save, update, go, onSound, openHome }) {
             {savedMsg && <div className="panel slide" style={{ padding: 8, background: "#FFFBE0", fontWeight: 800, fontSize: 12 }}>{savedMsg}</div>}
           </div>
         </div>
-        <div className="panel" style={{ padding: 14 }}>
-          <div className="pl-display" style={{ fontSize: 18, marginBottom: 8 }}>🎯 ちょうせん してみよう</div>
-          <div style={{ display: "grid", gap: 8 }}>
-            {ART_CHALLENGES.map(c => (
-              <div key={c.name} style={{ fontWeight: 800, fontSize: 14, background: "#F7FBFF", border: `2px solid ${C.ink}`, borderRadius: 12, padding: 10 }}>
-                {c.emoji} <b>{c.name}</b>：{c.hint}
-              </div>
-            ))}
-          </div>
+        {/* ちょうせん: 自前アコーディオン（初期閉・あそびかたHowToと同じ作法・b5r ①-b） */}
+        <div className="panel" style={{ padding: 0, overflow: "hidden" }}>
+          <button onClick={() => { SFX.tap(sound); setChallengeOpen(o => !o); }} aria-expanded={challengeOpen}
+            style={{ width: "100%", background: challengeOpen ? "#EAF7FF" : "#FFF3D6", border: "none", boxShadow: "none",
+              padding: "12px 14px", display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <span className="pl-display" style={{ fontSize: 16, flex: 1, textAlign: "left" }}>🎯 ちょうせん してみよう</span>
+            {!challengeOpen && <span style={{ fontWeight: 900, fontSize: 11, background: "#fff", border: `2px solid ${C.ink}`, borderRadius: 12, padding: "2px 8px" }}>👆 おしてね</span>}
+            <span style={{ fontWeight: 900 }}>{challengeOpen ? "▲" : "▼"}</span>
+          </button>
+          {challengeOpen && (
+            <div style={{ padding: 14, display: "grid", gap: 8 }}>
+              {ART_CHALLENGES.map(c => (
+                <div key={c.name} style={{ fontWeight: 800, fontSize: 14, background: "#F7FBFF", border: `2px solid ${C.ink}`, borderRadius: 12, padding: 10 }}>
+                  {c.emoji} <b>{c.name}</b>：{c.hint}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        {/* おうちの方へ（モーダル）。開閉しても かきかけの作品は消えない */}
-        <ParentGuide guide={ART_GUIDE} />
         {save.art.gallery.length > 0 && (
           <div className="panel" style={{ padding: 14 }}>
             <div className="pl-display" style={{ fontSize: 18, marginBottom: 8 }}>🖼️ わたしの びじゅつかん</div>
@@ -336,7 +348,7 @@ export default function Art({ save, update, go, onSound, openHome }) {
               {save.art.gallery.map(a => (
                 <button key={a.id} className="pbtn" onClick={() => { SFX.tap(sound); setViewWork(a); }}
                   style={{ padding: 8, borderRadius: 14, textAlign: "center", background: "#fff", display: "block" }}>
-                  <ArtSVG cmds={a.cmds} showTurtle={false} />
+                  <ArtSVG cmds={a.cmds} showTurtle={false} fill />
                   <div style={{ fontWeight: 900, fontSize: 12 }}>{a.name}</div>
                   <div style={{ fontSize: 10, fontWeight: 700 }}>{a.date}</div>
                 </button>
@@ -344,6 +356,8 @@ export default function Art({ save, update, go, onSound, openHome }) {
             </div>
           </div>
         )}
+        {/* おうちの方へ（モーダル）＝最下部・常時（他ページと統一・b5r ①-a）。開閉しても かきかけの作品は消えない */}
+        <ParentGuide guide={ART_GUIDE} />
       </div>
       {/* A3: 全消し確認モーダル */}
       {confirmClear && (
@@ -403,7 +417,7 @@ export default function Art({ save, update, go, onSound, openHome }) {
               <div style={{ padding: 6, borderRadius: 4, background: "linear-gradient(135deg,#6a4a1c,#3c2810)",
                 boxShadow: "inset 0 2px 5px rgba(0,0,0,.65), 0 1px 0 rgba(255,255,255,.25)" }}>
                 <div style={{ background: "#FBF6EA", padding: 11, borderRadius: 2, boxShadow: "inset 0 0 9px rgba(0,0,0,.3)" }}>
-                  <ArtSVG cmds={viewWork.cmds} showTurtle={false} />
+                  <ArtSVG cmds={viewWork.cmds} showTurtle={false} fill />
                 </div>
               </div>
               {/* 四隅の飾り（ロゼット風の立体ボス） */}

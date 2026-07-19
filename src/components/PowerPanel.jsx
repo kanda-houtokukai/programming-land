@@ -69,8 +69,10 @@ export default function PowerPanel({ save, update, go, hideTitle }) {
         <span style={{ fontWeight: 700, fontSize: 11, color: "#6B6265", marginLeft: "auto" }}>きを タップで くわしく</span>
       </div>
 
-      {/* もりのシーン（bg_mori.webp 1600×900=16:9ちょうど・ひろば/アリーナと同じ作法） */}
-      <div style={{ position: "relative", aspectRatio: "16 / 9", border: `3px solid ${C.ink}`, borderRadius: 20,
+      {/* もりのシーン（bg_mori.webp 1600×900=16:9ちょうど・ひろば/アリーナと同じ作法）。
+          b5r ②: .mapMax で端末最大化（16:9が画面高に収まる幅まで・%座標はコンテナ基準でズレない） */}
+      <div className="mapMax" style={{ position: "relative", aspectRatio: "16 / 9", "--mapReserve": "230px",
+        border: `3px solid ${C.ink}`, borderRadius: 20,
         overflow: "hidden", boxShadow: "5px 5px 0 rgba(58,51,53,.9)", background: "#BFE3C0" }}>
         <img src={bgMori} alt="そだちのもり" draggable="false"
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
