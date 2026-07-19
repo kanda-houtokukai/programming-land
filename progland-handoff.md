@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-19（v2.3-b5q 実機FB第10便追い=1件〔prefers-reduced-motionで「タップ」バウンドも停止〕・実機確認実質不要。b5pは実機OK）
+最終更新: 2026-07-19（v2.3-b5r 実機FB第11便=お絵描き下部整理〔並び替え/ちょうせん折りたたみ/図形に薄い塗り〕＋ちから・タイピング端末最大化・⚠️実機確認待ち。b5qは実機OK）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,7 +12,13 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **v2.3-b5q（2026-07-19・実機FB第10便追い=1件＝実機確認実質不要／deploy済み 4cb3dd5）**: 指示書=Chat支給（Codeの自発提案を採用）。theme.js 1行のみ・アセット/スキーマ/JSX変更なし。**`@media(prefers-reduced-motion: reduce)` の `animation:none` 群に `.tapPop` を追加**（`.fadein,.softpop,.mapfloat,.growpop,.sparkle,.pulse,.tapPop`）＝b5pの「タップ」バウンド`pl-tapbob`を動き抑制設定でも停止（既存.pulse等と一貫）。止めても色/フチ/大きさは維持＝機能不変。通常設定ではb5pと見た目同一。検証: verify6本全PASS・ビルドOK・CSSOM実測でreduced-motionルールに `.tapPop { animation:none }` 含有を確認・コンソールエラーゼロ
+- **v2.3-b5r（2026-07-19・実機FB第11便＝⚠️実機確認待ち／deploy済み 8728954）**: 指示書=Chat支給（raw実測）。新規アセットなし・スキーマ変更なし。既存 `.mapPage`/`.mapMax`（b5i）を再利用
+  - **①お絵描き下部の整理**（Art.jsx）: **①-a** `<ParentGuide>` を最下部へ移動＝並び「ちょうせん→びじゅつかん→おうちの方へ」（他ページと統一）。**①-b** ちょうせんを自前アコーディオン（`challengeOpen` state・**初期閉**・👆おしてね/▼▲・あそびかたHowToと同作法）に置換。**①-c** `ArtSVG` に `fill` prop 追加＝**閉じた形のみ**（`segs.length>2` かつ 始点⇔終点が1マス(G=34)以内）その作品色で `<polygon fillOpacity=.16 stroke=none>` を線の下に。呼び出しは**ギャラリーサムネ/拡大のみ** `fill` 付与（編集画面 grid付きは塗りなし）
+  - **②ちからを端末最大化**（Powers/PowerPanel）: `Powers.jsx` 外枠を `maxWidth:640` → **`className="mapPage"`**。`PowerPanel.jsx` の16:9コンテナに **`className="mapMax"` ＋ `--mapReserve:230px`**。木/ラベルは%座標＝コンテナ基準でズレない（マップと同じ堅牢パターン）
+  - **③タイピングのプレイ画面を最大化**（Typing.jsx）: TypingPlayコンテナ(L131)を `maxWidth 640→880`。**⚠️指示書の想定と実DOMが相違＝要修正だった**: L131は外枠(L181 `maxWidth:640`)の**子**で、640が上限を張り880が効かない（実測 actualWidth=640のまま）。**外枠を `maxWidth: stage ? 880 : 640` に変更**して解決＝プレイ時880・ステージ選択時640（指示書の「選択画面は対象外＝640」を維持）。指示書のL131=880も残置（自己文書化）
+  - 検証: **`npm run verify` 6本全PASS**・ビルドOK・**ブラウザ幅別に実測**＝①下部順=ちょうせん(閉/おしてね)→びじゅつかん→おうちの方へ・アコーディオン開閉OK(aria-expanded)・閉じた四角サムネに `polygon fill-opacity 0.16`(実測)②375px mapMax幅333→**1180px 1055**(16:9維持・木5本%配置でズレなし)③**プレイ画面 1180pxで actualWidth 880**(修正前640)・ステージ選択は640維持。**コンソールエラーゼロ**
+  - ⚠️次: 神田さんの実機確認（お絵描き=並び順/ちょうせん折りたたみ/図形の塗り濃さ(.16)や閉じ判定／ちから=最大化とズレ／タイピング=最大化の大きさ(880)）。値(reserve230/上限880/塗り.16)は初期値＝実機で微調整。`fill`外せば塗り即オフ
+- **v2.3-b5q（2026-07-19・実機FB第10便追い=1件＝実機確認実質不要・b5p実機OK確認済み／deploy済み 4cb3dd5）**: 指示書=Chat支給（Codeの自発提案を採用）。theme.js 1行のみ・アセット/スキーマ/JSX変更なし。**`@media(prefers-reduced-motion: reduce)` の `animation:none` 群に `.tapPop` を追加**（`.fadein,.softpop,.mapfloat,.growpop,.sparkle,.pulse,.tapPop`）＝b5pの「タップ」バウンド`pl-tapbob`を動き抑制設定でも停止（既存.pulse等と一貫）。止めても色/フチ/大きさは維持＝機能不変。通常設定ではb5pと見た目同一。検証: verify6本全PASS・ビルドOK・CSSOM実測でreduced-motionルールに `.tapPop { animation:none }` 含有を確認・コンソールエラーゼロ
 - **v2.3-b5p（2026-07-19・実機FB第10便=2件＝実機OK・神田さん実機確認合格／deploy 0651ee7）**: 指示書=Chat支給（raw実測＋モック承認）。新規アセットなし・スキーマ変更なし＝WorldMap.jsx 2箇所＋theme.js に小クラス1つ。神田さん承認=看板B（白文字＋こげ茶フチ）／副題は「タップ」の文字だけ効果B（オレンジ＋白フチ＋少し大きめ＋やさしくバウンド）・残りはプレーン
   - **①じゅんびちゅう看板の文字を白＋こげ茶フチに**（WorldMap.jsx SIGNS.map の文字span）: `color` を **#fff6e6**（生成り白）、`textShadow` を **#5a3410 の8方向1pxフチ＋やわらか影**に差し替え＝茶板の上でくっきり。他inline（position/left/top/transform/whiteSpace/fontWeight/fontSize=clamp(6px,1.35vw,11px)）は不変・SIGNS両方（flip側も文字はimgの兄弟で正立維持）
   - **②副題の「タップ」だけポップ＋バウンド**（WorldMap.jsx＋theme.js）: 副題を `いきたい ばしょを <span className="tapPop">タップ</span>してね` に（残りプレーン）。theme.js に **`.tapPop`**（inline-block・font-size17px・color #e07a15・#fff の8方向1.5pxフチ・`animation: pl-tapbob 1.6s`）＋ **`@keyframes pl-tapbob`**（translateY 0→-5px→0）。バウンドはtransform＝レイアウト非影響
