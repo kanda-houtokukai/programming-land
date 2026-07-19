@@ -21,6 +21,9 @@ import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../src/
 import {
   G, ANIM, CHIP_STYLE, pathBody, pathHat, pathC, gloss, blockH, stackH, chipY, labelY,
 } from "../src/studio/geometry.js";
+import {
+  ensureSpace, sceneNonEmpty, nextWorkName, saveWork, stashDraft, deleteWork,
+} from "../src/workshop/store.js";
 
 const BASELINE_PATH = join(dirname(fileURLToPath(import.meta.url)), "studio-baseline.json");
 const TICKS = 60; // トレースの拍数（§2-1）
@@ -158,10 +161,97 @@ const prefix = (name, base, now) => {
   }
 };
 
+/* ===== 保存モデル（workshop/store.js）の純ロジック試験（段階A S1・期待値直書き）=====
+   分離前の works.js の挙動（段階2 §2・b5f/b5m 実測合格）を仕様として固定する。 */
+function storeTests() {
+  const ok = (cond, msg) => { if (!cond) ng(`store: ${msg}`); };
+  const SPACE = { key: "studio", worksMax: 3, nameMax: 8, namePrefix: "さくひん" };
+  const mkHooks = () => {
+    const h = { persisted: 0, grants: [], persist: () => h.persisted++, today: () => "2026-07-19" };
+    h.grantForNewSave = (p, w, d) => { h.grants.push(w.id); return { xp: 10, coins: 0, hit: [] }; };
+    return h;
+  };
+  const stack = blocks => ({ x: 40, y: 40, blocks });
+  const FULL = [{ type: "hat", id: 1 }, { type: "jump", n: 1, id: 2 }]; // ガードを通る中身
+  const scene = () => ({ bg: "sougen", chars: [{ kind: { type: "player" }, x: 5, y: 3, stacks: [stack(FULL)] }] });
+
+  // 空作品ガード
+  ok(sceneNonEmpty(scene().chars) === true, "きっかけ+1枚 は空でない");
+  ok(sceneNonEmpty([]) === false, "キャラなし は空");
+  ok(sceneNonEmpty([{ stacks: [stack([{ type: "hat", id: 1 }])] }]) === false, "きっかけだけ は空");
+  ok(sceneNonEmpty([{ stacks: [stack([{ type: "jump", n: 1, id: 1 }])] }]) === false, "きっかけ無し浮きスタック は空");
+
+  // 連番命名
+  ok(nextWorkName([], "さくひん") === "さくひん1", "空の棚 → さくひん1");
+  ok(nextWorkName([{ name: "さくひん1" }, { name: "さくひん3" }, { name: "じさく" }], "さくひん") === "さくひん4", "最大+1（別名は無視）");
+
+  // 新規保存（名前空 → 連番・grant が通る・persist される）
+  {
+    const p = {}, h = mkHooks();
+    const r = saveWork(p, SPACE, scene(), "", null, h);
+    ok(r.ok && p.studio.works.length === 1, "新規保存で works+1");
+    ok(p.studio.works[0].name === "さくひん1", "名前空 → さくひん1");
+    ok(p.studio.works[0].savedAt === "2026-07-19", "savedAt=hooks.today()");
+    ok(p.studio.works[0].remixOf === null, "origin無し → remixOf null");
+    ok(r.grant && r.grant.xp === 10 && h.grants.length === 1, "新規は grant が呼ばれ戻り値が返る");
+    ok(h.persisted >= 1, "persist が呼ばれる");
+    // みほん origin → remixOf 記録
+    const r2 = saveWork(p, SPACE, scene(), "リミックス", { type: "sample", id: "dance" }, h);
+    ok(p.studio.works[1].remixOf === "dance", "sample origin → remixOf 記録");
+    // 名前は trim + nameMax 切り詰め
+    saveWork(p, SPACE, scene(), " あいうえおかきくけこ ", null, h);
+    ok(p.studio.works[2].name === "あいうえおかきく", "名前 trim + 8文字 slice");
+    // 満杯
+    const r4 = saveWork(p, SPACE, scene(), "", null, h);
+    ok(!r4.ok && r4.reason === "full" && p.studio.works.length === 3, "worksMax で {ok:false, full}");
+    ok(h.grants.length === 3, "満杯時は grant が呼ばれない");
+    // 上書き（origin=work）: 件数不変・grant null・名前/日付更新・id不変
+    const id0 = p.studio.works[0].id;
+    const r5 = saveWork(p, SPACE, { bg: "jungle", chars: scene().chars }, "なおした", { type: "work", id: id0 }, h);
+    ok(r5.ok && r5.id === id0 && r5.grant === null, "上書きは grant null・同id");
+    ok(p.studio.works.length === 3 && p.studio.works[0].name === "なおした" && p.studio.works[0].bg === "jungle", "上書きで件数不変・内容更新");
+    ok(h.grants.length === 3, "上書きでは grant が呼ばれない");
+  }
+  // origin=work だが元作品が消えている → 新規に落ちる
+  {
+    const p = {}, h = mkHooks();
+    const r = saveWork(p, SPACE, scene(), "", { type: "work", id: "きえたid" }, h);
+    ok(r.ok && p.studio.works.length === 1 && r.grant, "元作品消失 → 新規として保存・grant あり");
+  }
+  // stashDraft
+  {
+    ok(stashDraft(null, SPACE, mkHooks()).ok === true, "profile無し → ok");
+    const p = {}, h = mkHooks();
+    ok(stashDraft(p, SPACE, h).ok === true && p.studio.draft === null, "draft無し → ok");
+    // 空っぽの draft → 黙って捨てる
+    p.studio.draft = { bg: "sougen", chars: [{ stacks: [stack([{ type: "hat", id: 1 }])] }], origin: { type: "new" } };
+    ok(stashDraft(p, SPACE, h).ok && p.studio.draft === null && p.studio.works.length === 0, "空draft → 捨てて棚は増えない");
+    // 中身のある new draft → 「さくひん連番」で退避
+    p.studio.draft = { bg: "sougen", chars: scene().chars, origin: { type: "new" } };
+    ok(stashDraft(p, SPACE, h).ok && p.studio.works.length === 1 && p.studio.works[0].name === "さくひん1" && p.studio.draft === null,
+      "new draft → さくひん連番で退避・draft null");
+    // work origin の draft → 上書き（名前維持・件数不変）
+    const id0 = p.studio.works[0].id;
+    p.studio.draft = { bg: "jungle", chars: scene().chars, origin: { type: "work", id: id0 } };
+    ok(stashDraft(p, SPACE, h).ok && p.studio.works.length === 1 && p.studio.works[0].name === "さくひん1"
+      && p.studio.works[0].bg === "jungle" && p.studio.draft === null, "work draft → 上書き退避（名前維持）");
+    // 満杯で新規行きの draft → ブロック（draft は残す）
+    p.studio.works = [1, 2, 3].map(i => ({ id: "w" + i, name: "さくひん" + i }));
+    p.studio.draft = { bg: "sougen", chars: scene().chars, origin: { type: "new" } };
+    const r = stashDraft(p, SPACE, h);
+    ok(!r.ok && r.reason === "full" && p.studio.draft !== null, "満杯 → {ok:false, full}・draft は失わない");
+    // deleteWork
+    deleteWork(p, SPACE, "w2", h);
+    ok(p.studio.works.map(w => w.id).join() === "w1,w3", "deleteWork で対象だけ消える");
+  }
+}
+storeTests();
+
 const update = process.argv.includes("--update");
 const current = collect();
 
 if (update) {
+  if (fail) { console.log(`\n❌ 保存モデル試験 ${fail}件 FAIL のため baseline は書かない`); process.exit(1); }
   writeFileSync(BASELINE_PATH, JSON.stringify(current, null, 1));
   const n = Object.values(current.traces).reduce((a, t) => a + t.length, 0);
   console.log(`studio-baseline.json を再生成（トレース ${n}イベント・パス ${Object.keys(current.geometry.paths).length}本・DEFS ${Object.keys(current.blocks.defs).length}種）`);
@@ -196,7 +286,7 @@ for (const id of Object.keys(base.traces)) {
 
 if (fail === 0) {
   const n = Object.values(base.traces).reduce((a, t) => a + t.length, 0);
-  console.log(`スタジオ回帰 PASS（みほん4本シリアライズ／DEFS18種／ジオメトリ定数+パス${Object.keys(base.geometry.paths).length}本／エンジントレース${TICKS}拍×${Object.keys(base.traces).length}本=計${n}イベント）`);
+  console.log(`スタジオ回帰 PASS（みほん4本シリアライズ／DEFS18種／ジオメトリ定数+パス${Object.keys(base.geometry.paths).length}本／エンジントレース${TICKS}拍×${Object.keys(base.traces).length}本=計${n}イベント／保存モデル試験）`);
   process.exit(0);
 } else {
   console.log(`\n❌ スタジオ回帰 ${fail}件 FAIL（等価変換が破れている。--update で上書きせず、原因を直すこと）`);

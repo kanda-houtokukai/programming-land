@@ -1,44 +1,26 @@
-// つくるスタジオ: 作品の保存モデル（段階2 §2）＋教育接続の付与（段階3 §1-3・保存の一本道に集約）。
-// ※段階3で growth.js（画像import連鎖あり）に依存するため node直importは不可になった（ブラウザ専用）。
-//
-// 規則（§2）:
-// - 何か（あたらしく つくる／みほん／つくりなおす／コピーして つくる）を開く前に、
-//   現在の draft が「空作品ガード」を通るなら自動で works に保存してから開く（stashDraft）。
-//   通らなければ黙って捨てる。→ かきかけは失われず、確認ダイアログも不要。
-// - draft.origin = {type:"new"|"work"|"sample", id}
-//   ほぞん時: work=その作品を上書き ／ new・sample=新規追加（sampleは remixOf を記録）
-//
-// 付与（§1-3・設計§8「獲得は進歩ベース」）:
-// - XP: 空作品ガードを通った「新規追加」の保存のみ +XP.studioSave()（上書き=作り直し保存では出ない）
-// - コイン: 作品ごとの付与ゼロ。初回マイルストーンのみ（milestones フラグで永続化＝works を消しても再付与なし）
-// - きろく: log[today].studio を新規保存のみカウント（Art の log[d].art と同じ作法）
-import { isTrigger, workHasNestedContainer } from "../data/studio-blocks-defs.js";
+// つくるスタジオ: 作品保存モデルの「スタジオ薄皮」（段階A §3-2）。
+// 保存ロジックの共通核は src/workshop/store.js（node安全・モード非依存）へ分離し、
+// このファイルは ①スタジオ空間（prof.studio）への束縛 ②教育接続の付与（段階3 §1-3）だけを持つ。
+// ★export の形（関数名・引数・戻り値）は分離前と完全に同一＝利用側（エディタ/Home）は無変更で動く。
+// ※付与が growth.js（画像import連鎖あり）に依存するため、このファイルは従来どおりブラウザ専用。
+//   共通核 store.js は node から試験できる（tools/test-studio-regression.mjs の保存モデル試験）。
+import {
+  ensureSpace, sceneNonEmpty, nextWorkName as nextName, newWorkId,
+  saveWork as saveWorkCore, stashDraft as stashDraftCore, deleteWork as deleteWorkCore,
+} from "../workshop/store.js";
+import { workHasNestedContainer } from "../data/studio-blocks-defs.js";
 import { saveProfile, today } from "../storage.js";
 import { applyXp, addCoins, XP, COIN } from "../growth.js";
 
 export const WORKS_MAX = 30; // 上限30作品（設計§7・調整値）
 export const NAME_MAX = 8;   // 作品名ひらがな8文字（設計§7）
 
-export function ensureStudio(profile) {
-  if (!profile.studio) profile.studio = { works: [], draft: null };
-  return profile.studio;
-}
+// スタジオのモード空間（prof.studio・「さくひん{連番}」）
+export const STUDIO_SPACE = { key: "studio", worksMax: WORKS_MAX, nameMax: NAME_MAX, namePrefix: "さくひん" };
 
-// 空作品ガード（設計§8と同一）: 動くブロックが1枚以上あるきっかけスタックを持つキャラが1体以上
-export function sceneNonEmpty(chars) {
-  return (chars || []).some(c => (c.stacks || []).some(st =>
-    st.blocks && st.blocks[0] && isTrigger(st.blocks[0].type) && st.blocks.length > 1));
-}
-
-// 「さくひん{連番}」の次の番号（既存の同型名の最大値+1・削除で番号が戻らないように）
-export function nextWorkName(works) {
-  let n = 0;
-  for (const w of works || []) { const m = /^さくひん(\d+)$/.exec(w.name || ""); if (m) n = Math.max(n, +m[1]); }
-  return `さくひん${n + 1}`;
-}
-
-let seq = 0;
-export function newWorkId() { return "w" + Date.now().toString(36) + (seq++).toString(36); }
+export { sceneNonEmpty, newWorkId };
+export function ensureStudio(profile) { return ensureSpace(profile, STUDIO_SPACE); }
+export function nextWorkName(works) { return nextName(works, STUDIO_SPACE.namePrefix); }
 
 // マイルストーンの表示名（ほぞん完了演出「かんせい!」用・§3-2）
 export const MILESTONE_NAMES = {
@@ -49,7 +31,8 @@ export const MILESTONE_NAMES = {
   firstCast3: "はじめて キャラ3にん",
 };
 
-/* 新規保存への付与（§1-3）。push 済みの状態で呼ぶ。空作品ガードを通らなければ null（付与なし）。
+/* 新規保存への付与（段階3 §1-3・設計§8「獲得は進歩ベース」・ロジック不変）。
+   push 済みの状態で store.js から呼ばれる。空作品ガードを通らなければ null（付与なし）。
    戻り: { xp, coins, hit:[達成id...] }（エディタの「かんせい!」演出が表示に使う） */
 function grantForNewSave(profile, work, studio) {
   if (!sceneNonEmpty(work.chars)) return null; // 空作品ガード＝XP/コイン/きろくの対象外
@@ -73,58 +56,15 @@ function grantForNewSave(profile, work, studio) {
   return { xp, coins, hit };
 }
 
-/* 作品を works へ書く。scene={bg, chars}（純データ・cid/実行状態を含まない）
-   戻り: {ok:true, id, grant} ／ {ok:false, reason:"full"}（棚が満杯・設計§7「たなが いっぱい!」）
-   grant: 新規追加で空作品ガードを通ったときだけ {xp, coins, hit}（上書き=作り直し保存では null） */
+const HOOKS = { persist: saveProfile, today, grantForNewSave };
+
+/* 以下3つの引数・戻り値は分離前と同一（利用側無変更） */
 export function saveWork(profile, scene, name, origin) {
-  const studio = ensureStudio(profile);
-  const nm = (name || "").trim().slice(0, NAME_MAX) || nextWorkName(studio.works);
-  if (origin && origin.type === "work") {
-    const w = studio.works.find(x => x.id === origin.id);
-    if (w) { // つくりなおし=上書き（remixOf は維持・付与なし）
-      w.name = nm; w.bg = scene.bg; w.chars = scene.chars; w.savedAt = today();
-      saveProfile(profile);
-      return { ok: true, id: w.id, grant: null };
-    }
-    // 編集中に元作品が消えていた → 新規として保存に落とす
-  }
-  if (studio.works.length >= WORKS_MAX) return { ok: false, reason: "full" };
-  const w = {
-    id: newWorkId(), name: nm, savedAt: today(),
-    remixOf: origin && origin.type === "sample" ? origin.id : null,
-    bg: scene.bg, chars: scene.chars,
-  };
-  studio.works.push(w);
-  const grant = grantForNewSave(profile, w, studio); // 付与は「新規追加の一本道」だけ（自動退避も同じ道を通る）
-  saveProfile(profile);
-  return { ok: true, id: w.id, grant };
+  return saveWorkCore(profile, STUDIO_SPACE, scene, name, origin, HOOKS);
 }
-
-/* 何かを開く前の draft 自動退避（§2）。
-   戻り: {ok:true} ／ {ok:false, reason:"full"}（新規行きのかきかけがあるのに棚が満杯＝開くのをブロック） */
 export function stashDraft(profile) {
-  if (!profile) return { ok: true };
-  const studio = ensureStudio(profile);
-  const d = studio.draft;
-  if (!d) return { ok: true };
-  if (!sceneNonEmpty(d.chars)) { // ほぼ空っぽ → 黙って捨てる（ゴミ作品を溜めない）
-    studio.draft = null;
-    saveProfile(profile);
-    return { ok: true };
-  }
-  const origin = d.origin || { type: "new" };
-  const existing = origin.type === "work" ? studio.works.find(x => x.id === origin.id) : null;
-  const r = existing
-    ? saveWork(profile, { bg: d.bg, chars: d.chars }, existing.name, origin) // 上書き＝名前維持
-    : saveWork(profile, { bg: d.bg, chars: d.chars }, null, origin);         // 新規＝「さくひん{連番}」
-  if (!r.ok) return r;
-  studio.draft = null;
-  saveProfile(profile);
-  return { ok: true };
+  return stashDraftCore(profile, STUDIO_SPACE, HOOKS);
 }
-
 export function deleteWork(profile, id) {
-  const studio = ensureStudio(profile);
-  studio.works = studio.works.filter(w => w.id !== id);
-  saveProfile(profile);
+  return deleteWorkCore(profile, STUDIO_SPACE, id, HOOKS);
 }
