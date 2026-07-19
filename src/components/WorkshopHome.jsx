@@ -1,17 +1,14 @@
-// つくるスタジオ: 入口画面（段階2 §3・フィルムだな＋みほんのたな）。
-// 世界観=撮影スタジオ（背景 studio-interior.webp・フィルム棚とスポットライトの部屋）。
+// 共通部品: 入口画面＝棚UI（段階A §3-4 で StudioHome.jsx から改名・モード注入化）。
+// つくるスタジオ／ゲームこうぼう（段階1〜）が共有する。骨格=かきかけカード／あたらしく つくる／
+// 作品だな／みほんのたな／4択メニュー／けす確認／トースト／狭幅ガード（段階2 §3）。
+// モード固有物（背景画像・みほん・ガイド・棚の語彙・保存モデル）は props の mode 経由で受ける。
 // §2の保存モデル: 何か（あたらしく つくる／みほん／つくりなおす／コピーして つくる）を開く前に
 // stashDraft で draft を自動退避（空作品ガードを通るなら棚へ・通らなければ捨てる）
 // ＝かきかけは失われず、確認ダイアログも不要。「みる」は draft に触れないので退避しない。
 import { useReducer, useRef, useState, useEffect } from "react";
 import { lastProfile } from "../storage.js";
-import { BGS } from "../data/studio-bgs.js";
-import { SAMPLES } from "../data/studio-samples.js";
-import { stashDraft, deleteWork, WORKS_MAX, NAME_MAX } from "../studio/works.js";
 import StudioThumb from "./StudioThumb.jsx";
 import ParentGuide from "./ParentGuide.jsx";
-import { STUDIO_GUIDE } from "../data/parent-guide.js";
-import bgInterior from "../assets/studio-assets/studio-interior.webp";
 
 /* 効果音（エディタと同じWebAudio簡易音の最小セット） */
 let AC = null;
@@ -113,15 +110,21 @@ const CSS = `
   @media (max-width: 699px) { .sh-narrow { display: flex; } .sh-stage .sh-scroll { display: none; } }
 `;
 
-/* onExitApp（段階3）: App経由（マップ→スタジオ）のときの戻り先。未指定（#studio-dev）は従来どおり hash="" */
-export default function StudioHome({ onOpen, onExitApp }) {
+/* props（段階2 §3＋段階A §3-4）:
+   mode      … モード設定（src/studio/mode.jsx の STUDIO_MODE 等）。space/works/bgs/samples/guide/homeBg/texts/mark
+   onExitApp … App経由（マップ→スタジオ）のときの戻り先。未指定（#studio-dev）は従来どおり hash="" */
+export default function WorkshopHome({ mode, onOpen, onExitApp }) {
   const [, force] = useReducer(x => x + 1, 0);
+  // モード注入（段階A §3-4）: モード固有物はこの先の数行でだけ触る
+  const { stashDraft, deleteWork, WORKS_MAX, NAME_MAX } = mode.works;
+  const { samples: SAMPLES, guide, homeBg, bgs: BGS, space } = mode;
+  const TXT = mode.texts;
   const profRef = useRef(undefined);
   if (profRef.current === undefined) profRef.current = lastProfile();
   const prof = profRef.current;
-  const studio = (prof && prof.studio) || { works: [], draft: null };
-  const works = studio.works || [];
-  const draft = studio.draft;
+  const data = (prof && space.peek(prof)) || { works: [], draft: null };
+  const works = data.works || [];
+  const draft = data.draft;
   const draftAlive = !!(draft && Array.isArray(draft.chars) && draft.chars.length);
   const [menu, setMenu] = useState(null);           // 作品タップの4択 {work}
   const [confirmDel, setConfirmDel] = useState(null); // けす確認 {work}
@@ -140,7 +143,7 @@ export default function StudioHome({ onOpen, onExitApp }) {
     if (prof) {
       const r = stashDraft(prof);
       if (!r.ok) { blockFull(); force(); return false; }
-      if (needsSlot && prof.studio.works.length >= WORKS_MAX) { blockFull(); force(); return false; }
+      if (needsSlot && space.ensure(prof).works.length >= WORKS_MAX) { blockFull(); force(); return false; }
     }
     return true;
   };
@@ -159,7 +162,7 @@ export default function StudioHome({ onOpen, onExitApp }) {
   const openRemake = w => {
     setMenu(null); sndTick();
     if (!stashThen(false)) return; // 上書き先があるので新規の棚は要らない
-    const cur = prof ? prof.studio.works.find(x => x.id === w.id) || w : w; // 退避で上書きされた最新を開く
+    const cur = prof ? space.ensure(prof).works.find(x => x.id === w.id) || w : w; // 退避で上書きされた最新を開く
     onOpen({ bg: cur.bg, chars: cur.chars, name: cur.name, origin: { type: "work", id: cur.id } }, false);
   };
   const openCopy = w => {
@@ -179,19 +182,17 @@ export default function StudioHome({ onOpen, onExitApp }) {
     <div className="sh-root">
       <style>{CSS}</style>
       <header>
-        <div className="mark">
-          <svg width="17" height="17" viewBox="0 0 17 17"><path d="M2 15V2h9l-2.6 3.4L11 9H4.2" fill="none" stroke="#4a2c05" strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round" /></svg>
-        </div>
+        <div className="mark">{mode.mark}</div>
         <div style={{ minWidth: 0 }}>
-          <h1>つくるスタジオ</h1>
-          <div className="sub">じぶんの さくひんを つくろう</div>
+          <h1>{TXT.title}</h1>
+          <div className="sub">{TXT.homeSub}</div>
         </div>
         <button style={{ marginLeft: "auto" }}
           onClick={() => { onExitApp ? onExitApp() : (window.location.hash = ""); }}>
           {onExitApp ? "◀ マップへ" : "◀ アプリへ"}</button>
       </header>
       <div className="sh-stage">
-        <img className="sh-bg" src={bgInterior} alt="" draggable="false" />
+        <img className="sh-bg" src={homeBg} alt="" draggable="false" />
         <div className="sh-scroll">
           <div className="sh-col">
             {draftAlive && (
@@ -205,9 +206,9 @@ export default function StudioHome({ onOpen, onExitApp }) {
             )}
             <button className="sh-new" onClick={openNew}>＋ あたらしく つくる</button>
             <div className="sh-sec">
-              <div className="sh-title">フィルムだな（{works.length}/{WORKS_MAX}）</div>
+              <div className="sh-title">{TXT.shelfName}（{works.length}/{WORKS_MAX}）</div>
               {works.length === 0 ? (
-                <div className="sh-empty">まだ さくひんが ないよ。「あたらしく つくる」か、したの みほんから はじめよう</div>
+                <div className="sh-empty">{TXT.shelfEmpty}</div>
               ) : (
                 <div className="sh-shelf">
                   {[...works].reverse().map(w => (
@@ -220,8 +221,8 @@ export default function StudioHome({ onOpen, onExitApp }) {
               )}
             </div>
             <div className="sh-sec">
-              <div className="sh-title">みほんのたな</div>
-              {firstVisit && <div className="sh-hint">みほんを ひらいてみよう</div>}
+              <div className="sh-title">{TXT.sampleShelfTitle}</div>
+              {firstVisit && <div className="sh-hint">{TXT.sampleHint}</div>}
               <div className="sh-shelf">
                 {SAMPLES.map(s => (
                   <button key={s.id} className="film" onClick={() => openSample(s)}>
@@ -231,8 +232,8 @@ export default function StudioHome({ onOpen, onExitApp }) {
                 ))}
               </div>
             </div>
-            {/* おうちの方へ（段階3 §3-1・他モードと同じ ParentGuide モーダルの作法） */}
-            <ParentGuide guide={STUDIO_GUIDE} />
+            {/* おうちの方へ（段階3 §3-1・他モードと同じ ParentGuide モーダルの作法・原稿は mode.guide） */}
+            <ParentGuide guide={guide} />
           </div>
         </div>
         {toast && <div className="sh-toast">{toast}</div>}

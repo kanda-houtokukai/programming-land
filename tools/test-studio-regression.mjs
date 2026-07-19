@@ -11,9 +11,9 @@
    ベースラインの再生成: node tools/test-studio-regression.mjs --update
    ★段階Aの最中に --update を使ったら等価変換違反（初回生成と、将来仕様を意図的に変えるときだけ）。 */
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { dirname, join, basename } from "node:path";
 
 import { SAMPLES } from "../src/data/studio-samples.js";
 import { DEFS, PALORDER, SOUNDS, STUDIO_BG_IDS } from "../src/data/studio-blocks-defs.js";
@@ -246,6 +246,31 @@ function storeTests() {
   }
 }
 storeTests();
+
+/* ===== 境界の機械チェック（段階A §4）=====
+   共通部品（src/workshop/*・WorkshopEditor/WorkshopHome）がスタジオ固有物を import したら FAIL。
+   許容: data/studio-blocks*.js・data/studio-bgs.js（共有カタログ）・storage.js の汎用関数・React・
+   汎用コンポーネント（StudioBlock/StudioThumb/ParentGuide/PlayerAvatar）。
+   禁止: src/studio/（works/mode）・みほん・growth（教育接続）・保護者ガイド原稿・スタジオ内装画像。 */
+function boundaryTests() {
+  const SRC = join(dirname(fileURLToPath(import.meta.url)), "..", "src");
+  const files = [
+    ...readdirSync(join(SRC, "workshop")).map(f => join(SRC, "workshop", f)),
+    join(SRC, "components", "WorkshopEditor.jsx"),
+    join(SRC, "components", "WorkshopHome.jsx"),
+  ];
+  const FORBID = ["/studio/", "studio-samples", "growth", "parent-guide", "studio-interior"];
+  for (const f of files) {
+    for (const line of readFileSync(f, "utf8").split("\n")) {
+      const m = /^\s*(?:import|export)\s[^;]*?from\s+["']([^"']+)["']/.exec(line);
+      if (!m) continue;
+      for (const bad of FORBID) if (m[1].includes(bad)) {
+        ng(`境界: 共通部品 ${basename(f)} がモード固有物 "${m[1]}" を import している（§4）`);
+      }
+    }
+  }
+}
+boundaryTests();
 
 const update = process.argv.includes("--update");
 const current = collect();
