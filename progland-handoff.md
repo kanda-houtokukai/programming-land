@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-19（v2.3-b5p 実機FB第10便=2件〔じゅんびちゅう看板を白文字＋こげ茶フチ/副題の「タップ」だけポップ＋バウンド〕・⚠️実機確認待ち。b5oは実機OK）
+最終更新: 2026-07-19（v2.3-b5q 実機FB第10便追い=1件〔prefers-reduced-motionで「タップ」バウンドも停止〕・実機確認実質不要。b5pは実機OK）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,11 +12,12 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **v2.3-b5p（2026-07-19・実機FB第10便=2件＝⚠️実機確認待ち／deploy済み 0651ee7）**: 指示書=Chat支給（raw実測＋モック承認）。新規アセットなし・スキーマ変更なし＝WorldMap.jsx 2箇所＋theme.js に小クラス1つ。神田さん承認=看板B（白文字＋こげ茶フチ）／副題は「タップ」の文字だけ効果B（オレンジ＋白フチ＋少し大きめ＋やさしくバウンド）・残りはプレーン
+- **v2.3-b5q（2026-07-19・実機FB第10便追い=1件＝実機確認実質不要／deploy済み 4cb3dd5）**: 指示書=Chat支給（Codeの自発提案を採用）。theme.js 1行のみ・アセット/スキーマ/JSX変更なし。**`@media(prefers-reduced-motion: reduce)` の `animation:none` 群に `.tapPop` を追加**（`.fadein,.softpop,.mapfloat,.growpop,.sparkle,.pulse,.tapPop`）＝b5pの「タップ」バウンド`pl-tapbob`を動き抑制設定でも停止（既存.pulse等と一貫）。止めても色/フチ/大きさは維持＝機能不変。通常設定ではb5pと見た目同一。検証: verify6本全PASS・ビルドOK・CSSOM実測でreduced-motionルールに `.tapPop { animation:none }` 含有を確認・コンソールエラーゼロ
+- **v2.3-b5p（2026-07-19・実機FB第10便=2件＝実機OK・神田さん実機確認合格／deploy 0651ee7）**: 指示書=Chat支給（raw実測＋モック承認）。新規アセットなし・スキーマ変更なし＝WorldMap.jsx 2箇所＋theme.js に小クラス1つ。神田さん承認=看板B（白文字＋こげ茶フチ）／副題は「タップ」の文字だけ効果B（オレンジ＋白フチ＋少し大きめ＋やさしくバウンド）・残りはプレーン
   - **①じゅんびちゅう看板の文字を白＋こげ茶フチに**（WorldMap.jsx SIGNS.map の文字span）: `color` を **#fff6e6**（生成り白）、`textShadow` を **#5a3410 の8方向1pxフチ＋やわらか影**に差し替え＝茶板の上でくっきり。他inline（position/left/top/transform/whiteSpace/fontWeight/fontSize=clamp(6px,1.35vw,11px)）は不変・SIGNS両方（flip側も文字はimgの兄弟で正立維持）
   - **②副題の「タップ」だけポップ＋バウンド**（WorldMap.jsx＋theme.js）: 副題を `いきたい ばしょを <span className="tapPop">タップ</span>してね` に（残りプレーン）。theme.js に **`.tapPop`**（inline-block・font-size17px・color #e07a15・#fff の8方向1.5pxフチ・`animation: pl-tapbob 1.6s`）＋ **`@keyframes pl-tapbob`**（translateY 0→-5px→0）。バウンドはtransform＝レイアウト非影響
   - 検証: **`npm run verify` 6本全PASS**（CSS＋文字周りのみ＝engine/roundtrip/typing 影響なし）・ビルドOK・**ブラウザ computed 実測**＝①看板span 2枚 color=rgb(255,246,230)（#fff6e6）・textShadow に rgb(90,52,16)（#5a3410）フチ／②`.tapPop` color=rgb(224,122,21)（#e07a15）・font-size17px・display inline-block・animationName **pl-tapbob**（keyframe定義済み・transform ty が 0→-2.5…と実際に上下＝バウンド動作）。**コンソールエラーゼロ**
-  - ⚠️次: 神田さんの実機確認（①看板の白文字＋フチの読みやすさ〔フチ太さ/色〕②「タップ」のポップの大きさ・オレンジの色み・バウンドの速さ）。色/フチ/大きさ/動きは初期値＝実機で微調整
+  - ✅実機確認合格（神田さん）: ①看板の白文字＋フチの読みやすさ②「タップ」のポップの大きさ・オレンジ・バウンド＝OK。（reduced-motion対応は b5q で追加）
   - 💡自発提案（未実施・Chat判断待ち）: theme.js の `prefers-reduced-motion` ブロック（.fadein/.mapfloat/.pulse 等を animation:none）に **`.tapPop` を含めるか**。含めれば動きを抑えたい端末でバウンド停止＝既存の一貫性。指示書スコープ外のため据え置き
 - **v2.3-b5o（2026-07-19・実機FB第9便=2件＝実機OK・神田さん実機確認合格／deploy 386e99a）**: 指示書=Chat支給（raw実測）。新規アセットなし・スキーマ変更なし＝theme.js＋HomeRoom.jsxの微修正のみ。**両方 @media(min-width:700px)＝PC/タブレット限定・スマホ(<700px)は一切不変**。神田さん指示=PC/タブレットで①ずかん・きろくをもう少し下へ②お店の話しかけをもう少し大きく（スマホは全部そのまま）
   - **①おうち ずかん(dex)/きろく(records)ラベルを≥700pxで少し下へ**（HomeRoom.jsx＋theme.js）: FURNITUREラベルspanの className に **`spot-{key}`** を追加＋transform を **`translate(-50%, calc({labelDy}px + var(--labelDown, 0px)))`** に。theme.js `@media(min-width:700px)` に **`.spot-dex, .spot-records { --labelDown: 12px }`**。CSS変数を同一spanに設定→同spanのinline transformが読む構造。既定=スマホは 0px（現状維持）・chestは対象外
