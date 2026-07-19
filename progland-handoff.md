@@ -12,7 +12,7 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。実装は §11 の段階A（スタジオ共通化リファクタ・機能追加ゼロ・回帰の機械保証）から=未着手。段階Aは新規Chatで指示書を作成してから着手。
+- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。実装は §11 の段階A（スタジオ共通化リファクタ・機能追加ゼロ・回帰の機械保証）から=未着手。段階A指示書=正本 `brushup/gamelab-implementation-stageA.md`（S0回帰ハーネス→分離→§4境界の機械チェック）＝実装は新規Codeセッションでこの指示書を読んでから着手・未着手。
 - **v2.3-b5r（2026-07-19・実機FB第11便＝⚠️実機確認待ち／deploy済み 8728954）**: 指示書=Chat支給（raw実測）。新規アセットなし・スキーマ変更なし。既存 `.mapPage`/`.mapMax`（b5i）を再利用
   - **①お絵描き下部の整理**（Art.jsx）: **①-a** `<ParentGuide>` を最下部へ移動＝並び「ちょうせん→びじゅつかん→おうちの方へ」（他ページと統一）。**①-b** ちょうせんを自前アコーディオン（`challengeOpen` state・**初期閉**・👆おしてね/▼▲・あそびかたHowToと同作法）に置換。**①-c** `ArtSVG` に `fill` prop 追加＝**閉じた形のみ**（`segs.length>2` かつ 始点⇔終点が1マス(G=34)以内）その作品色で `<polygon fillOpacity=.16 stroke=none>` を線の下に。呼び出しは**ギャラリーサムネ/拡大のみ** `fill` 付与（編集画面 grid付きは塗りなし）
   - **②ちからを端末最大化**（Powers/PowerPanel）: `Powers.jsx` 外枠を `maxWidth:640` → **`className="mapPage"`**。`PowerPanel.jsx` の16:9コンテナに **`className="mapMax"` ＋ `--mapReserve:230px`**。木/ラベルは%座標＝コンテナ基準でズレない（マップと同じ堅牢パターン）
