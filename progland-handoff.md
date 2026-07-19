@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-19（v2.3-b5r 実機FB第11便=お絵描き下部整理〔並び替え/ちょうせん折りたたみ/図形に薄い塗り〕＋ちから・タイピング端末最大化・⚠️実機確認待ち。b5qは実機OK）
+最終更新: 2026-07-19（v2.3-b5s ゲームこうぼう段階A=スタジオ共通化リファクタ完了・⚠️実機確認待ち。b5r=お絵描き下部整理＋ちから・タイピング最大化も⚠️実機確認待ち。b5qは実機OK）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,7 +12,8 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。実装は §11 の段階A（スタジオ共通化リファクタ・機能追加ゼロ・回帰の機械保証）から=未着手。段階A指示書=正本 `brushup/gamelab-implementation-stageA.md`（S0回帰ハーネス→分離→§4境界の機械チェック）＝実装は新規Codeセッションでこの指示書を読んでから着手・未着手。
+- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s・実機確認待ち）／次は段階1。段階A指示書=正本 `brushup/gamelab-implementation-stageA.md`（S0回帰ハーネス→分離→§4境界の機械チェック）。
+- **v2.3-b5s（2026-07-19・ゲームこうぼう段階A=スタジオ共通化リファクタ完了＝⚠️実機確認待ち／deploy済み 8550d85）**: 指示書=`brushup/gamelab-implementation-stageA.md`。機能追加ゼロ・スキーマ不変。共通部品 src/workshop/（engine/geometry/cast/store）＋WorkshopEditor/WorkshopHome、スタジオ薄皮=studio/works.js+mode.jsx（STUDIO_MODE）。verify 7本目に回帰ハーネス（ベースライン732イベント照合・保存モデル試験・境界スキャン）を恒久追加。★教訓: 自己テストの復元は git checkout でなく sed 逆適用（未コミット編集を2回巻き戻した）。実機合格で段階1（ゲームの器）へ＝新規Chatで指示書から。
 - **v2.3-b5r（2026-07-19・実機FB第11便＝⚠️実機確認待ち／deploy済み 8728954）**: 指示書=Chat支給（raw実測）。新規アセットなし・スキーマ変更なし。既存 `.mapPage`/`.mapMax`（b5i）を再利用
   - **①お絵描き下部の整理**（Art.jsx）: **①-a** `<ParentGuide>` を最下部へ移動＝並び「ちょうせん→びじゅつかん→おうちの方へ」（他ページと統一）。**①-b** ちょうせんを自前アコーディオン（`challengeOpen` state・**初期閉**・👆おしてね/▼▲・あそびかたHowToと同作法）に置換。**①-c** `ArtSVG` に `fill` prop 追加＝**閉じた形のみ**（`segs.length>2` かつ 始点⇔終点が1マス(G=34)以内）その作品色で `<polygon fillOpacity=.16 stroke=none>` を線の下に。呼び出しは**ギャラリーサムネ/拡大のみ** `fill` 付与（編集画面 grid付きは塗りなし）
   - **②ちからを端末最大化**（Powers/PowerPanel）: `Powers.jsx` 外枠を `maxWidth:640` → **`className="mapPage"`**。`PowerPanel.jsx` の16:9コンテナに **`className="mapMax"` ＋ `--mapReserve:230px`**。木/ラベルは%座標＝コンテナ基準でズレない（マップと同じ堅牢パターン）
