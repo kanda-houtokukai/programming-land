@@ -51,6 +51,7 @@ export function saveWork(profile, space, scene, name, origin, hooks) {
     const w = data.works.find(x => x.id === origin.id);
     if (w) { // つくりなおし=上書き（remixOf は維持・付与なし）
       w.name = nm; w.bg = scene.bg; w.chars = scene.chars; w.savedAt = hooks.today();
+      if ("gameConfig" in scene) w.gameConfig = scene.gameConfig; // presenceガード（stage1 §5）
       hooks.persist(profile);
       return { ok: true, id: w.id, grant: null };
     }
@@ -62,6 +63,8 @@ export function saveWork(profile, space, scene, name, origin, hooks) {
     remixOf: origin && origin.type === "sample" ? origin.id : null,
     bg: scene.bg, chars: scene.chars,
   };
+  // ゲームの器（stage1 §5）: scene が持つときだけ載せる（presenceガード＝studio はキーが増えず不変）
+  if (scene && "gameConfig" in scene) w.gameConfig = scene.gameConfig;
   data.works.push(w);
   // 付与は「新規追加の一本道」だけ（自動退避も同じ道を通る・段階3 §1-3）
   const grant = hooks.grantForNewSave ? hooks.grantForNewSave(profile, w, data) : null;
@@ -83,9 +86,11 @@ export function stashDraft(profile, space, hooks) {
   }
   const origin = d.origin || { type: "new" };
   const existing = origin.type === "work" ? data.works.find(x => x.id === origin.id) : null;
+  // draft が gameConfig を持っていれば退避先の作品にも載せる（stage1 §5・studio の draft には無い）
+  const scene = { bg: d.bg, chars: d.chars, ...("gameConfig" in d ? { gameConfig: d.gameConfig } : {}) };
   const r = existing
-    ? saveWork(profile, space, { bg: d.bg, chars: d.chars }, existing.name, origin, hooks) // 上書き＝名前維持
-    : saveWork(profile, space, { bg: d.bg, chars: d.chars }, null, origin, hooks);         // 新規＝「{prefix}{連番}」
+    ? saveWork(profile, space, scene, existing.name, origin, hooks) // 上書き＝名前維持
+    : saveWork(profile, space, scene, null, origin, hooks);         // 新規＝「{prefix}{連番}」
   if (!r.ok) return r;
   data.draft = null;
   hooks.persist(profile);

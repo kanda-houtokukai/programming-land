@@ -200,6 +200,38 @@ const STUDIO_CSS = `
   .theater .scoreHud.pop { animation: sbScorePop .3s; }
   @keyframes sbScorePop { 0% { transform: translateX(-50%) scale(1); } 40% { transform: translateX(-50%) scale(1.25); } 100% { transform: translateX(-50%) scale(1); } }
 
+  /* --- ゲームの器（stage1）: せっていパネル・おいわい。isGame のときだけ描画される --- */
+  .gamecfg { margin-top: 8px; }
+  .gamecfg .gc-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .gamecfg .gc-toggle { font-family: inherit; font-weight: 900; font-size: 12px; color: #f5eddf;
+    background: #4a3a58; border: none; border-radius: 999px; padding: 7px 14px; cursor: pointer;
+    box-shadow: inset 0 1.5px 0 rgba(255,255,255,.18), 0 2px 0 rgba(0,0,0,.3); }
+  .gamecfg .gc-toggle.on { background: #58a839; }
+  .gamecfg .gc-toggle:active { transform: translateY(1px); }
+  .gamecfg .gc-toggle:disabled, .gamecfg .gc-step:disabled { opacity: .4; cursor: default; }
+  .gamecfg .gc-goal { display: inline-flex; align-items: center; gap: 7px; color: #f5eddf;
+    font-size: 12px; font-weight: 900; background: rgba(36,26,44,.6); border-radius: 999px; padding: 4px 8px; }
+  .gamecfg .gc-num { color: #ffe9b8; font-size: 14px; }
+  .gamecfg .gc-step { width: 26px; height: 26px; border-radius: 50%; border: none; cursor: pointer;
+    font-family: inherit; font-weight: 900; font-size: 15px; color: #fff; background: #4a7fc9;
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
+  .gamecfg .gc-step:active { transform: translateY(1px); }
+  .theater .gameclear { position: absolute; inset: 0; z-index: 60; display: flex; align-items: center;
+    justify-content: center; background: rgba(30,20,40,.35); overflow: hidden; }
+  .theater .gameclear .confetti { position: absolute; top: -12px; width: 9px; height: 14px; border-radius: 2px;
+    animation: sbConfetti linear infinite; }
+  @keyframes sbConfetti { 0% { transform: translateY(-14px) rotate(0deg); } 100% { transform: translateY(110%) rotate(540deg); } }
+  .theater .gameclear .gc-box { background: #fffdf6; border-radius: 18px; padding: 16px 26px; text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+  .theater .gameclear .gc-title { color: #4a3520; font-size: 20px; font-weight: 900; }
+  .theater .gameclear .gc-score { color: #b8860b; font-size: 30px; font-weight: 900; margin: 8px 0 12px; }
+  .theater .gameclear button { display: block; width: 100%; font-family: inherit; font-weight: 900; font-size: 14px;
+    border: none; cursor: pointer; border-radius: 999px; padding: 10px 0; margin: 7px 0; color: #fff;
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,.2), 0 2px 0 rgba(0,0,0,.15); }
+  .theater .gameclear .gc-again { background: #58a839; }
+  .theater .gameclear .gc-fix { background: #4a7fc9; }
+  .theater .gameclear button:active { transform: translateY(2px); }
+
   .theater .roundbtn { position: absolute; z-index: 50; width: 42px; height: 42px; border-radius: 50%;
     border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
     box-shadow: inset 0 3px 0 rgba(255,255,255,.35), inset 0 -4px 0 rgba(0,0,0,.25), 0 3px 0 rgba(0,0,0,.4); }
@@ -416,6 +448,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const [saveOpen, setSaveOpen] = useState(false);    // ほぞんモーダル（段階2 §2）
   const [saveName, setSaveName] = useState("");
   const [saveDone, setSaveDone] = useState(null);     // かんせい!演出（段階3 §3-2）: { name, grant:{xp,coins,hit} }
+  const [celebrate, setCelebrate] = useState(null);   // おいわい画面（ゲームの器・stage1 §7e）: { score }
 
   /* ==== とりけし/やりなおし（履歴20手・ブロック木＋キャラ配置のスナップショット） ==== */
   const histRef = useRef({ past: [], future: [] });
@@ -464,12 +497,18 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     const o = originRef.current;
     if (o && o.type === "work") {                       // 保存済み作品と同一なら下書き不要（本FB）
       const w = sp.works.find(x => x.id === o.id);
-      if (w && JSON.stringify({ bg: w.bg, chars: w.chars }) === JSON.stringify(scene)) {
+      // ゲームでは gameConfig も比較に含める（せってい変更もかきかけ対象・stage1 §7g）。studio は従来比較のまま
+      const same = w && (mode.isGame
+        ? JSON.stringify({ bg: w.bg, chars: w.chars, gameConfig: w.gameConfig })
+          === JSON.stringify({ ...scene, gameConfig: gameConfigRef.current })
+        : JSON.stringify({ bg: w.bg, chars: w.chars }) === JSON.stringify(scene));
+      if (same) {
         if (sp.draft) { sp.draft = null; saveProfile(prof); }
         return;
       }
     }
-    sp.draft = { bg: sc.bg, sel: sc.sel, origin: o, name: nameRef.current, chars: scene.chars };
+    sp.draft = { bg: sc.bg, sel: sc.sel, origin: o, name: nameRef.current, chars: scene.chars,
+      ...(mode.isGame ? { gameConfig: gameConfigRef.current } : {}) };
     saveProfile(prof);
   };
   const scheduleDraft = () => {
@@ -497,7 +536,8 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     const prof = profileRef.current;
     if (!prof) { setSaveOpen(false); setToast("セーブデータが ないよ。さいしょの がめんで なまえを つくってね"); return; }
     const sc = serializeScene(); // JSON往復のディープクローン＝以後の編集と共有しない
-    const scene = { bg: sc.bg, chars: sc.chars.map(c => ({ kind: c.kind, x: c.x, y: c.y, stacks: c.stacks })) };
+    const scene = { bg: sc.bg, chars: sc.chars.map(c => ({ kind: c.kind, x: c.x, y: c.y, stacks: c.stacks })),
+      ...(mode.isGame ? { gameConfig: gameConfigRef.current } : {}) }; // ゲームはせっていごと保存（stage1 §7f）
     const r = saveWork(prof, scene, saveName, originRef.current);
     if (!r.ok) { setSaveOpen(false); setToast("たなが いっぱい! どれか けしてから"); sndNo(); return; }
     const sp = space.ensure(prof);
@@ -519,6 +559,16 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     clearTimeout(draftTimerRef.current);   // 予約済みの下書き書き込みを取消
     saveProfile(prof);
   };
+
+  /* ==== ゲームのせってい（stage1 §7b・mode.isGame のみ）: 変更は gameConfigRef＋かきかけへ ==== */
+  const setGameCfg = mut => {
+    if (runningRef.current) return;
+    const g = JSON.parse(JSON.stringify(gameConfigRef.current));
+    mut(g);
+    gameConfigRef.current = g;
+    scheduleDraft(); sndTick(); force();
+  };
+  const bumpGoal = d => setGameCfg(g => { g.clear.param = Math.max(5, Math.min(50, g.clear.param + d)); }); // 5〜50・5刻み（設計§4）
 
   const curChar = () => charsRef.current[selRef.current] || charsRef.current[0];
   const curStacks = () => (curChar() ? curChar().stacks : []);
@@ -951,6 +1001,19 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     const eng = engineRef.current;
     if (!eng || !runningRef.current) return;
     eng.tick();
+    // ゲーム終了判定は毎拍の最後（設計§6: 同拍に+3でまたぎ到達しても発火）。段階1は "score" のみ
+    if (mode.isGame && runningRef.current && gameConfigRef.current.clear.type === "score"
+        && scoreRef.current >= gameConfigRef.current.clear.param) {
+      runningRef.current = false;
+      clearTimeout(tickTimerRef.current);
+      postRunRef.current = true; // 位置は保ったまま（おいわいの背景に最後の場面が見える）
+      if (asmRef.current) asmRef.current.querySelectorAll(".exec").forEach(el => el.classList.remove("exec")); // 発光を消す
+      setCelebrate({ score: scoreRef.current });
+      // 簡易おいわい音（WebAudio・音の仕上げは段階3）
+      tone(660, 0.12, "sine", 0.18); setTimeout(() => tone(880, 0.12, "sine", 0.18), 110); setTimeout(() => tone(1320, 0.2, "sine", 0.18), 220);
+      force();
+      return;
+    }
     if (runningRef.current) tickTimerRef.current = setTimeout(tickLoop, TICK);
   };
   const startRun = () => {
@@ -959,7 +1022,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     const eng = createEngine(defs, engineCbs);
     if (!eng.hasAnyTrigger()) { sndNo(); return; } // きっかけブロックがない
     setPopTarget(null); setCopyBalloon(null);
-    if (mode.isGame) scoreRef.current = 0; // ▶のたびスコアは0から（stage1 §7c）
+    if (mode.isGame) { scoreRef.current = 0; setCelebrate(null); } // ▶のたびスコア0から・おいわいを畳む（stage1 §7c）
     engineRef.current = eng;
     postRunRef.current = false;
     runningRef.current = true;
@@ -1170,6 +1233,27 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
             {mode.isGame && gameConfigRef.current && gameConfigRef.current.scoreShow && (running || postRunRef.current) && (
               <div className="scoreHud" ref={scoreHudRef}>⭐ {scoreRef.current}</div>
             )}
+            {/* おいわい画面（ゲームの器・stage1 §7e）: スコア到達で紙吹雪＋スコア＋もういちど/なおす */}
+            {mode.isGame && celebrate && (
+              <div className="gameclear">
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => (
+                  <i key={i} className="confetti" style={{
+                    left: `${6 + i * 8}%`,
+                    background: ["#f2b23a", "#e0704f", "#58a839", "#4a7fc9", "#8F7EEA", "#E8639C"][i % 6],
+                    animationDelay: `${(i * 0.23) % 1.4}s`, animationDuration: `${1.6 + (i % 3) * 0.5}s`,
+                  }} />
+                ))}
+                <div className="gc-box">
+                  <div className="gc-title">クリア！ やったね！</div>
+                  <div className="gc-score">⭐ {celebrate.score}</div>
+                  <button className="gc-again" onClick={() => { ac(); sndTick(); startRun(); }}>もういちど</button>
+                  {!showOnly && (
+                    <button className="gc-fix" onClick={() => { ac(); sndTick(); setCelebrate(null);
+                      engineRef.current = null; postRunRef.current = false; setBig(false); force(); }}>なおす</button>
+                  )}
+                </div>
+              </div>
+            )}
             {charsRef.current.map((c, i) => {
               const disp = dispOf(c);
               return (
@@ -1192,6 +1276,23 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
                 : <svg width="20" height="20" viewBox="0 0 20 20"><path d="M5 2 L18 10 L5 18 Z" fill="#fff" /></svg>}
             </button>
           </div>
+          {/* ゲームのせってい（stage1 §7b・isGameのみ・段階1は スコアひょうじ＋目標スコアの2項目。種別3択は段階2） */}
+          {mode.isGame && !showOnly && gameConfigRef.current && (
+            <div className="gamecfg">
+              <div className="rowtitle">ゲームの せってい</div>
+              <div className="gc-row">
+                <button className={"gc-toggle" + (gameConfigRef.current.scoreShow ? " on" : "")} disabled={running}
+                  onClick={() => setGameCfg(g => { g.scoreShow = !g.scoreShow; })}>
+                  スコアを だす {gameConfigRef.current.scoreShow ? "◯" : "✕"}
+                </button>
+                <span className="gc-goal">
+                  <button className="gc-step" disabled={running} onClick={() => bumpGoal(-5)}>−</button>
+                  <span className="gc-num">⭐{gameConfigRef.current.clear.param}</span> たまったら クリア
+                  <button className="gc-step" disabled={running} onClick={() => bumpGoal(5)}>＋</button>
+                </span>
+              </div>
+            </div>
+          )}
           <div className="bgrow">
             <div className="rowtitle">ぶたい（はいけい）</div>
             <div className="thumbs">

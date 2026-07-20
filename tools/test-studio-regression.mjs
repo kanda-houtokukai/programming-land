@@ -244,6 +244,22 @@ function storeTests() {
     deleteWork(p, SPACE, "w2", h);
     ok(p.studio.works.map(w => w.id).join() === "w1,w3", "deleteWork で対象だけ消える");
   }
+  // gameConfig の presence ガード（stage1 §5）: scene に無ければキーが増えない（studio 不変）・あれば新規/上書き/退避で運ばれる
+  {
+    const p = {}, h = mkHooks();
+    saveWork(p, SPACE, scene(), "", null, h);
+    ok(!("gameConfig" in p.studio.works[0]), "gameConfig 無しの scene → 作品にキーが増えない（studio 経路不変）");
+    const GC = { scoreShow: true, clear: { type: "score", param: 10 }, gameOver: null };
+    const r = saveWork(p, SPACE, { ...scene(), gameConfig: GC }, "げーむ", null, h);
+    ok(JSON.stringify(p.studio.works[1].gameConfig) === JSON.stringify(GC), "gameConfig 付き scene → 新規作品に載る");
+    const GC2 = { ...GC, clear: { type: "score", param: 25 } };
+    saveWork(p, SPACE, { ...scene(), gameConfig: GC2 }, "げーむ", { type: "work", id: r.id }, h);
+    ok(p.studio.works[1].gameConfig.clear.param === 25, "上書き保存でも gameConfig が更新される");
+    p.studio.draft = { bg: "sougen", chars: scene().chars, origin: { type: "new" }, gameConfig: GC };
+    stashDraft(p, SPACE, h);
+    ok(JSON.stringify(p.studio.works[2].gameConfig) === JSON.stringify(GC) && p.studio.draft === null,
+      "draft の gameConfig が退避先の作品に載る");
+  }
 }
 storeTests();
 
