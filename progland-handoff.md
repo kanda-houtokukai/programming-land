@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-20（v2.3-b5t 音差し込み=バトル/スタジオBGM接続＋かんせい!ジングル・実機OK。b5r〜b5tまで全件実機OK＝実機確認待ちなし）
+最終更新: 2026-07-20（v2.3-b5u ゲームこうぼう段階1=ゲームの器・あつめゲーム＝⚠️実機確認待ち。b5r〜b5tは実機OK）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,7 +12,14 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s・実機OK）／次は段階1（新規Chatで指示書作成から）。段階A指示書=正本 `brushup/gamelab-implementation-stageA.md`（S0回帰ハーネス→分離→§4境界の機械チェック）。
+- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s・実機OK）・段階1=実装完了（b5u・実機確認待ち）／実機合格で段階2へ。指示書=段階A `brushup/gamelab-implementation-stageA.md`・段階1 `brushup/gamelab-implementation-stage1.md`（正本）。
+- **v2.3-b5u（2026-07-20・ゲームこうぼう段階1=ゲームの器・勝ち筋のみ＝⚠️実機確認待ち／deploy済み e61f842）**: 指示書=`brushup/gamelab-implementation-stage1.md`（正本）。**SCHEMA 6→7**（`gamelab:{works,draft}` 既定追加・移行はデフォルトマージのみ=roundtripで機械確認）。中間①=ec73f76・②=254a55c・③=e61f842（deploy）
+  - **モード骨格**: `#gamelab-dev` 仮導線（マップ開店は段階3）・GAMELAB_MODE（isGame/gameDefault・カセットだな/ゲーム{連番}）・gamelab/works.js は付与なし薄皮（教育接続は段階3）。共通部品への追加は**すべて mode.isGame ガード＝スタジオ経路に一切入らない**
+  - **カード2枚**: scoreUp/scoreDown（かず・きいろ #F6C445・幅206・n 1..5）。GAMELAB_PALORDER 新設（**スタジオの PALORDER 不変**）。engine は `onFx{type:"score",delta}` 通知のみ＝スコア保持・下限0・判定は器（設計§6）
+  - **ゲームの器**: gameConfig{scoreShow, clear:{type:"score",param 5〜50}, gameOver:null予約}を open/draft/保存で運搬（store.js は presence ガード=studio のシリアライズ不変）。せっていパネル（トグル＋±5刻み）・スコアHUD（⭐N・▶で0リセット・+でぽよん）・毎拍最後にクリア判定→**おいわい**（紙吹雪12・もういちど=再スタート/なおす=編集へ・showOnlyでは なおす非表示）
+  - ★実装判断: ①スコアアイコンは**暫定グリフ**（data URI SVG・card_icon_19/20 未着=指示書許容・支給後は blocks.js の2定数差し替えのみ） ②新規保存の「かんせい!」演出は grant 前提のため段階1は静かなトースト（付与なし=指示書§6の帰結・演出は段階3で教育接続とともに） ③回帰ハーネスのジオメトリ比較を「既存18種の変更削除FAIL/追加許容」に明文化（新カードで物差しが壊れないように・ベースライン不変）
+  - 検証: **verify 8本全PASS**（verify-gamelab 新設=gameConfig妥当性込み・エンジンにb5uスコア3ケース・roundtripにgamelab往復+旧セーブ補完・storeにpresenceガード試験）・**回帰GREEN**（732イベント不変）・ブラウザ実測=みほん開く→目標10→5→▶⭐0→タップ+1ぽよん→きえる/でる→**⭐5でおいわい**→もういちど⭐0/なおす→ほぞん（gameConfig込み・ゲーム1プレースホルダ）→かきかけ復元（せってい✕/⭐5込み）→みる=あそぶ専用（なおす非表示・draft不変）・**スタジオ完全無変化**（HUD/せってい非表示・18種）・コンソールエラーゼロ
+  - ⚠️次: 神田さんの実機確認（§10ゲート: カセットだな→あつめゲーム→タップ→スコア10でおいわい→もういちど/なおす/■・新規作成→せってい→保存→再入場復元・スタジオ無変化）。合格で**段階2**（うごき3種・ばくだんタッチ・じかん/クリアなし・カセットだな装飾・みほん全部・全画面プレイ）へ
 - **v2.3-b5t（2026-07-20・音差し込み=バトル/スタジオBGM接続＋かんせい!ジングル配線＝実機OK・神田さん実機確認合格／deploy済み a73fd15）**: 指示書=Chat支給（加工済み音源3点同梱）。スキーマ変更なし。アセット=battle.m4a(142.9s)/studio.m4a(60.2s)=-19 LUFS・jingle_kansei.m4a(2.35s)=-16 LUFS を `src/assets/bgm/` へ配置
   - **①BGM battle/studio を SRC+TRACK に接続**＝無音マッピング解消・**10曲化**（bgm.js の SRC＋App.jsx の TRACK に1行ずつ=b5j設計どおり。クロスフェード・音量段・ミュートは既存機構がそのまま働く）
   - **②かんせい!ジングル**: bgm.js に `playJingle(key, on)` 一発再生API新設（volume **0.8** 初期値・ループなし・BGMに重ねる=ダッキングなしは指示どおり）。WorkshopEditor の WebAudio簡易ファンファーレ（tone2発）を撤去・sndSnap「パシャッ」は残置。**WorkshopEditor共通配線＝将来こうぼう保存にも自動適用**。ミュート時（musicVol=0）はジングルも鳴らさない
