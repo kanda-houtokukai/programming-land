@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-19（v2.3-b5s ゲームこうぼう段階A=スタジオ共通化リファクタ完了・⚠️実機確認待ち。b5r=お絵描き下部整理＋ちから・タイピング最大化も⚠️実機確認待ち。b5qは実機OK）
+最終更新: 2026-07-20（v2.3-b5t 音差し込み=バトル/スタジオBGM接続＋かんせい!ジングル・⚠️実機確認待ち。b5r・b5sは実機OK）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,9 +12,15 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s・実機確認待ち）／次は段階1。段階A指示書=正本 `brushup/gamelab-implementation-stageA.md`（S0回帰ハーネス→分離→§4境界の機械チェック）。
-- **v2.3-b5s（2026-07-19・ゲームこうぼう段階A=スタジオ共通化リファクタ完了＝⚠️実機確認待ち／deploy済み 8550d85）**: 指示書=`brushup/gamelab-implementation-stageA.md`。機能追加ゼロ・スキーマ不変。共通部品 src/workshop/（engine/geometry/cast/store）＋WorkshopEditor/WorkshopHome、スタジオ薄皮=studio/works.js+mode.jsx（STUDIO_MODE）。verify 7本目に回帰ハーネス（ベースライン732イベント照合・保存モデル試験・境界スキャン）を恒久追加。★教訓: 自己テストの復元は git checkout でなく sed 逆適用（未コミット編集を2回巻き戻した）。実機合格で段階1（ゲームの器）へ＝新規Chatで指示書から。
-- **v2.3-b5r（2026-07-19・実機FB第11便＝⚠️実機確認待ち／deploy済み 8728954）**: 指示書=Chat支給（raw実測）。新規アセットなし・スキーマ変更なし。既存 `.mapPage`/`.mapMax`（b5i）を再利用
+- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s・実機OK）／次は段階1（新規Chatで指示書作成から）。段階A指示書=正本 `brushup/gamelab-implementation-stageA.md`（S0回帰ハーネス→分離→§4境界の機械チェック）。
+- **v2.3-b5t（2026-07-20・音差し込み=バトル/スタジオBGM接続＋かんせい!ジングル配線＝⚠️実機確認待ち／deploy済み a73fd15）**: 指示書=Chat支給（加工済み音源3点同梱）。スキーマ変更なし。アセット=battle.m4a(142.9s)/studio.m4a(60.2s)=-19 LUFS・jingle_kansei.m4a(2.35s)=-16 LUFS を `src/assets/bgm/` へ配置
+  - **①BGM battle/studio を SRC+TRACK に接続**＝無音マッピング解消・**10曲化**（bgm.js の SRC＋App.jsx の TRACK に1行ずつ=b5j設計どおり。クロスフェード・音量段・ミュートは既存機構がそのまま働く）
+  - **②かんせい!ジングル**: bgm.js に `playJingle(key, on)` 一発再生API新設（volume **0.8** 初期値・ループなし・BGMに重ねる=ダッキングなしは指示どおり）。WorkshopEditor の WebAudio簡易ファンファーレ（tone2発）を撤去・sndSnap「パシャッ」は残置。**WorkshopEditor共通配線＝将来こうぼう保存にも自動適用**。ミュート時（musicVol=0）はジングルも鳴らさない
+  - ★実装判断: 指示書の `profile.settings?.musicVol` は doSaveWork の実変数 `prof` に読み替え（指示書と実DOMの相違報告の作法）。「verify 6本」は段階A後の**7本**（回帰含む）で実施
+  - 検証: **verify 7本全PASS**・build後 docs/assets に battle/studio/jingle_kansei が**ハッシュ付き**で出力（static import有効）・ブラウザ実測=マップ→つくるで **studio.m4a(0.6)**・バトル解放後の入場で **battle.m4a(0.6)**＋home クロスフェード停止／新規保存で **jingle 0.8 がBGMに重なって再生**・上書き=静か（再再生なし）／**🔇で全BGM停止＋ミュート中の新規保存はかんせい!画面のみでジングル無音**・コンソールエラーゼロ（rAFフェードはプレビュー既知事象のため自前ポンプで実測=b5l申し送りの作法）
+  - ⚠️次: 神田さんの実機確認（バトル/スタジオBGMの鳴り・音量バランス／ジングルの大きさ(0.8)とタイミング／ミュートで全部止まること）。こうぼう用BGM・他ジングル（しんか/クリア等）・ダッキングは対象外＝後日別便
+- **v2.3-b5s（2026-07-19・ゲームこうぼう段階A=スタジオ共通化リファクタ完了＝実機OK／deploy済み 8550d85）**: 指示書=`brushup/gamelab-implementation-stageA.md`。機能追加ゼロ・スキーマ不変。共通部品 src/workshop/（engine/geometry/cast/store）＋WorkshopEditor/WorkshopHome、スタジオ薄皮=studio/works.js+mode.jsx（STUDIO_MODE）。verify 7本目に回帰ハーネス（ベースライン732イベント照合・保存モデル試験・境界スキャン）を恒久追加。★教訓: 自己テストの復元は git checkout でなく sed 逆適用（未コミット編集を2回巻き戻した）。実機合格で段階1（ゲームの器）へ＝新規Chatで指示書から。
+- **v2.3-b5r（2026-07-19・実機FB第11便＝実機OK／deploy済み 8728954）**: 指示書=Chat支給（raw実測）。新規アセットなし・スキーマ変更なし。既存 `.mapPage`/`.mapMax`（b5i）を再利用
   - **①お絵描き下部の整理**（Art.jsx）: **①-a** `<ParentGuide>` を最下部へ移動＝並び「ちょうせん→びじゅつかん→おうちの方へ」（他ページと統一）。**①-b** ちょうせんを自前アコーディオン（`challengeOpen` state・**初期閉**・👆おしてね/▼▲・あそびかたHowToと同作法）に置換。**①-c** `ArtSVG` に `fill` prop 追加＝**閉じた形のみ**（`segs.length>2` かつ 始点⇔終点が1マス(G=34)以内）その作品色で `<polygon fillOpacity=.16 stroke=none>` を線の下に。呼び出しは**ギャラリーサムネ/拡大のみ** `fill` 付与（編集画面 grid付きは塗りなし）
   - **②ちからを端末最大化**（Powers/PowerPanel）: `Powers.jsx` 外枠を `maxWidth:640` → **`className="mapPage"`**。`PowerPanel.jsx` の16:9コンテナに **`className="mapMax"` ＋ `--mapReserve:230px`**。木/ラベルは%座標＝コンテナ基準でズレない（マップと同じ堅牢パターン）
   - **③タイピングのプレイ画面を最大化**（Typing.jsx）: TypingPlayコンテナ(L131)を `maxWidth 640→880`。**⚠️指示書の想定と実DOMが相違＝要修正だった**: L131は外枠(L181 `maxWidth:640`)の**子**で、640が上限を張り880が効かない（実測 actualWidth=640のまま）。**外枠を `maxWidth: stage ? 880 : 640` に変更**して解決＝プレイ時880・ステージ選択時640（指示書の「選択画面は対象外＝640」を維持）。指示書のL131=880も残置（自己文書化）
