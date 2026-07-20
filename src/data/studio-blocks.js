@@ -23,8 +23,21 @@ import iconMatsu from "../assets/studio-assets/card_icon_16_matsu.png";
 import iconKurikaeshi from "../assets/studio-assets/card_icon_17_kurikaeshi.png";
 import iconZutto from "../assets/studio-assets/card_icon_18_zutto.png";
 
+// スコア＋/−の暫定グリフ（段階1・Chat支給の card_icon_19/20 が未着のため。stage1 §1「未着なら簡易グリフ可」）。
+// 支給されたら import に差し替えるだけ（この2定数を消して ICONS の2行を張り替える）。
+const svgGlyph = d =>
+  "data:image/svg+xml," + encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">${d}</svg>`);
+const iconScoreUp = svgGlyph(
+  `<circle cx="13" cy="13" r="10.5" fill="#F6C445" stroke="#8A6606" stroke-width="1.6"/>` +
+  `<path d="M13 8v10M8 13h10" stroke="#8A6606" stroke-width="3" stroke-linecap="round"/>`);
+const iconScoreDown = svgGlyph(
+  `<circle cx="13" cy="13" r="10.5" fill="#F6C445" stroke="#8A6606" stroke-width="1.6"/>` +
+  `<path d="M8 13h10" stroke="#8A6606" stroke-width="3" stroke-linecap="round"/>`);
+
 const ICONS = {
   hat: iconHata, tap: iconTap, bump: iconButsukatta,
+  scoreUp: iconScoreUp, scoreDown: iconScoreDown,
   move: iconMigi, moveL: iconHidari, moveU: iconUe, moveD: iconShita,
   spin: iconMawaru, jump: iconJump, home: iconMotono,
   grow: iconOokiku, shrink: iconChiisaku, hide: iconKieru, show: iconDeru,
@@ -38,6 +51,6 @@ export const DEFS = Object.fromEntries(
 );
 
 export {
-  PALORDER, SOUNDS, STUDIO_BG_IDS, isTrigger, isContainer,
+  PALORDER, GAMELAB_PALORDER, SOUNDS, STUDIO_BG_IDS, isTrigger, isContainer,
   makeBlock, claimBlockIds, cloneBlocks,
 } from "./studio-blocks-defs.js";

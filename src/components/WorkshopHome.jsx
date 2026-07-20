@@ -147,28 +147,30 @@ export default function WorkshopHome({ mode, onOpen, onExitApp }) {
     }
     return true;
   };
+  // ゲームモード（stage1 §8）: open に gameConfig を載せる（studio では付けない＝挙動不変）
+  const gc = v => (mode.isGame ? { gameConfig: v } : {});
   const openDraft = () => { sndTick(); onOpen(null, false); };
   const openNew = () => {
     sndTick();
     if (!stashThen(true)) return;
-    onOpen({ bg: BGS[0].id, chars: [{ kind: { type: "player" }, x: 5, y: 3, stacks: [] }], name: "", origin: { type: "new" } }, false);
+    onOpen({ bg: BGS[0].id, chars: [{ kind: { type: "player" }, x: 5, y: 3, stacks: [] }], name: "", origin: { type: "new" }, ...gc(mode.gameDefault) }, false);
   };
   const openSample = s => { // みほん=開いた瞬間コピー（原本不変・保存で remixOf 記録）
     sndTick();
     if (!stashThen(true)) return;
-    onOpen({ bg: s.bg, chars: s.chars, name: s.name.slice(0, NAME_MAX), origin: { type: "sample", id: s.id } }, false);
+    onOpen({ bg: s.bg, chars: s.chars, name: s.name.slice(0, NAME_MAX), origin: { type: "sample", id: s.id }, ...gc(s.gameConfig) }, false);
   };
-  const openView = w => { setMenu(null); sndTick(); onOpen({ bg: w.bg, chars: w.chars, name: w.name, origin: { type: "work", id: w.id } }, true); };
+  const openView = w => { setMenu(null); sndTick(); onOpen({ bg: w.bg, chars: w.chars, name: w.name, origin: { type: "work", id: w.id }, ...gc(w.gameConfig) }, true); };
   const openRemake = w => {
     setMenu(null); sndTick();
     if (!stashThen(false)) return; // 上書き先があるので新規の棚は要らない
     const cur = prof ? space.ensure(prof).works.find(x => x.id === w.id) || w : w; // 退避で上書きされた最新を開く
-    onOpen({ bg: cur.bg, chars: cur.chars, name: cur.name, origin: { type: "work", id: cur.id } }, false);
+    onOpen({ bg: cur.bg, chars: cur.chars, name: cur.name, origin: { type: "work", id: cur.id }, ...gc(cur.gameConfig) }, false);
   };
   const openCopy = w => {
     setMenu(null); sndTick();
     if (!stashThen(true)) return;
-    onOpen({ bg: w.bg, chars: w.chars, name: w.name, origin: { type: "new" } }, false); // 保存で新規追加（§2）
+    onOpen({ bg: w.bg, chars: w.chars, name: w.name, origin: { type: "new" }, ...gc(w.gameConfig) }, false); // 保存で新規追加（§2）
   };
   const doDelete = () => {
     const w = confirmDel;
@@ -232,8 +234,8 @@ export default function WorkshopHome({ mode, onOpen, onExitApp }) {
                 ))}
               </div>
             </div>
-            {/* おうちの方へ（段階3 §3-1・他モードと同じ ParentGuide モーダルの作法・原稿は mode.guide） */}
-            <ParentGuide guide={guide} />
+            {/* おうちの方へ（原稿は mode.guide・こうぼうは段階3まで null=非表示） */}
+            {guide && <ParentGuide guide={guide} />}
           </div>
         </div>
         {toast && <div className="sh-toast">{toast}</div>}

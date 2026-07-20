@@ -4,7 +4,7 @@
      progland:v2:profile:<id>  … 各プロファイルの記録本体
    将来の項目追加でクラッシュしないよう、読み込みは常にデフォルト値マージで行う */
 
-export const SCHEMA_VERSION = 6; // b5k: settings.musicVol（音楽の音量3段階+ミュート）。5 = b5g: studio.milestones／4 = b5e: studio／3 = b4j: partner 相棒ごとレベル
+export const SCHEMA_VERSION = 7; // 7 = b5u: gamelab（ゲームこうぼう: works/draft）。6 = b5k: settings.musicVol／5 = b5g: studio.milestones／4 = b5e: studio／3 = b4j: partner 相棒ごとレベル
 export const MAX_PROFILES = 4;
 const META_KEY = "progland:v2:meta";
 const profileKey = id => `progland:v2:profile:${id}`;
@@ -51,6 +51,7 @@ export function newProfileData(name = "", character = null) {
     shopUsed: false,                      // ショップで一度でも買ったか（バッジ判定用）
     powers: { prev: {} },                 // そだったちからF2: 前回見たときの各ちから% { powerId: pct }。差分演出の基準（後方互換=空でマージ）
     studio: { works: [], draft: null, milestones: {} }, // つくるスタジオ: works=保存作品 / draft=かきかけ / milestones=コイン節目の達成フラグ（b5g・worksを消しても達成済みであり続ける）
+    gamelab: { works: [], draft: null }, // ゲームこうぼう: works=保存ゲーム / draft=かきかけ（段階1・マイルストーンは段階3で追加）
   };
 }
 

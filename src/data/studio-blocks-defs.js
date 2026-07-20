@@ -12,6 +12,7 @@ const COL = {
   looks: { fill: "#E8639C", edge: "#C13D77", dark: "#8E2456" },   // みため（C.sakura基準・段階0で承認済み）
   sound: { fill: "#7BB03B", edge: "#578B22", dark: "#365812" },   // おと
   control: { fill: "#8F7EEA", edge: "#6A57C9", dark: "#41309B" }, // せいぎょ
+  count: { fill: "#F6C445", edge: "#CF9A12", dark: "#8A6606" },   // かず（変数・スコア）: ゲームこうぼう段階1
 };
 
 /* 各ブロック定義:
@@ -42,11 +43,24 @@ export const DEFS = {
   wait: { ...COL.control, w: 172, label: "まつ", shape: "body", pill: "n", min: 1, max: 10, def: 1, cat: "せいぎょ" },
   repeat: { ...COL.control, w: 206, label: "くりかえし", shape: "c", pill: "n", min: 2, max: 10, def: 2, cat: "せいぎょ" },
   forever: { ...COL.control, w: 186, label: "ずっと", shape: "c", flat: true, cat: "せいぎょ" },
+  // かず（ゲームこうぼう段階1・gamelab-implementation-stage1.md §3）。スタジオのパレット（PALORDER）には出ない
+  scoreUp: { ...COL.count, w: 206, label: "スコア ＋", shape: "body", pill: "n", min: 1, max: 5, def: 1, cat: "かず" },
+  scoreDown: { ...COL.count, w: 206, label: "スコア －", shape: "body", pill: "n", min: 1, max: 5, def: 1, cat: "かず" },
 };
 
 // たな（パレット）の並び順＝カテゴリ順（設計§5の表の順）
 export const PALORDER = [
   "hat", "tap", "bump",
+  "move", "moveL", "moveU", "moveD", "spin", "jump", "home",
+  "grow", "shrink", "hide", "show",
+  "sound",
+  "wait", "repeat", "forever",
+];
+
+// ゲームこうぼうのパレット構成（きっかけの直後に「かず」を置く＝スコアを前面に・stage1 §3）
+export const GAMELAB_PALORDER = [
+  "hat", "tap", "bump",
+  "scoreUp", "scoreDown",
   "move", "moveL", "moveU", "moveD", "spin", "jump", "home",
   "grow", "shrink", "hide", "show",
   "sound",

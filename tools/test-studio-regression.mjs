@@ -302,7 +302,22 @@ prefix("SOUNDS", base.blocks.sounds, SOUNDS);
 prefix("STUDIO_BG_IDS", base.blocks.bgIds, STUDIO_BG_IDS);
 
 exact("エンジン定数", base.engineConst, current.engineConst);
-exact("ジオメトリ", base.geometry, current.geometry);
+// ジオメトリ: 定数・入れ子計測は完全一致。paths/measures/widths は DEFS と同じ向き
+// （既存＝スタジオ18種ぶんの変更・削除は FAIL／新カード追加ぶんは許容・段階1で方針を明文化）
+exact("ジオメトリ定数",
+  { G: base.geometry.G, ANIM: base.geometry.ANIM, CHIP_STYLE: base.geometry.CHIP_STYLE, nestedStackH: base.geometry.nestedStackH },
+  { G: current.geometry.G, ANIM: current.geometry.ANIM, CHIP_STYLE: current.geometry.CHIP_STYLE, nestedStackH: current.geometry.nestedStackH });
+for (const w of base.geometry.widths) {
+  if (!current.geometry.widths.includes(w)) ng(`ジオメトリ: 既存の幅 ${w} が消えている`);
+}
+for (const [k, v] of Object.entries(base.geometry.paths)) {
+  if (!(k in current.geometry.paths)) { ng(`ジオメトリ: 既存パス ${k} が消えている`); continue; }
+  exact(`ジオメトリパス ${k}`, v, current.geometry.paths[k]);
+}
+for (const [k, v] of Object.entries(base.geometry.measures)) {
+  if (!(k in current.geometry.measures)) { ng(`ジオメトリ: 既存計測 ${k} が消えている`); continue; }
+  exact(`ジオメトリ計測 ${k}`, v, current.geometry.measures[k]);
+}
 exact("みほん4本のシリアライズ", base.samples, current.samples);
 for (const id of Object.keys(base.traces)) {
   if (!current.traces[id]) { ng(`トレース「${id}」: みほんが消えている`); continue; }
