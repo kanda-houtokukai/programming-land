@@ -36,7 +36,7 @@ import { checkAchievementUnlocks } from "./data/dressup.js";
 const TRACK = {
   home: "home", powers: "powers", puzzle: "puzzle", quiz: "quiz",
   art: "art", typing: "typing", shop: "shop", dex: "myhome",
-  battle: null, studio: null, records: null, parenthub: null,
+  battle: "battle", studio: "studio", records: null, parenthub: null, // b5t: battle/studio 曲を接続
   select: null, create: null,
 };
 function trackFor(screen, home, save) {

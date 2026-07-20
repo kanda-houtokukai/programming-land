@@ -12,6 +12,7 @@ import { isTrigger, isContainer, makeBlock, cloneBlocks } from "../data/studio-b
 import { G, ANIM, pathBody, pathHat, pathC, chipY, blockH, stackH, containerDepth } from "../workshop/geometry.js";
 import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../workshop/engine.js";
 import { lastProfile, saveProfile } from "../storage.js";
+import { playJingle } from "../bgm.js";
 import { buildCast, kindImg, kindName, kindValid } from "../workshop/cast.js";
 import iconCoin from "../assets/icon_stat_coin.png";
 import PlayerAvatar from "./PlayerAvatar.jsx";
@@ -493,9 +494,8 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       // かんせい!演出（段階3 §3-2）: 新規保存のみ +XP/コイン/マイルストーン名。初回だけ賑やか・2回目以降はXPのみが自然に実現。
       // 新規バッジ・ベレー解放の祝いは App 側の既存演出（もどった再読込時）が担う＝スタジオ内では作らない
       setSaveDone({ name: nameRef.current, grant: r.grant });
-      sndSnap();
-      setTimeout(() => tone(660, 0.12, "sine", 0.16), 80);   // 簡易ファンファーレ（WebAudio・Suno差し替えは本線）
-      setTimeout(() => tone(880, 0.16, "sine", 0.16), 200);
+      sndSnap(); // 保存の「パシャッ」は残す
+      playJingle("kansei", (prof.settings?.musicVol ?? 3) > 0); // b5t: 本物のかんせい!ジングル（簡易ファンファーレ撤去）
     } else {
       setToast(TXT.savedToast); // 上書き保存（作り直し）は付与なし＝静かに
       sndSnap();

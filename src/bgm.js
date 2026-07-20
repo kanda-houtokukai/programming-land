@@ -10,10 +10,13 @@ import quizUrl   from "./assets/bgm/quiz.m4a";
 import typingUrl from "./assets/bgm/typing.m4a";
 import artUrl    from "./assets/bgm/art.m4a";
 import powersUrl from "./assets/bgm/powers.m4a";
+import battleUrl from "./assets/bgm/battle.m4a";
+import studioUrl from "./assets/bgm/studio.m4a";
 
-const SRC = {                 // 生成済みのkeyだけ。battle/studioは曲が来たら足す
+const SRC = {                 // 10曲（b5t: battle/studio 接続で無音マッピング解消）
   home: homeUrl, myhome: myhomeUrl, shop: shopUrl, puzzle: puzzleUrl,
   quiz: quizUrl, typing: typingUrl, art: artUrl, powers: powersUrl,
+  battle: battleUrl, studio: studioUrl,
 };
 
 // FB5便①: 音量3段階+ミュート。index=settings.musicVol（0=ミュート/1=小/2=中/3=大）。
@@ -96,4 +99,21 @@ export function setBgm(key, level) {
   }
   current = key;
   start(key);
+}
+
+/* ===== ジングル（b5t）: ループしない一発再生（完成演出などの締め） ===== */
+import kanseiUrl from "./assets/bgm/jingle_kansei.m4a";
+const JINGLES = { kansei: kanseiUrl };
+let jingleEl = null;
+
+// 一発再生。on=音が出る設定か（settings.musicVol>0）。ミュート時は鳴らさない（全音オフと一貫）。
+// BGMとは別要素なので、BGMを止めずに上に重なる（2.3sの締め。ダッキングは今回入れない＝指示書）。
+export function playJingle(key, on) {
+  if (!on || !JINGLES[key]) return;
+  if (!jingleEl) jingleEl = new Audio();
+  jingleEl.src = JINGLES[key];
+  jingleEl.volume = 0.8;                 // -16 LUFS素材＝BGMの上で映える。初期値
+  jingleEl.currentTime = 0;
+  const p = jingleEl.play();
+  if (p && p.catch) p.catch(() => {});   // 保存ボタン後＝解錠済みのはずだが握りつぶす
 }
