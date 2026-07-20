@@ -147,6 +147,13 @@ export function createEngine(charDefs, cb = {}) {
       emitUpdate(ch, ch.visible ? "show" : "hide");
       th.cur = { b, left: 0 }; return;
     }
+    if (b.type === "scoreUp" || b.type === "scoreDown") {
+      // スコアは「器」（WorkshopEditor のゲーム層）が持つ＝エンジンは通知だけ（設計§6・stage1 §4）。
+      // 保持・下限0・クリア判定はすべて器側。studio の作品にはこのカードが存在しない＝studio では実行されない
+      const delta = b.type === "scoreUp" ? (b.n || 0) : -(b.n || 0);
+      emitFx(ch.key, { type: "score", delta });
+      th.cur = { b, left: 0 }; return; // 1拍で消費（みため各種と同じ）
+    }
     th.cur = { b, left: 0 }; // 未知カード: 1拍で素通し（第2期の器）
   };
 

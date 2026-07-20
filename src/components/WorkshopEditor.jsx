@@ -193,6 +193,13 @@ const STUDIO_CSS = `
   .actor .sp-in.bumpA { animation: sbBump .3s ease-out; }
   @keyframes sbSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   .actor .sp-spin.spinA { animation: sbSpin ${TICK * 2}ms linear; }
+  /* --- ゲームの器（stage1）: スコアHUD。isGame のときだけ描画される＝studio には出ない --- */
+  .theater .scoreHud { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); z-index: 45;
+    background: rgba(36,26,44,.78); color: #ffe9b8; font-size: 24px; font-weight: 900; letter-spacing: .04em;
+    border-radius: 999px; padding: 6px 22px; pointer-events: none; }
+  .theater .scoreHud.pop { animation: sbScorePop .3s; }
+  @keyframes sbScorePop { 0% { transform: translateX(-50%) scale(1); } 40% { transform: translateX(-50%) scale(1.25); } 100% { transform: translateX(-50%) scale(1); } }
+
   .theater .roundbtn { position: absolute; z-index: 50; width: 42px; height: 42px; border-radius: 50%;
     border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
     box-shadow: inset 0 3px 0 rgba(255,255,255,.35), inset 0 -4px 0 rgba(0,0,0,.25), 0 3px 0 rgba(0,0,0,.4); }
@@ -336,11 +343,14 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       stacks: (c.stacks || []).map(s => ({ x: s.x || 20, y: s.y || 20, blocks: cloneBlocks(s.blocks || []) })),
     }));
     let chars = null, bg = BGS[0].id, sel = 0, toast = null, origin = { type: "new" }, name = "";
+    // ゲームの器（stage1 §7a）: gameConfig は入口で必ず既定へ正規化（?? mode.gameDefault）。studio では null のまま
+    let gameConfig = mode.isGame ? mode.gameDefault : null;
     if (open) {
       chars = loadScene(open);
       bg = BGS.some(b => b.id === open.bg) ? open.bg : BGS[0].id;
       origin = open.origin || { type: "new" };
       name = open.name || "";
+      if (mode.isGame) gameConfig = open.gameConfig ?? mode.gameDefault;
     } else {
       const sp0 = profile && space.peek(profile);
       const draft = sp0 && sp0.draft;
@@ -351,12 +361,13 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
           sel = Math.max(0, Math.min(chars.length - 1, draft.sel | 0));
           origin = draft.origin || { type: "new" };
           name = draft.name || "";
+          if (mode.isGame) gameConfig = draft.gameConfig ?? mode.gameDefault;
           toast = "かきかけの さくひんが あるよ";  // 続きから再開（保存ダイアログは作らない・設計§7）
         } else chars = null;
       }
     }
     if (!chars || !chars.length) chars = [{ cid: "c1", kind: { type: "player" }, x: 5, y: 3, stacks: [] }];
-    initRef.current = { profile, chars, bg, sel, toast: showOnly ? null : toast, origin, name, cidSeq: chars.length, cast: buildCast(profile) };
+    initRef.current = { profile, chars, bg, sel, toast: showOnly ? null : toast, origin, name, gameConfig, cidSeq: chars.length, cast: buildCast(profile) };
   }
   const profileRef = useRef(initRef.current.profile);
   const charsRef = useRef(initRef.current.chars);
@@ -366,6 +377,10 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const castRef = useRef(initRef.current.cast);
   const originRef = useRef(initRef.current.origin); // draft.origin（§2: ほぞん時 work=上書き／new・sample=新規追加）
   const nameRef = useRef(initRef.current.name);     // 作品名（ほぞんモーダルのプリフィル）
+  /* ==== ゲームの器（stage1 §7・mode.isGame のときだけ使う。studio では常に初期値のまま触られない） ==== */
+  const gameConfigRef = useRef(initRef.current.gameConfig); // { scoreShow, clear:{type,param}, gameOver }
+  const scoreRef = useRef(0);        // スコアの実体は器が持つ（エンジンは onFx 通知だけ・設計§6）
+  const scoreHudRef = useRef(null);  // HUD の「ぽよん」用
 
   /* ==== ブロックドラッグ（段階0の1:1移植・対象は選択中キャラのスタック） ==== */
   const dragRef = useRef(null);
@@ -911,6 +926,14 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         replayEl(key, ".sp-in", "hopA", TICK * 2);
       }
       else if (fx.type === "spin") replayEl(key, ".sp-spin", "spinA", TICK * 2);
+      else if (fx.type === "score") {
+        // ゲームの器（stage1 §7c）: スコアの保持と下限0は器が担う。studio ではこの fx 自体が発生しない
+        if (!mode.isGame) return;
+        scoreRef.current = Math.max(0, scoreRef.current + fx.delta);
+        const el = scoreHudRef.current; // HUD「ぽよん」（設計§5: +の瞬間スコア表示がぽよん）
+        if (el) { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
+        force();
+      }
     },
     onGlow: (id, on) => {
       const el = asmRef.current && asmRef.current.querySelector(`[data-id="${id}"]`);
@@ -936,6 +959,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     const eng = createEngine(defs, engineCbs);
     if (!eng.hasAnyTrigger()) { sndNo(); return; } // きっかけブロックがない
     setPopTarget(null); setCopyBalloon(null);
+    if (mode.isGame) scoreRef.current = 0; // ▶のたびスコアは0から（stage1 §7c）
     engineRef.current = eng;
     postRunRef.current = false;
     runningRef.current = true;
@@ -1142,6 +1166,10 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         <div className="studio-right">
           <div className="theater" ref={theaterRef} onPointerDown={onTheaterPointerDown}>
             <img className="bgimg" src={bgImg} alt="" draggable="false" />
+            {/* スコアHUD（ゲームの器・stage1 §7d）: 上演中/自然終了後だけ出す＝▶直後の⭐0が「はじまった」合図（§9） */}
+            {mode.isGame && gameConfigRef.current && gameConfigRef.current.scoreShow && (running || postRunRef.current) && (
+              <div className="scoreHud" ref={scoreHudRef}>⭐ {scoreRef.current}</div>
+            )}
             {charsRef.current.map((c, i) => {
               const disp = dispOf(c);
               return (

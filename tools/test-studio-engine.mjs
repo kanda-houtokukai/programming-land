@@ -192,5 +192,23 @@ ok(SIZE_STEPS.join() === "0.5,0.75,1,1.5,2" && SIZE_STEPS[SIZE_INIT] === 1, "定
   ok(SIZE_STEPS[eng4.getChar("a").sizeIdx] === 1.5, "補: おおきく×4は上限2倍で止まり ちいさく で1.5へ");
 }
 
+/* ---- b5u ゲームこうぼう段階1: スコアカード（stage1 §4/§10） ---- */
+{
+  // スコアは器が持つ＝エンジンは onFx{type:"score",delta} を出すだけ・1拍消費
+  const r = record();
+  const eng = createEngine([
+    { key: "a", x: 0, y: 0, stacks: [{ blocks: [mk("tap"), mk("scoreUp", { n: 3 }), mk("scoreDown", { n: 2 }), mk("sound", { s: 0 })] }] },
+  ], r.cb);
+  ok(eng.start() === true, "b5u start（tapのみでも開始できる=待ち受け）");
+  eng.tap("a");
+  r.tickTo(eng, 3);
+  const sc = r.ev.filter(e => e.type === "score");
+  ok(sc.length === 2 && sc[0].delta === 3 && sc[1].delta === -2,
+    `b5u tap→スコア＋3/−2 が onFx{type:"score",delta} で通知される（実測 ${JSON.stringify(sc.map(e => e.delta))}）`);
+  ok(sc[0].beat === 1 && sc[1].beat === 2 && r.ev.find(e => e.type === "sound").beat === 3,
+    "b5u スコアカードは1拍で消費（＋が1拍目・−が2拍目・おとが3拍目）");
+  eng.stop();
+}
+
 console.log(fail === 0 ? "\n✅ エンジン単体テスト 全PASS" : `\n❌ ${fail}件 FAIL`);
 process.exit(fail === 0 ? 0 : 1);
