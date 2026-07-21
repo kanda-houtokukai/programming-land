@@ -34,10 +34,19 @@ const iconScoreUp = svgGlyph(
 const iconScoreDown = svgGlyph(
   `<circle cx="13" cy="13" r="10.5" fill="#F6C445" stroke="#8A6606" stroke-width="1.6"/>` +
   `<path d="M8 13h10" stroke="#8A6606" stroke-width="3" stroke-linecap="round"/>`);
+// 段階2の暫定グリフ（stage2・Chat支給アイコン未着のため。うごき=青#124E8C・きっかけ=橙#8F5606）
+const iconMoveRand = svgGlyph( // 4方向矢印（ランダム）
+  `<path d="M13 2l3.2 3.2h-2.1v4.3h-2.2V5.2H9.8zM13 24l-3.2-3.2h2.1v-4.3h2.2v4.3h2.1zM2 13l3.2-3.2v2.1h4.3v2.2H5.2v2.1zM24 13l-3.2 3.2v-2.1h-4.3v-2.2h4.3v-2.1z" fill="#124E8C"/>`);
+const iconBounce = svgGlyph( // 左右矢印（はねかえり）
+  `<path d="M6.5 13l4-4v2.8h5V9l4 4-4 4v-2.8h-5V17z" fill="#124E8C"/>`);
+const iconBumpTarget = svgGlyph( // 的（相手指定）
+  `<circle cx="13" cy="13" r="9.5" fill="none" stroke="#8F5606" stroke-width="2"/>` +
+  `<circle cx="13" cy="13" r="4.5" fill="#8F5606"/>`);
 
 const ICONS = {
-  hat: iconHata, tap: iconTap, bump: iconButsukatta,
+  hat: iconHata, tap: iconTap, bump: iconButsukatta, bumpTarget: iconBumpTarget,
   scoreUp: iconScoreUp, scoreDown: iconScoreDown,
+  moveRand: iconMoveRand, bounce: iconBounce,
   move: iconMigi, moveL: iconHidari, moveU: iconUe, moveD: iconShita,
   spin: iconMawaru, jump: iconJump, home: iconMotono,
   grow: iconOokiku, shrink: iconChiisaku, hide: iconKieru, show: iconDeru,

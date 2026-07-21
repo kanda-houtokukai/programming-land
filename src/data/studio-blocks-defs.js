@@ -46,6 +46,10 @@ export const DEFS = {
   // かず（ゲームこうぼう段階1・gamelab-implementation-stage1.md §3）。スタジオのパレット（PALORDER）には出ない
   scoreUp: { ...COL.count, w: 206, label: "スコア ＋", shape: "body", pill: "n", min: 1, max: 5, def: 1, cat: "かず" },
   scoreDown: { ...COL.count, w: 206, label: "スコア －", shape: "body", pill: "n", min: 1, max: 5, def: 1, cat: "かず" },
+  // ゲームこうぼう段階2（stage2 §A-1・gamelab専用＝GAMELAB_PALORDER のみ）
+  moveRand: { ...COL.motion, w: 206, label: "ランダムに うごく", shape: "body", cat: "うごき" }, // 1拍ごと4方向のどれかへ1マス
+  bounce: { ...COL.motion, w: 186, label: "はねかえる", shape: "body", cat: "うごき" },       // 向きへ1マス・端で反転
+  bumpTarget: { ...COL.trigger, w: 210, label: "ぶつかったら", shape: "hat", pill: "target", cat: "きっかけ" }, // 相手ピルで指定キャラ（既定=だれか）
 };
 
 // たな（パレット）の並び順＝カテゴリ順（設計§5の表の順）
@@ -57,11 +61,11 @@ export const PALORDER = [
   "wait", "repeat", "forever",
 ];
 
-// ゲームこうぼうのパレット構成（きっかけの直後に「かず」を置く＝スコアを前面に・stage1 §3）
+// ゲームこうぼうのパレット構成（きっかけの直後に「かず」を置く＝スコアを前面に・stage1 §3／stage2で3種追加）
 export const GAMELAB_PALORDER = [
-  "hat", "tap", "bump",
+  "hat", "tap", "bump", "bumpTarget",
   "scoreUp", "scoreDown",
-  "move", "moveL", "moveU", "moveD", "spin", "jump", "home",
+  "move", "moveL", "moveU", "moveD", "moveRand", "bounce", "spin", "jump", "home",
   "grow", "shrink", "hide", "show",
   "sound",
   "wait", "repeat", "forever",
@@ -85,6 +89,7 @@ export function makeBlock(type) {
   const b = { id: nextId++, type };
   if (d.pill === "n") b.n = d.def;
   if (d.pill === "s") b.s = 0;
+  if (d.pill === "target") b.target = "any"; // stage2: 相手指定ぶつかり（既定=だれか）
   if (d.shape === "c") b.children = [];
   return b;
 }

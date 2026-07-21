@@ -210,5 +210,56 @@ ok(SIZE_STEPS.join() === "0.5,0.75,1,1.5,2" && SIZE_STEPS[SIZE_INIT] === 1, "定
   eng.stop();
 }
 
+/* ---- stage2 ゲームこうぼう: うごき3種（moveRand/bounce/bumpTarget） ---- */
+{
+  // moveRand: Math.random をスタブ＝範囲内候補[[1,0],[-1,0],[0,1],[0,-1]] の index0（右）へ
+  const orig = Math.random;
+  Math.random = () => 0;
+  const eng = createEngine([{ key: "a", x: 5, y: 3, stacks: [hatStack(mk("moveRand"))] }], {});
+  eng.start(); eng.tick();
+  const a = eng.getChar("a");
+  ok(a.x === 6 && a.y === 3, `stage2 moveRand: random=0 で最初の候補（右）へ1マス（実測 ${a.x},${a.y}）`);
+  Math.random = orig;
+  eng.stop();
+}
+{
+  // bounce: 初期向き右→端で反転→継続。x=10 から
+  const eng = createEngine([{ key: "a", x: 10, y: 0, stacks: [hatStack(mk("forever", { children: [mk("bounce")] }))] }], {});
+  eng.start();
+  eng.tick(); ok(eng.getChar("a").x === 11, "stage2 bounce: 初期向き右へ 10→11（右端）");
+  eng.tick(); ok(eng.getChar("a").x === 10, "stage2 bounce: 端で反転して 11→10");
+  eng.tick(); ok(eng.getChar("a").x === 9, "stage2 bounce: 反転後 10→9 と継続（往復）");
+  eng.stop();
+}
+{
+  // bumpTarget: 指定相手(k1)と重なって発火・指定外では不発火・any はだれでも（k0 が右へ進み x=2 で標的 k1 と重なる）
+  const r1 = record();
+  const e1 = createEngine([
+    { key: "k0", x: 0, y: 0, stacks: [hatStack(mk("move", { n: 3 })), { blocks: [mk("bumpTarget", { target: "k1" }), mk("sound", { s: 0 })] }] },
+    { key: "k1", x: 2, y: 0, stacks: [] }, // 動かない標的（x=2）
+  ], r1.cb);
+  e1.start(); r1.tickTo(e1, 4);
+  ok(r1.ev.some(e => e.type === "sound"), "stage2 bumpTarget: 指定相手 k1 と重なって発火");
+  e1.stop();
+
+  const r2 = record();
+  const e2 = createEngine([
+    { key: "k0", x: 0, y: 0, stacks: [hatStack(mk("move", { n: 3 })), { blocks: [mk("bumpTarget", { target: "k9" }), mk("sound", { s: 0 })] }] },
+    { key: "k1", x: 2, y: 0, stacks: [] },
+  ], r2.cb);
+  e2.start(); r2.tickTo(e2, 4);
+  ok(!r2.ev.some(e => e.type === "sound"), "stage2 bumpTarget: 指定外の相手(k1≠k9)とは発火しない");
+  e2.stop();
+
+  const r3 = record();
+  const e3 = createEngine([
+    { key: "k0", x: 0, y: 0, stacks: [hatStack(mk("move", { n: 3 })), { blocks: [mk("bumpTarget", { target: "any" }), mk("sound", { s: 0 })] }] },
+    { key: "k1", x: 2, y: 0, stacks: [] },
+  ], r3.cb);
+  e3.start(); r3.tickTo(e3, 4);
+  ok(r3.ev.some(e => e.type === "sound"), "stage2 bumpTarget(any): だれとでも重なって発火");
+  e3.stop();
+}
+
 console.log(fail === 0 ? "\n✅ エンジン単体テスト 全PASS" : `\n❌ ${fail}件 FAIL`);
 process.exit(fail === 0 ? 0 : 1);

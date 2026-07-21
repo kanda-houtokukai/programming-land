@@ -9,7 +9,7 @@ import { G, CHIP_STYLE, pathBody, pathHat, pathC, gloss, chipY, labelY } from ".
    inFly=ドラッグ持ち上げ中の描画（transitionなし・イベントなし）
    land=着地ぷにっ発火キー
    onPill(e, block)=ピルタップ */
-export default function StudioBlock({ b, mouth = 0, x, y, z, inFly, land, onPill }) {
+export default function StudioBlock({ b, mouth = 0, x, y, z, inFly, land, onPill, targetName }) {
   const d = DEFS[b.type];
   const ref = useRef(null);
   const first = useRef(true);
@@ -54,6 +54,11 @@ export default function StudioBlock({ b, mouth = 0, x, y, z, inFly, land, onPill
         {d.pill === "s" && (
           <span className="pill" style={{ color: d.dark, textShadow: "none" }}
             onPointerDown={e => { e.stopPropagation(); onPill && onPill(e, b); }}>{SOUNDS[b.s]}</span>
+        )}
+        {d.pill === "target" && ( // stage2: 相手指定ぶつかり。any=だれか／それ以外は相手キャラ名（targetName で解決）
+          <span className="pill" style={{ color: d.dark, textShadow: "none" }}
+            onPointerDown={e => { e.stopPropagation(); onPill && onPill(e, b); }}>
+            {b.target === "any" || !b.target ? "だれか" : (targetName ? targetName(b.target) : b.target)}</span>
         )}
       </div>
     </div>
