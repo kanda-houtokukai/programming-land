@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-20（v2.3-b5u ゲームこうぼう段階1=ゲームの器・あつめゲーム＝⚠️実機確認待ち。b5r〜b5tは実機OK）
+最終更新: 2026-07-21（v2.3-b5v こうぐだな共通2点修正=チップ干渉解消＋タッチ縦スクロール＝⚠️実機確認待ち。b5u=段階1は段階2指示書が完了前提のため実機OK扱い。b5r〜b5tは実機OK）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,8 +12,14 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s・実機OK）・段階1=実装完了（b5u・実機確認待ち）／実機合格で段階2へ。指示書=段階A `brushup/gamelab-implementation-stageA.md`・段階1 `brushup/gamelab-implementation-stage1.md`（正本）。
-- **v2.3-b5u（2026-07-20・ゲームこうぼう段階1=ゲームの器・勝ち筋のみ＝⚠️実機確認待ち／deploy済み e61f842）**: 指示書=`brushup/gamelab-implementation-stage1.md`（正本）。**SCHEMA 6→7**（`gamelab:{works,draft}` 既定追加・移行はデフォルトマージのみ=roundtripで機械確認）。中間①=ec73f76・②=254a55c・③=e61f842（deploy）
+- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s・実機OK）・段階1=完了（b5u・実機OK扱い）・こうぐだな共通修正=完了（b5v・実機確認待ち）／次は段階2（うごき3種・ばくだんタッチ・じかん/クリアなし・みほん全部・全画面・**gamelabエディタ見た目作り直し**）。指示書=段階A `stageA.md`・段階1 `stage1.md`・**段階2 `brushup/gamelab-implementation-stage2.md`（正本・見た目基準=`gamelab-editor-mock.html`）**・共通修正 `brushup/palette-fixes.md`（すべて brushup/）。
+- **v2.3-b5v（2026-07-21・こうぐだな共通2点修正=チップ干渉解消＋タッチ縦スクロール＝⚠️実機確認待ち／deploy済み ef2d4a5）**: 指示書=`brushup/palette-fixes.md`（正本・段階1/2と独立の共通修正＝**studio と gamelab 両方に効く**・先行デプロイ）
+  - **①チップ干渉解消**: `geometry.js` G.CHIP **34→30**・ICON **26→24**＋`StudioBlock`/パレット描画で `chipY` を **`max(_,9)` クランプ**＝メスのくぼみ底(TD=8)を全ブロックで回避（容器チップ 5→9・通常 7→9・はた14不変）。**★ベースライン再取得（`--update`）実施**: 変化は G.CHIP/ICON・既存15型の chipY・DEFSへの scoreUp/scoreDown 焼き込み（段階1分）だけ。**パス91本・幅・エンジントレース732イベント・ANIM・CHIP_STYLE は1バイト不変**（Python厳密比較で確認＝スタジオ挙動保証は維持）
+  - **②タッチ縦スクロール**: `.studio-pal`/`.pal` の `touch-action` **none→pan-y**。`onPalPointerDown` を pointerdown即ドラッグ→**横しきい値確定**へ（`palPendingRef` 新設・グローバル onMove で「横>縦 かつ 横>6px」なら取り出し確定／縦優勢は pan-y でブラウザにスクロール譲る・pointercancel/up で保留破棄）。トリガのプルッ拒否も横確定時に判定
+  - ★実装判断: **PCマウスも横しきい値経由**になる（pointerType 分岐なし＝指示書のレイアウト前提「取り出し=横／スクロール=縦」に従う。こうぐだな左・組み立て右なので実用上は横優勢）。実機でPCの取り出し感に難があれば pointerType 分岐を追加。回帰完了メッセージの「DEFS18種」ハードコードを動的化（→20種）
+  - 検証: **verify 8本全PASS**・**回帰GREEN**・ビルドOK・ブラウザ実測=チップ全型 y≥9(はた14/通常9/容器9・幅30)／横10pxで取り出し(fly block・スタック0→1)／縦20pxで取り出さず(fly none・不変)／タップ不変／トリガ2本目=プルッ拒否(no・fly none)／**studio・gamelab 両方で成立**・コンソールエラーゼロ
+  - ⚠️次: 神田さんの実機確認（**iPad: こうぐだな縦スワイプでスクロール（gamelab20種で下のカズまで届く）・横で取り出し**／容器チップがくぼみに触れないこと／PC・iPad両方・studio+gamelab両方）
+- **v2.3-b5u（2026-07-20・ゲームこうぼう段階1=ゲームの器・勝ち筋のみ＝実機OK扱い〔段階2指示書が完了前提〕／deploy済み e61f842）**: 指示書=`brushup/gamelab-implementation-stage1.md`（正本）。**SCHEMA 6→7**（`gamelab:{works,draft}` 既定追加・移行はデフォルトマージのみ=roundtripで機械確認）。中間①=ec73f76・②=254a55c・③=e61f842（deploy）
   - **モード骨格**: `#gamelab-dev` 仮導線（マップ開店は段階3）・GAMELAB_MODE（isGame/gameDefault・カセットだな/ゲーム{連番}）・gamelab/works.js は付与なし薄皮（教育接続は段階3）。共通部品への追加は**すべて mode.isGame ガード＝スタジオ経路に一切入らない**
   - **カード2枚**: scoreUp/scoreDown（かず・きいろ #F6C445・幅206・n 1..5）。GAMELAB_PALORDER 新設（**スタジオの PALORDER 不変**）。engine は `onFx{type:"score",delta}` 通知のみ＝スコア保持・下限0・判定は器（設計§6）
   - **ゲームの器**: gameConfig{scoreShow, clear:{type:"score",param 5〜50}, gameOver:null予約}を open/draft/保存で運搬（store.js は presence ガード=studio のシリアライズ不変）。せっていパネル（トグル＋±5刻み）・スコアHUD（⭐N・▶で0リセット・+でぽよん）・毎拍最後にクリア判定→**おいわい**（紙吹雪12・もういちど=再スタート/なおす=編集へ・showOnlyでは なおす非表示）
