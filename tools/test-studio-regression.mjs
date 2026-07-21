@@ -342,7 +342,7 @@ for (const id of Object.keys(base.traces)) {
 
 if (fail === 0) {
   const n = Object.values(base.traces).reduce((a, t) => a + t.length, 0);
-  console.log(`スタジオ回帰 PASS（みほん4本シリアライズ／DEFS18種／ジオメトリ定数+パス${Object.keys(base.geometry.paths).length}本／エンジントレース${TICKS}拍×${Object.keys(base.traces).length}本=計${n}イベント／保存モデル試験）`);
+  console.log(`スタジオ回帰 PASS（みほん4本シリアライズ／DEFS${Object.keys(base.blocks.defs).length}種／ジオメトリ定数+パス${Object.keys(base.geometry.paths).length}本／エンジントレース${TICKS}拍×${Object.keys(base.traces).length}本=計${n}イベント／保存モデル試験）`);
   process.exit(0);
 } else {
   console.log(`\n❌ スタジオ回帰 ${fail}件 FAIL（等価変換が破れている。--update で上書きせず、原因を直すこと）`);

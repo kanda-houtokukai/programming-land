@@ -28,7 +28,7 @@ export default function StudioBlock({ b, mouth = 0, x, y, z, inFly, land, onPill
   if (d.shape === "hat") { path = pathHat(d.w); hh = G.HATH; }
   else if (d.shape === "c") { path = pathC(d.w, mouth, !!d.flat); hh = G.TB + mouth + G.BB; }
   else { path = pathBody(d.w); hh = G.H; }
-  const cy = chipY(b.type);
+  const cy = Math.max(chipY(b.type), 9); // palette-fixes: メスのくぼみ底 TD=8 を避ける（容器の食い込み対策）
   const iconOff = (G.CHIP - G.ICON) / 2;
   const isHat = d.shape === "hat";
 

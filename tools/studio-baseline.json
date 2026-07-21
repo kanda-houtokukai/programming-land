@@ -198,6 +198,32 @@
     "shape": "c",
     "flat": true,
     "cat": "せいぎょ"
+   },
+   "scoreUp": {
+    "fill": "#F6C445",
+    "edge": "#CF9A12",
+    "dark": "#8A6606",
+    "w": 206,
+    "label": "スコア ＋",
+    "shape": "body",
+    "pill": "n",
+    "min": 1,
+    "max": 5,
+    "def": 1,
+    "cat": "かず"
+   },
+   "scoreDown": {
+    "fill": "#F6C445",
+    "edge": "#CF9A12",
+    "dark": "#8A6606",
+    "w": 206,
+    "label": "スコア －",
+    "shape": "body",
+    "pill": "n",
+    "min": 1,
+    "max": 5,
+    "def": 1,
+    "cat": "かず"
    }
   },
   "palorder": [
@@ -263,9 +289,9 @@
    "SNAPWY": 1.3,
    "RESCUE": 140,
    "MAXDEPTH": 2,
-   "CHIP": 34,
+   "CHIP": 30,
    "CHIPX": 6,
-   "ICON": 26,
+   "ICON": 24,
    "LABELX": 46
   },
   "ANIM": {
@@ -411,92 +437,104 @@
    "move": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "moveL": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "moveU": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "moveD": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "spin": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "jump": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "home": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "grow": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "shrink": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "hide": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "show": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "sound": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "wait": {
     "blockH": 48,
     "blockH2": null,
-    "chipY": 7,
+    "chipY": 9,
     "labelY": 13
    },
    "repeat": {
     "blockH": 112,
     "blockH2": 162,
-    "chipY": 5,
+    "chipY": 7,
     "labelY": 12
    },
    "forever": {
     "blockH": 112,
     "blockH2": 162,
-    "chipY": 5,
+    "chipY": 7,
     "labelY": 12
+   },
+   "scoreUp": {
+    "blockH": 48,
+    "blockH2": null,
+    "chipY": 9,
+    "labelY": 13
+   },
+   "scoreDown": {
+    "blockH": 48,
+    "blockH2": null,
+    "chipY": 9,
+    "labelY": 13
    }
   },
   "nestedStackH": 180

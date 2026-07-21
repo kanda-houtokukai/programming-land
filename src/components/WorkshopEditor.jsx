@@ -84,7 +84,7 @@ const STUDIO_CSS = `
   /* --- 左: こうぐだな（段階0のまま） --- */
   .studio-pal { width: 300px; flex-shrink: 0; background: linear-gradient(180deg, #8a5a33, #6f4526);
     border-right: 4px solid #543317; padding: 10px 10px; position: relative; z-index: 5;
-    transition: background .15s; touch-action: none; overflow-y: auto; }
+    transition: background .15s; touch-action: pan-y; overflow-y: auto; } /* palette-fixes: 縦スワイプはブラウザにスクロールさせる（横はカード取り出し） */
   .studio-pal .shelf-title { color: #f7e6c8; font-size: 12px; font-weight: 900; text-align: center;
     letter-spacing: .12em; margin-bottom: 8px; text-shadow: 0 1px 0 rgba(0,0,0,.4); }
   .studio-pal .palgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
@@ -94,7 +94,7 @@ const STUDIO_CSS = `
     color: #ffe9e2; font-weight: 900; font-size: 14px; text-align: center; line-height: 1.6; pointer-events: none; }
   .studio-pal.del .delmsg { display: flex; }
   .studio-pal .pal { background: rgba(255, 244, 220, .12); border: 2px solid rgba(255, 244, 220, .18);
-    border-radius: 12px; padding: 7px 6px 5px; cursor: grab; touch-action: none;
+    border-radius: 12px; padding: 7px 6px 5px; cursor: grab; touch-action: pan-y;
     transition: transform .12s, opacity .15s; }
   .studio-pal .pal:active { transform: scale(.96); }
   .studio-pal .pal.off { opacity: .35; }
@@ -417,6 +417,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   /* ==== ブロックドラッグ（段階0の1:1移植・対象は選択中キャラのスタック） ==== */
   const dragRef = useRef(null);
   const pendingRef = useRef(null);
+  const palPendingRef = useRef(null); // palette-fixes: パレット取り出しの保留（横しきい値超えで確定・縦はスクロール）
   const pointerIdRef = useRef(null); // 最初の1本指のみ有効（多点タッチ対策）
   const nodesRef = useRef([]);
   const slotsRef = useRef([]);
@@ -781,6 +782,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   useEffect(() => {
     const onMove = e => {
       if (pointerIdRef.current !== null && e.pointerId !== pointerIdRef.current) return;
+      resolvePalPending(e); // palette-fixes: パレット取り出しを横しきい値で確定（縦はスクロールに譲る）
       const pending = pendingRef.current;
       if (pending && !dragRef.current) {
         if (Math.hypot(e.clientX - pending.x0, e.clientY - pending.y0) > CFG.DRAG_START) {
@@ -801,6 +803,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       if (pendingCharRef.current) moveCharDrag(e);
     };
     const onUp = e => {
+      if (palPendingRef.current && palPendingRef.current.pointerId === e.pointerId) palPendingRef.current = null; // 取り出し前に指を離した＝タップ（何もしない）
       if (pointerIdRef.current !== null && e.pointerId !== pointerIdRef.current) return;
       pointerIdRef.current = null;
       pendingRef.current = null;
@@ -809,6 +812,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       if (pendingCharRef.current) endCharDrag(e);
     };
     const onCancel = e => {
+      if (palPendingRef.current && palPendingRef.current.pointerId === e.pointerId) palPendingRef.current = null; // ブラウザが縦スクロールを取った＝取り出しを中断
       if (pointerIdRef.current !== null && e.pointerId !== pointerIdRef.current) return;
       pointerIdRef.current = null;
       clearTimeout(copyTimerRef.current);
@@ -878,17 +882,28 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     setTimeout(() => setLandId(null), ANIM.land + 40);
   };
 
-  /* ==== パレットから新規ブロック（段階0の1:1移植） ==== */
+  /* ==== パレットから新規ブロック（段階0の1:1移植＋palette-fixes: 横しきい値で取り出し確定） ==== */
+  // palette-fixes: pointerdown では preventDefault せず保留だけ記録。最初の pointermove で
+  // 横移動が優勢＆しきい値超えなら取り出し確定、縦優勢なら touch-action:pan-y でブラウザにスクロールさせる。
   const onPalPointerDown = (e, type) => {
-    e.preventDefault();
     ac();
     if (runningRef.current) return;
-    if (pointerIdRef.current !== null) return;
+    if (pointerIdRef.current !== null || palPendingRef.current) return;
+    palPendingRef.current = { x0: e.clientX, y0: e.clientY, type, pointerId: e.pointerId, el: e.currentTarget };
+  };
+  // 保留中のパレット取り出しを横しきい値で確定する（グローバル onMove から呼ばれる）
+  const resolvePalPending = e => {
+    const pal = palPendingRef.current;
+    if (!pal || pal.pointerId !== e.pointerId || dragRef.current) return;
+    const dx = e.clientX - pal.x0, dy = e.clientY - pal.y0;
+    if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > CFG.DRAG_START) { palPendingRef.current = null; return; } // 縦優勢=スクロールに譲る
+    if (Math.abs(dx) <= CFG.DRAG_START) return; // まだしきい値未満＝判定保留
+    e.preventDefault(); // 横確定＝ここからはアプリのドラッグ
+    const { type, el } = pal;
+    palPendingRef.current = null;
     if (isTrigger(type) && hasTrigger(type)) {
       // きっかけは1キャラにつき各1本＝プルッと拒否（DOM直接操作＝段階0の実装知見）
-      const item = e.currentTarget;
-      item.classList.remove("no"); void item.offsetWidth; item.classList.add("no");
-      setTimeout(() => item.classList.remove("no"), 300);
+      if (el) { el.classList.remove("no"); void el.offsetWidth; el.classList.add("no"); setTimeout(() => el.classList.remove("no"), 300); }
       sndNo();
       return;
     }
@@ -1160,7 +1175,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
               const d = DEFS[t];
               const mouth = d.shape === "c" ? G.MOUTH : 0;
               const hh = d.shape === "hat" ? G.HATH : d.shape === "c" ? G.TB + mouth + G.BB : G.H;
-              const pChipY = chipY(t);
+              const pChipY = Math.max(chipY(t), 9); // palette-fixes: メスのくぼみ底 TD=8 を避ける（StudioBlockと同基準）
               const pOff = (G.CHIP - G.ICON) / 2;
               const off = isTrigger(t) && hasTrigger(t);
               return (
