@@ -216,6 +216,22 @@ const STUDIO_CSS = `
     font-family: inherit; font-weight: 900; font-size: 15px; color: #fff; background: #4a7fc9;
     box-shadow: inset 0 -2px 0 rgba(0,0,0,.25); }
   .gamecfg .gc-step:active { transform: translateY(1px); }
+  /* stage2: せってい拡張（クリア3択・ばくだん選び）。isGame のときだけ描画される */
+  .gamecfg .gc-row + .gc-row { margin-top: 7px; }
+  .gamecfg .gc-cap { color: #f5eddf; font-size: 12px; font-weight: 900; }
+  .gamecfg .gc-seg { font-family: inherit; font-weight: 900; font-size: 12px; color: #f5eddf;
+    background: #4a3a58; border: none; border-radius: 999px; padding: 6px 13px; cursor: pointer;
+    box-shadow: inset 0 1.5px 0 rgba(255,255,255,.18), 0 2px 0 rgba(0,0,0,.3); }
+  .gamecfg .gc-seg.on { background: #58a839; }
+  .gamecfg .gc-seg:active { transform: translateY(1px); }
+  .gamecfg .gc-seg:disabled { opacity: .4; cursor: default; }
+  .gamecfg .gc-bombs { display: inline-flex; gap: 6px; }
+  .gamecfg .gc-bomb { position: relative; width: 38px; height: 38px; border-radius: 10px; padding: 2px;
+    border: 2px solid rgba(255,244,220,.25); background: rgba(255,244,220,.12); cursor: pointer; }
+  .gamecfg .gc-bomb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .gamecfg .gc-bomb.on { border-color: #e0704f; background: rgba(224,112,79,.28); }
+  .gamecfg .gc-bomb .skull { position: absolute; right: -7px; top: -9px; font-size: 14px; }
+  .gamecfg .gc-bomb:disabled { opacity: .4; cursor: default; }
   .theater .gameclear { position: absolute; inset: 0; z-index: 60; display: flex; align-items: center;
     justify-content: center; background: rgba(30,20,40,.35); overflow: hidden; }
   .theater .gameclear .confetti { position: absolute; top: -12px; width: 9px; height: 14px; border-radius: 2px;
@@ -413,6 +429,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const gameConfigRef = useRef(initRef.current.gameConfig); // { scoreShow, clear:{type,param}, gameOver }
   const scoreRef = useRef(0);        // スコアの実体は器が持つ（エンジンは onFx 通知だけ・設計§6）
   const scoreHudRef = useRef(null);  // HUD の「ぽよん」用
+  const timerRef = useRef(0);        // じかんクリアの残り拍（stage2・秒→拍換算。0=無効/切れ）
 
   /* ==== ブロックドラッグ（段階0の1:1移植・対象は選択中キャラのスタック） ==== */
   const dragRef = useRef(null);
@@ -570,6 +587,10 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     scheduleDraft(); sndTick(); force();
   };
   const bumpGoal = d => setGameCfg(g => { g.clear.param = Math.max(5, Math.min(50, g.clear.param + d)); }); // 5〜50・5刻み（設計§4）
+  const bumpTime = d => setGameCfg(g => { g.clear.param = Math.max(10, Math.min(60, g.clear.param + d)); }); // 10〜60秒・10刻み（設計§4）
+  const setClearType = t => setGameCfg(g => { g.clear.type = t; if (t === "score") g.clear.param = 10; if (t === "time") g.clear.param = 30; }); // 種別切替で param を既定へ（点↔秒で意味が変わるため）
+  const toggleBomb = () => setGameCfg(g => { g.gameOver = g.gameOver ? null : { targetId: (charsRef.current[0] && charsRef.current[0].cid) || null }; });
+  const setBomb = cid => setGameCfg(g => { g.gameOver = { targetId: cid }; }); // ばくだんにするキャラ（設計§4）
 
   const curChar = () => charsRef.current[selRef.current] || charsRef.current[0];
   const curStacks = () => (curChar() ? curChar().stacks : []);
@@ -913,7 +934,10 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     beginDrag(e, [b], true, { x: DEFS[type].w / 2, y: 20 });
   };
 
-  /* ==== ピル（数値ステッパー／おと切替） ==== */
+  // 相手キャラ名の解決（bumpTarget のピル表示／stage2）。any=だれか
+  const targetName = cid => { const c = charsRef.current.find(x => x.cid === cid); return c ? kindName(c.kind) : cid; };
+
+  /* ==== ピル（数値ステッパー／おと切替／相手指定） ==== */
   const onPill = useCallback((e, b) => {
     ac();
     if (runningRef.current) return;
@@ -923,6 +947,15 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       b.s = (b.s + 1) % SOUNDS.length;
       SND[b.s]();
       afterEdit();
+      return;
+    }
+    if (d.pill === "target") { // stage2: タップで だれか→他キャラ→…を循環（自分は除く）
+      takeSnapshot("pill" + b.id);
+      const self = curChar();
+      const cands = ["any", ...charsRef.current.filter(c => !self || c.cid !== self.cid).map(c => c.cid)];
+      const cur = Math.max(0, cands.indexOf(b.target));
+      b.target = cands[(cur + 1) % cands.length];
+      afterEdit(); sndTick();
       return;
     }
     const rect = e.currentTarget.getBoundingClientRect();
@@ -1005,6 +1038,8 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       if (el) el.classList.toggle("exec", on);
     },
     onDone: natural => {
+      // ゲームのじかんクリア中は、engine が自然終了（動く敵がいない等）してもタイマーを回し続ける（時間で終わる）
+      if (natural && mode.isGame && gameConfigRef.current.clear.type === "time" && timerRef.current > 0) return; // runningRef 維持・tickLoop 継続
       runningRef.current = false;
       clearTimeout(tickTimerRef.current);
       if (natural) postRunRef.current = true;   // 自然終了: 位置維持（次の▶で初期化）
@@ -1012,22 +1047,45 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       force();
     },
   };
+  /* ==== ゲーム終了（stage2 §A-2/A-3・mode.isGame のみ） ==== */
+  const timerSec = () => Math.max(0, Math.ceil(timerRef.current * TICK / 1000)); // 残り拍→秒（HUD表示）
+  // ばくだんタッチ判定: 指定ばくだん(targetId)が他キャラと重なったら負け（設計§4）
+  const bombHit = () => {
+    const g = gameConfigRef.current;
+    if (!g.gameOver || !g.gameOver.targetId) return false;
+    const eng = engineRef.current;
+    const bomb = eng.getChar(g.gameOver.targetId);
+    if (!bomb || !bomb.visible) return false;
+    return eng.chars.some(c => c !== bomb && c.visible && c.x === bomb.x && c.y === bomb.y);
+  };
+  // result: "clear"（おいわい）/ "timeup"（けっか）/ "lose"（ざんねん）
+  const endGame = result => {
+    runningRef.current = false;
+    clearTimeout(tickTimerRef.current);
+    postRunRef.current = true; // 位置は保ったまま（画面の背景に最後の場面が見える）
+    if (asmRef.current) asmRef.current.querySelectorAll(".exec").forEach(el => el.classList.remove("exec")); // 発光を消す
+    setCelebrate({ result, score: scoreRef.current });
+    if (result === "lose") { tone(300, 0.18, "sine", 0.15); setTimeout(() => tone(240, 0.22, "sine", 0.14), 130); } // 責めない下降音
+    else { tone(660, 0.12, "sine", 0.18); setTimeout(() => tone(880, 0.12, "sine", 0.18), 110); setTimeout(() => tone(1320, 0.2, "sine", 0.18), 220); }
+    force();
+  };
   const tickLoop = () => {
     const eng = engineRef.current;
     if (!eng || !runningRef.current) return;
     eng.tick();
-    // ゲーム終了判定は毎拍の最後（設計§6: 同拍に+3でまたぎ到達しても発火）。段階1は "score" のみ
-    if (mode.isGame && runningRef.current && gameConfigRef.current.clear.type === "score"
-        && scoreRef.current >= gameConfigRef.current.clear.param) {
-      runningRef.current = false;
-      clearTimeout(tickTimerRef.current);
-      postRunRef.current = true; // 位置は保ったまま（おいわいの背景に最後の場面が見える）
-      if (asmRef.current) asmRef.current.querySelectorAll(".exec").forEach(el => el.classList.remove("exec")); // 発光を消す
-      setCelebrate({ score: scoreRef.current });
-      // 簡易おいわい音（WebAudio・音の仕上げは段階3）
-      tone(660, 0.12, "sine", 0.18); setTimeout(() => tone(880, 0.12, "sine", 0.18), 110); setTimeout(() => tone(1320, 0.2, "sine", 0.18), 220);
-      force();
-      return;
+    // 終了判定は毎拍の最後（設計§6）。判定順=★ゲームオーバー優先（設計に明記なし・よけの核「触れたら負け」を守る）
+    // ★runningRef ガードにしない: エンジンがこの拍の中で自然終了（onDoneでrunning=false）しても、
+    //   同拍のばくだん接触・スコア到達は拾う（はた1枚だけの作品で1拍目に自然終了するケースの実測バグ対策）
+    if (mode.isGame) {
+      const g = gameConfigRef.current;
+      if (bombHit()) { endGame("lose"); return; }                                          // ①ばくだんタッチ
+      if (g.clear.type === "score" && scoreRef.current >= g.clear.param) { endGame("clear"); return; } // ②スコア到達
+      if (g.clear.type === "time") { // ③時間切れ（エンジンが先に静止しても時計は進む・HUD更新のため毎拍force）
+        timerRef.current -= 1;
+        if (timerRef.current <= 0) { endGame("timeup"); return; }
+        force();
+      }
+      // g.clear.type === "none" は自動終了なし（■でのみ止まる）
     }
     if (runningRef.current) tickTimerRef.current = setTimeout(tickLoop, TICK);
   };
@@ -1037,7 +1095,11 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     const eng = createEngine(defs, engineCbs);
     if (!eng.hasAnyTrigger()) { sndNo(); return; } // きっかけブロックがない
     setPopTarget(null); setCopyBalloon(null);
-    if (mode.isGame) { scoreRef.current = 0; setCelebrate(null); } // ▶のたびスコア0から・おいわいを畳む（stage1 §7c）
+    if (mode.isGame) { // ▶のたびスコア0から・タイマー初期化・結果画面を畳む（stage1 §7c/stage2）
+      scoreRef.current = 0; setCelebrate(null);
+      const g = gameConfigRef.current;
+      timerRef.current = g.clear.type === "time" ? Math.round(g.clear.param * 1000 / TICK) : 0; // 秒→拍
+    }
     engineRef.current = eng;
     postRunRef.current = false;
     runningRef.current = true;
@@ -1049,7 +1111,15 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   };
   const stopRun = () => {
     const eng = engineRef.current;
-    if (eng && runningRef.current) { eng.stop(); sndCut(); }
+    if (eng && runningRef.current) {
+      eng.stop(); sndCut();
+      if (runningRef.current) { // stage2: エンジンは自然終了済みで器の時計だけ回っている（じかん待ち）→ 器側で止める
+        runningRef.current = false;
+        clearTimeout(tickTimerRef.current);
+        engineRef.current = null; postRunRef.current = false; // ■=初期化（編集位置に戻す）
+        force();
+      }
+    }
     if (!showOnly) setBig(false); // ■で全画面からも復帰（指示書§3-1）。上演専用はbig固定（§4）
   };
   useEffect(() => () => { clearTimeout(tickTimerRef.current); }, []);
@@ -1244,31 +1314,42 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         <div className="studio-right">
           <div className="theater" ref={theaterRef} onPointerDown={onTheaterPointerDown}>
             <img className="bgimg" src={bgImg} alt="" draggable="false" />
-            {/* スコアHUD（ゲームの器・stage1 §7d）: 上演中/自然終了後だけ出す＝▶直後の⭐0が「はじまった」合図（§9） */}
-            {mode.isGame && gameConfigRef.current && gameConfigRef.current.scoreShow && (running || postRunRef.current) && (
-              <div className="scoreHud" ref={scoreHudRef}>⭐ {scoreRef.current}</div>
-            )}
-            {/* おいわい画面（ゲームの器・stage1 §7e）: スコア到達で紙吹雪＋スコア＋もういちど/なおす */}
-            {mode.isGame && celebrate && (
-              <div className="gameclear">
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => (
-                  <i key={i} className="confetti" style={{
-                    left: `${6 + i * 8}%`,
-                    background: ["#f2b23a", "#e0704f", "#58a839", "#4a7fc9", "#8F7EEA", "#E8639C"][i % 6],
-                    animationDelay: `${(i * 0.23) % 1.4}s`, animationDuration: `${1.6 + (i % 3) * 0.5}s`,
-                  }} />
-                ))}
-                <div className="gc-box">
-                  <div className="gc-title">クリア！ やったね！</div>
-                  <div className="gc-score">⭐ {celebrate.score}</div>
-                  <button className="gc-again" onClick={() => { ac(); sndTick(); startRun(); }}>もういちど</button>
-                  {!showOnly && (
-                    <button className="gc-fix" onClick={() => { ac(); sndTick(); setCelebrate(null);
-                      engineRef.current = null; postRunRef.current = false; setBig(false); force(); }}>なおす</button>
-                  )}
-                </div>
+            {/* スコア/タイマーHUD（ゲームの器・stage1 §7d/stage2 §A-3）: 上演中/終了後だけ・▶直後の⭐0が合図 */}
+            {mode.isGame && gameConfigRef.current && (running || postRunRef.current)
+              && (gameConfigRef.current.scoreShow || gameConfigRef.current.clear.type === "time") && (
+              <div className="scoreHud" ref={scoreHudRef}>
+                {gameConfigRef.current.scoreShow && <span>⭐ {scoreRef.current}</span>}
+                {gameConfigRef.current.clear.type === "time" && (
+                  <span style={{ marginLeft: gameConfigRef.current.scoreShow ? 16 : 0 }}>⏱ {timerSec()}</span>
+                )}
               </div>
             )}
+            {/* 結果画面（ゲームの器・stage1 §7e/stage2 §A-2/A-3）: clear=おいわい／timeup=けっか／lose=ざんねん */}
+            {mode.isGame && celebrate && (() => {
+              const rlt = celebrate.result || "clear";
+              const lose = rlt === "lose";
+              const title = lose ? "おしい！ もういちど？" : rlt === "timeup" ? "じかん たったよ！" : "クリア！ やったね！";
+              return (
+                <div className={"gameclear" + (lose ? " lose" : "")}>
+                  {!lose && [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => ( // 負けは紙吹雪なし（責めない・設計§4）
+                    <i key={i} className="confetti" style={{
+                      left: `${6 + i * 8}%`,
+                      background: ["#f2b23a", "#e0704f", "#58a839", "#4a7fc9", "#8F7EEA", "#E8639C"][i % 6],
+                      animationDelay: `${(i * 0.23) % 1.4}s`, animationDuration: `${1.6 + (i % 3) * 0.5}s`,
+                    }} />
+                  ))}
+                  <div className="gc-box">
+                    <div className="gc-title">{title}</div>
+                    <div className="gc-score">⭐ {celebrate.score}</div>
+                    <button className="gc-again" onClick={() => { ac(); sndTick(); startRun(); }}>もういちど</button>
+                    {!showOnly && (
+                      <button className="gc-fix" onClick={() => { ac(); sndTick(); setCelebrate(null);
+                        engineRef.current = null; postRunRef.current = false; setBig(false); force(); }}>なおす</button>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
             {charsRef.current.map((c, i) => {
               const disp = dispOf(c);
               return (
@@ -1291,23 +1372,60 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
                 : <svg width="20" height="20" viewBox="0 0 20 20"><path d="M5 2 L18 10 L5 18 Z" fill="#fff" /></svg>}
             </button>
           </div>
-          {/* ゲームのせってい（stage1 §7b・isGameのみ・段階1は スコアひょうじ＋目標スコアの2項目。種別3択は段階2） */}
-          {mode.isGame && !showOnly && gameConfigRef.current && (
+          {/* ゲームのせってい（stage1 §7b／stage2 §A-4・isGameのみ）: スコアひょうじ／クリア3種／ばくだんタッチ */}
+          {mode.isGame && !showOnly && gameConfigRef.current && (() => {
+            const g = gameConfigRef.current;
+            return (
             <div className="gamecfg">
               <div className="rowtitle">ゲームの せってい</div>
               <div className="gc-row">
-                <button className={"gc-toggle" + (gameConfigRef.current.scoreShow ? " on" : "")} disabled={running}
-                  onClick={() => setGameCfg(g => { g.scoreShow = !g.scoreShow; })}>
-                  スコアを だす {gameConfigRef.current.scoreShow ? "◯" : "✕"}
+                <button className={"gc-toggle" + (g.scoreShow ? " on" : "")} disabled={running}
+                  onClick={() => setGameCfg(gg => { gg.scoreShow = !gg.scoreShow; })}>
+                  スコアを だす {g.scoreShow ? "◯" : "✕"}
                 </button>
-                <span className="gc-goal">
+              </div>
+              {/* クリアじょうけん 3択 */}
+              <div className="gc-row">
+                <span className="gc-cap">クリア:</span>
+                <button className={"gc-seg" + (g.clear.type === "score" ? " on" : "")} disabled={running} onClick={() => setClearType("score")}>スコア</button>
+                <button className={"gc-seg" + (g.clear.type === "time" ? " on" : "")} disabled={running} onClick={() => setClearType("time")}>じかん</button>
+                <button className={"gc-seg" + (g.clear.type === "none" ? " on" : "")} disabled={running} onClick={() => setClearType("none")}>なし</button>
+              </div>
+              {g.clear.type === "score" && (
+                <div className="gc-row"><span className="gc-goal">
                   <button className="gc-step" disabled={running} onClick={() => bumpGoal(-5)}>−</button>
-                  <span className="gc-num">⭐{gameConfigRef.current.clear.param}</span> たまったら クリア
+                  <span className="gc-num">⭐{g.clear.param}</span> たまったら
                   <button className="gc-step" disabled={running} onClick={() => bumpGoal(5)}>＋</button>
-                </span>
+                </span></div>
+              )}
+              {g.clear.type === "time" && (
+                <div className="gc-row"><span className="gc-goal">
+                  <button className="gc-step" disabled={running} onClick={() => bumpTime(-10)}>−</button>
+                  <span className="gc-num">⏱{g.clear.param}びょう</span> まで
+                  <button className="gc-step" disabled={running} onClick={() => bumpTime(10)}>＋</button>
+                </span></div>
+              )}
+              {/* ばくだんタッチ（ゲームオーバー） */}
+              <div className="gc-row">
+                <button className={"gc-toggle" + (g.gameOver ? " on" : "")} disabled={running}
+                  onClick={toggleBomb}>ばくだんタッチ {g.gameOver ? "◯" : "✕"}</button>
+                {g.gameOver && (
+                  <span className="gc-bombs">
+                    {charsRef.current.map(c => (
+                      <button key={c.cid} className={"gc-bomb" + (g.gameOver.targetId === c.cid ? " on" : "")}
+                        disabled={running} onClick={() => setBomb(c.cid)} title="さわったら まけ">
+                        {c.kind.type === "player"
+                          ? <PlayerAvatar character={(profileRef.current && profileRef.current.character) || "boy"} dressup={profileRef.current && profileRef.current.dressup} size={26} />
+                          : <img src={kindImg(c.kind)} alt="" draggable="false" />}
+                        {g.gameOver.targetId === c.cid && <span className="skull">💀</span>}
+                      </button>
+                    ))}
+                  </span>
+                )}
               </div>
             </div>
-          )}
+            );
+          })()}
           <div className="bgrow">
             <div className="rowtitle">ぶたい（はいけい）</div>
             <div className="thumbs">
