@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-21（v2.3-b5v こうぐだな共通2点修正=チップ干渉解消＋タッチ縦スクロール＝⚠️実機確認待ち。b5u=段階1は段階2指示書が完了前提のため実機OK扱い。b5r〜b5tは実機OK）
+最終更新: 2026-07-21（v2.3-b5w ゲームこうぼう段階2=ゲーム完成〔うごき3種/ばくだん/じかん/みほん3本/全画面〕＋gamelabエディタ見た目作り直し＝⚠️実機確認待ち。b5vも実機確認待ち。b5r〜b5uは実機OK）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,7 +12,13 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s・実機OK）・段階1=完了（b5u・実機OK扱い）・こうぐだな共通修正=完了（b5v・実機確認待ち）／次は段階2（うごき3種・ばくだんタッチ・じかん/クリアなし・みほん全部・全画面・**gamelabエディタ見た目作り直し**）。指示書=段階A `stageA.md`・段階1 `stage1.md`・**段階2 `brushup/gamelab-implementation-stage2.md`（正本・見た目基準=`gamelab-editor-mock.html`）**・共通修正 `brushup/palette-fixes.md`（すべて brushup/）。
+- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・**段階2=実装完了（b5w・実機確認待ち）**／実機合格で段階3（ロジック=もし〜なら等・stage2指示書C-3の区分）へ＝新規Chatで指示書から。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `brushup/gamelab-implementation-stage2.md`（正本・見た目基準=`gamelab-editor-mock.html`）・共通修正 `brushup/palette-fixes.md`（すべて brushup/）。
+- **v2.3-b5w（2026-07-21・ゲームこうぼう段階2=ゲーム完成＋エディタ見た目作り直し＝⚠️実機確認待ち／deploy済み b5854ec）**: 指示書=`brushup/gamelab-implementation-stage2.md`（正本）・見た目基準=`gamelab-editor-mock.html`。スキーマ変更なし（gameConfig の枠は段階1予約分に中身を入れただけ）。中間①=21b614a・②=84e00e3・③=476746e・④=783020e（deploy=b5854ec）
+  - **A ゲーム機能**: うごき3種（moveRand=範囲内4方向ランダム／bounce=向きへ1マス・端反転・dir保持／bumpTarget=相手指定ぶつかり・ピルタップで だれか→他キャラ循環）＝GAMELAB_PALORDER 23種化・**スタジオ18種不変**。ばくだんタッチ（gameOver={targetId}・💀キャラ選び）→ざんねん「おしい！ もういちど？」（紙吹雪なし=責めない）。じかんクリア（10〜60秒10刻み・⏱HUD毎拍更新・エンジン静止後も器の時計継続）→けっか「じかん たったよ！」（中立・スコア発表）。クリアなし（■のみ）。せってい=クリア3択セレクタ＋ばくだんトグル/キャラ選び。みほん3本（あつめ/よけ/キャッチ=設計§5全レシピ・キャッチはbumpTargetでスライムだけ点+きのこは はねかえるダミー）。全画面プレイ（big中HUD/結果画面・編集UI消灯）
+  - **B 見た目作り直し（gamelabのみ）**: GAMELAB_CSS=`.studio-root.gl` オーバーライドのみ＝**studioに1pxも影響しない**。こうぐだな=枠なし・ジャンル見出し1回・自動幅・実寸凸凹カード（#f3f6fa）／キャンバス=淡いドット／ステージ額装＋白カード操作盤／ヘッダー明るいツール調。値はモック初期値=実機微調整可
+  - ★実装判断: ①クリアとゲームオーバー同拍成立は**ゲームオーバー優先**（設計に明記なし・「触れたら負け」を守る） ②主人公の移動=「タップされたら→ランダムにうごく」で代替（designの「タップ移動」） ③よけの敵は1体（gameOverが単数指定） ④実測バグ修正=エンジンが同拍中に自然終了すると終了判定がスキップされる→判定をrunningRefガードの外へ（+じかん中の時計継続・時計待ち中の■対応）
+  - 検証: **verify 8本全PASS**（エンジン7ケース・verify-gamelab拡張=time/gameOver/target妥当性・みほん3本）・**回帰GREEN**（732イベント不変・studio=gl無し/palgrid/pname18で無変化実測）・ブラウザ実測=乱数固定で敵突進→ざんねん／⏱10→8→けっか＋もういちどで復帰／全画面でbumpTarget発火⭐1／glパレットで横取り出し・プルッ・pan-y動作／コンソールエラーゼロ
+  - ⚠️次: 神田さんの実機確認（stage2 §C-4ゲート: よけ/キャッチが作れて遊べる・じかん→けっか・ばくだん→ざんねん・全画面で家族に渡せる・せってい3種切替・**gamelabの見た目がモックの方向か**・studio不変・iPad+PC）。合格で段階3へ
 - **v2.3-b5v（2026-07-21・こうぐだな共通2点修正=チップ干渉解消＋タッチ縦スクロール＝⚠️実機確認待ち／deploy済み ef2d4a5）**: 指示書=`brushup/palette-fixes.md`（正本・段階1/2と独立の共通修正＝**studio と gamelab 両方に効く**・先行デプロイ）
   - **①チップ干渉解消**: `geometry.js` G.CHIP **34→30**・ICON **26→24**＋`StudioBlock`/パレット描画で `chipY` を **`max(_,9)` クランプ**＝メスのくぼみ底(TD=8)を全ブロックで回避（容器チップ 5→9・通常 7→9・はた14不変）。**★ベースライン再取得（`--update`）実施**: 変化は G.CHIP/ICON・既存15型の chipY・DEFSへの scoreUp/scoreDown 焼き込み（段階1分）だけ。**パス91本・幅・エンジントレース732イベント・ANIM・CHIP_STYLE は1バイト不変**（Python厳密比較で確認＝スタジオ挙動保証は維持）
   - **②タッチ縦スクロール**: `.studio-pal`/`.pal` の `touch-action` **none→pan-y**。`onPalPointerDown` を pointerdown即ドラッグ→**横しきい値確定**へ（`palPendingRef` 新設・グローバル onMove で「横>縦 かつ 横>6px」なら取り出し確定／縦優勢は pan-y でブラウザにスクロール譲る・pointercancel/up で保留破棄）。トリガのプルッ拒否も横確定時に判定
