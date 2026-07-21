@@ -25,7 +25,7 @@ const CLEAR_TYPES = ["score", "time", "none"]; // enum は段階2まで込みで
 
 function countBlocks(list) { return (list || []).reduce((a, b) => a + 1 + (b.children ? countBlocks(b.children) : 0), 0); }
 
-function walkList(list, depth, where) {
+function walkList(list, depth, where, charCount) {
   list.forEach((b, i) => {
     const d = DEFS[b.type];
     if (!d) { ng(`${where}: 未知のブロック type="${b.type}"`); return; }
@@ -38,28 +38,42 @@ function walkList(list, depth, where) {
     if (d.pill === "s") {
       if (typeof b.s !== "number" || b.s < 0 || b.s >= SOUNDS.length) ng(`${where}: 「${d.label}」の s=${b.s} が範囲外`);
     }
+    if (d.pill === "target") { // stage2: 相手指定ぶつかり＝any か 実在キャラ
+      if (b.target !== "any" && !cidExists(b.target, charCount)) ng(`${where}: 「${d.label}」の target="${b.target}" が any でも実在キャラでもない`);
+    }
     if (isContainer(b.type)) {
       if (!Array.isArray(b.children)) ng(`${where}: 容器「${d.label}」に children 配列がない`);
       else {
         if (depth + 1 > MAXDEPTH) ng(`${where}: 入れ子深さが${MAXDEPTH}を超えている`);
-        walkList(b.children, depth + 1, `${where}>「${d.label}」`);
+        walkList(b.children, depth + 1, `${where}>「${d.label}」`, charCount);
       }
     } else if (b.children) ng(`${where}: 容器でない「${d.label}」が children を持つ`);
     if (d.flat && i !== list.length - 1) ng(`${where}: 「${d.label}」（ずっと）がリスト末尾以外にある`);
   });
 }
 
-// gameConfig の妥当性（stage1 §10: scoreShow bool・clear.type 許容集合・score は param 5〜50 の5刻み・gameOver===null）
-function checkGameConfig(g, W) {
+// gameConfig の妥当性（stage1 §10＋stage2: score=5〜50の5刻み／time=10〜60の10刻み／gameOver=null か 実在キャラの {targetId}）
+function checkGameConfig(g, W, charCount) {
   if (!g || typeof g !== "object") { ng(`${W}: gameConfig がない`); return; }
   if (typeof g.scoreShow !== "boolean") ng(`${W}: gameConfig.scoreShow が bool でない（${g.scoreShow}）`);
   if (!g.clear || !CLEAR_TYPES.includes(g.clear.type)) ng(`${W}: gameConfig.clear.type="${g.clear && g.clear.type}" が許容集合（${CLEAR_TYPES.join("/")}）の外`);
   else if (g.clear.type === "score") {
     const p = g.clear.param;
     if (typeof p !== "number" || p < 5 || p > 50 || p % 5 !== 0) ng(`${W}: clear.param=${p} が 5〜50 の5刻みでない`);
+  } else if (g.clear.type === "time") {
+    const p = g.clear.param;
+    if (typeof p !== "number" || p < 10 || p > 60 || p % 10 !== 0) ng(`${W}: clear.param=${p} が 10〜60 の10刻みでない`);
   }
-  if (g.gameOver !== null) ng(`${W}: gameOver が null でない（段階1は常に null・中身は段階2）`);
+  if (g.gameOver !== null) {
+    if (!g.gameOver || typeof g.gameOver !== "object") ng(`${W}: gameOver が null でもオブジェクトでもない`);
+    else if (!cidExists(g.gameOver.targetId, charCount)) ng(`${W}: gameOver.targetId="${g.gameOver.targetId}" が実在キャラ（c1..c${charCount}）でない`);
+  }
 }
+// cid は loadScene の採番規則「配列順で c1, c2, …」
+const cidExists = (cid, charCount) => {
+  const m = /^c(\d+)$/.exec(cid || "");
+  return !!m && +m[1] >= 1 && +m[1] <= charCount;
+};
 
 const ids = new Set();
 for (const s of SAMPLES) {
@@ -68,7 +82,7 @@ for (const s of SAMPLES) {
   ids.add(s.id);
   if (!s.name) ng(`${W}: name がない`);
   if (!STUDIO_BG_IDS.includes(s.bg)) ng(`${W}: bg="${s.bg}" が BGS に実在しない`);
-  checkGameConfig(s.gameConfig, W);
+  checkGameConfig(s.gameConfig, W, (s.chars || []).length);
   if (!Array.isArray(s.chars) || !s.chars.length || s.chars.length > MAX_CHARS) {
     ng(`${W}: キャラ数 ${s.chars && s.chars.length} が 1..${MAX_CHARS} の外`);
     continue;
@@ -88,7 +102,7 @@ for (const s of SAMPLES) {
         seenTrigger.add(head.type);
       }
       if (countBlocks(st.blocks) > STACK_MAX) ng(`${SW}: ブロック数が上限${STACK_MAX}超え`);
-      walkList(st.blocks || [], 0, SW);
+      walkList(st.blocks || [], 0, SW, s.chars.length);
     });
   });
   // エンジンでスモーク実行（IDを振ってから40拍＋タップ発火・例外なく回りきること）
@@ -105,10 +119,10 @@ for (const s of SAMPLES) {
     ng(`${W}: エンジン実行で例外 ${e.message}`);
   }
 }
-if (SAMPLES.length !== 1) ng(`段階1のみほんは1本のはず（実際 ${SAMPLES.length}本）`);
+if (SAMPLES.length !== 3) ng(`段階2のみほんは3本（あつめ/よけ/キャッチ）のはず（実際 ${SAMPLES.length}本）`);
 
 if (fail === 0) {
-  console.log(`ゲームこうぼう みほん${SAMPLES.length}本 PASS（型/範囲/深さ/きっかけ/上限/gameConfig妥当性/エンジン40拍スモーク）`);
+  console.log(`ゲームこうぼう みほん${SAMPLES.length}本 PASS（型/範囲/深さ/きっかけ/上限/gameConfig妥当性〔score・time・gameOver・target〕/エンジン40拍スモーク）`);
   process.exit(0);
 } else {
   console.log(`\n❌ こうぼうみほん検証 ${fail}件 FAIL`);
