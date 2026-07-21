@@ -9,7 +9,7 @@
 //   コールバック（位置更新/発光/効果音）を描画に反映するだけ。
 import { useReducer, useRef, useState, useEffect, useLayoutEffect, useCallback } from "react";
 import { isTrigger, isContainer, makeBlock, cloneBlocks } from "../data/studio-blocks.js";
-import { G, ANIM, pathBody, pathHat, pathC, chipY, blockH, stackH, containerDepth } from "../workshop/geometry.js";
+import { G, ANIM, pathBody, pathHat, pathC, gloss, chipY, labelY, blockH, stackH, containerDepth } from "../workshop/geometry.js";
 import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../workshop/engine.js";
 import { lastProfile, saveProfile } from "../storage.js";
 import { playJingle } from "../bgm.js";
@@ -322,6 +322,66 @@ const STUDIO_CSS = `
     align-items: center; justify-content: center; color: #f5eddf; font-size: 16px; font-weight: 900;
     text-align: center; line-height: 2; }
   @media (max-width: 699px) { .studio-narrow { display: flex; } .studio-wrap { display: none; } }
+`;
+
+/* ==== ゲームこうぼうの見た目（stage2 §B・基準=brushup/gamelab-editor-mock.html） ====
+   .studio-root.gl のオーバーライドのみ＝studio には .gl が付かないので1pxも影響しない。
+   方針（B-4・合意済み）: 地は「涼しく明るいツール」（スタジオの茶と別世界）。ただし角丸・ひらがな・
+   柔らかい色で冷たくしない。値はすべてモックの初期値＝実機で微調整可。凸凹ブロックのパスは不変。 */
+const GAMELAB_CSS = `
+  .studio-root.gl { background: #e7ecf2; }
+  .studio-root.gl header { background: #fbfcfe; border-bottom: 1px solid #dbe2ea; color: #33404f; }
+  .studio-root.gl header .mark { background: #eaf1fb; box-shadow: inset 0 0 0 1.5px #cfe0f5; }
+  .studio-root.gl header h1 { color: #33404f; }
+  .studio-root.gl header .sub { color: #5b6675; opacity: 1; }
+  .studio-root.gl header button { color: #33404f; background: #eef2f7;
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,.06); }
+  .studio-root.gl header button.savebtn { background: #58a839; color: #fff; }
+  .studio-root.gl header button:active { transform: translateY(1px); box-shadow: none; }
+
+  /* --- 左: こうぐだな（B-1: 枠なし・見出し1回・自動幅・明るい涼しめ） --- */
+  .studio-root.gl .studio-pal { width: 252px; background: #f3f6fa; border-right: 1px solid #dbe2ea; padding: 12px 12px 6px; }
+  .studio-root.gl .studio-pal .shelf-title { color: #33404f; text-shadow: none; letter-spacing: .03em; margin-bottom: 11px; }
+  .studio-root.gl .studio-pal.del { background: #fbe9e5; border-right-color: #e0704f; }
+  .studio-root.gl .studio-pal .delmsg { color: #b3402f; }
+  .glsec { margin-bottom: 13px; }
+  .glsec-h { display: flex; align-items: center; gap: 7px; margin: 0 2px 8px; }
+  .glsec-h .dot { width: 10px; height: 10px; border-radius: 3px; }
+  .glsec-h .nm { font-size: 11px; font-weight: 900; color: #5b6675; letter-spacing: .05em; }
+  .glsec-h .ln { flex: 1; height: 1px; background: #dbe2ea; }
+  .glcards { display: flex; flex-wrap: wrap; gap: 9px 10px; align-items: flex-start; }
+  .studio-root.gl .studio-pal .pal.glpal { background: none; border: none; padding: 0; border-radius: 0; position: relative; }
+  .studio-root.gl .studio-pal .pal.glpal svg { margin: 0; display: block; }
+  .gllbl { position: absolute; display: flex; align-items: center; gap: 6px; color: #fff; font-weight: 800;
+    font-size: 14px; white-space: nowrap; pointer-events: none; text-shadow: 0 1px 1px rgba(0,0,0,.12); }
+  .gllbl .glpill { background: rgba(255,255,255,.9); color: #2b2b2b; font-size: 11px; font-weight: 900;
+    border-radius: 8px; padding: 1px 6px; text-shadow: none; }
+
+  /* --- 中央: 組み立てキャンバス（B-2: 淡いドット・地だけ変更） --- */
+  .studio-root.gl .studio-asm { background: #fcfdff;
+    background-image: radial-gradient(#e3e9f1 1.3px, transparent 1.3px); background-size: 20px 20px; }
+  .studio-root.gl .studio-asm::after { background: none; }
+  .studio-root.gl .studio-asm .hint { color: #8b98a8; }
+  .studio-root.gl .selchip { background: #fff; border: 1px solid #dbe2ea; color: #33404f;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+
+  /* --- 右: ステージ額装＋操作盤（B-3: 白カード＋見出し） --- */
+  .studio-root.gl .studio-right { background: #f3f6fa; border-left: 1px solid #dbe2ea; }
+  .studio-root.gl .theater { border-radius: 15px;
+    box-shadow: inset 0 0 0 3px #fff, 0 6px 16px rgba(0,0,0,.18); }
+  .studio-root.gl .gamecfg, .studio-root.gl .bgrow, .studio-root.gl .castrow {
+    background: #fff; border: 1px solid #dbe2ea; border-radius: 13px; padding: 11px 12px;
+    margin-top: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+  .studio-root.gl .rowtitle { color: #5b6675; text-shadow: none; }
+  .studio-root.gl .rcap { color: #8b98a8; }
+  .studio-root.gl .gamecfg .gc-cap { color: #33404f; }
+  .studio-root.gl .gamecfg .gc-toggle, .studio-root.gl .gamecfg .gc-seg {
+    color: #33404f; background: #eef2f7; box-shadow: inset 0 -2px 0 rgba(0,0,0,.06); }
+  .studio-root.gl .gamecfg .gc-toggle.on, .studio-root.gl .gamecfg .gc-seg.on { background: #58a839; color: #fff; }
+  .studio-root.gl .gamecfg .gc-goal { color: #33404f; background: #f1f4f8; }
+  .studio-root.gl .gamecfg .gc-num { color: #b8860b; }
+  .studio-root.gl .gamecfg .gc-bomb { border-color: #dbe2ea; background: #eef2f7; }
+  .studio-root.gl .gamecfg .gc-bomb.on { border-color: #e0704f; background: rgba(224,112,79,.18); }
 `;
 
 /* fly（持ち上げ中の束）の描画用: グループをフラットな配置リストに展開（段階0と同じ） */
@@ -1220,8 +1280,8 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const hist = histRef.current;
 
   return (
-    <div className={"studio-root" + (running ? " running" : "") + (big ? " big" : "") + (showOnly ? " showonly" : "")}>
-      <style>{STUDIO_CSS}</style>
+    <div className={"studio-root" + (mode.isGame ? " gl" : "") + (running ? " running" : "") + (big ? " big" : "") + (showOnly ? " showonly" : "")}>
+      <style>{STUDIO_CSS + (mode.isGame ? GAMELAB_CSS : "")}</style>
       <header>
         <div className="mark">{mode.mark}</div>
         <div style={{ minWidth: 0 }}>
@@ -1236,10 +1296,62 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         </div>
       </header>
       <div className="studio-wrap">
-        {/* 左: こうぐだな（18種・段階0のまま。プルッ拒否はDOM直接操作） */}
+        {/* 左: こうぐだな。studio=段階0のまま（2列grid＋pname）／gamelab=Scratch寄り（stage2 B-1・モック基準:
+            枠なし・ジャンル見出し1回・内容ぴったりの自動幅・実寸の凸凹カード）。プルッ拒否はDOM直接操作 */}
         <div className={"studio-pal" + (delHover ? " del" : "")} ref={palRef}>
           <div className="shelf-title">こうぐだな</div>
           <div className="delmsg">ここで はなすと<br />けせるよ</div>
+          {mode.isGame ? (() => {
+            // カテゴリごとにまとめる（PALORDER 順のまま・見出しはカテゴリの先頭で1回）
+            const groups = [];
+            for (const t of PALORDER) {
+              const cat = DEFS[t].cat;
+              if (!groups.length || groups[groups.length - 1].cat !== cat) groups.push({ cat, types: [] });
+              groups[groups.length - 1].types.push(t);
+            }
+            const CAT_DOT = { "きっかけ": "#F2A227", "うごき": "#3E93E8", "みため": "#E8639C", "おと": "#7BB03B", "せいぎょ": "#8F7EEA", "かず": "#F6C445" };
+            // 自動幅（モックの widthOf 相当・和文≈14px/半角≈7.5px の近似＝実測レイアウトは実機微調整前提）
+            const textW = (s, jp, en) => [...s].reduce((a, c) => a + (c.charCodeAt(0) < 256 ? en : jp), 0);
+            const pillTextOf = d => d.pill === "n" ? `×${d.def}` : d.pill === "s" ? SOUNDS[0] : d.pill === "target" ? "だれか" : null;
+            const palW = d => {
+              const pill = pillTextOf(d);
+              return Math.max(88, Math.round(G.LABELX + textW(d.label, 14, 7.5) + (pill ? 12 + textW(pill, 11, 6) + 6 : 0) + 14));
+            };
+            return groups.map(g => (
+              <div key={g.cat} className="glsec">
+                <div className="glsec-h"><span className="dot" style={{ background: CAT_DOT[g.cat] || "#9aa" }} /><span className="nm">{g.cat}</span><span className="ln" /></div>
+                <div className="glcards">
+                  {g.types.map(t => {
+                    const d = DEFS[t];
+                    const w = palW(d);
+                    const mouth = d.shape === "c" ? G.MOUTH : 0;
+                    const hh = d.shape === "hat" ? G.HATH : d.shape === "c" ? G.TB + mouth + G.BB : G.H;
+                    const isHat = d.shape === "hat";
+                    const pChipY = Math.max(chipY(t), 9);
+                    const pOff = (G.CHIP - G.ICON) / 2;
+                    const off = isTrigger(t) && hasTrigger(t);
+                    const pill = pillTextOf(d);
+                    return (
+                      <div key={t} className={"pal glpal" + (off ? " off" : "")}
+                        onPointerDown={e => onPalPointerDown(e, t)}>
+                        <svg width={w + 2} height={hh + G.TD + (isHat ? 9 : 6)}
+                          viewBox={`-1 ${isHat ? -4 : -1} ${w + 2} ${hh + G.TD + (isHat ? 9 : 6)}`}>
+                          <path d={isHat ? pathHat(w) : d.shape === "c" ? pathC(w, mouth, !!d.flat) : pathBody(w)}
+                            fill={d.fill} stroke={d.edge} strokeWidth="2" />
+                          <path d={gloss(w, isHat)} fill="none" stroke="rgba(255,255,255,.5)" strokeWidth="3.5" strokeLinecap="round" />
+                          <rect x={G.CHIPX} y={pChipY} width={G.CHIP} height={G.CHIP} rx="10" fill="#FFFDF6" stroke="rgba(0,0,0,.10)" strokeWidth="1" />
+                          <image href={d.icon} x={G.CHIPX + pOff} y={pChipY + pOff} width={G.ICON} height={G.ICON} />
+                        </svg>
+                        <div className="gllbl" style={{ left: G.LABELX, top: labelY(t) }}>
+                          {d.label}{pill && <span className="glpill">{pill}</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ));
+          })() : (
           <div className="palgrid">
             {PALORDER.map(t => {
               const d = DEFS[t];
@@ -1264,6 +1376,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
               );
             })}
           </div>
+          )}
         </div>
 
         {/* 中央: 組み立てエリア（選択中キャラのプログラムのみ） */}
