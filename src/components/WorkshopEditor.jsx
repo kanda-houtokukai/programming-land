@@ -16,7 +16,7 @@ import { playJingle } from "../bgm.js";
 import { buildCast, kindImg, kindName, kindValid } from "../workshop/cast.js";
 import iconCoin from "../assets/icon_stat_coin.png";
 import PlayerAvatar from "./PlayerAvatar.jsx";
-import StudioBlock from "./StudioBlock.jsx";
+import StudioBlock, { cardW } from "./StudioBlock.jsx";
 
 /* ============ 調整値（マジックナンバー集約・憲章§4-4） ============ */
 const CFG = {
@@ -765,18 +765,20 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     return best;
   };
   const overlapsAnyBlock = (fx, fy, group) => {
-    const gw = DEFS[group[0].type].w, gh = stackH(group);
+    const gw = cardW(group[0]), gh = stackH(group); // §2-2: 幅は内容ぴったり（StudioBlock の描画と同一・targetName未渡し=現状の表示に一致）
     for (const n of nodesRef.current) {
-      const nw = DEFS[n.b.type].w, nh = n.h || blockH(n.b);
+      const nw = cardW(n.b), nh = n.h || blockH(n.b);
       if (fx < n.x + nw && fx + gw > n.x && fy < n.y + nh && fy + gh > n.y) return true;
     }
     return false;
   };
 
   /* ==== ブロックドラッグ本体（段階0の1:1移植） ==== */
+  // §2-1: 作業エリアは .asm-scaled で見た目だけ CANVAS_S 倍に縮む。ポインタ座標は /CANVAS_S で
+  // 論理座標へ戻す＝磁石・接続・自由配置・保存座標はすべて従来の論理px（G.SNAP=78 等を凍結）。
   const asmPos = e => {
     const r = asmRef.current.getBoundingClientRect();
-    return { x: e.clientX - r.left, y: e.clientY - r.top };
+    return { x: (e.clientX - r.left) / CANVAS_S, y: (e.clientY - r.top) / CANVAS_S };
   };
   const findBlock = (list, id) => {
     for (let i = 0; i < list.length; i++) {
@@ -812,9 +814,11 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     const fx = p.x - drag.ox, fy = p.y - drag.oy;
     if (drag.fromPalette) {
       // §3: ゴーストは棚のサイズで始まり、作業エリアに入った瞬間 大きくなる（=ここで使える形になる合図）
+      // ★fly は .asm-scaled（scale CANVAS_S）の中にある。棚サイズ(絶対0.76)にするには追加で PAL_S/CANVAS_S、
+      //   作業エリアでは追加スケールなし＝ラッパーの CANVAS_S(0.86) がそのまま効く。
       const ar = asmRef.current.getBoundingClientRect();
       const overAsm = e.clientX > ar.left && e.clientX < ar.right && e.clientY > ar.top && e.clientY < ar.bottom;
-      flyRef.current.style.transform = `translate(${fx}px, ${fy}px)` + (overAsm ? "" : ` scale(${PAL_S})`);
+      flyRef.current.style.transform = `translate(${fx}px, ${fy}px)` + (overAsm ? "" : ` scale(${PAL_S / CANVAS_S})`);
       asmRef.current.classList.toggle("hotdrop", overAsm); // 作業エリアが光る（§5）
     } else {
       flyRef.current.style.transform = `translate(${fx}px, ${fy}px)`;
@@ -1115,7 +1119,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     pointerIdRef.current = e.pointerId;
     takeSnapshot();
     const b = makeBlock(type);
-    beginDrag(e, [b], true, { x: DEFS[type].w / 2, y: 20 });
+    beginDrag(e, [b], true, { x: cardW(b) / 2, y: 20 }); // §2-2: つかみ位置も内容ぴったり幅の中央
   };
 
   // 相手キャラ名の解決（bumpTarget のピル表示／stage2）。any=だれか
@@ -1395,7 +1399,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const { nodes } = layoutAll();
   const drag = dragRef.current;
   const ghost = drag && drag.slot ? {
-    w: DEFS[drag.group[0].type].w, h: drag.groupH - 4, x: drag.slot.x, y: drag.slot.y,
+    w: cardW(drag.group[0]), h: drag.groupH - 4, x: drag.slot.x, y: drag.slot.y, // §2-2: ゴーストも内容ぴったり幅
   } : null;
   const sel = selRef.current;
   const selC = curChar();
@@ -1491,15 +1495,31 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
               ながおしで コピー ／ けすときは たなへ ドラッグ
             </div>
           )}
-          <div className="studio-ghost" style={{
-            display: ghost ? "block" : "none",
-            width: ghost ? ghost.w : 0, height: ghost ? ghost.h : 0,
-            transform: ghost ? `translate(${ghost.x}px, ${ghost.y}px)` : undefined,
-          }} />
-          {nodes.map((n, order) => (
-            <StudioBlock key={n.b.id} b={n.b} mouth={n.mouth || 0} x={n.x} y={n.y} z={10 + order}
-              land={landId === n.b.id} onPill={onPill} />
-          ))}
+          {/* §2-1: ブロック層だけ CANVAS_S 倍に縮小（当たり判定は asmPos の /CANVAS_S で論理座標に戻す）。
+              selchip/hint と ピル値エディタ(pop) は画面座標のまま＝ラッパーの外（pop の指の当たり大きさを保つ）。 */}
+          <div className="asm-scaled" style={{
+            position: "absolute", left: 0, top: 0, width: `${100 / CANVAS_S}%`, height: `${100 / CANVAS_S}%`,
+            transformOrigin: "0 0", transform: `scale(${CANVAS_S})`,
+          }}>
+            <div className="studio-ghost" style={{
+              display: ghost ? "block" : "none",
+              width: ghost ? ghost.w : 0, height: ghost ? ghost.h : 0,
+              transform: ghost ? `translate(${ghost.x}px, ${ghost.y}px)` : undefined,
+            }} />
+            {nodes.map((n, order) => (
+              <StudioBlock key={n.b.id} b={n.b} mouth={n.mouth || 0} x={n.x} y={n.y} z={10 + order}
+                land={landId === n.b.id} onPill={onPill} />
+            ))}
+            {copyBalloon && (
+              <button className="copy-balloon" style={{ left: copyBalloon.x, top: Math.max(6, copyBalloon.y - 46) }}
+                onPointerDown={e => e.stopPropagation()} onClick={() => doCopy(copyBalloon.id)}>コピー</button>
+            )}
+            <div className="studio-fly" ref={flyRef} style={{ display: "none" }}>
+              {flyGroup && flyGroup.map(f => (
+                <StudioBlock key={"fly" + f.b.id} b={f.b} mouth={f.mouth} x={f.x} y={f.y} z={1} inFly />
+              ))}
+            </div>
+          </div>
           {popTarget && popVal !== null && (
             <div className="studio-pop" style={{ left: popTarget.x, top: popTarget.y }}
               onPointerDown={e => e.stopPropagation()}>
@@ -1508,15 +1528,6 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
               <button className="plus" onClick={() => stepVal(1)}>＋</button>
             </div>
           )}
-          {copyBalloon && (
-            <button className="copy-balloon" style={{ left: copyBalloon.x, top: Math.max(6, copyBalloon.y - 46) }}
-              onPointerDown={e => e.stopPropagation()} onClick={() => doCopy(copyBalloon.id)}>コピー</button>
-          )}
-          <div className="studio-fly" ref={flyRef} style={{ display: "none" }}>
-            {flyGroup && flyGroup.map(f => (
-              <StudioBlock key={"fly" + f.b.id} b={f.b} mouth={f.mouth} x={f.x} y={f.y} z={1} inFly />
-            ))}
-          </div>
         </div>
 
         {/* 右: ステージペイン（12×8を常に全体縮尺表示・3:2） */}
