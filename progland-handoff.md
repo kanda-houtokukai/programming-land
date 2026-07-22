@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-22（v2.3-b5x こうぐだな＆エディタUI刷新=つねに2列・ながおし→せつめい→ドラッグ・せつめい文30種＝**実機OK・神田さん確認済み**。b5v/b5w/b5r〜b5u もすべて実機OK。次=①`brushup/palette-ui-tuning.md`（b5x実機FBの微調整）→②段階3）
+最終更新: 2026-07-22（**v2.3-b5y こうぐだな＆作業エリア微調整=deploy済み・⚠️実機確認待ち**。b5x/b5v/b5w/b5r〜b5u は実機OK。次=①b5y の実機確認→合格で②段階3 `brushup/gamelab-implementation-stage3.md`）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,14 +12,22 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**こうぐだなUI刷新=完了（b5x・実機OK）**／次は①UI微調整=`brushup/palette-ui-tuning.md`（b5x実機FB反映・基準モック=`brushup/palette-mock3.html`）→②段階3（新カード7枚=`brushup/gamelab-implementation-stage3.md`・こうぐだなUI刷新が前提=完了済み）。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
+- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**こうぐだなUI刷新=完了（b5x・実機OK）→ UI微調整=完了（b5y・deploy済み・⚠️実機確認待ち）**／次は①b5y の実機確認→合格で②段階3（新カード7枚=`brushup/gamelab-implementation-stage3.md`・こうぐだなUI刷新が前提=完了済み）。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
 - **v2.3-b5x（2026-07-22・こうぐだな＆エディタUI刷新=2列・ながおし・せつめい＝実機OK・神田さん実機確認合格／deploy済み aa66929）**: 指示書=`brushup/palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`＝実装前にブラウザで全挙動を確認済み）。**[DECISION] §7=神田さん判断で「studioの見た目も2列に揃える」**（操作と見た目はセット・棚描画1系統化。studioの茶の世界観・色はそのまま）。区切り①=f69462b・②=1046625・③=b978d8b（deploy=aa66929）
   - **①データ層**: DEFS全23種に short（=label流用）/long/desc（§6の表を一字一句）。ベースライン再取得＝変更はlabel/long/descのみ＋段階2カード3種の焼き込み（既存パス91本は1バイト不変・**トレース732イベント不変**を機械確認）
   - **②2列＋%レイアウト**: `.palscroll` 新設（scrollbar-gutter:stable・5pxバー・スクロールは棚の中だけ）・カード幅=floor((clientWidth−8)/2)・カテゴリ見出しタップ開閉（初期: みため/おと閉）・棚=みじかい名前のみ/ピルなし/縮尺0.76/fitFont自動最大化（上限16px・webフォント確定後再計測）・こうぐだな24%/作業・プレビュー半分ずつ・GAMELAB_PALORDERを頻度順へ（studio PALORDERは現行順・色分岐維持）
   - **③ながおし操作（tap-to-copy廃止）**: 150ms成立（scale1.14＋ふきだし=long+desc・押している間だけ）→6px超でドラッグ（ゴースト棚0.76→作業エリアで等倍＋hotdrop発光）→内で置く「おいたよ！」/外で「とりけし」（dropLastSnapshotでundo履歴無傷）・成立前7px超=pan-yスクロールに譲る・pointercancel全中止・タップは初回のみヒントトースト・プルッ拒否はドラッグ確定時
   - ★実装判断: 作業エリアの縮尺は§2の98%でなく**従来1倍のまま**（2%差より§11凍結値〔磁石78等〕の保護を優先・実機で気になれば調整）／せつめい文の新カード7枚ぶんは段階3で追加
   - 検証: verify 8本全PASS・回帰GREEN・ブラウザ実測=studio/gamelab両方で 2列（gamelab 23枚・studio 18枚）・開閉・スクロール・§5全状態遷移（タップ無効/ながおし/スクロール譲り/2段階ゴースト/置く/取り消し/プルッ/undo履歴無傷）・コンソールゼロ
-  - ✅実機確認合格（2026-07-22・神田さん）。FB3件（棚カードのごちゃごちゃ感・作業エリアのカードが大きく空白あり・見出しが小さい）→ 微調整指示書 `brushup/palette-ui-tuning.md`（基準モック=`brushup/palette-mock3.html`）で対応＝次作業
+  - ✅実機確認合格（2026-07-22・神田さん）。FB3件（棚カードのごちゃごちゃ感・作業エリアのカードが大きく空白あり・見出しが小さい）→ 微調整 b5y で対応
+- **v2.3-b5y（2026-07-22・こうぐだな＆作業エリア微調整＝b5x実機FB反映＝⚠️実機確認待ち／deploy済み 02e4bfa）**: 指示書=`brushup/palette-ui-tuning.md`（正本）・基準モック=`brushup/palette-mock3.html`（3つのつまみで確定値が初期値・実装前にブラウザで挙動と数値を確認済み）。**studio/gamelab 両方に適用**（b5x §7 決定の継続）。中間①=7c055ff・②=2ad90cf・③=79dda2b（deploy=e5f7d5c→版上げ 02e4bfa）
+  - **①こうぐだなの余白（§1）**: カード幅=`floor(full×0.92)`（full=従来の「ぴったり2列」幅）。slack=実はば−幅×2 を `unit=max(4,floor(slack/3))` として `.glcards` の gap＋左右padding に均等配分＝両端と列間に余白。2列維持・fitFont据え置き（幅が縮むぶん文字は自動で少し小さく）。実測: palscroll302→カード135/unit10・studio 267→118/10
+  - **②作業エリアを小さく＋空白除去（§2）**: **[DECISION] 方針A採用**（自動幅）。`StudioBlock` に `cardW(b)`（=LABELX46＋ラベル文字幅＋(ピルあれば gap7＋ピル幅)＋右14・下限96・論理px）を新設し、**描画と当たり判定（overlap/ghost/つかみ位置）で共用**＝b5x で残っていた長い名前カードの右空白を根絶（例 ランダム 206→118論理・タップされたら 200→160）。縮尺は `.asm-scaled`（`transform:scale(0.86)`・`transform-origin:0 0`）で**ブロック層だけ縮小**し、`asmPos` を `/CANVAS_S` で論理座標へ戻す＝**G.SNAP=78・保存座標 stack.x/y・パス幅は論理pxのまま凍結**（磁石・接続の当たり判定は不変）。ピル値エディタ(pop)は画面座標のままラッパー外＝指の当たりを維持。fly は棚→作業で 0.76→0.86（`scale(PAL_S/CANVAS_S)`）
+  - **③見出しを押しやすく（§3）**: `.glsec-h` に `min-height:34px`＋`border-radius:8px`＋`padding:0 4px`＝押せる範囲を拡大。押下ハイライト studio=`rgba(255,244,220,.14)`／gl=`#e4eaf2`（モック準拠）。**文字サイズ・色・区切り線・ドットは不変**（「極端に変えない」を厳守）・開閉トグルは従来どおり
+  - ★重要判断: **ベースライン再取得は不要だった**。方針A＋CSS transform が DEFS/geometry.js/engine を一切触らないため、`npm run verify` が `--update` なしで全PASS＝ジオメトリベースライン（パス98本・DEFS23種）も**エンジントレース732イベントも1バイト不変**を機械確認（指示書§5は「縮尺・幅が変わるので再取得必要」と想定していたが、実装方式で回帰GREENを保てた）。定数=`PAL_GAP_RATIO=0.92`・`CANVAS_S=0.86`（WorkshopEditor 冒頭）
+  - ★発見（スコープ外・別タスク起票済み）: bumpTarget のピルが相手名でなく cid（「c2」）表示＝`targetName` が `StudioBlock` に未伝達の既存バグ（stage2/b5w 混入と推定）。今回は表示を変えず cardW を cid 基準で一致させた（表示修正は別便）
+  - 検証: **verify 8本全PASS**（区切り①②③の各後で実行・毎回 732イベント不変）・**ブラウザ実測（dev）**=①studio/gamelab とも 2列で余白（gamelab 23枚・studio 18枚）②`.asm-scaled` scale 0.86・作業エリアのカードが内容ぴったり幅（screen幅=論理×0.86）③見出し全6/5個 34px・開閉トグル動作・押下色④**合成ポインタで実ドラッグ接続を検証＝gamelab「みぎへ」を既存スタックに接続成功／studio「はた▶」→「みぎへ」接続成功**＝縮尺変更後も磁石・接続が効く⑤コンソールエラーゼロ・本番URLで b5y バンドル配信確認
+  - ⚠️次: 神田さんの実機確認（§5 ゲート iPad横+PC・studio/gamelab 両方）: ①こうぐだなが2列のまま余白で詰まって見えない②作業エリアのカードが小さく「はた ▶」「みぎへ」「おと」に右の空白がない③**ブロックの接続（磁石）が従来どおり効く**（縮尺の影響なし＝当たり判定の「反応する距離」が体感で狭すぎないか）④見出しが押しやすい／見た目は b5x と変わらない⑤ながおし・ドラッグ・スクロールは b5x のまま。合格で**段階3**へ
 - **v2.3-b5w（2026-07-21・ゲームこうぼう段階2=ゲーム完成＋エディタ見た目作り直し＝実機OK・神田さん実機確認合格／deploy済み b5854ec）**: 指示書=`brushup/gamelab-implementation-stage2.md`（正本）・見た目基準=`gamelab-editor-mock.html`。スキーマ変更なし（gameConfig の枠は段階1予約分に中身を入れただけ）。中間①=21b614a・②=84e00e3・③=476746e・④=783020e（deploy=b5854ec）
   - **A ゲーム機能**: うごき3種（moveRand=範囲内4方向ランダム／bounce=向きへ1マス・端反転・dir保持／bumpTarget=相手指定ぶつかり・ピルタップで だれか→他キャラ循環）＝GAMELAB_PALORDER 23種化・**スタジオ18種不変**。ばくだんタッチ（gameOver={targetId}・💀キャラ選び）→ざんねん「おしい！ もういちど？」（紙吹雪なし=責めない）。じかんクリア（10〜60秒10刻み・⏱HUD毎拍更新・エンジン静止後も器の時計継続）→けっか「じかん たったよ！」（中立・スコア発表）。クリアなし（■のみ）。せってい=クリア3択セレクタ＋ばくだんトグル/キャラ選び。みほん3本（あつめ/よけ/キャッチ=設計§5全レシピ・キャッチはbumpTargetでスライムだけ点+きのこは はねかえるダミー）。全画面プレイ（big中HUD/結果画面・編集UI消灯）
   - **B 見た目作り直し（gamelabのみ）**: GAMELAB_CSS=`.studio-root.gl` オーバーライドのみ＝**studioに1pxも影響しない**。こうぐだな=枠なし・ジャンル見出し1回・自動幅・実寸凸凹カード（#f3f6fa）／キャンバス=淡いドット／ステージ額装＋白カード操作盤／ヘッダー明るいツール調。値はモック初期値=実機微調整可
