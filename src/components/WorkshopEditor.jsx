@@ -401,7 +401,10 @@ const GAMELAB_CSS = `
 `;
 
 /* ==== こうぐだな2列（palette-ui-overhaul §1-§2） ==== */
-const PAL_S = 0.76; // 棚のブロック縮尺（§2・実機モック確定値。作業エリアは従来1倍＝★実装判断・§11凍結値保護）
+const PAL_S = 0.76; // 棚のブロック縮尺（§2・実機モック確定値）
+// palette-ui-tuning（b5x 実機FB反映・基準モック brushup/palette-mock3.html）
+const PAL_GAP_RATIO = 0.92; // §1: カード幅=floor(full×0.92)・余ったぶんを両端と列間へ均等配分（モック確定値）
+const CANVAS_S = 0.86;      // §2-1: 作業エリアのブロック縮尺。見た目だけ縮め、当たり判定は論理座標のまま（G.SNAP=78 等を凍結）
 const measCtx = document.createElement("canvas").getContext("2d");
 // 文字の自動最大化（§2・モック fitFont が基準）: カード幅に収まる最大サイズ（上限16px・下限7px）
 function fitFont(txt, avail, max) {
@@ -526,7 +529,8 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const pointerIdRef = useRef(null); // 最初の1本指のみ有効（多点タッチ対策）
   /* こうぐだな2列（palette-ui-overhaul §1・§4） */
   const palScrollRef = useRef(null);
-  const [colW, setColW] = useState(120); // カード幅=floor((実はば−7−1)/2)。実はば=palscroll.clientWidth
+  const [colW, setColW] = useState(120); // カード幅=floor(full×0.92)。full=floor((実はば−7−1)/2)・実はば=palscroll.clientWidth（§1）
+  const [palUnit, setPalUnit] = useState(7); // §1: 余白ユニット=max(4,floor(slack/3))。カード置き場の左右padding・列間gap 共通
   const [openCats, setOpenCats] = useState({ "みため": false, "おと": false }); // §4: 初期は みため・おと を閉じる
   /* ながおし（§5）: タイマー・ふきだし・初回ヒント */
   const palLPTimerRef = useRef(null);
@@ -535,7 +539,13 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   useLayoutEffect(() => {
     const meas = () => {
       const el = palScrollRef.current;
-      if (el && el.clientWidth > 40) setColW(Math.floor((el.clientWidth - 7 - 1) / 2));
+      if (el && el.clientWidth > 40) {
+        const full = Math.floor((el.clientWidth - 7 - 1) / 2); // 従来の「ぴったり2列」幅
+        const cw = Math.floor(full * PAL_GAP_RATIO);           // §1: 少し縮めて余白を作る
+        const slack = el.clientWidth - cw * 2;
+        setColW(cw);
+        setPalUnit(Math.max(4, Math.floor(slack / 3)));        // 両端＋列間の3枠へ均等配分
+      }
     };
     meas();
     window.addEventListener("resize", meas);
@@ -1433,7 +1443,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
                       <span className="dot" style={{ background: CAT_DOT[g.cat] || "#999" }} />
                       <span className="nm">{g.cat}</span><span className="ln" /><span className="ar">▼</span>
                     </div>
-                    <div className="glcards">
+                    <div className="glcards" style={{ gap: palUnit, padding: `0 ${palUnit}px` }}>
                       {g.types.map(t => {
                         const d = DEFS[t];
                         const isHat = d.shape === "hat";
