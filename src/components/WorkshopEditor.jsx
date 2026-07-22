@@ -107,7 +107,9 @@ const STUDIO_CSS = `
   .studio-pal .pal svg { display: block; }
   /* カテゴリ見出し（タップで開閉・§4）と2列カード。色は studio=茶地向け・gl 側で上書き */
   .glsec { margin-bottom: 9px; }
-  .glsec-h { display: flex; align-items: center; gap: 6px; margin: 0 1px 6px; cursor: pointer; }
+  .glsec-h { display: flex; align-items: center; gap: 6px; margin: 0 1px 6px; cursor: pointer;
+    min-height: 34px; border-radius: 8px; padding: 0 4px; } /* palette-ui-tuning §3: 押せる範囲を広げる（高さ34px・角丸8px・押下で薄い背景。文字/色/区切り線/ドットは不変） */
+  .glsec-h:active { background: rgba(255,244,220,.14); } /* studio（茶地）: やわらかいハイライト */
   .glsec-h .dot { width: 9px; height: 9px; border-radius: 3px; flex: 0 0 auto; }
   .glsec-h .nm { font-size: 10px; font-weight: 900; color: #f7e6c8; white-space: nowrap; }
   .glsec-h .ln { flex: 1; height: 1px; background: rgba(255,244,220,.25); }
@@ -371,6 +373,7 @@ const GAMELAB_CSS = `
   .studio-root.gl .glsec-h .nm { color: #5b6675; }
   .studio-root.gl .glsec-h .ln { background: #dbe2ea; }
   .studio-root.gl .glsec-h .ar { color: #9aa5b1; }
+  .studio-root.gl .glsec-h:active { background: #e4eaf2; } /* palette-ui-tuning §3: gl（明るい地）の押下ハイライト（モック準拠） */
   .studio-root.gl .palscroll::-webkit-scrollbar-thumb { background: #c9d3de; }
 
   /* --- 中央: 組み立てキャンバス（B-2: 淡いドット・地だけ変更） --- */
