@@ -81,27 +81,40 @@ const STUDIO_CSS = `
   .studio-root header button:disabled { opacity: .35; cursor: default; }
   .studio-wrap { flex: 1; display: flex; min-height: 0; }
 
-  /* --- 左: こうぐだな（段階0のまま） --- */
-  .studio-pal { width: 300px; flex-shrink: 0; background: linear-gradient(180deg, #8a5a33, #6f4526);
-    border-right: 4px solid #543317; padding: 10px 10px; position: relative; z-index: 5;
-    transition: background .15s; touch-action: pan-y; overflow-y: auto; } /* palette-fixes: 縦スワイプはブラウザにスクロールさせる（横はカード取り出し） */
+  /* --- 左: こうぐだな（palette-ui-overhaul §1-§4: つねに2列・スクロールは棚の中だけ・studio/gamelab共通構造） --- */
+  .studio-pal { width: 24%; flex-shrink: 0; background: linear-gradient(180deg, #8a5a33, #6f4526);
+    border-right: 4px solid #543317; padding: 8px 8px 2px; position: relative; z-index: 5;
+    transition: background .15s; touch-action: pan-y; display: flex; flex-direction: column; min-width: 0; }
   .studio-pal .shelf-title { color: #f7e6c8; font-size: 12px; font-weight: 900; text-align: center;
-    letter-spacing: .12em; margin-bottom: 8px; text-shadow: 0 1px 0 rgba(0,0,0,.4); }
-  .studio-pal .palgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    letter-spacing: .12em; margin-bottom: 7px; text-shadow: 0 1px 0 rgba(0,0,0,.4); flex: 0 0 auto; }
+  .palscroll { flex: 1 1 auto; min-height: 0; overflow-y: scroll; scrollbar-gutter: stable;
+    -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+  .palscroll::-webkit-scrollbar { width: 5px; }
+  .palscroll::-webkit-scrollbar-thumb { background: rgba(247,230,200,.35); border-radius: 3px; }
+  .palscroll::-webkit-scrollbar-track { background: transparent; }
   .studio-pal.del { background: linear-gradient(180deg, #a03a35, #7c2723); border-right-color: #5c1512; }
   .studio-pal.del .pal { opacity: .25; }
   .studio-pal .delmsg { position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
-    color: #ffe9e2; font-weight: 900; font-size: 14px; text-align: center; line-height: 1.6; pointer-events: none; }
+    color: #ffe9e2; font-weight: 900; font-size: 14px; text-align: center; line-height: 1.6; pointer-events: none; z-index: 6; }
   .studio-pal.del .delmsg { display: flex; }
-  .studio-pal .pal { background: rgba(255, 244, 220, .12); border: 2px solid rgba(255, 244, 220, .18);
-    border-radius: 12px; padding: 7px 6px 5px; cursor: grab; touch-action: pan-y;
-    transition: transform .12s, opacity .15s; }
-  .studio-pal .pal:active { transform: scale(.96); }
+  .studio-pal .pal { background: none; border: none; padding: 0; cursor: grab; touch-action: pan-y;
+    transition: transform .13s ease, opacity .15s; position: relative; flex: 0 0 auto; }
   .studio-pal .pal.off { opacity: .35; }
   @keyframes sbPalNo { 0%,100% { transform: none; } 25% { transform: translateX(4px); } 60% { transform: translateX(-4px); } }
   .studio-pal .pal.no { animation: sbPalNo .25s; }
-  .studio-pal .pal svg { display: block; margin: 0 auto; }
-  .studio-pal .pal .pname { text-align: center; color: #f7e6c8; font-size: 10px; font-weight: 700; margin-top: 2px; }
+  .studio-pal .pal svg { display: block; }
+  /* カテゴリ見出し（タップで開閉・§4）と2列カード。色は studio=茶地向け・gl 側で上書き */
+  .glsec { margin-bottom: 9px; }
+  .glsec-h { display: flex; align-items: center; gap: 6px; margin: 0 1px 6px; cursor: pointer; }
+  .glsec-h .dot { width: 9px; height: 9px; border-radius: 3px; flex: 0 0 auto; }
+  .glsec-h .nm { font-size: 10px; font-weight: 900; color: #f7e6c8; white-space: nowrap; }
+  .glsec-h .ln { flex: 1; height: 1px; background: rgba(255,244,220,.25); }
+  .glsec-h .ar { font-size: 9px; color: rgba(247,230,200,.6); font-weight: 900; }
+  .glsec.closed .glcards { display: none; }
+  .glsec.closed .ar { transform: rotate(-90deg); }
+  .glcards { display: flex; flex-wrap: wrap; gap: 7px; align-items: flex-start; }
+  .gllbl { position: absolute; display: flex; align-items: center; gap: 4px; color: #fff; font-weight: 800;
+    white-space: nowrap; pointer-events: none; text-shadow: 0 1px 1px rgba(0,0,0,.12); }
 
   /* --- 中央: 組み立てエリア（段階0のステージと同じ作法） --- */
   .studio-asm { flex: 1; position: relative; overflow: hidden; min-width: 0;
@@ -164,7 +177,7 @@ const STUDIO_CSS = `
   .copy-balloon:active { transform: scale(.95); }
 
   /* --- 右: ステージペイン --- */
-  .studio-right { width: clamp(280px, 36vw, 620px); flex-shrink: 0; display: flex; flex-direction: column;
+  .studio-right { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; /* §1: 作業とプレビューは残りを半分ずつ */
     gap: 8px; padding: 10px; overflow-y: auto; }
   .theater { position: relative; width: 100%; aspect-ratio: 3 / 2; flex-shrink: 0; border-radius: 14px;
     border: 4px solid #241a2c; overflow: hidden; background: #1c1424; touch-action: none; }
@@ -339,23 +352,15 @@ const GAMELAB_CSS = `
   .studio-root.gl header button.savebtn { background: #58a839; color: #fff; }
   .studio-root.gl header button:active { transform: translateY(1px); box-shadow: none; }
 
-  /* --- 左: こうぐだな（B-1: 枠なし・見出し1回・自動幅・明るい涼しめ） --- */
-  .studio-root.gl .studio-pal { width: 252px; background: #f3f6fa; border-right: 1px solid #dbe2ea; padding: 12px 12px 6px; }
-  .studio-root.gl .studio-pal .shelf-title { color: #33404f; text-shadow: none; letter-spacing: .03em; margin-bottom: 11px; }
+  /* --- 左: こうぐだな（B-1: 明るい涼しめ。構造・2列は STUDIO_CSS 共通＝ここは色だけ上書き） --- */
+  .studio-root.gl .studio-pal { background: #f3f6fa; border-right: 1px solid #dbe2ea; }
+  .studio-root.gl .studio-pal .shelf-title { color: #33404f; text-shadow: none; letter-spacing: .03em; }
   .studio-root.gl .studio-pal.del { background: #fbe9e5; border-right-color: #e0704f; }
   .studio-root.gl .studio-pal .delmsg { color: #b3402f; }
-  .glsec { margin-bottom: 13px; }
-  .glsec-h { display: flex; align-items: center; gap: 7px; margin: 0 2px 8px; }
-  .glsec-h .dot { width: 10px; height: 10px; border-radius: 3px; }
-  .glsec-h .nm { font-size: 11px; font-weight: 900; color: #5b6675; letter-spacing: .05em; }
-  .glsec-h .ln { flex: 1; height: 1px; background: #dbe2ea; }
-  .glcards { display: flex; flex-wrap: wrap; gap: 9px 10px; align-items: flex-start; }
-  .studio-root.gl .studio-pal .pal.glpal { background: none; border: none; padding: 0; border-radius: 0; position: relative; }
-  .studio-root.gl .studio-pal .pal.glpal svg { margin: 0; display: block; }
-  .gllbl { position: absolute; display: flex; align-items: center; gap: 6px; color: #fff; font-weight: 800;
-    font-size: 14px; white-space: nowrap; pointer-events: none; text-shadow: 0 1px 1px rgba(0,0,0,.12); }
-  .gllbl .glpill { background: rgba(255,255,255,.9); color: #2b2b2b; font-size: 11px; font-weight: 900;
-    border-radius: 8px; padding: 1px 6px; text-shadow: none; }
+  .studio-root.gl .glsec-h .nm { color: #5b6675; }
+  .studio-root.gl .glsec-h .ln { background: #dbe2ea; }
+  .studio-root.gl .glsec-h .ar { color: #9aa5b1; }
+  .studio-root.gl .palscroll::-webkit-scrollbar-thumb { background: #c9d3de; }
 
   /* --- 中央: 組み立てキャンバス（B-2: 淡いドット・地だけ変更） --- */
   .studio-root.gl .studio-asm { background: #fcfdff;
@@ -383,6 +388,18 @@ const GAMELAB_CSS = `
   .studio-root.gl .gamecfg .gc-bomb { border-color: #dbe2ea; background: #eef2f7; }
   .studio-root.gl .gamecfg .gc-bomb.on { border-color: #e0704f; background: rgba(224,112,79,.18); }
 `;
+
+/* ==== こうぐだな2列（palette-ui-overhaul §1-§2） ==== */
+const PAL_S = 0.76; // 棚のブロック縮尺（§2・実機モック確定値。作業エリアは従来1倍＝★実装判断・§11凍結値保護）
+const measCtx = document.createElement("canvas").getContext("2d");
+// 文字の自動最大化（§2・モック fitFont が基準）: カード幅に収まる最大サイズ（上限16px・下限7px）
+function fitFont(txt, avail, max) {
+  measCtx.font = '800 100px "Hiragino Maru Gothic ProN",sans-serif';
+  const w = measCtx.measureText(txt).width / 100;
+  return Math.max(7, Math.min(max, avail / w));
+}
+// カテゴリ見出しの色（§4・そうさ=ティールは stage3 のカード追加で使う）
+const CAT_DOT = { "きっかけ": "#F2A227", "うごき": "#3E93E8", "みため": "#E8639C", "おと": "#7BB03B", "せいぎょ": "#8F7EEA", "かず": "#F6C445", "そうさ": "#2FB4A6" };
 
 /* fly（持ち上げ中の束）の描画用: グループをフラットな配置リストに展開（段階0と同じ） */
 function flattenGroup(group) {
@@ -496,6 +513,20 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const pendingRef = useRef(null);
   const palPendingRef = useRef(null); // palette-fixes: パレット取り出しの保留（横しきい値超えで確定・縦はスクロール）
   const pointerIdRef = useRef(null); // 最初の1本指のみ有効（多点タッチ対策）
+  /* こうぐだな2列（palette-ui-overhaul §1・§4） */
+  const palScrollRef = useRef(null);
+  const [colW, setColW] = useState(120); // カード幅=floor((実はば−7−1)/2)。実はば=palscroll.clientWidth
+  const [openCats, setOpenCats] = useState({ "みため": false, "おと": false }); // §4: 初期は みため・おと を閉じる
+  useLayoutEffect(() => {
+    const meas = () => {
+      const el = palScrollRef.current;
+      if (el && el.clientWidth > 40) setColW(Math.floor((el.clientWidth - 7 - 1) / 2));
+    };
+    meas();
+    window.addEventListener("resize", meas);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { meas(); force(); }); // webフォント確定後に fitFont を測り直す
+    return () => window.removeEventListener("resize", meas);
+  }, []);
   const nodesRef = useRef([]);
   const slotsRef = useRef([]);
   const asmRef = useRef(null);
@@ -1296,87 +1327,59 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         </div>
       </header>
       <div className="studio-wrap">
-        {/* 左: こうぐだな。studio=段階0のまま（2列grid＋pname）／gamelab=Scratch寄り（stage2 B-1・モック基準:
-            枠なし・ジャンル見出し1回・内容ぴったりの自動幅・実寸の凸凹カード）。プルッ拒否はDOM直接操作 */}
+        {/* 左: こうぐだな（palette-ui-overhaul §1-§4・studio/gamelab共通＝§7神田さん承認で見た目も統一）:
+            つねに横2列・カテゴリ見出しタップで開閉・みじかい名前のみ（数字ピルは作業エリアだけ=§3）・
+            文字はカード内で自動最大化。プルッ拒否はドラッグ確定時（palette-fixes 作法） */}
         <div className={"studio-pal" + (delHover ? " del" : "")} ref={palRef}>
           <div className="shelf-title">こうぐだな</div>
           <div className="delmsg">ここで はなすと<br />けせるよ</div>
-          {mode.isGame ? (() => {
-            // カテゴリごとにまとめる（PALORDER 順のまま・見出しはカテゴリの先頭で1回）
-            const groups = [];
-            for (const t of PALORDER) {
-              const cat = DEFS[t].cat;
-              if (!groups.length || groups[groups.length - 1].cat !== cat) groups.push({ cat, types: [] });
-              groups[groups.length - 1].types.push(t);
-            }
-            const CAT_DOT = { "きっかけ": "#F2A227", "うごき": "#3E93E8", "みため": "#E8639C", "おと": "#7BB03B", "せいぎょ": "#8F7EEA", "かず": "#F6C445" };
-            // 自動幅（モックの widthOf 相当・和文≈14px/半角≈7.5px の近似＝実測レイアウトは実機微調整前提）
-            const textW = (s, jp, en) => [...s].reduce((a, c) => a + (c.charCodeAt(0) < 256 ? en : jp), 0);
-            const pillTextOf = d => d.pill === "n" ? `×${d.def}` : d.pill === "s" ? SOUNDS[0] : d.pill === "target" ? "だれか" : null;
-            const palW = d => {
-              const pill = pillTextOf(d);
-              return Math.max(88, Math.round(G.LABELX + textW(d.label, 14, 7.5) + (pill ? 12 + textW(pill, 11, 6) + 6 : 0) + 14));
-            };
-            return groups.map(g => (
-              <div key={g.cat} className="glsec">
-                <div className="glsec-h"><span className="dot" style={{ background: CAT_DOT[g.cat] || "#9aa" }} /><span className="nm">{g.cat}</span><span className="ln" /></div>
-                <div className="glcards">
-                  {g.types.map(t => {
-                    const d = DEFS[t];
-                    const w = palW(d);
-                    const mouth = d.shape === "c" ? G.MOUTH : 0;
-                    const hh = d.shape === "hat" ? G.HATH : d.shape === "c" ? G.TB + mouth + G.BB : G.H;
-                    const isHat = d.shape === "hat";
-                    const pChipY = Math.max(chipY(t), 9);
-                    const pOff = (G.CHIP - G.ICON) / 2;
-                    const off = isTrigger(t) && hasTrigger(t);
-                    const pill = pillTextOf(d);
-                    return (
-                      <div key={t} className={"pal glpal" + (off ? " off" : "")}
-                        onPointerDown={e => onPalPointerDown(e, t)}>
-                        <svg width={w + 2} height={hh + G.TD + (isHat ? 9 : 6)}
-                          viewBox={`-1 ${isHat ? -4 : -1} ${w + 2} ${hh + G.TD + (isHat ? 9 : 6)}`}>
-                          <path d={isHat ? pathHat(w) : d.shape === "c" ? pathC(w, mouth, !!d.flat) : pathBody(w)}
-                            fill={d.fill} stroke={d.edge} strokeWidth="2" />
-                          <path d={gloss(w, isHat)} fill="none" stroke="rgba(255,255,255,.5)" strokeWidth="3.5" strokeLinecap="round" />
-                          <rect x={G.CHIPX} y={pChipY} width={G.CHIP} height={G.CHIP} rx="10" fill="#FFFDF6" stroke="rgba(0,0,0,.10)" strokeWidth="1" />
-                          <image href={d.icon} x={G.CHIPX + pOff} y={pChipY + pOff} width={G.ICON} height={G.ICON} />
-                        </svg>
-                        <div className="gllbl" style={{ left: G.LABELX, top: labelY(t) }}>
-                          {d.label}{pill && <span className="glpill">{pill}</span>}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ));
-          })() : (
-          <div className="palgrid">
-            {PALORDER.map(t => {
-              const d = DEFS[t];
-              const mouth = d.shape === "c" ? G.MOUTH : 0;
-              const hh = d.shape === "hat" ? G.HATH : d.shape === "c" ? G.TB + mouth + G.BB : G.H;
-              const pChipY = Math.max(chipY(t), 9); // palette-fixes: メスのくぼみ底 TD=8 を避ける（StudioBlockと同基準）
-              const pOff = (G.CHIP - G.ICON) / 2;
-              const off = isTrigger(t) && hasTrigger(t);
-              return (
-                <div key={t} className={"pal" + (off ? " off" : "")}
-                  onPointerDown={e => onPalPointerDown(e, t)}>
-                  <svg width="128" height={(hh + G.TD + 8) * 0.5} viewBox={`-1 ${d.shape === "hat" ? -6 : -2} ${d.w + 4} ${hh + G.TD + 10}`}>
-                    <path d={d.shape === "hat" ? pathHat(d.w) : d.shape === "c" ? pathC(d.w, mouth, !!d.flat) : pathBody(d.w)}
-                      fill={d.fill} stroke={d.edge} strokeWidth="2.5" />
-                    <rect x={G.CHIPX} y={pChipY} width={G.CHIP} height={G.CHIP} rx="11" fill="#FFFDF6" stroke="rgba(0,0,0,.10)" strokeWidth="1" />
-                    <image href={d.icon} x={G.CHIPX + pOff} y={pChipY + pOff} width={G.ICON} height={G.ICON} />
-                    <text x={G.LABELX} y={d.shape === "hat" ? 42 : 32} fill="#fff" fontSize="21" fontWeight="900"
-                      fontFamily="'M PLUS Rounded 1c', sans-serif">{d.label}</text>
-                  </svg>
-                  <div className="pname">{d.cat}</div>
-                </div>
-              );
-            })}
+          <div className="palscroll" ref={palScrollRef}>
+            {(() => {
+              const groups = [];
+              for (const t of PALORDER) {
+                const cat = DEFS[t].cat;
+                if (!groups.length || groups[groups.length - 1].cat !== cat) groups.push({ cat, types: [] });
+                groups[groups.length - 1].types.push(t);
+              }
+              const W0 = Math.max(60, colW) / PAL_S; // ブロック論理幅（svg viewBox 側・表示は colW に縮む）
+              return groups.map(g => {
+                const closed = openCats[g.cat] === false;
+                return (
+                  <div key={g.cat} className={"glsec" + (closed ? " closed" : "")}>
+                    <div className="glsec-h" onClick={() => { sndTick(); setOpenCats(o => ({ ...o, [g.cat]: closed })); }}>
+                      <span className="dot" style={{ background: CAT_DOT[g.cat] || "#999" }} />
+                      <span className="nm">{g.cat}</span><span className="ln" /><span className="ar">▼</span>
+                    </div>
+                    <div className="glcards">
+                      {g.types.map(t => {
+                        const d = DEFS[t];
+                        const isHat = d.shape === "hat";
+                        const mouth = d.shape === "c" ? G.MOUTH : 0;
+                        const H0 = isHat ? G.HATH : d.shape === "c" ? G.TB + mouth + G.BB : G.H;
+                        const vbH = H0 + G.TD + (isHat ? 10 : 8);
+                        const pChipY = Math.max(chipY(t), 9);
+                        const pOff = (G.CHIP - G.ICON) / 2;
+                        const off = isTrigger(t) && hasTrigger(t);
+                        const f = fitFont(d.label, colW - G.LABELX * PAL_S - 8, 16); // §2: 自動最大化・上限16px
+                        return (
+                          <div key={t} className={"pal" + (off ? " off" : "")} style={{ width: colW }}
+                            onPointerDown={e => onPalPointerDown(e, t)}>
+                            <svg width={colW} height={Math.round(vbH * PAL_S)} viewBox={`-1 ${isHat ? -5 : -1} ${W0 + 2} ${vbH}`}>
+                              <path d={isHat ? pathHat(W0) : d.shape === "c" ? pathC(W0, mouth, !!d.flat) : pathBody(W0)}
+                                fill={d.fill} stroke={d.edge} strokeWidth="2.5" />
+                              <rect x={G.CHIPX} y={pChipY} width={G.CHIP} height={G.CHIP} rx="11" fill="#FFFDF6" stroke="rgba(0,0,0,.10)" strokeWidth="1" />
+                              <image href={d.icon} x={G.CHIPX + pOff} y={pChipY + pOff} width={G.ICON} height={G.ICON} />
+                            </svg>
+                            <div className="gllbl" style={{ left: G.LABELX * PAL_S, top: labelY(t) * PAL_S, fontSize: f }}>{d.label}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              });
+            })()}
           </div>
-          )}
         </div>
 
         {/* 中央: 組み立てエリア（選択中キャラのプログラムのみ） */}

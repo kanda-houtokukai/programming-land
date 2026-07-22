@@ -63,14 +63,15 @@ export const PALORDER = [
   "wait", "repeat", "forever",
 ];
 
-// ゲームこうぼうのパレット構成（きっかけの直後に「かず」を置く＝スコアを前面に・stage1 §3／stage2で3種追加）
+// ゲームこうぼうのパレット構成（palette-ui-overhaul §4: ゲームで使う頻度順＝
+// きっかけ→（そうさ=stage3で挿入）→かず→せいぎょ→うごき→みため→おと。うごき内はゲーム用カードを先頭に）
 export const GAMELAB_PALORDER = [
   "hat", "tap", "bump", "bumpTarget",
   "scoreUp", "scoreDown",
-  "move", "moveL", "moveU", "moveD", "moveRand", "bounce", "spin", "jump", "home",
+  "wait", "repeat", "forever",
+  "moveRand", "bounce", "move", "moveL", "moveU", "moveD", "spin", "jump", "home",
   "grow", "shrink", "hide", "show",
   "sound",
-  "wait", "repeat", "forever",
 ];
 
 // おとの種類（切替式・§5）。音源は段階2まではWebAudio簡易音（Suno差し替えは段階3）
