@@ -26,6 +26,8 @@ const CFG = {
   DRAFT_DEBOUNCE: 500, // かきかけ自動保存のデバウンス(ms)
   LONGPRESS: 500,      // 長押しコピー(ms)（指示書§3-3）
   DRAG_START: 6,       // ドラッグ開始のしきい値(px)（プロトタイプ準拠）
+  PAL_LONGPRESS: 150,  // こうぐだな ながおし成立(ms)（palette-ui-overhaul §5・確定値）
+  PAL_PRE_MOVE: 7,     // ながおし成立前の許容移動(px)＝超えたらスクロールに譲る（§5）
   ACTOR_K: 2.2,        // キャラ表示幅 = cellPx×これ（プロトタイプ実測値）
   JUMP_K: 1.6,         // ジャンプ高さ = cellPx×これ（§11）
   MOVE_MS: 340,        // 1マス移動のtransition(ms)（プロトタイプ .34s）
@@ -115,6 +117,15 @@ const STUDIO_CSS = `
   .glcards { display: flex; flex-wrap: wrap; gap: 7px; align-items: flex-start; }
   .gllbl { position: absolute; display: flex; align-items: center; gap: 4px; color: #fff; font-weight: 800;
     white-space: nowrap; pointer-events: none; text-shadow: 0 1px 1px rgba(0,0,0,.12); }
+  /* ながおし（palette-ui-overhaul §5）: 成立でカードが少し大きくなり、ふきだしで ながい名前＋せつめい */
+  .studio-pal .pal.lift { transform: scale(1.14); z-index: 5; filter: drop-shadow(0 6px 12px rgba(0,0,0,.28)); }
+  .palDesc { position: fixed; z-index: 260; max-width: 250px; background: #fffdf6; color: #33414f;
+    border-radius: 13px; padding: 10px 13px; box-shadow: 0 10px 26px rgba(0,0,0,.3); border: 2px solid #e5dcc6;
+    pointer-events: none; }
+  .palDesc .dt { font-weight: 900; font-size: 12.5px; margin-bottom: 4px; }
+  .palDesc .dd { font-size: 12px; line-height: 1.65; font-weight: 700; }
+  .palDesc .dg { font-size: 10.5px; color: #8a94a0; margin-top: 6px; font-weight: 800; }
+  .studio-asm.hotdrop { box-shadow: inset 0 0 0 3px #9dc4f0; } /* ドラッグ中: 作業エリアが光る（§5） */
 
   /* --- 中央: 組み立てエリア（段階0のステージと同じ作法） --- */
   .studio-asm { flex: 1; position: relative; overflow: hidden; min-width: 0;
@@ -517,6 +528,10 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const palScrollRef = useRef(null);
   const [colW, setColW] = useState(120); // カード幅=floor((実はば−7−1)/2)。実はば=palscroll.clientWidth
   const [openCats, setOpenCats] = useState({ "みため": false, "おと": false }); // §4: 初期は みため・おと を閉じる
+  /* ながおし（§5）: タイマー・ふきだし・初回ヒント */
+  const palLPTimerRef = useRef(null);
+  const palHintedRef = useRef(false); // 初回タップだけ「ながおしすると せつめいが でるよ」
+  const [palDesc, setPalDesc] = useState(null); // { type, x, y }
   useLayoutEffect(() => {
     const meas = () => {
       const el = palScrollRef.current;
@@ -785,7 +800,15 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     if (!drag) return;
     const p = asmPos(e);
     const fx = p.x - drag.ox, fy = p.y - drag.oy;
-    flyRef.current.style.transform = `translate(${fx}px, ${fy}px)`;
+    if (drag.fromPalette) {
+      // §3: ゴーストは棚のサイズで始まり、作業エリアに入った瞬間 大きくなる（=ここで使える形になる合図）
+      const ar = asmRef.current.getBoundingClientRect();
+      const overAsm = e.clientX > ar.left && e.clientX < ar.right && e.clientY > ar.top && e.clientY < ar.bottom;
+      flyRef.current.style.transform = `translate(${fx}px, ${fy}px)` + (overAsm ? "" : ` scale(${PAL_S})`);
+      asmRef.current.classList.toggle("hotdrop", overAsm); // 作業エリアが光る（§5）
+    } else {
+      flyRef.current.style.transform = `translate(${fx}px, ${fy}px)`;
+    }
     const pr = palRef.current.getBoundingClientRect();
     const overPal = e.clientX < pr.right && !drag.fromPalette;
     setDelHover(overPal);
@@ -816,6 +839,29 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     if (!d) return;
     const p = asmPos(e);
     setDelHover(false);
+    if (asmRef.current) asmRef.current.classList.remove("hotdrop");
+    if (d.fromPalette) {
+      const ar = asmRef.current.getBoundingClientRect();
+      const overAsm = e.clientX > ar.left && e.clientX < ar.right && e.clientY > ar.top && e.clientY < ar.bottom;
+      if (!overAsm) { // §5: 作業エリアの外で離す＝取り消し（何も置かない・履歴も汚さない）
+        const fly = flyRef.current;
+        fly.classList.add("poof");
+        sndPoof();
+        d.slot = null; d.committing = true;
+        dropLastSnapshot();
+        setTimeout(() => {
+          fly.classList.remove("poof");
+          fly.style.display = "none";
+          dragRef.current = null;
+          setFlyGroup(null);
+          force();
+        }, 220);
+        setToast("とりけし");
+        force();
+        return;
+      }
+      setToast("おいたよ！"); // §5: 作業エリアで離す＝置く（以降は従来のスナップ/自由配置）
+    }
     const pr = palRef.current.getBoundingClientRect();
     const overPal = e.clientX < pr.right && !d.fromPalette;
 
@@ -915,7 +961,13 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       if (pendingCharRef.current) moveCharDrag(e);
     };
     const onUp = e => {
-      if (palPendingRef.current && palPendingRef.current.pointerId === e.pointerId) palPendingRef.current = null; // 取り出し前に指を離した＝タップ（何もしない）
+      if (palPendingRef.current && palPendingRef.current.pointerId === e.pointerId) {
+        // ドラッグに至らず指を離した: ふきだしは消える（§5「押している間だけ説明」）。
+        // ながおし前のただのタップなら、初回だけヒントのトースト（§5・モックと同じ）
+        const wasArmed = palPendingRef.current.armed;
+        clearPalPending();
+        if (!wasArmed && !palHintedRef.current) { setToast("ながおしすると せつめいが でるよ"); palHintedRef.current = true; }
+      }
       if (pointerIdRef.current !== null && e.pointerId !== pointerIdRef.current) return;
       pointerIdRef.current = null;
       pendingRef.current = null;
@@ -924,12 +976,15 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       if (pendingCharRef.current) endCharDrag(e);
     };
     const onCancel = e => {
-      if (palPendingRef.current && palPendingRef.current.pointerId === e.pointerId) palPendingRef.current = null; // ブラウザが縦スクロールを取った＝取り出しを中断
+      if (palPendingRef.current && palPendingRef.current.pointerId === e.pointerId) clearPalPending(); // ブラウザがスクロールを取った＝すべて中止（§5）
       if (pointerIdRef.current !== null && e.pointerId !== pointerIdRef.current) return;
       pointerIdRef.current = null;
       clearTimeout(copyTimerRef.current);
       const d = dragRef.current;
-      if (d && !d.committing && d.group) curStacks().push({ x: 60, y: 60, blocks: d.group });
+      if (d && !d.committing && d.group) {
+        if (d.fromPalette) dropLastSnapshot(); // §5: パレット由来のcancelは何も置かない（取り出しのスナップショットも戻す）
+        else curStacks().push({ x: 60, y: 60, blocks: d.group }); // 既存ブロックの束は失わない（従来どおり）
+      }
       pendingRef.current = null;
       dragRef.current = null;
       const pc = pendingCharRef.current;
@@ -994,27 +1049,55 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     setTimeout(() => setLandId(null), ANIM.land + 40);
   };
 
-  /* ==== パレットから新規ブロック（段階0の1:1移植＋palette-fixes: 横しきい値で取り出し確定） ==== */
-  // palette-fixes: pointerdown では preventDefault せず保留だけ記録。最初の pointermove で
-  // 横移動が優勢＆しきい値超えなら取り出し確定、縦優勢なら touch-action:pan-y でブラウザにスクロールさせる。
+  /* ==== パレット: ながおし → せつめい → ドラッグ（palette-ui-overhaul §5・モック実装が正） ====
+     tap-to-copy 廃止＝棚の上ではタップでもながおしでもコピーされない。
+     pointerdown→150msでながおし成立（lift+ふきだし）→さらに6px動いたらドラッグ開始。
+     成立前に7px動いたら中止＝touch-action:pan-y でブラウザの縦スクロールに譲る。 */
+  const showPalDesc = (type, el) => {
+    const r = el.getBoundingClientRect();
+    setPalDesc({
+      type,
+      x: Math.min(window.innerWidth - 262, r.right + 10),
+      y: Math.max(8, Math.min(window.innerHeight - 130, r.top - 8)),
+    });
+  };
+  const clearPalPending = () => {
+    clearTimeout(palLPTimerRef.current);
+    const pal = palPendingRef.current;
+    if (pal && pal.el) pal.el.classList.remove("lift");
+    setPalDesc(null);
+    palPendingRef.current = null;
+  };
   const onPalPointerDown = (e, type) => {
     ac();
     if (runningRef.current) return;
     if (pointerIdRef.current !== null || palPendingRef.current) return;
-    palPendingRef.current = { x0: e.clientX, y0: e.clientY, type, pointerId: e.pointerId, el: e.currentTarget };
+    palPendingRef.current = { x0: e.clientX, y0: e.clientY, type, pointerId: e.pointerId, el: e.currentTarget, armed: false };
+    clearTimeout(palLPTimerRef.current);
+    palLPTimerRef.current = setTimeout(() => {
+      const pal = palPendingRef.current;
+      if (!pal || pal.armed || dragRef.current) return;
+      pal.armed = true; // ながおし成立: 少し大きく＋ふきだし（ながい名前＋せつめい）
+      pal.el.classList.add("lift");
+      showPalDesc(pal.type, pal.el);
+      try { pal.el.setPointerCapture(pal.pointerId); } catch (_) { /* 未対応環境は無視 */ }
+    }, CFG.PAL_LONGPRESS);
   };
-  // 保留中のパレット取り出しを横しきい値で確定する（グローバル onMove から呼ばれる）
+  // グローバル onMove から呼ばれる: ながおし前=スクロール譲り／後=ドラッグ確定
   const resolvePalPending = e => {
     const pal = palPendingRef.current;
     if (!pal || pal.pointerId !== e.pointerId || dragRef.current) return;
     const dx = e.clientX - pal.x0, dy = e.clientY - pal.y0;
-    if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > CFG.DRAG_START) { palPendingRef.current = null; return; } // 縦優勢=スクロールに譲る
-    if (Math.abs(dx) <= CFG.DRAG_START) return; // まだしきい値未満＝判定保留
-    e.preventDefault(); // 横確定＝ここからはアプリのドラッグ
+    if (!pal.armed) { // ながおし成立前に動いた → 中止（pan-y でブラウザがスクロール）
+      if (Math.abs(dx) > CFG.PAL_PRE_MOVE || Math.abs(dy) > CFG.PAL_PRE_MOVE) clearPalPending();
+      return;
+    }
+    if (Math.abs(dx) <= CFG.DRAG_START && Math.abs(dy) <= CFG.DRAG_START) return; // ながおし中（まだ動かない）
+    e.preventDefault(); // ドラッグ開始: ふきだしを消してゴーストが指に追従
     const { type, el } = pal;
-    palPendingRef.current = null;
+    clearPalPending();
     if (isTrigger(type) && hasTrigger(type)) {
-      // きっかけは1キャラにつき各1本＝プルッと拒否（DOM直接操作＝段階0の実装知見）
+      // きっかけは1キャラにつき各1本＝プルッと拒否（ドラッグ確定時に判定＝b5v作法）
       if (el) { el.classList.remove("no"); void el.offsetWidth; el.classList.add("no"); setTimeout(() => el.classList.remove("no"), 300); }
       sndNo();
       return;
@@ -1626,6 +1709,14 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
           </div>
         </div>
       )}
+      {/* ながおしの せつめいふきだし（palette-ui-overhaul §5・押している間だけ表示） */}
+      {palDesc && (() => { const d = DEFS[palDesc.type]; return (
+        <div className="palDesc" style={{ left: palDesc.x, top: palDesc.y }}>
+          <div className="dt">{d.long || d.label}</div>
+          <div className="dd">{d.desc}</div>
+          <div className="dg">そのまま ひっぱると おけるよ</div>
+        </div>
+      ); })()}
       {toast && <div className="studio-toast">{toast}</div>}
       <div className="studio-narrow">
         この あそびは<br />タブレットか パソコンで<br />あそんでね
