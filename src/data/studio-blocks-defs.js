@@ -16,40 +16,42 @@ const COL = {
 };
 
 /* 各ブロック定義:
-   w=幅px / label / cat（表示名）/ shape: "hat"|"c"|"body"
-   pill: "n"=数値（min/max/def）| "s"=おと切替 / flat: 容器で下が平ら（ずっと=後続不可）
-   §11既存9種の幅は変更禁止: hat218 / move・moveL・repeat206 / moveU・moveD・forever186 / jump178 / sound198 */
+   w=幅px / label（みじかい名前＝棚と作業エリアの表示・palette-ui-overhaul §6 の short を流用）/
+   long（ながおしふきだしの見出し）/ desc（ふきだし本文）/ cat（表示名）/ shape: "hat"|"c"|"body"
+   pill: "n"=数値（min/max/def）| "s"=おと切替 | "target"=相手指定 / flat: 容器で下が平ら（ずっと=後続不可）
+   §11既存9種の幅は変更禁止: hat218 / move・moveL・repeat206 / moveU・moveD・forever186 / jump178 / sound198
+   （w は作業エリアのブロック幅。棚のカード幅は描画側が2列幅から算出＝palette-ui-overhaul §1） */
 export const DEFS = {
   // きっかけ（帽子型・スタック先頭のみ・1キャラにつき各1本）
-  hat: { ...COL.trigger, w: 218, label: "はたが おされたら", shape: "hat", cat: "きっかけ" },
-  tap: { ...COL.trigger, w: 200, label: "タップされたら", shape: "hat", cat: "きっかけ" },
-  bump: { ...COL.trigger, w: 186, label: "ぶつかったら", shape: "hat", cat: "きっかけ" },
+  hat: { ...COL.trigger, w: 218, label: "はた ▶", long: "はたが おされたら", desc: "はたを おしたら、この したの カードが うごきだすよ。スタートに つかおう。", shape: "hat", cat: "きっかけ" },
+  tap: { ...COL.trigger, w: 200, label: "タップされたら", long: "タップされたら", desc: "この キャラが タップされたら、したの カードが うごくよ。", shape: "hat", cat: "きっかけ" },
+  bump: { ...COL.trigger, w: 186, label: "ぶつかったら", long: "ぶつかったら", desc: "なにかに ぶつかったら、したの カードが うごくよ。", shape: "hat", cat: "きっかけ" },
   // うごき（青）
-  move: { ...COL.motion, w: 206, label: "みぎへ すすむ", shape: "body", pill: "n", min: 1, max: 10, def: 3, cat: "うごき" },
-  moveL: { ...COL.motion, w: 206, label: "ひだりへ すすむ", shape: "body", pill: "n", min: 1, max: 10, def: 3, cat: "うごき" },
-  moveU: { ...COL.motion, w: 186, label: "うえへ", shape: "body", pill: "n", min: 1, max: 10, def: 3, cat: "うごき" },
-  moveD: { ...COL.motion, w: 186, label: "したへ", shape: "body", pill: "n", min: 1, max: 10, def: 3, cat: "うごき" },
-  spin: { ...COL.motion, w: 186, label: "まわる", shape: "body", pill: "n", min: 1, max: 3, def: 1, cat: "うごき" },
-  jump: { ...COL.motion, w: 178, label: "ジャンプ", shape: "body", pill: "n", min: 1, max: 5, def: 1, cat: "うごき" },
-  home: { ...COL.motion, w: 190, label: "もとのばしょへ", shape: "body", cat: "うごき" },
+  move: { ...COL.motion, w: 206, label: "みぎへ", long: "みぎへ すすむ", desc: "みぎへ すすむよ。すすむ マスの かずは きめられる。", shape: "body", pill: "n", min: 1, max: 10, def: 3, cat: "うごき" },
+  moveL: { ...COL.motion, w: 206, label: "ひだりへ", long: "ひだりへ すすむ", desc: "ひだりへ すすむよ。すすむ マスの かずは きめられる。", shape: "body", pill: "n", min: 1, max: 10, def: 3, cat: "うごき" },
+  moveU: { ...COL.motion, w: 186, label: "うえへ", long: "うえへ すすむ", desc: "うえへ すすむよ。", shape: "body", pill: "n", min: 1, max: 10, def: 3, cat: "うごき" },
+  moveD: { ...COL.motion, w: 186, label: "したへ", long: "したへ すすむ", desc: "したへ すすむよ。", shape: "body", pill: "n", min: 1, max: 10, def: 3, cat: "うごき" },
+  spin: { ...COL.motion, w: 186, label: "まわる", long: "くるっと まわる", desc: "くるっと まわるよ。", shape: "body", pill: "n", min: 1, max: 3, def: 1, cat: "うごき" },
+  jump: { ...COL.motion, w: 178, label: "ジャンプ", long: "ジャンプする", desc: "ぴょんと ジャンプするよ。", shape: "body", pill: "n", min: 1, max: 5, def: 1, cat: "うごき" },
+  home: { ...COL.motion, w: 190, label: "もとのばしょ", long: "もとの ばしょへ もどる", desc: "さいしょに いた ばしょに もどるよ。やりなおしに つかおう。", shape: "body", cat: "うごき" },
   // みため（ピンク）
-  grow: { ...COL.looks, w: 150, label: "おおきく", shape: "body", cat: "みため" },
-  shrink: { ...COL.looks, w: 150, label: "ちいさく", shape: "body", cat: "みため" },
-  hide: { ...COL.looks, w: 138, label: "きえる", shape: "body", cat: "みため" },
-  show: { ...COL.looks, w: 126, label: "でる", shape: "body", cat: "みため" },
+  grow: { ...COL.looks, w: 150, label: "おおきく", long: "からだを おおきく する", desc: "からだが おおきく なるよ。", shape: "body", cat: "みため" },
+  shrink: { ...COL.looks, w: 150, label: "ちいさく", long: "からだを ちいさく する", desc: "からだが ちいさく なるよ。", shape: "body", cat: "みため" },
+  hide: { ...COL.looks, w: 138, label: "きえる", long: "すがたを けす", desc: "すがたを けすよ。とられた リンゴなどに つかおう。", shape: "body", cat: "みため" },
+  show: { ...COL.looks, w: 126, label: "でる", long: "すがたを だす", desc: "すがたを だすよ。きえた あとに つかうと、また あらわれる。", shape: "body", cat: "みため" },
   // おと（緑）
-  sound: { ...COL.sound, w: 198, label: "おとを ならす", shape: "body", pill: "s", cat: "おと" },
+  sound: { ...COL.sound, w: 198, label: "おと", long: "おとを ならす", desc: "おとを ならすよ。おとは えらべる。", shape: "body", pill: "s", cat: "おと" },
   // せいぎょ（むらさき）
-  wait: { ...COL.control, w: 172, label: "まつ", shape: "body", pill: "n", min: 1, max: 10, def: 1, cat: "せいぎょ" },
-  repeat: { ...COL.control, w: 206, label: "くりかえし", shape: "c", pill: "n", min: 2, max: 10, def: 2, cat: "せいぎょ" },
-  forever: { ...COL.control, w: 186, label: "ずっと", shape: "c", flat: true, cat: "せいぎょ" },
+  wait: { ...COL.control, w: 172, label: "まつ", long: "ちょっと まつ", desc: "きめた あいだ、ちょっと まつよ。うごきの あいだを あけたい ときに。", shape: "body", pill: "n", min: 1, max: 10, def: 1, cat: "せいぎょ" },
+  repeat: { ...COL.control, w: 206, label: "くりかえし", long: "きめた かいすう くりかえす", desc: "なかに いれた カードを、きめた かいすう くりかえすよ。", shape: "c", pill: "n", min: 2, max: 10, def: 2, cat: "せいぎょ" },
+  forever: { ...COL.control, w: 186, label: "ずっと", long: "ずっと くりかえす", desc: "なかに いれた カードを、ゲームが おわるまで ずっと くりかえすよ。てきを うごかす ときは これ。", shape: "c", flat: true, cat: "せいぎょ" },
   // かず（ゲームこうぼう段階1・gamelab-implementation-stage1.md §3）。スタジオのパレット（PALORDER）には出ない
-  scoreUp: { ...COL.count, w: 206, label: "スコア ＋", shape: "body", pill: "n", min: 1, max: 5, def: 1, cat: "かず" },
-  scoreDown: { ...COL.count, w: 206, label: "スコア －", shape: "body", pill: "n", min: 1, max: 5, def: 1, cat: "かず" },
+  scoreUp: { ...COL.count, w: 206, label: "スコア ＋", long: "スコアを ふやす", desc: "スコアを ふやすよ。ふえる かずは じぶんで きめられる。", shape: "body", pill: "n", min: 1, max: 5, def: 1, cat: "かず" },
+  scoreDown: { ...COL.count, w: 206, label: "スコア －", long: "スコアを へらす", desc: "スコアを へらすよ。へる かずは じぶんで きめられる。", shape: "body", pill: "n", min: 1, max: 5, def: 1, cat: "かず" },
   // ゲームこうぼう段階2（stage2 §A-1・gamelab専用＝GAMELAB_PALORDER のみ）
-  moveRand: { ...COL.motion, w: 206, label: "ランダムに うごく", shape: "body", cat: "うごき" }, // 1拍ごと4方向のどれかへ1マス
-  bounce: { ...COL.motion, w: 186, label: "はねかえる", shape: "body", cat: "うごき" },       // 向きへ1マス・端で反転
-  bumpTarget: { ...COL.trigger, w: 210, label: "ぶつかったら", shape: "hat", pill: "target", cat: "きっかけ" }, // 相手ピルで指定キャラ（既定=だれか）
+  moveRand: { ...COL.motion, w: 206, label: "ランダム", long: "ランダムに うごく", desc: "あちこち ばらばらに うごくよ。てきに つかうと よけゲームに なる。", shape: "body", cat: "うごき" },
+  bounce: { ...COL.motion, w: 186, label: "はねかえる", long: "はねかえる", desc: "まっすぐ すすんで、はしに あたると はねかえるよ。うごきが よめるので よけやすい てきに なる。", shape: "body", cat: "うごき" },
+  bumpTarget: { ...COL.trigger, w: 210, label: "ぶつかったら", long: "ぶつかったら（あいてを えらぶ）", desc: "えらんだ あいてに ぶつかったら、したの カードが うごくよ。てんを いれたり、まけに したり できる。", shape: "hat", pill: "target", cat: "きっかけ" },
 };
 
 // たな（パレット）の並び順＝カテゴリ順（設計§5の表の順）
