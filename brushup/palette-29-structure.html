@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>こうぐだな 構成案（29種・カテゴリ開閉）</title>
+<style>
+  :root{
+    --trigger:#F2A227; --trigger-e:#C77E0C; --motion:#3E93E8; --motion-e:#1F6DBE;
+    --looks:#E8639C; --looks-e:#C13D77; --sound:#5FB84A; --sound-e:#3F9A2E;
+    --control:#8F7EEA; --control-e:#6A57C9; --count:#F6C445; --count-e:#CF9A12;
+    --ctrlpad:#2FB4A6; --ctrlpad-e:#1B8478;   /* ★新カテゴリ「そうさ」＝ティール（既存6色と混ざらない） */
+    --ink:#2f3a47; --slate:#5b6675; --line:#dbe2ea;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:"Hiragino Maru Gothic ProN","Hiragino Sans",system-ui,sans-serif;
+    background:#1c2026; color:#eef1f5; -webkit-font-smoothing:antialiased; padding:16px 12px 60px;}
+  .note{max-width:600px; margin:0 auto 12px; text-align:center;}
+  .note h1{font-size:17px; margin:0 0 5px;}
+  .note p{font-size:12px; opacity:.75; margin:0; line-height:1.65;}
+  .note .ph{font-size:11px; opacity:.5; margin-top:6px;}
+
+  .pal{max-width:600px; margin:0 auto; background:#f3f6fa; border-radius:18px; padding:14px 14px 8px;
+    box-shadow:0 12px 32px rgba(0,0,0,.42);}
+  .pal .title{color:#2b3a4a; font-size:12.5px; font-weight:900; text-align:center; margin:0 0 6px; letter-spacing:.03em;}
+  .pal .hint{color:#7a8694; font-size:11px; text-align:center; margin:0 0 12px;}
+
+  .sec{margin-bottom:10px;}
+  .sec-h{display:flex; align-items:center; gap:8px; margin:0 2px 8px; cursor:pointer; user-select:none;
+    padding:5px 6px; border-radius:9px;}
+  .sec-h:active{background:#e6ebf2;}
+  .sec-h .dot{width:11px; height:11px; border-radius:3px; flex:0 0 auto;}
+  .sec-h .nm{font-size:11.5px; font-weight:900; color:#5b6675; letter-spacing:.05em;}
+  .sec-h .cnt{font-size:10.5px; font-weight:800; color:#9aa5b1;}
+  .sec-h .ln{flex:1; height:1px; background:var(--line);}
+  .sec-h .ar{font-size:11px; color:#9aa5b1; font-weight:900; transition:transform .18s;}
+  .sec.closed .ar{transform:rotate(-90deg);}
+  .sec.closed .cards{display:none;}
+  .cards{display:flex; flex-wrap:wrap; gap:10px 11px; align-items:flex-start; padding:0 2px 4px;}
+
+  .blk{position:relative;} .blk svg{display:block;}
+  .blk .ic{position:absolute; display:flex; align-items:center; justify-content:center; pointer-events:none;}
+  .blk .lbl{position:absolute; display:flex; align-items:center; gap:6px; color:#fff; font-weight:800; font-size:13.5px;
+    white-space:nowrap; pointer-events:none; text-shadow:0 1px 1px rgba(0,0,0,.12);}
+  .blk .lbl .pill{background:rgba(255,255,255,.9); color:#2b2b2b; font-size:11px; font-weight:900;
+    border-radius:8px; padding:1px 6px; text-shadow:none;}
+  .blk.isnew::after{content:"NEW"; position:absolute; right:-5px; top:-7px; background:#e2483d; color:#fff;
+    font-size:8.5px; font-weight:900; border-radius:5px; padding:1px 4px; letter-spacing:.04em;}
+  #meas{position:absolute; visibility:hidden; left:-9999px; display:flex; gap:6px; font-weight:800; font-size:13.5px; white-space:nowrap;}
+  #meas .pill{font-size:11px; font-weight:900; padding:1px 6px;}
+
+  .foot{max-width:600px; margin:12px auto 0; color:#c7cdd6; font-size:11.5px; line-height:1.8;}
+  .foot b{color:#8fd3a0;} .foot .x{color:#ff9a9a;}
+  .foot h3{color:#eef1f5; font-size:12.5px; margin:12px 0 5px;}
+</style>
+</head>
+<body>
+  <div class="note">
+    <h1>ゲームこうぼう こうぐだな（29種・構成案）</h1>
+    <p>カテゴリの見出しを<strong>タップで開閉</strong>できます。使わないジャンルを畳めば、29種でも探しやすい。</p>
+    <p class="ph">※アイコンは仮。並び順は「ゲームで使う頻度」順に組み替えています。NEW＝これから足す7枚。</p>
+  </div>
+
+  <div class="pal">
+    <div class="title">こうぐだな</div>
+    <div class="hint">▼ みだしを タップすると ひらいたり とじたり できるよ</div>
+    <div id="palbody"></div>
+  </div>
+
+  <div class="foot">
+    <h3>この構成でやったこと</h3>
+    ・<b>「そうさ」カテゴリを新設</b>（ティール色）＝じゅうじキー・タップいどう・ジャンプ・ゴール。<b>ゲームの主役なので上から2番目</b>に。<br>
+    ・<b>並びをゲームの使用頻度順に</b>：きっかけ → そうさ → かず → せいぎょ → うごき → みため → おと。<br>
+    　（スタジオは「うごき・みため」中心だが、ゲームは「きっかけ・そうさ・かず・せいぎょ」が主役）<br>
+    ・<b>せいぎょ（ずっと・くりかえし）を上位に</b>＝敵の自動うごきは全部これで書くため。<br>
+    ・<span class="x">bump（ぶつかったら・相手指定なし）はゲームこうぼうから削除</span>（bumpTarget に一本化）。スタジオには残ります。<br>
+    ・<b>カテゴリ開閉</b>で、使わないジャンルを畳める＝29種でも圧迫しない。初期は「きっかけ・そうさ」だけ開いた状態も選べます。
+  </div>
+
+  <div id="meas"></div>
+
+<script>
+  const G={R:9,TX:20,TW:30,TD:8,SL:6,H:48,HATH:56,TB:44,BB:22,AW:17,CHIP:30,CHIPX:6,ICON:24,LABELX:46};
+  const CTM=9;
+  const segR=x=>`H${x} l${G.SL} ${G.TD} h${G.TW-G.SL*2} l${G.SL} ${-G.TD}`;
+  const segL=x=>`H${x+G.TW} l${-G.SL} ${G.TD} h${-(G.TW-G.SL*2)} l${-G.SL} ${-G.TD}`;
+  const pBody=w=>`M0 ${G.R} Q0 0 ${G.R} 0 ${segR(G.TX)} H${w-G.R} Q${w} 0 ${w} ${G.R} V${G.H-G.R} Q${w} ${G.H} ${w-G.R} ${G.H} ${segL(G.TX)} H${G.R} Q0 ${G.H} 0 ${G.H-G.R} Z`;
+  const pHat=w=>{const h=G.HATH;return `M0 24 C0 7 ${w*0.16} -2 ${w*0.5} -2 C${w*0.84} -2 ${w} 7 ${w} 24 V${h-G.R} Q${w} ${h} ${w-G.R} ${h} ${segL(G.TX)} H${G.R} Q0 ${h} 0 ${h-G.R} Z`;};
+  const pC=(w,m)=>{const MF=G.TB+m,BT=MF+G.BB,inX=G.AW;return `M0 ${G.R} Q0 0 ${G.R} 0 ${segR(G.TX)} H${w-G.R} Q${w} 0 ${w} ${G.R} V${G.TB-G.R} Q${w} ${G.TB} ${w-G.R} ${G.TB} ${segL(inX+G.TX)} H${inX+G.R} Q${inX} ${G.TB} ${inX} ${G.TB+G.R} V${MF-G.R} Q${inX} ${MF} ${inX+G.R} ${MF} ${segR(inX+G.TX)} H${w-G.R} Q${w} ${MF} ${w} ${MF+G.R} V${BT-G.R} Q${w} ${BT} ${w-G.R} ${BT} ${segL(G.TX)} H${G.R} Q0 ${BT} 0 ${BT-G.R} Z`;};
+  const gloss=(w,h)=>h?`M${w*0.2} 8 C${w*0.33} 3.5 ${w*0.67} 3.5 ${w*0.8} 8`:`M${G.TX+G.TW+8} 5 H${w-14}`;
+  const chipY=s=>s==='hat'?14:s==='c'?(G.TB-G.CHIP)/2:(G.H-G.CHIP)/2;
+  const labY=s=>s==='hat'?26:s==='c'?12:13;
+  const bh=s=>s==='hat'?G.HATH:s==='c'?(G.TB+G.H+G.BB):G.H;
+  const meas=document.getElementById('meas');
+  const mw=s=>{meas.innerHTML=`<span>${s.label}</span>`+(s.pill?`<span class="pill">${s.pill}</span>`:'');return meas.offsetWidth;};
+
+  function card(s){
+    const shape=s.shape||'body', isHat=shape==='hat', w=Math.max(86,Math.round(G.LABELX+mw(s)+13));
+    const path=isHat?pHat(w):shape==='c'?pC(w,G.H):pBody(w);
+    const hh=bh(shape), cy=Math.max(chipY(shape),CTM), io=(G.CHIP-G.ICON)/2;
+    const top=isHat?-4:-1, H=hh+G.TD+(isHat?9:6);
+    const el=document.createElement('div'); el.className='blk'+(s.isnew?' isnew':'');
+    el.innerHTML=`<svg width="${w+2}" height="${H}" viewBox="-1 ${top} ${w+2} ${H}">`
+      +`<path d="${path}" fill="var(--${s.cat})" stroke="var(--${s.cat}-e)" stroke-width="2"/>`
+      +`<path d="${gloss(w,isHat)}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3.5" stroke-linecap="round"/>`
+      +`<rect x="${G.CHIPX}" y="${cy}" width="${G.CHIP}" height="${G.CHIP}" rx="10" fill="#FFFDF6" stroke="rgba(0,0,0,.10)"/></svg>`
+      +`<div class="ic" style="left:${G.CHIPX+io}px;top:${cy+io}px;width:${G.ICON}px;height:${G.ICON}px;font-size:15px;">${s.icon}</div>`
+      +`<div class="lbl" style="left:${G.LABELX}px;top:${labY(shape)}px;"><span>${s.label}</span>${s.pill?`<span class="pill">${s.pill}</span>`:''}</div>`;
+    return el;
+  }
+
+  // ★ゲームで使う頻度順。NEW=これから足す7枚。bump は gamelab から削除。
+  const CATS=[
+    {key:'trigger', name:'きっかけ', open:true, items:[
+      {label:'はたが おされたら',icon:'🚩',shape:'hat'},
+      {label:'タップされたら',icon:'👆',shape:'hat'},
+      {label:'ぶつかったら',icon:'🎯',pill:'あいて',shape:'hat'},
+      {label:'ゴールに ついたら',icon:'🏁',shape:'hat',isnew:1},
+    ]},
+    {key:'ctrlpad', name:'そうさ（あそぶ人がうごかす）', open:true, items:[
+      {label:'じゅうじキーで うごかす',icon:'🎮',isnew:1},
+      {label:'タップした ところへ',icon:'👉',isnew:1},
+      {label:'ジャンプできるように',icon:'🦘',isnew:1},
+    ]},
+    {key:'count', name:'かず（スコア）', open:true, items:[
+      {label:'スコア ＋',icon:'⭐',pill:'×1'},
+      {label:'スコア －',icon:'⭐',pill:'×1'},
+    ]},
+    {key:'control', name:'せいぎょ（ずっと・くりかえし）', open:true, items:[
+      {label:'ずっと',icon:'♾️',shape:'c'},
+      {label:'くりかえし',icon:'🔁',pill:'×3',shape:'c'},
+      {label:'まつ',icon:'⏳',pill:'2'},
+    ]},
+    {key:'motion', name:'うごき（じどうで うごく）', open:true, items:[
+      {label:'ランダムに うごく',icon:'🔀'},
+      {label:'はねかえる',icon:'↔️'},
+      {label:'おいかける',icon:'🐾',pill:'あいて',isnew:1},
+      {label:'ふってくる',icon:'🌧️',isnew:1},
+      {label:'ぶんしんを だす',icon:'✨',isnew:1},
+      {label:'みぎへ すすむ',icon:'➡️',pill:'1'},
+      {label:'ひだりへ すすむ',icon:'⬅️',pill:'1'},
+      {label:'うえへ',icon:'⬆️',pill:'1'},
+      {label:'したへ',icon:'⬇️',pill:'1'},
+      {label:'ジャンプ',icon:'⤴️',pill:'1'},
+      {label:'まわる',icon:'🔄',pill:'1'},
+      {label:'もとのばしょへ',icon:'🏠'},
+    ]},
+    {key:'looks', name:'みため', open:false, items:[
+      {label:'きえる',icon:'👻'},
+      {label:'でる',icon:'🎩'},
+      {label:'おおきく',icon:'🔍'},
+      {label:'ちいさく',icon:'🔎'},
+    ]},
+    {key:'sound', name:'おと', open:false, items:[
+      {label:'おとを ならす',icon:'🎺',pill:'ポン'},
+    ]},
+  ];
+
+  const body=document.getElementById('palbody');
+  let total=0;
+  for(const c of CATS){
+    const sec=document.createElement('div'); sec.className='sec'+(c.open?'':' closed');
+    const h=document.createElement('div'); h.className='sec-h';
+    h.innerHTML=`<span class="dot" style="background:var(--${c.key})"></span><span class="nm">${c.name}</span>`
+      +`<span class="cnt">${c.items.length}</span><span class="ln"></span><span class="ar">▼</span>`;
+    h.onclick=()=>sec.classList.toggle('closed');
+    const cards=document.createElement('div'); cards.className='cards';
+    for(const it of c.items){ it.cat=c.key; cards.appendChild(card(it)); total++; }
+    sec.appendChild(h); sec.appendChild(cards); body.appendChild(sec);
+  }
+  document.querySelector('.pal .title').textContent=`こうぐだな（${total}種）`;
+</script>
+</body>
+</html>

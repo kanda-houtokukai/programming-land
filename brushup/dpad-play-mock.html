@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>あそぶ画面モック（じゅうじキー）</title>
+<style>
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{margin:0; font-family:"Hiragino Maru Gothic ProN","Hiragino Sans",system-ui,sans-serif;
+    background:#1c2026; color:#eef1f5; -webkit-font-smoothing:antialiased; padding:14px 12px 50px; touch-action:manipulation;}
+  .note{max-width:560px; margin:0 auto 12px; text-align:center;}
+  .note h1{font-size:16px; margin:0 0 4px;}
+  .note p{font-size:12px; opacity:.72; margin:0; line-height:1.6;}
+
+  .frame{max-width:560px; margin:0 auto; background:#e7ecf2; border-radius:18px; padding:12px;
+    box-shadow:0 12px 34px rgba(0,0,0,.45);}
+  .titlebar{display:flex; align-items:center; gap:8px; margin-bottom:9px;}
+  .titlebar .nm{font-size:12.5px; font-weight:900; color:#33414f;}
+  .titlebar .sp{flex:1;}
+  .titlebar button{font-family:inherit; font-weight:800; font-size:11.5px; border:none; border-radius:8px;
+    padding:6px 10px; background:#dde4ec; color:#33414f; cursor:pointer;}
+  .titlebar button.on{background:#4a7fc9; color:#fff;}
+
+  /* ステージ（額装） */
+  .stage{position:relative; border-radius:14px; overflow:hidden; aspect-ratio:4/3;
+    background:linear-gradient(#bfe3ff 0%,#d9f0ff 55%,#dff3d6 56%,#cdebc0 100%);
+    box-shadow:inset 0 0 0 3px #fff, 0 5px 14px rgba(0,0,0,.2); touch-action:none; user-select:none;}
+  .ground{position:absolute; left:0; right:0; bottom:0; height:18%; background:linear-gradient(#a6d977,#8cc65f);}
+  .sun{position:absolute; top:10px; left:14px; width:30px; height:30px; border-radius:50%; background:#ffe08a; box-shadow:0 0 20px #ffe9a8;}
+  .hud{position:absolute; top:8px; left:50%; transform:translateX(-50%); display:flex; gap:8px;}
+  .hud .b{background:rgba(36,26,44,.82); color:#ffe9b8; font-weight:900; font-size:16px; border-radius:999px; padding:3px 14px;}
+  .actor{position:absolute; font-size:30px; line-height:1; will-change:transform;}
+  .item{position:absolute; font-size:26px; line-height:1;}
+  .rb{position:absolute; width:36px; height:36px; border-radius:50%; border:none; cursor:pointer; color:#fff;
+    font-size:15px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,.22);}
+  .rb.run{right:9px; top:9px; background:#58a839;} .rb.stop{right:9px; top:9px; background:#c0453c;}
+
+  /* 結果 */
+  .over{position:absolute; inset:0; background:rgba(28,34,42,.72); display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:10px; color:#fff;}
+  .over .t{font-size:22px; font-weight:900;} .over .s{font-size:15px; font-weight:800; opacity:.95;}
+  .over .btns{display:flex; gap:9px; margin-top:4px;}
+  .over button{font-family:inherit; font-weight:900; font-size:13px; border:none; border-radius:11px;
+    padding:10px 16px; cursor:pointer; background:#58a839; color:#fff;}
+  .over button.sec{background:#dde4ec; color:#33414f;}
+
+  /* ===== じゅうじキー（操作UI） ===== */
+  .pad{margin-top:11px; display:flex; align-items:center; justify-content:space-between; gap:12px;}
+  .dpad{position:relative; width:132px; height:132px; flex:0 0 auto; touch-action:none;}
+  .dpad button{position:absolute; width:44px; height:44px; border:none; background:#fff; color:#33414f;
+    font-size:19px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer;
+    box-shadow:0 2px 0 #c3cdd8, 0 3px 8px rgba(0,0,0,.12);}
+  .dpad button:active, .dpad button.hold{background:#4a7fc9; color:#fff; transform:translateY(1px);}
+  .dpad .u{left:44px; top:0; border-radius:11px 11px 4px 4px;}
+  .dpad .d{left:44px; top:88px; border-radius:4px 4px 11px 11px;}
+  .dpad .l{left:0; top:44px; border-radius:11px 4px 4px 11px;}
+  .dpad .r{left:88px; top:44px; border-radius:4px 11px 11px 4px;}
+  .dpad .c{left:44px; top:44px; width:44px; height:44px; background:#eef2f7; box-shadow:none; border-radius:4px;}
+  .padnote{font-size:11.5px; color:#5b6675; line-height:1.7; flex:1;}
+  .padnote b{color:#33414f;}
+
+  .opts{max-width:560px; margin:14px auto 0; background:#fff; border-radius:13px; padding:12px 14px;
+    box-shadow:0 4px 14px rgba(0,0,0,.28); color:#33414f;}
+  .opts h3{font-size:12px; margin:0 0 8px; color:#5b6675; letter-spacing:.05em;}
+  .row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px;}
+  .row button{font-family:inherit; font-weight:800; font-size:11.5px; border:none; border-radius:9px;
+    padding:8px 11px; background:#eef2f7; color:#33414f; cursor:pointer;}
+  .row button.on{background:#33414f; color:#fff;}
+  .opts p{font-size:11.5px; color:#5b6675; line-height:1.7; margin:6px 0 0;}
+</style>
+</head>
+<body>
+  <div class="note">
+    <h1>あそぶ画面モック：じゅうじキーで うごかす</h1>
+    <p>指で十字キーを押して動かせます。落ちてくるリンゴを取ると⭐+1／ばくだん💣に当たると まけ。</p>
+  </div>
+
+  <div class="frame">
+    <div class="titlebar">
+      <span class="nm">おちものキャッチ</span>
+      <span class="sp"></span>
+      <button id="modeBtn">そうさ：じゅうじキー</button>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="sun"></div>
+      <div class="ground"></div>
+      <div class="hud"><div class="b" id="hudScore">⭐ 0</div><div class="b" id="hudTime">⏱ 20</div></div>
+      <div class="actor" id="hero" style="left:46%; bottom:18%;">🧑</div>
+      <button class="rb run" id="runBtn">▶</button>
+    </div>
+
+    <div class="pad">
+      <div class="dpad" id="dpad">
+        <button class="u" data-dir="u">▲</button>
+        <button class="l" data-dir="l">◀</button>
+        <div class="c"></div>
+        <button class="r" data-dir="r">▶</button>
+        <button class="d" data-dir="d">▼</button>
+      </div>
+      <div class="padnote">
+        <b>じゅうじキー</b>は「じゅうじキーで うごかす」カードを主人公に置くと出ます。<br>
+        押しっぱなしで動き続け、指をはなすと止まります。<br>
+        <b>上下が要らないゲーム</b>（このキャッチなど）は<b>左右だけ</b>にもできます（下で切替）。
+      </div>
+    </div>
+  </div>
+
+  <div class="opts">
+    <h3>ためせる かたち（実機で指の使い心地を見てください）</h3>
+    <div class="row">
+      <button class="on" data-pad="full">十字（4方向）</button>
+      <button data-pad="lr">左右だけ</button>
+      <button data-pad="float">画面の中に重ねる</button>
+    </div>
+    <div class="row">
+      <button class="on" data-size="m">キーの大きさ：ふつう</button>
+      <button data-size="l">大きめ</button>
+    </div>
+    <p>「画面の中に重ねる」＝ステージの上に半透明で置く形（全画面で遊ぶとき用）。どれが指で押しやすいか、実機で比べてください。</p>
+  </div>
+
+<script>
+  const stage=document.getElementById('stage'), hero=document.getElementById('hero');
+  const hudS=document.getElementById('hudScore'), hudT=document.getElementById('hudTime');
+  const runBtn=document.getElementById('runBtn'), dpad=document.getElementById('dpad'), modeBtn=document.getElementById('modeBtn');
+  let running=false, score=0, time=20, hx=46, hy=18, held=null, items=[], timer=null, tickN=0, tapMode=false, tapTarget=null;
+
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  function reset(){ score=0; time=20; hx=46; hy=18; items.forEach(i=>i.el.remove()); items=[]; tickN=0; tapTarget=null;
+    hudS.textContent='⭐ 0'; hudT.textContent='⏱ 20'; draw(); const o=stage.querySelector('.over'); if(o)o.remove(); }
+  function draw(){ hero.style.left=hx+'%'; hero.style.bottom=hy+'%'; }
+
+  function spawn(){
+    const bomb=Math.random()<0.28;
+    const el=document.createElement('div'); el.className='item'; el.textContent=bomb?'💣':'🍎';
+    el.style.left=rnd(6,88)+'%'; el.style.top='-8%'; stage.appendChild(el);
+    items.push({el,bomb,y:-8,x:parseFloat(el.style.left),v:rnd(1.6,2.8)});
+  }
+  function endGame(win,msg){
+    running=false; clearInterval(timer); runBtn.className='rb run'; runBtn.textContent='▶';
+    const o=document.createElement('div'); o.className='over';
+    o.innerHTML=`<div class="t">${msg}</div><div class="s">⭐ ${score}</div>
+      <div class="btns"><button id="again">もういちど</button><button class="sec" id="fix">なおす</button></div>`;
+    stage.appendChild(o);
+    o.querySelector('#again').onclick=()=>{reset(); start();};
+    o.querySelector('#fix').onclick=()=>{reset();};
+  }
+  function step(){
+    tickN++;
+    // 移動（押しっぱなしで連続移動）
+    const sp=1.9;
+    if(held==='l') hx=Math.max(3,hx-sp);
+    if(held==='r') hx=Math.min(94,hx+sp);
+    if(held==='u') hy=Math.min(70,hy+sp);
+    if(held==='d') hy=Math.max(18,hy-sp);
+    if(tapMode&&tapTarget!==null){ const d=tapTarget-hx; if(Math.abs(d)<2) tapTarget=null; else hx+=Math.sign(d)*sp; }
+    draw();
+    if(tickN%14===0) spawn();
+    // 落下と当たり判定
+    const hxPx=hx, hyTop=100-hy-12;
+    for(let i=items.length-1;i>=0;i--){
+      const it=items[i]; it.y+=it.v; it.el.style.top=it.y+'%';
+      if(Math.abs(it.x-hxPx)<7 && it.y>hyTop-4 && it.y<hyTop+10){
+        it.el.remove(); items.splice(i,1);
+        if(it.bomb){ endGame(false,'おしい！ もういちど？'); return; }
+        score++; hudS.textContent='⭐ '+score;
+      } else if(it.y>100){ it.el.remove(); items.splice(i,1); }
+    }
+    if(tickN%20===0){ time--; hudT.textContent='⏱ '+Math.max(0,time); if(time<=0){ endGame(true,'じかん たったよ！'); } }
+  }
+  function start(){ running=true; runBtn.className='rb stop'; runBtn.textContent='■'; timer=setInterval(step,50); }
+  runBtn.onclick=()=>{ if(running){ running=false; clearInterval(timer); runBtn.className='rb run'; runBtn.textContent='▶'; } else { reset(); start(); } };
+
+  // 十字キー：押しっぱなし対応
+  dpad.querySelectorAll('button').forEach(b=>{
+    const on=e=>{e.preventDefault(); held=b.dataset.dir; b.classList.add('hold');};
+    const off=e=>{e.preventDefault(); if(held===b.dataset.dir) held=null; b.classList.remove('hold');};
+    b.addEventListener('pointerdown',on); b.addEventListener('pointerup',off);
+    b.addEventListener('pointerleave',off); b.addEventListener('pointercancel',off);
+  });
+  // タップ移動モード
+  stage.addEventListener('pointerdown',e=>{ if(!tapMode||!running) return;
+    const r=stage.getBoundingClientRect(); tapTarget=((e.clientX-r.left)/r.width)*100; });
+  modeBtn.onclick=()=>{ tapMode=!tapMode; modeBtn.textContent='そうさ：'+(tapMode?'タップいどう':'じゅうじキー');
+    modeBtn.classList.toggle('on',tapMode); dpad.style.opacity=tapMode?.35:1; };
+
+  // 形・大きさ切替
+  document.querySelectorAll('[data-pad]').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('[data-pad]').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+    const v=b.dataset.pad, up=dpad.querySelector('.u'), dn=dpad.querySelector('.d');
+    dpad.style.position='relative'; dpad.style.margin=''; stage.style.overflow='hidden';
+    if(v==='lr'){ up.style.display='none'; dn.style.display='none'; }
+    else { up.style.display=''; dn.style.display=''; }
+    if(v==='float'){ dpad.style.position='absolute'; dpad.style.left='8px'; dpad.style.bottom='8px';
+      dpad.style.opacity='.75'; stage.appendChild(dpad); }
+    else if(dpad.parentElement!==document.querySelector('.pad')){ document.querySelector('.pad').prepend(dpad); dpad.style.opacity='1'; }
+  });
+  document.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('[data-size]').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+    const big=b.dataset.size==='l', s=big?56:44, g=big?112:88;
+    dpad.style.width=(s*3)+'px'; dpad.style.height=(s*3)+'px';
+    dpad.querySelectorAll('button, .c').forEach(el=>{ el.style.width=s+'px'; el.style.height=s+'px'; el.style.fontSize=(big?23:19)+'px'; });
+    dpad.querySelector('.u').style.left=s+'px'; dpad.querySelector('.d').style.left=s+'px'; dpad.querySelector('.d').style.top=g+'px';
+    dpad.querySelector('.l').style.top=s+'px'; dpad.querySelector('.r').style.top=s+'px'; dpad.querySelector('.r').style.left=g+'px';
+    dpad.querySelector('.c').style.left=s+'px'; dpad.querySelector('.c').style.top=s+'px';
+  });
+
+  draw();
+</script>
+</body>
+</html>
