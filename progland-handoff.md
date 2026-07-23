@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-23（**v2.3-b6a こうぐだな縮小＋トースト位置修正=deploy済み・⚠️実機確認待ち**。b5z/b5y/b5x/b5v/b5w/b5r〜b5u は実機OK。次=①b6a の実機確認→合格で②段階3 `brushup/gamelab-implementation-stage3.md`）
+最終更新: 2026-07-23（**v2.3-b6a こうぐだな縮小＋トースト位置修正=実機OK・神田さん実機確認合格**。b5z/b5y/b5x/b5v/b5w/b5r〜b5u も実機OK。次=**段階3 着手**（`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`。最初の区切り=① dpad＋tapMove＋そうさカテゴリ新設＋短縮ラベル））
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,7 +12,7 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**こうぐだなUI刷新=完了（b5x・実機OK）→ UI微調整=完了（b5y・実機OK）→ 指ドラッグ不具合修正=完了（b5z・実機OK）→ こうぐだな縮小＋トースト位置修正=完了（b6a・deploy済み・⚠️実機確認待ち）**／次は①b6a の実機確認→合格で②段階3（新カード7枚=`brushup/gamelab-implementation-stage3.md`・こうぐだなUI刷新が前提=完了済み・基準モック=`brushup/palette-29-structure.html`・`brushup/dpad-play-mock.html`）。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
+- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**こうぐだなUI刷新=完了（b5x・実機OK）→ UI微調整=完了（b5y・実機OK）→ 指ドラッグ不具合修正=完了（b5z・実機OK）→ こうぐだな縮小＋トースト位置修正=完了（b6a・実機OK）**／次は**段階3 着手**（新カード7枚=`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`・基準モック=`brushup/palette-29-structure.html`・`brushup/dpad-play-mock.html`）。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
 - **v2.3-b5x（2026-07-22・こうぐだな＆エディタUI刷新=2列・ながおし・せつめい＝実機OK・神田さん実機確認合格／deploy済み aa66929）**: 指示書=`brushup/palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`＝実装前にブラウザで全挙動を確認済み）。**[DECISION] §7=神田さん判断で「studioの見た目も2列に揃える」**（操作と見た目はセット・棚描画1系統化。studioの茶の世界観・色はそのまま）。区切り①=f69462b・②=1046625・③=b978d8b（deploy=aa66929）
   - **①データ層**: DEFS全23種に short（=label流用）/long/desc（§6の表を一字一句）。ベースライン再取得＝変更はlabel/long/descのみ＋段階2カード3種の焼き込み（既存パス91本は1バイト不変・**トレース732イベント不変**を機械確認）
   - **②2列＋%レイアウト**: `.palscroll` 新設（scrollbar-gutter:stable・5pxバー・スクロールは棚の中だけ）・カード幅=floor((clientWidth−8)/2)・カテゴリ見出しタップ開閉（初期: みため/おと閉）・棚=みじかい名前のみ/ピルなし/縮尺0.76/fitFont自動最大化（上限16px・webフォント確定後再計測）・こうぐだな24%/作業・プレビュー半分ずつ・GAMELAB_PALORDERを頻度順へ（studio PALORDERは現行順・色分岐維持）
@@ -35,13 +35,13 @@
   - ★重要な限界（正直に記録）: **この開発環境では実機タッチ再現ができなかった**（Xcode/シミュレータ未導入で `simctl` 不可・iPad 手元になし・Chromium プレビューは `maxTouchPoints:0` でタッチ入力なし＝touch-action のスクロール横取り→pointercancel を発火させられない）。代わりに **§1 の推定5点すべてを現行コードで裏取り**（`touch-action:pan-y` 存在・無言消失は `pointercancel`→`onCancel` の1経路のみ・`pointerType`/`touchstart`/`touchmove` 0箇所・`PAL_PRE_MOVE=7`/`PAL_LONGPRESS=150`）＝矛盾なし。合成ポインタ（mouse）で**新経路の実挙動を検証**（20msで横移動→即ドラッグ→配置成功／静止150ms→lift＋ふきだし表示／縦移動→ドラッグせず誤配置なし）。**真の確認は神田さんの iPad 実機（§5ゲート）**
   - 検証: **verify 8本全PASS**（`--update` なし＝**732イベント・パス98本・DEFS23種 byte不変**＝§4凍結を維持）・ビルドOK・本番URLで b5z バンドル（`index-DxKGwzeJ.js`）配信確認・コンソールエラーゼロ
   - ✅実機確認合格（2026-07-23・神田さん・iPad Pro 11 よこ）: §5ゲート5項目すべてOK（全カテゴリ指ドラッグ・縦スクロール・ふきだし・磁石・マウス退行なし）。b5y+b5z をまとめて実機OK。実機FB=「こうぐだな/カードをもう少し小さく（特にずっと/くりかえし）・形は変えずサイズだけ」「おいたよ!トーストが上部で見切れる」→ `brushup/palette-shrink-toast-fix.md`（→b6a）で対応
-- **v2.3-b6a（2026-07-23・こうぐだな縮小＋おいたよ!トーストの見切れ修正＝⚠️実機確認待ち／deploy済み f15b4ba）**: 指示書=`brushup/palette-shrink-toast-fix.md`（正本）。微調整の便。studio/gamelab 共通。§0台帳記帳=c41d21a・§1縮小=2279497・§2トースト=a8b811e（deploy=f15b4ba）
+- **v2.3-b6a（2026-07-23・こうぐだな縮小＋おいたよ!トーストの見切れ修正＝実機OK・神田さん実機確認合格／deploy済み f15b4ba）**: 指示書=`brushup/palette-shrink-toast-fix.md`（正本）。微調整の便。studio/gamelab 共通。§0台帳記帳=c41d21a・§1縮小=2279497・§2トースト=a8b811e（deploy=f15b4ba）
   - **§1 こうぐだな縮小**: `.studio-pal` 幅 24%→**21%**・`PAL_S` 0.76→**0.67**（`PAL_GAP_RATIO`=0.92 据え置き）。**同率で下げて形を保つ**（幅は colW、高さは PAL_S で決まる）。形の不変は **W0=colW/PAL_S** で機械確認＝実測 W0=**162.7**（1194px）／before 167.1＝差 **2.6%（3%以内）**。実測: studio/gamelab 両方 2列維持・colW 109・18/23種維持・指ドラッグ配置も従来どおり
   - **★§1 フォントの申し送り**: 6文字ラベルが Chromium 実測 **11.70px**（指示書の 12px 下限をわずかに下回る）。原因は colW=109 が指示書の iPad 実測値 111 より2px小さいため＝Chromium/Safari のレイアウト差（枠/スクロールバー/サブピクセル約4px）。指示書の colW=111/12px は iPad 実測由来なので**実機では12px見込み**。神田さん決定値（21%/0.67）は変えず、**実機ゲート#3（小1の読みやすさ）で最終確認**とした。もし実機で小さすぎれば こうぐだな幅を+1%する余地あり（W0 は範囲内を維持できる）
   - **§2 トースト見切れ修正**: `.studio-wrap` に `position:relative`＝トーストの基準を画面上端からヘッダー下へ。トーストを `.studio-root` 直下から **`.studio-wrap` の中**へ移動（`top` 64px→12px）＝ヘッダー高が将来変わっても壊れない。**★`.studio-asm` 基準にしない**（全画面 `.big` で asm=`display:none` だがトーストは残すべき→wrap は big でも残る。実測: big で wrap 1194×754 表示・asm none）。ヘッダーと同系色（RGB 36,26,44）に溶けないよう**白いリング** box-shadow を追加。実測（1194px）: toast top92／header下端80＝**12px下・重なりなし**・親=studio-wrap
   - 検証: **verify 8本全PASS**（`--update` なし＝**732イベント・パス98本・DEFS23種 byte不変**＝§3凍結を維持）・ビルドOK・本番URLで b6a バンドル（`index-CC8XCtWl.js`）配信確認・コンソールエラーゼロ
   - ⚠️申し送り（次便＝ゲームのせってい再設計）: こうぐだな 24%→21% で余った3%が作業/プレビューへ分配され、プレビュー（aspect 3/2）は幅増で**高さ約+12px**。右カラムは iPad で既に約40pxはみ出し（はいゆうひかえしつが下で切れる）＝**この変更で約12px悪化**。せってい再設計（A-4）で縦予算にこの12pxを織り込むこと。本便では未対処（指示書§6）
-  - ⚠️次: 神田さんの iPad 実機確認（§4ゲート・studio/gamelab 両方）: ①カードが小さくなりすっきり②**形が変わっていない**（縦横比・凸凹）③文字が読める（小1・上記11.70px要チェック）④**指ドラッグが b5z のまま効く**（小さくなって掴みにくくないか）⑤おいたよ!がヘッダーに重ならず全部読める⑥**ひろげる（全画面）でもトーストが出る**。合格で段階3へ
+  - ✅実機確認合格（2026-07-23・神田さん・iPad Pro 11 よこ）: §4ゲート6項目すべてOK（小さくすっきり・形不変・文字読める〔11.70px 実機で問題なし〕・指ドラッグOK・トースト重ならない・全画面でもトースト出る）。次=段階3
   - 検証: **verify 8本全PASS**（区切り①②③の各後で実行・毎回 732イベント不変）・**ブラウザ実測（dev）**=①studio/gamelab とも 2列で余白（gamelab 23枚・studio 18枚）②`.asm-scaled` scale 0.86・作業エリアのカードが内容ぴったり幅（screen幅=論理×0.86）③見出し全6/5個 34px・開閉トグル動作・押下色④**合成ポインタで実ドラッグ接続を検証＝gamelab「みぎへ」を既存スタックに接続成功／studio「はた▶」→「みぎへ」接続成功**＝縮尺変更後も磁石・接続が効く⑤コンソールエラーゼロ・本番URLで b5y バンドル配信確認
   - ⚠️次: 神田さんの実機確認（§5 ゲート iPad横+PC・studio/gamelab 両方）: ①こうぐだなが2列のまま余白で詰まって見えない②作業エリアのカードが小さく「はた ▶」「みぎへ」「おと」に右の空白がない③**ブロックの接続（磁石）が従来どおり効く**（縮尺の影響なし＝当たり判定の「反応する距離」が体感で狭すぎないか）④見出しが押しやすい／見た目は b5x と変わらない⑤ながおし・ドラッグ・スクロールは b5x のまま。合格で**段階3**へ
 - **v2.3-b5w（2026-07-21・ゲームこうぼう段階2=ゲーム完成＋エディタ見た目作り直し＝実機OK・神田さん実機確認合格／deploy済み b5854ec）**: 指示書=`brushup/gamelab-implementation-stage2.md`（正本）・見た目基準=`gamelab-editor-mock.html`。スキーマ変更なし（gameConfig の枠は段階1予約分に中身を入れただけ）。中間①=21b614a・②=84e00e3・③=476746e・④=783020e（deploy=b5854ec）
