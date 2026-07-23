@@ -298,6 +298,28 @@
     "shape": "hat",
     "pill": "target",
     "cat": "きっかけ"
+   },
+   "dpad": {
+    "fill": "#2FB4A6",
+    "edge": "#1B8478",
+    "dark": "#0F5F55",
+    "w": 206,
+    "label": "じゅうじキー",
+    "long": "じゅうじキーで うごかす",
+    "desc": "これを おくと、あそぶ とき がめんの したに じゅうじキーが でて、この キャラを じぶんで うごかせるよ。",
+    "shape": "body",
+    "cat": "そうさ"
+   },
+   "tapMove": {
+    "fill": "#2FB4A6",
+    "edge": "#1B8478",
+    "dark": "#0F5F55",
+    "w": 206,
+    "label": "タップいどう",
+    "long": "タップした ところへ すすむ",
+    "desc": "がめんを タップした ところへ、この キャラが すすんで いくよ。ついたら とまる。",
+    "shape": "body",
+    "cat": "そうさ"
    }
   },
   "palorder": [
@@ -635,6 +657,18 @@
     "blockH2": null,
     "chipY": 14,
     "labelY": 26
+   },
+   "dpad": {
+    "blockH": 48,
+    "blockH2": null,
+    "chipY": 9,
+    "labelY": 13
+   },
+   "tapMove": {
+    "blockH": 48,
+    "blockH2": null,
+    "chipY": 9,
+    "labelY": 13
    }
   },
   "nestedStackH": 180

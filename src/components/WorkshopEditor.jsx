@@ -282,6 +282,16 @@ const STUDIO_CSS = `
   .theater .runbtn.stop { background: #d8553a; }
   .theater .bigbtn { right: 60px; top: 12px; background: #4a7fc9; }
 
+  /* 段階3 そうさ: じゅうじキー（ステージの外＝下に固定・画面に重ねない・全画面でも下に出る・stage3 §1 A-1） */
+  .dpadbox { flex-shrink: 0; display: flex; justify-content: center; padding: 10px 0 2px; }
+  .dpad { display: grid; grid-template-columns: repeat(3, 42px); grid-template-rows: repeat(3, 42px); gap: 5px; touch-action: none; }
+  .dpad button { border: none; background: #fff; color: #33414f; font-weight: 900; font-size: 18px; border-radius: 10px;
+    box-shadow: 0 2px 0 #c3cdd8, 0 3px 8px rgba(0,0,0,.12); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .dpad button:active { background: #2FB4A6; color: #fff; transform: translateY(1px); box-shadow: 0 1px 0 #1B8478; }
+  .dpad .dp-u { grid-area: 1 / 2; } .dpad .dp-l { grid-area: 2 / 1; }
+  .dpad .dp-r { grid-area: 2 / 3; } .dpad .dp-d { grid-area: 3 / 2; }
+
   .bgrow, .castrow { flex-shrink: 0; }
   .rowtitle { color: rgba(245, 237, 223, .75); font-size: 11px; font-weight: 900; letter-spacing: .08em; margin-bottom: 4px; }
   .bgrow .thumbs { display: flex; gap: 6px; }
@@ -410,6 +420,7 @@ const PAL_S = 0.67; // 棚のブロック縮尺（palette-shrink-toast-fix §1: 
 // palette-ui-tuning（b5x 実機FB反映・基準モック brushup/palette-mock3.html）
 const PAL_GAP_RATIO = 0.92; // §1: カード幅=floor(full×0.92)・余ったぶんを両端と列間へ均等配分（モック確定値）
 const CANVAS_S = 0.86;      // §2-1: 作業エリアのブロック縮尺。見た目だけ縮め、当たり判定は論理座標のまま（G.SNAP=78 等を凍結）
+const OP_MS = 100;          // 段階3 そうさ: 操作の移動間隔(ms)。拍(400ms)を待たずに動かす（stage3 §1・じゅうじキー連続移動/タップ移動）
 const measCtx = document.createElement("canvas").getContext("2d");
 // 文字の自動最大化（§2・モック fitFont が基準）: カード幅に収まる最大サイズ（上限16px・下限7px）
 function fitFont(txt, avail, max) {
@@ -579,6 +590,8 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const runningRef = useRef(false);
   const postRunRef = useRef(false);
   const tickTimerRef = useRef(null);
+  const opTimerRef = useRef(null);   // 段階3 そうさ: 操作ループ（拍とは別の~100ms・じゅうじキー連続移動＋タップ移動）
+  const heldDirRef = useRef(null);   // じゅうじキー押下中の向き [dx,dy]（離すと null）
   const instantRef = useRef(new Set());   // 次の描画だけ transition なし（home/reset の瞬間移動）
   const pendingCharRef = useRef(null);    // { idx, x0, y0, grab, orig, moved }
   const [stripHover, setStripHover] = useState(false);
@@ -1243,6 +1256,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         if (el) { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
         force();
       }
+      else if (fx.type === "operable" || fx.type === "tapmove") force(); // 段階3: じゅうじキーの表示/操作可能を反映
     },
     onGlow: (id, on) => {
       const el = asmRef.current && asmRef.current.querySelector(`[data-id="${id}"]`);
@@ -1250,9 +1264,10 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     },
     onDone: natural => {
       // ゲームのじかんクリア中は、engine が自然終了（動く敵がいない等）してもタイマーを回し続ける（時間で終わる）
-      if (natural && mode.isGame && gameConfigRef.current.clear.type === "time" && timerRef.current > 0) return; // runningRef 維持・tickLoop 継続
+      if (natural && mode.isGame && gameConfigRef.current.clear.type === "time" && timerRef.current > 0) return; // runningRef 維持・tickLoop/opLoop 継続
       runningRef.current = false;
       clearTimeout(tickTimerRef.current);
+      clearTimeout(opTimerRef.current); heldDirRef.current = null; // 段階3: 操作ループ停止
       if (natural) postRunRef.current = true;   // 自然終了: 位置維持（次の▶で初期化）
       else { engineRef.current = null; postRunRef.current = false; } // ■: 初期化済み
       force();
@@ -1273,6 +1288,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const endGame = result => {
     runningRef.current = false;
     clearTimeout(tickTimerRef.current);
+    clearTimeout(opTimerRef.current); heldDirRef.current = null; // 段階3: 操作ループ停止
     postRunRef.current = true; // 位置は保ったまま（画面の背景に最後の場面が見える）
     if (asmRef.current) asmRef.current.querySelectorAll(".exec").forEach(el => el.classList.remove("exec")); // 発光を消す
     setCelebrate({ result, score: scoreRef.current });
@@ -1300,6 +1316,16 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     }
     if (runningRef.current) tickTimerRef.current = setTimeout(tickLoop, TICK);
   };
+  // 段階3 そうさ: 拍とは別の操作ループ（~100ms）。押下中のじゅうじキー移動＋タップ移動を進める
+  const opLoop = () => {
+    const eng = engineRef.current;
+    if (!eng || !runningRef.current) return;
+    let moved = false;
+    if (heldDirRef.current) moved = eng.nudge(heldDirRef.current[0], heldDirRef.current[1]) || moved;
+    moved = eng.tapMoveStep() || moved;
+    if (moved) force();
+    opTimerRef.current = setTimeout(opLoop, OP_MS);
+  };
   const startRun = () => {
     if (runningRef.current) return;
     const defs = charsRef.current.map(c => ({ key: c.cid, x: c.x, y: c.y, stacks: c.stacks }));
@@ -1319,6 +1345,9 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     force();
     clearTimeout(tickTimerRef.current);
     tickTimerRef.current = setTimeout(tickLoop, TICK * 0.5); // プロトタイプ: はたの半拍おいて最初の拍
+    heldDirRef.current = null; // 段階3: 操作ループ開始（じゅうじキー/タップ移動は拍を待たない）
+    clearTimeout(opTimerRef.current);
+    opTimerRef.current = setTimeout(opLoop, OP_MS);
   };
   const stopRun = () => {
     const eng = engineRef.current;
@@ -1331,9 +1360,10 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         force();
       }
     }
+    clearTimeout(opTimerRef.current); heldDirRef.current = null; // 段階3: 操作ループ停止（■）
     if (!showOnly) setBig(false); // ■で全画面からも復帰（指示書§3-1）。上演専用はbig固定（§4）
   };
-  useEffect(() => () => { clearTimeout(tickTimerRef.current); }, []);
+  useEffect(() => () => { clearTimeout(tickTimerRef.current); clearTimeout(opTimerRef.current); }, []);
   useEffect(() => { instantRef.current.clear(); }); // 瞬間移動フラグは1描画かぎり
 
   /* ==== キャラの表示状態（実行中/自然終了後はエンジン・編集中は初期値） ==== */
@@ -1351,7 +1381,11 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     ac();
     const actorEl = e.target.closest(".actor");
     if (runningRef.current) {
-      if (actorEl && engineRef.current) engineRef.current.tap(actorEl.dataset.cid); // タップされたら
+      if (actorEl && engineRef.current) engineRef.current.tap(actorEl.dataset.cid); // タップされたら（キャラの上）
+      else if (engineRef.current) { // 段階3 タップいどう: 背景タップ＝その場所へ向かう（ヒットテストでキャラtapと分離・§1 A-2）
+        const p = theaterPos(e);
+        engineRef.current.bgTap(Math.round((p.x - 22) / cellPx), Math.round((p.h - 12 - p.y) / cellPx));
+      }
       return;
     }
     if (big) return; // 上演モードでは編集しない
@@ -1615,6 +1649,21 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
                 : <svg width="20" height="20" viewBox="0 0 20 20"><path d="M5 2 L18 10 L5 18 Z" fill="#fff" /></svg>}
             </button>
           </div>
+          {/* 段階3 そうさ: じゅうじキー（mode.isGame・上演中・操作可能キャラがいる時だけ・ステージの外＝下に固定）。
+              ★.studio-right の子＝全画面(.big)でも残る（addendum §5）。押下中は heldDirRef で opLoop が連続移動 */}
+          {mode.isGame && running && engineRef.current && engineRef.current.hasOperable() && (
+            <div className="dpadbox">
+              <div className="dpad">
+                {[["u", 0, 1, "▲"], ["l", -1, 0, "◀"], ["r", 1, 0, "▶"], ["d", 0, -1, "▼"]].map(([k, dx, dy, glyph]) => (
+                  <button key={k} className={"dp-" + k} aria-label={k}
+                    onPointerDown={e => { e.preventDefault(); e.stopPropagation(); heldDirRef.current = [dx, dy]; if (engineRef.current && engineRef.current.nudge(dx, dy)) force(); }}
+                    onPointerUp={e => { e.preventDefault(); heldDirRef.current = null; }}
+                    onPointerLeave={() => { heldDirRef.current = null; }}
+                    onPointerCancel={() => { heldDirRef.current = null; }}>{glyph}</button>
+                ))}
+              </div>
+            </div>
+          )}
           {/* ゲームのせってい（stage1 §7b／stage2 §A-4・isGameのみ）: スコアひょうじ／クリア3種／ばくだんタッチ */}
           {mode.isGame && !showOnly && gameConfigRef.current && (() => {
             const g = gameConfigRef.current;

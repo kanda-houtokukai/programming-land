@@ -42,9 +42,16 @@ const iconBounce = svgGlyph( // 左右矢印（はねかえり）
 const iconBumpTarget = svgGlyph( // 的（相手指定）
   `<circle cx="13" cy="13" r="9.5" fill="none" stroke="#8F5606" stroke-width="2"/>` +
   `<circle cx="13" cy="13" r="4.5" fill="#8F5606"/>`);
+// 段階3 そうさの暫定グリフ（Chat支給アイコン未着のため。ティール edge #1B8478）
+const iconDpad = svgGlyph( // 十字キー
+  `<path d="M10 3h6v7h7v6h-7v7h-6v-7H3v-6h7z" fill="#2FB4A6" stroke="#1B8478" stroke-width="1.6" stroke-linejoin="round"/>`);
+const iconTapMove = svgGlyph( // タップした先へすすむ矢印＋着地点
+  `<circle cx="18.5" cy="18.5" r="4" fill="none" stroke="#1B8478" stroke-width="1.8"/>` +
+  `<path d="M4 4l8.5 3-3.2 2.1 3.9 3.9-2.2 2.2-3.9-3.9L5.8 17z" fill="#2FB4A6" stroke="#1B8478" stroke-width="1.4" stroke-linejoin="round"/>`);
 
 const ICONS = {
   hat: iconHata, tap: iconTap, bump: iconButsukatta, bumpTarget: iconBumpTarget,
+  dpad: iconDpad, tapMove: iconTapMove,
   scoreUp: iconScoreUp, scoreDown: iconScoreDown,
   moveRand: iconMoveRand, bounce: iconBounce,
   move: iconMigi, moveL: iconHidari, moveU: iconUe, moveD: iconShita,

@@ -13,6 +13,7 @@ const COL = {
   sound: { fill: "#7BB03B", edge: "#578B22", dark: "#365812" },   // おと
   control: { fill: "#8F7EEA", edge: "#6A57C9", dark: "#41309B" }, // せいぎょ
   count: { fill: "#F6C445", edge: "#CF9A12", dark: "#8A6606" },   // かず（変数・スコア）: ゲームこうぼう段階1
+  ctrlpad: { fill: "#2FB4A6", edge: "#1B8478", dark: "#0F5F55" }, // そうさ（プレイヤー操作）: 段階3。既存6色と混ざらないティール（stage3 §2-2・モック基準）
 };
 
 /* 各ブロック定義:
@@ -52,6 +53,10 @@ export const DEFS = {
   moveRand: { ...COL.motion, w: 206, label: "ランダム", long: "ランダムに うごく", desc: "あちこち ばらばらに うごくよ。てきに つかうと よけゲームに なる。", shape: "body", cat: "うごき" },
   bounce: { ...COL.motion, w: 186, label: "はねかえる", long: "はねかえる", desc: "まっすぐ すすんで、はしに あたると はねかえるよ。うごきが よめるので よけやすい てきに なる。", shape: "body", cat: "うごき" },
   bumpTarget: { ...COL.trigger, w: 210, label: "ぶつかったら", long: "ぶつかったら（あいてを えらぶ）", desc: "えらんだ あいてに ぶつかったら、したの カードが うごくよ。てんを いれたり、まけに したり できる。", shape: "hat", pill: "target", cat: "きっかけ" },
+  // ゲームこうぼう段階3・そうさ（プレイヤー操作）。gamelab専用＝GAMELAB_PALORDER のみ。studio には出ない
+  // ★ラベルは b6a のカード縮小に合わせ6文字以内（棚のフォント下限12px・stage3-addendum §3）。意味は long/desc が担う
+  dpad: { ...COL.ctrlpad, w: 206, label: "じゅうじキー", long: "じゅうじキーで うごかす", desc: "これを おくと、あそぶ とき がめんの したに じゅうじキーが でて、この キャラを じぶんで うごかせるよ。", shape: "body", cat: "そうさ" },
+  tapMove: { ...COL.ctrlpad, w: 206, label: "タップいどう", long: "タップした ところへ すすむ", desc: "がめんを タップした ところへ、この キャラが すすんで いくよ。ついたら とまる。", shape: "body", cat: "そうさ" },
 };
 
 // たな（パレット）の並び順＝カテゴリ順（設計§5の表の順）
@@ -67,6 +72,7 @@ export const PALORDER = [
 // きっかけ→（そうさ=stage3で挿入）→かず→せいぎょ→うごき→みため→おと。うごき内はゲーム用カードを先頭に）
 export const GAMELAB_PALORDER = [
   "hat", "tap", "bump", "bumpTarget",
+  "dpad", "tapMove",
   "scoreUp", "scoreDown",
   "wait", "repeat", "forever",
   "moveRand", "bounce", "move", "moveL", "moveU", "moveD", "spin", "jump", "home",

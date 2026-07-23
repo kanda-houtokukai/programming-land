@@ -68,7 +68,15 @@ export function createEngine(charDefs, cb = {}) {
   const resetChar = ch => {
     ch.x = ch.init.x; ch.y = ch.init.y; ch.sizeIdx = SIZE_INIT; ch.visible = true;
     ch.dir = null; // はねかえるの向きも初期化（stage2・▶のたび初期向きから）
+    ch.operable = false; ch.tapMovable = false; ch.tapTarget = null; // 段階3 そうさ: ▶のたび操作フラグを初期化
     emitUpdate(ch, "reset");
+  };
+
+  // 盤の範囲でクランプしてグリッド1マス移動（操作＝dpad/tapMove で共用。拍とは別に呼ばれる・stage3 §1）
+  const gridMove = (ch, dx, dy) => {
+    const nx = ch.x + dx, ny = ch.y + dy;
+    if (nx < 0 || nx >= LCOLS || ny < 0 || ny >= LROWS) return false; // 盤の外＝その場に留まる（操作は端で静かに止まる）
+    ch.x = nx; ch.y = ny; emitUpdate(ch, "move"); return true;
   };
 
   const overlapNow = () => {
@@ -161,6 +169,14 @@ export function createEngine(charDefs, cb = {}) {
     if (b.type === "hide" || b.type === "show") {
       ch.visible = b.type === "show";
       emitUpdate(ch, ch.visible ? "show" : "hide");
+      th.cur = { b, left: 0 }; return;
+    }
+    if (b.type === "dpad") { // 段階3: このキャラを「じゅうじキーで動かせる」ようにする（1回実行で有効化・以後ずっと）
+      ch.operable = true; emitFx(ch.key, { type: "operable" }); // UI にじゅうじキー表示を促す
+      th.cur = { b, left: 0 }; return; // 1拍で消費（みため各種と同じ）
+    }
+    if (b.type === "tapMove") { // 段階3: 背景タップした先へ進むキャラにする（UIは増えない）
+      ch.tapMovable = true; emitFx(ch.key, { type: "tapmove" });
       th.cur = { b, left: 0 }; return;
     }
     if (b.type === "scoreUp" || b.type === "scoreDown") {
@@ -291,6 +307,35 @@ export function createEngine(charDefs, cb = {}) {
       if (!ch || !ch.visible || !ch.triggers.tap) return;
       startThread(ch, "tap");
     },
+
+    /* ---- そうさ（段階3・拍とは別に UI から呼ぶ。押下中は短い間隔で・タップ移動は毎ステップ） ---- */
+    // じゅうじキー: 操作可能キャラを1マス動かす（押しっぱなしで連続移動＝UIが~100msごとに呼ぶ）
+    nudge(dx, dy) {
+      if (!running) return false;
+      let moved = false;
+      for (const ch of chars) if (ch.operable) moved = gridMove(ch, dx, dy) || moved;
+      return moved;
+    },
+    // 背景タップ: タップ移動キャラの目的地（グリッド）をセット
+    bgTap(gx, gy) {
+      if (!running) return;
+      const tx = Math.max(0, Math.min(LCOLS - 1, gx | 0)), ty = Math.max(0, Math.min(LROWS - 1, gy | 0));
+      for (const ch of chars) if (ch.tapMovable) ch.tapTarget = { x: tx, y: ty };
+    },
+    // タップ移動を1マス進める（UIが~100msごとに呼ぶ）。目的地に着いたら止まる
+    tapMoveStep() {
+      if (!running) return false;
+      let moved = false;
+      for (const ch of chars) {
+        if (!ch.tapMovable || !ch.tapTarget) continue;
+        const ddx = ch.tapTarget.x - ch.x, ddy = ch.tapTarget.y - ch.y;
+        if (ddx === 0 && ddy === 0) { ch.tapTarget = null; continue; } // 到達＝停止
+        const [dx, dy] = Math.abs(ddx) >= Math.abs(ddy) ? [Math.sign(ddx), 0] : [0, Math.sign(ddy)]; // 差の大きい軸へ1マス
+        moved = gridMove(ch, dx, dy) || moved;
+      }
+      return moved;
+    },
+    hasOperable: () => chars.some(c => c.operable), // UI: じゅうじキーを出すか（操作可能キャラが1体でもいれば）
 
     // ■=カット!: 全停止＋全キャラ初期化（位置/大きさ/表示）
     stop() {
