@@ -76,7 +76,9 @@ export const PALORDER = [
 // ゲームこうぼうのパレット構成（palette-ui-overhaul §4: ゲームで使う頻度順＝
 // きっかけ→（そうさ=stage3で挿入）→かず→せいぎょ→うごき→みため→おと。うごき内はゲーム用カードを先頭に）
 export const GAMELAB_PALORDER = [
-  "hat", "tap", "bump", "bumpTarget", "goal",
+  // stage3 §1: bump（相手指定なしぶつかり）は gamelab のこうぐだなから外し bumpTarget に一本化。
+  // ★DEFS からは消さない・studio の PALORDER には残す・エンジンは引き続き bump を解釈（既存 gamelab 作品が壊れない）
+  "hat", "tap", "bumpTarget", "goal",
   "dpad", "tapMove",
   "scoreUp", "scoreDown",
   "wait", "repeat", "forever",

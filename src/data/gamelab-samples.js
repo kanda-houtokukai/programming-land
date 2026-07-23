@@ -58,5 +58,46 @@ export const SAMPLES = [
         ] }] },
     ],
   },
+  // ===== 段階3 区切り③のみほん3本（新カード dpad/fall/chase/goal の型見せ・stage3-step3 §3） =====
+  {
+    // おちものキャッチ: 主人公=じゅうじキーで動かす・リンゴ=ずっと→ふってくる・ぶつかったら[リンゴ]→スコア＋・クリア=じかん30秒
+    id: "dropcatch", name: "おちものキャッチ", bg: "sougen",
+    gameConfig: { scoreShow: true, clear: { type: "time", param: 30 }, gameOver: null },
+    chars: [
+      { kind: { type: "player" }, x: 5, y: 0,
+        stacks: [
+          { x: 40, y: 40, blocks: [{ type: "hat" }, { type: "dpad" }] },
+          { x: 40, y: 200, blocks: [{ type: "bumpTarget", target: "c2" }, { type: "scoreUp", n: 1 }, { type: "sound", s: 1 }] },
+        ] },
+      { kind: { type: "enemy", id: "slime" }, x: 5, y: 7, // リンゴ役（上から降ってくる）
+        stacks: [{ x: 40, y: 40, blocks: [{ type: "hat" }, { type: "forever", children: [{ type: "fall" }] }] }] },
+    ],
+  },
+  {
+    // おにごっこ: 主人公=じゅうじキー・鬼=ずっと→おいかける[主人公]＋ばくだん指定・クリア=じかん（逃げ切り）
+    id: "oni", name: "おにごっこ", bg: "canyon",
+    gameConfig: { scoreShow: false, clear: { type: "time", param: 30 }, gameOver: { targetId: "c2" } },
+    chars: [
+      { kind: { type: "player" }, x: 2, y: 3,
+        stacks: [{ x: 40, y: 40, blocks: [{ type: "hat" }, { type: "dpad" }] }] },
+      { kind: { type: "enemy", id: "slime" }, x: 9, y: 4, // 鬼（ばくだん＝さわったら まけ）
+        stacks: [{ x: 40, y: 40, blocks: [{ type: "hat" }, { type: "forever", children: [{ type: "chase", target: "c1" }] }] }] },
+    ],
+  },
+  {
+    // ゴールまで いこう（正本のめいろを差し替え・stage3-step3 §3-3）: 主人公=じゅうじキー・ゴール[旗]→スコア＋5でクリア・いわ=ばくだんをよける
+    // ★クリア score は 5刻み制約のため param=5。ゴール到達で +5＝1回着けばクリア（「1点」の意図を制約内で表現）
+    id: "goalrun", name: "ゴールまで いこう", bg: "jungle",
+    gameConfig: { scoreShow: true, clear: { type: "score", param: 5 }, gameOver: { targetId: "c3" } },
+    chars: [
+      { kind: { type: "player" }, x: 1, y: 3,
+        stacks: [
+          { x: 40, y: 40, blocks: [{ type: "hat" }, { type: "dpad" }] },
+          { x: 40, y: 200, blocks: [{ type: "goal", target: "c2" }, { type: "scoreUp", n: 5 }] },
+        ] },
+      { kind: { type: "enemy", id: "mushroom" }, x: 10, y: 5, stacks: [] }, // ゴール旗（動かない・目印）
+      { kind: { type: "enemy", id: "slime" }, x: 6, y: 3, stacks: [] },      // いわ（ばくだん＝よけて進む）
+    ],
+  },
 ];
 export const sampleById = id => SAMPLES.find(s => s.id === id) || null;

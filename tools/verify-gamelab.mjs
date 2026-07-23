@@ -4,8 +4,17 @@
    実行: node tools/verify-gamelab.mjs */
 
 import { SAMPLES } from "../src/data/gamelab-samples.js";
-import { DEFS, SOUNDS, STUDIO_BG_IDS, isTrigger, isContainer } from "../src/data/studio-blocks-defs.js";
+import { DEFS, SOUNDS, STUDIO_BG_IDS, GAMELAB_PALORDER, isTrigger, isContainer } from "../src/data/studio-blocks-defs.js";
 import { createEngine, LCOLS, LROWS } from "../src/workshop/engine.js";
+
+const GL_SET = new Set(GAMELAB_PALORDER); // stage3-step3 §3-4: みほんのカードは gamelab のこうぐだなに実在すること
+// 作品内で使われている全ブロック type を集める（クリア条件との噛み合い検証用）
+function typesUsed(chars) {
+  const set = new Set();
+  const walk = l => { for (const b of l || []) { set.add(b.type); walk(b.children); } };
+  for (const c of chars || []) for (const st of c.stacks || []) walk(st.blocks);
+  return set;
+}
 
 let fail = 0;
 const ng = msg => { console.log(`✗ FAIL ${msg}`); fail++; };
@@ -29,6 +38,7 @@ function walkList(list, depth, where, charCount) {
   list.forEach((b, i) => {
     const d = DEFS[b.type];
     if (!d) { ng(`${where}: 未知のブロック type="${b.type}"`); return; }
+    if (!GL_SET.has(b.type)) ng(`${where}: 「${d.label}」(${b.type}) が GAMELAB_PALORDER に無い＝gamelab の棚に出ないカードをみほんが使っている（§3-4）`);
     if (depth > 0 || i > 0) {
       if (isTrigger(b.type)) ng(`${where}: きっかけ「${d.label}」がスタック先頭以外にある`);
     }
@@ -83,6 +93,11 @@ for (const s of SAMPLES) {
   if (!s.name) ng(`${W}: name がない`);
   if (!STUDIO_BG_IDS.includes(s.bg)) ng(`${W}: bg="${s.bg}" が BGS に実在しない`);
   checkGameConfig(s.gameConfig, W, (s.chars || []).length);
+  // stage3-step3 §3-4: クリア条件と作品の内容が噛み合っているか（クリア=スコアなのに得点手段が無い、を防ぐ）
+  if (s.gameConfig && s.gameConfig.clear && s.gameConfig.clear.type === "score") {
+    const used = typesUsed(s.chars);
+    if (!used.has("scoreUp")) ng(`${W}: クリア=スコアなのに「スコア ＋」が作品内に無い（得点手段が無くクリア不能）`);
+  }
   if (!Array.isArray(s.chars) || !s.chars.length || s.chars.length > MAX_CHARS) {
     ng(`${W}: キャラ数 ${s.chars && s.chars.length} が 1..${MAX_CHARS} の外`);
     continue;
@@ -119,7 +134,7 @@ for (const s of SAMPLES) {
     ng(`${W}: エンジン実行で例外 ${e.message}`);
   }
 }
-if (SAMPLES.length !== 3) ng(`段階2のみほんは3本（あつめ/よけ/キャッチ）のはず（実際 ${SAMPLES.length}本）`);
+if (SAMPLES.length !== 6) ng(`みほんは6本（あつめ/よけ/キャッチ＋段階3: おちものキャッチ/おにごっこ/ゴールまで いこう）のはず（実際 ${SAMPLES.length}本）`);
 
 if (fail === 0) {
   console.log(`ゲームこうぼう みほん${SAMPLES.length}本 PASS（型/範囲/深さ/きっかけ/上限/gameConfig妥当性〔score・time・gameOver・target〕/エンジン40拍スモーク）`);
