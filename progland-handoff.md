@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-24（**v2.3-b6e 段階3 区切り③=カード一覧生成＋bump削除＋みほん3本＝deploy済み・⚠️実機確認待ち**。b6d まで実機OK。次=①b6e の実機確認→合格で②【3-B】区切り④ jumpable（ジャンプできるように）。段階3=`brushup/gamelab-implementation-stage3.md`＋区切り③指示書 `brushup/stage3-step3-cards-samples.md`＋カード一覧 `brushup/cards-reference.md`）
+最終更新: 2026-07-24（**v2.3-b6f 段階3 区切り④=jumpable「とべるように」（重力・ジャンプ）＝deploy済み・⚠️実機確認待ち**。b6d まで実機OK・b6e は実機確認待ち。次=①b6e/b6f の実機確認→合格で②区切り⑤ clone（ぶんしんを だす）＋ジャンプ/ぶんしんのみほん。段階3=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,7 +12,7 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**b5x〜b6a=実機OK → 段階3 着手**。段階3=新カード7枚（`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`・基準モック=`brushup/palette-29-structure.html`・`brushup/dpad-play-mock.html`）。**区切り①（dpad＋tapMove）=b6b→手直し=b6c(実機OK)→区切り②（goal＋chase＋fall＋相手ピル）=b6d(実機OK)→区切り③（カード一覧生成＋bump削除＋みほん3本）=完了（b6e・deploy済み・⚠️実機確認待ち）**／次は【3-B】④jumpable（ジャンプできるように・重力）→⑤clone（ぶんしん）＋よこスクロールみほん。★3-A（区切り①〜③）が実機OKになってから 3-B 着手（指示書§0）。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
+- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**b5x〜b6a=実機OK → 段階3 着手**。段階3=新カード7枚（`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`・基準モック=`brushup/palette-29-structure.html`・`brushup/dpad-play-mock.html`）。**区切り①（dpad＋tapMove）=b6b→手直し=b6c(実機OK)→区切り②（goal＋chase＋fall＋相手ピル）=b6d(実機OK)→区切り③（カード一覧生成＋bump削除＋みほん3本）=完了（b6e・⚠️実機確認待ち）→**【3-B】区切り④（jumpable とべるように）=完了（b6f・deploy済み・⚠️実機確認待ち）**／次は⑤clone（ぶんしんを だす）＋ジャンプ/ぶんしんのみほん（区切り⑤でまとめて）。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
 - **v2.3-b5x（2026-07-22・こうぐだな＆エディタUI刷新=2列・ながおし・せつめい＝実機OK・神田さん実機確認合格／deploy済み aa66929）**: 指示書=`brushup/palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`＝実装前にブラウザで全挙動を確認済み）。**[DECISION] §7=神田さん判断で「studioの見た目も2列に揃える」**（操作と見た目はセット・棚描画1系統化。studioの茶の世界観・色はそのまま）。区切り①=f69462b・②=1046625・③=b978d8b（deploy=aa66929）
   - **①データ層**: DEFS全23種に short（=label流用）/long/desc（§6の表を一字一句）。ベースライン再取得＝変更はlabel/long/descのみ＋段階2カード3種の焼き込み（既存パス91本は1バイト不変・**トレース732イベント不変**を機械確認）
   - **②2列＋%レイアウト**: `.palscroll` 新設（scrollbar-gutter:stable・5pxバー・スクロールは棚の中だけ）・カード幅=floor((clientWidth−8)/2)・カテゴリ見出しタップ開閉（初期: みため/おと閉）・棚=みじかい名前のみ/ピルなし/縮尺0.76/fitFont自動最大化（上限16px・webフォント確定後再計測）・こうぐだな24%/作業・プレビュー半分ずつ・GAMELAB_PALORDERを頻度順へ（studio PALORDERは現行順・色分岐維持）
@@ -70,7 +70,18 @@
   - **§3 みほん3本追加（既存3本は残す・計6本）**: おちものキャッチ（主人公=じゅうじキー＋ぶつかったら[リンゴ]→スコア＋／リンゴ=ずっと→ふってくる／じかん30）・おにごっこ（主人公=じゅうじキー／鬼=ずっと→おいかける[主人公]＋ばくだん／じかん30逃げ切り）・ゴールまで いこう（★正本のめいろを差し替え=§3-3: 現状ばくだんは1体しか指定できず壁1つ＝迷路にならないため。主人公=じゅうじキー＋ゴール[旗]→スコア＋5／いわ=ばくだん／クリア=スコア5。★score は5刻み制約で param=5・ゴール到達で+5=1回で達成）。verify-gamelab に §3-4 検証追加（カードが GAMELAB_PALORDER 実在・クリア=スコアなら scoreUp あり・本数6）
   - **§4 ベースライン不変**: bump は DEFS に残るため `--update` 不要＝`traces`732/`paths`98/`defs`28/studio `palorder`18 すべて byte 不変（確認済み）
   - 検証: verify 8本全PASS（みほん6本・カード一覧照合27/18）・ビルドOK・本番 b6e（`index-DIIyzi1J.js`）配信確認・コンソールエラーゼロ・ブラウザ実測(1194px)=gamelab 27種／「ぶつかったら」1枚／studio 18種で bump あり・gamelabカード無し／6みほん表示・ゴールまで いこう ロードOK（ゴール[きのこちゃん]→スコア＋5・名前表示）
-  - ⚠️次: 神田さんの iPad 実機確認（§6ゲート: ①gamelab「ぶつかったら」1枚②studio 18種完全無変化③みほん3本が遊べる〔おちものキャッチ/おにごっこ/ゴールまで いこう〕④見出しの押しやすさ不変⑤`brushup/cards-reference.md` の内容が実物と合う。⚠️「ぶつかったら」と「ゴール」が混乱しないか＝§1-1）。合格で**3-A 全体が実機OK→3-B（区切り④ jumpable）**へ
+  - ⚠️次: 神田さんの iPad 実機確認（§6ゲート: ①gamelab「ぶつかったら」1枚②studio 18種完全無変化③みほん3本が遊べる〔おちものキャッチ/おにごっこ/ゴールまで いこう〕④見出しの押しやすさ不変⑤`brushup/cards-reference.md` の内容が実物と合う。⚠️「ぶつかったら」と「ゴール」が混乱しないか＝§1-1）
+- **v2.3-b6f（2026-07-24・段階3 区切り④=`jumpable`「とべるように」（重力・着地・足場・ジャンプ）＝⚠️実機確認待ち／deploy済み b9aeb8b）**: 指示書=`brushup/stage3-step4-jumpable.md`（正本）。gamelab 専用・そうさカテゴリ3枚目・`w=206` 再利用。指示書配置=b18da73・実装=84c085d（deploy=b9aeb8b）
+  - **[DECISION] §0-2 整数マスのまま実装**（小数座標を入れない）＝`ch.x/ch.y` を使う全箇所への波及と 732イベント凍結へのリスクを避ける。重力・ジャンプはすべて**操作ループ（`OP_MS=100`）で1ステップ1マス**＝拍を待たない
+  - **エンジン**: `beginBlock("jumpable")`→`ch.jumpable=true`（`resetChar` で ▶ ごとに `jumpRise` ごと初期化）／`isSupported`＝地面 or 真下に別キャラ／`gravityStep()`＝上昇中は1マス上・支え無しなら1マス下／`tryJump()`＝接地かつ操作可能なキャラだけ `JUMP_CELLS=3` 上昇（空中・上昇中は不可＝二段にならない）／`nudge()` は jumpable キャラの**たて入力を無視**（縦は重力/ジャンプ担当・よこは空中でも操舵可）
+  - **★指示書との相違（要記憶）**: 指示書§1-2 は「地面=`y=LROWS-1`」「足場=`y+1`」だが、**このエンジンは `y=0` が盤の下端**（`moveU=[0,+1]`／`fall` は `y-=1` で下降し `y<=0` で上端へ／CharSprite は `ay=-y*cellPx`）。意図（盤の一番下・真下のマス）どおり **地面=`y===0`・足場=`(x, y-1)`** で実装した
+  - **★§1-3 判断報告**: ジャンプ高さ=**3マス**（12×8盤で2マス上の足場に届く・`OP_MS=100` で上り300ms＋下り300msと軽快）。**▼＝何もしない**（重力が下方向を担うため追加移動は落下速度が二重になり予測しづらい。小1には「▲でとぶ・◀▶で動く・下は勝手に落ちる」の3つに絞る）
+  - **★§2 よこスクロールは実装に無い**（カメラ・ワールド座標が無く盤は12×8固定）＝「よこから見た1画面のジャンプゲーム」と読み替え。**みほん追加は区切り⑤でまとめて**
+  - エンジン単体テスト追加: 空中→地面で停止／3マス上昇→重力で戻る／空中では跳べない／足場の上で停止／足場消滅で再落下＝全PASS
+  - **★ベースライン再取得（28→29種）**: diff機械確認＝`blocks.defs` に `jumpable` 1つ＋`geometry.measures` 同1つのみ追加。**traces732イベント・paths98本・widths・studio palorder は byte不変**
+  - 検証: verify 8本全PASS（DEFS29・みほん6本・カード一覧28種）・本番 b6f（`index-DF1xy6tM.js`）配信確認・コンソールエラーゼロ・ブラウザ実測=そうさ3枚目「とべるように」font13.03px（≥12）・**実ブラウザビルドでエンジンを直接駆動して確認**（落下 y3→0で停止／◀で横移動／接地でジャンプ→3マス上昇→重力で復帰／空中ジャンプ不可／▲は縦移動しない）
+  - ★教訓（プレビュー環境）: **プレビューペインが非表示だと `setTimeout` の拍ループが抑制され、キャラが動かないように見える**（b5k/b5l の rAF 停止と同型・実機フォアグラウンドでは起きない）。エンジンを手動 tick して切り分けること
+  - ⚠️次: 神田さんの iPad 実機確認（§5ゲート: ①落ちて地面で止まる②別キャラの上に乗れる③▲でジャンプ・空中では跳べない④落ちる/跳ぶがなめらか⑤うごきの「ジャンプ」（その場演出）と混同しないか〔混同するなら名前を練り直す〕⑥既存みほん6本が不変⑦studio 完全無変化）。合格で区切り⑤（clone）へ
   - 検証: **verify 8本全PASS**（区切り①②③の各後で実行・毎回 732イベント不変）・**ブラウザ実測（dev）**=①studio/gamelab とも 2列で余白（gamelab 23枚・studio 18枚）②`.asm-scaled` scale 0.86・作業エリアのカードが内容ぴったり幅（screen幅=論理×0.86）③見出し全6/5個 34px・開閉トグル動作・押下色④**合成ポインタで実ドラッグ接続を検証＝gamelab「みぎへ」を既存スタックに接続成功／studio「はた▶」→「みぎへ」接続成功**＝縮尺変更後も磁石・接続が効く⑤コンソールエラーゼロ・本番URLで b5y バンドル配信確認
   - ⚠️次: 神田さんの実機確認（§5 ゲート iPad横+PC・studio/gamelab 両方）: ①こうぐだなが2列のまま余白で詰まって見えない②作業エリアのカードが小さく「はた ▶」「みぎへ」「おと」に右の空白がない③**ブロックの接続（磁石）が従来どおり効く**（縮尺の影響なし＝当たり判定の「反応する距離」が体感で狭すぎないか）④見出しが押しやすい／見た目は b5x と変わらない⑤ながおし・ドラッグ・スクロールは b5x のまま。合格で**段階3**へ
 - **v2.3-b5w（2026-07-21・ゲームこうぼう段階2=ゲーム完成＋エディタ見た目作り直し＝実機OK・神田さん実機確認合格／deploy済み b5854ec）**: 指示書=`brushup/gamelab-implementation-stage2.md`（正本）・見た目基準=`gamelab-editor-mock.html`。スキーマ変更なし（gameConfig の枠は段階1予約分に中身を入れただけ）。中間①=21b614a・②=84e00e3・③=476746e・④=783020e（deploy=b5854ec）
