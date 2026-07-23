@@ -65,6 +65,10 @@ export const SND = [
 
 /* 控え室の顔ぶれ・キャラ種別ヘルパーは src/workshop/cast.js（段階2で分離・段階Aでworkshopへ・Home/サムネと共有） */
 
+// 段階3 そうさ: 操作の移動間隔(ms)。拍(400ms)を待たずに動かす＝実機の手触りで調整する値（stage3-op-feel §1-3。速すぎ→130/遅すぎ→70 が目安）。
+// ★STUDIO_CSS より前で宣言する（.actor.op の transition が ${OP_MS} を参照するため。後ろに置くと TDZ で描画が落ちる）
+const OP_MS = 100;
+
 /* ============ CSS ============ */
 const STUDIO_CSS = `
   .studio-root { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column;
@@ -202,6 +206,10 @@ const STUDIO_CSS = `
   .theater::after { right: 0; border-radius: 8px 0 0 8px; }
   .actor { position: absolute; bottom: 12px; left: 0; will-change: transform;
     transition: transform ${CFG.MOVE_MS}ms cubic-bezier(.45, .05, .55, 1), opacity .25s; }
+  /* 段階3 §1: そうさ（操作可能/タップ移動）キャラの移動だけ、移動間隔 OP_MS と一致する等速に＝
+     340ms ease の途中中断によるカクつきを解消。1拍ごとの移動（studio共有・非opキャラ）は上の .actor 定義のまま不変 */
+  .actor.op { transition: transform ${OP_MS}ms linear, opacity .25s; }
+  .actor.op .sp-in.stepA { animation: none; } /* §1: 足踏み演出を連続移動中は再発火させない（小刻みな揺れを解消） */
   .actor.noanim { transition: opacity .25s; }
   .actor .sp-spot { position: absolute; left: 50%; bottom: -5px; transform: translateX(-50%); z-index: -1;
     border-radius: 50%; background: radial-gradient(ellipse at center, rgba(255,230,120,.7), rgba(255,230,120,0) 72%);
@@ -328,7 +336,14 @@ const STUDIO_CSS = `
   .studio-root.big .studio-pal, .studio-root.big .studio-asm, .studio-root.big .bgrow,
   .studio-root.big .castrow, .studio-root.big .rcap, .studio-root.big .editbtn { display: none; }
   .studio-root.big .studio-right { width: auto; flex: 1; align-items: center; justify-content: center; }
-  .studio-root.big .theater { width: min(100%, calc((100dvh - 110px) * 1.5)); }
+  .studio-root.big .theater { width: min(100%, calc((100dvh - 110px) * 1.5)); } /* studio 従来どおり（不変・§3） */
+  /* stage3-op-feel §2: 全画面の1画面化は gamelab のみ（じゅうじキーは gamelab 専用＝studio の全画面は完全無変化） */
+  .studio-root.big.gl .gamecfg { display: none; } /* §2-2: 全画面は「遊ぶ」だけ＝せっていは隠す */
+  /* §2-3: 縦を flex で配分＝じゅうじキー（あれば flex:0 0 auto で自然高さを確保）とプレビュー（残りを埋める）。
+     じゅうじキーの有無で予備が自動で変わる＝新しい固定px値を足さない。プレビューは3:2を保ちつつ残り高さに収める */
+  .studio-root.big.gl .studio-right { flex-direction: column; min-height: 0; gap: 8px; padding: 6px 8px; }
+  .studio-root.big.gl .theater { width: auto; flex: 1 1 0; min-height: 0; max-width: 100%; }
+  .studio-root.big.gl .dpadbox { flex: 0 0 auto; }
 
   /* --- 確認モーダル（キャラ削除のみ・設計§9「ここだけ確認」）とトースト --- */
   .studio-confirm { position: absolute; inset: 0; z-index: 350; background: rgba(30,20,40,.55);
@@ -420,7 +435,6 @@ const PAL_S = 0.67; // 棚のブロック縮尺（palette-shrink-toast-fix §1: 
 // palette-ui-tuning（b5x 実機FB反映・基準モック brushup/palette-mock3.html）
 const PAL_GAP_RATIO = 0.92; // §1: カード幅=floor(full×0.92)・余ったぶんを両端と列間へ均等配分（モック確定値）
 const CANVAS_S = 0.86;      // §2-1: 作業エリアのブロック縮尺。見た目だけ縮め、当たり判定は論理座標のまま（G.SNAP=78 等を凍結）
-const OP_MS = 100;          // 段階3 そうさ: 操作の移動間隔(ms)。拍(400ms)を待たずに動かす（stage3 §1・じゅうじキー連続移動/タップ移動）
 const measCtx = document.createElement("canvas").getContext("2d");
 // 文字の自動最大化（§2・モック fitFont が基準）: カード幅に収まる最大サイズ（上限16px・下限7px）
 function fitFont(txt, avail, max) {
@@ -449,12 +463,12 @@ function flattenGroup(group) {
 const countBlocks = list => (list || []).reduce((a, b) => a + 1 + (b.children ? countBlocks(b.children) : 0), 0);
 
 /* ============ キャラ1体のステージ描画 ============ */
-function CharSprite({ ch, disp, cellPx, base, selected, running, instant, profile, onRef }) {
+function CharSprite({ ch, disp, cellPx, base, selected, running, instant, op, profile, onRef }) {
   const w = base;
   const ax = 22 + disp.x * cellPx;   // プロトタイプ placeActor と同じ式（22はステージ左マージン）
   const ay = -disp.y * cellPx;
   return (
-    <div className={"actor" + (instant ? " noanim" : "")} data-cid={ch.cid} ref={onRef}
+    <div className={"actor" + (instant ? " noanim" : "") + (op ? " op" : "")} data-cid={ch.cid} ref={onRef}
       style={{ transform: `translate(${ax}px, ${ay}px)`, width: w, zIndex: 10 + ch.z,
         opacity: disp.visible ? 1 : 0, pointerEvents: disp.visible ? "auto" : "none",
         cursor: running ? "pointer" : "grab" }}>
@@ -1629,9 +1643,10 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
             })()}
             {charsRef.current.map((c, i) => {
               const disp = dispOf(c);
+              const op = running && !!(disp.operable || disp.tapMovable); // 段階3 §1: そうさ由来の移動だけ「歩き」（等速・足踏み無し）
               return (
                 <CharSprite key={c.cid} ch={{ ...c, z: i }} disp={disp} cellPx={cellPx} base={actorBase}
-                  selected={i === sel} running={running} instant={instantRef.current.has(c.cid)}
+                  selected={i === sel} running={running} instant={instantRef.current.has(c.cid)} op={op}
                   profile={profileRef.current}
                   onRef={el => { if (el) charElsRef.current.set(c.cid, el); else charElsRef.current.delete(c.cid); }} />
               );
