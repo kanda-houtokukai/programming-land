@@ -48,10 +48,21 @@ const iconDpad = svgGlyph( // 十字キー
 const iconTapMove = svgGlyph( // タップした先へすすむ矢印＋着地点
   `<circle cx="18.5" cy="18.5" r="4" fill="none" stroke="#1B8478" stroke-width="1.8"/>` +
   `<path d="M4 4l8.5 3-3.2 2.1 3.9 3.9-2.2 2.2-3.9-3.9L5.8 17z" fill="#2FB4A6" stroke="#1B8478" stroke-width="1.4" stroke-linejoin="round"/>`);
+// 段階3 区切り②の暫定グリフ（Chat支給アイコン未着。うごき=青#124E8C・きっかけ=橙#8F5606）
+const iconChase = svgGlyph( // 足あと（おいかける）
+  `<ellipse cx="9" cy="16" rx="3" ry="4" fill="#124E8C"/><circle cx="6.5" cy="10.5" r="1.6" fill="#124E8C"/><circle cx="11.5" cy="10.5" r="1.6" fill="#124E8C"/>` +
+  `<ellipse cx="18" cy="9" rx="2.6" ry="3.4" fill="#124E8C" opacity=".55"/><circle cx="16" cy="4.6" r="1.3" fill="#124E8C" opacity=".55"/><circle cx="20.3" cy="4.6" r="1.3" fill="#124E8C" opacity=".55"/>`);
+const iconFall = svgGlyph( // 下向き矢印＋しずく（ふってくる）
+  `<path d="M13 3v13m0 0l-5-5m5 5l5-5" fill="none" stroke="#124E8C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>` +
+  `<circle cx="6" cy="7" r="1.6" fill="#124E8C" opacity=".5"/><circle cx="20" cy="7" r="1.6" fill="#124E8C" opacity=".5"/>`);
+const iconGoal = svgGlyph( // ゴール旗
+  `<path d="M7 3v20" stroke="#8F5606" stroke-width="2.2" stroke-linecap="round"/>` +
+  `<path d="M8.5 4h11l-3 3.5 3 3.5h-11z" fill="#8F5606"/>`);
 
 const ICONS = {
-  hat: iconHata, tap: iconTap, bump: iconButsukatta, bumpTarget: iconBumpTarget,
+  hat: iconHata, tap: iconTap, bump: iconButsukatta, bumpTarget: iconBumpTarget, goal: iconGoal,
   dpad: iconDpad, tapMove: iconTapMove,
+  chase: iconChase, fall: iconFall,
   scoreUp: iconScoreUp, scoreDown: iconScoreDown,
   moveRand: iconMoveRand, bounce: iconBounce,
   move: iconMigi, moveL: iconHidari, moveU: iconUe, moveD: iconShita,

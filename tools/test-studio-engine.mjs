@@ -261,5 +261,46 @@ ok(SIZE_STEPS.join() === "0.5,0.75,1,1.5,2" && SIZE_STEPS[SIZE_INIT] === 1, "定
   e3.stop();
 }
 
+/* ---- 段階3 区切り②: chase（寄る方向）／fall（下端で上に戻る） ---- */
+{
+  // chase: 相手へ差の大きい軸で1拍1マス寄る。横差が大きい→横へ／縦差が大きい→縦へ／同マスで止まる
+  const r = record();
+  const e = createEngine([
+    { key: "oni", x: 0, y: 0, stacks: [hatStack(mk("forever", { children: [mk("chase", { target: "hero" })] }))] },
+    { key: "hero", x: 3, y: 1, stacks: [] }, // 横差3・縦差1＝まず横へ寄る
+  ], r.cb);
+  e.start(); r.tickTo(e, 1);
+  let oni = e.getChar("oni");
+  ok(oni.x === 1 && oni.y === 0, `chase: 横差>縦差 → 横へ1マス（実測 x=${oni.x} y=${oni.y}）`);
+  r.tickTo(e, 5); oni = e.getChar("oni");
+  ok(oni.x === 3 && oni.y === 1, `chase: 追い続けて相手(3,1)に到達（実測 x=${oni.x} y=${oni.y}）`);
+  r.tickTo(e, 8); oni = e.getChar("oni");
+  ok(oni.x === 3 && oni.y === 1, `chase: 同マスに着いたら それ以上寄らない（重なって暴れない・実測 x=${oni.x} y=${oni.y}）`);
+  e.stop();
+
+  // fall: 1拍1マス下、下端(y=0)に着いたら上端(LROWS-1)へ戻る
+  const r2 = record();
+  const e2 = createEngine([
+    { key: "apple", x: 5, y: 2, stacks: [hatStack(mk("forever", { children: [mk("fall")] }))] },
+  ], r2.cb);
+  e2.start(); r2.tickTo(e2, 1);
+  ok(e2.getChar("apple").y === 1, `fall: 1拍で1マス下（y2→1・実測 y=${e2.getChar("apple").y}）`);
+  r2.tickTo(e2, 2);
+  ok(e2.getChar("apple").y === 0, `fall: 下端 y=0 に着く（実測 y=${e2.getChar("apple").y}）`);
+  r2.tickTo(e2, 3);
+  ok(e2.getChar("apple").y === LROWS - 1, `fall: 下端の次の拍で上端(${LROWS - 1})へ戻る（実測 y=${e2.getChar("apple").y}）`);
+  e2.stop();
+
+  // goal（挙動は bumpTarget と共通・別トリガ）: 指定相手に到達したら発火
+  const r3 = record();
+  const e3 = createEngine([
+    { key: "p", x: 0, y: 0, stacks: [hatStack(mk("move", { n: 3 })), { blocks: [mk("goal", { target: "flag" }), mk("sound", { s: 0 })] }] },
+    { key: "flag", x: 2, y: 0, stacks: [] },
+  ], r3.cb);
+  e3.start(); r3.tickTo(e3, 4);
+  ok(r3.ev.some(e => e.type === "sound"), "goal: 指定ゴール(flag)に到達して発火（bumpTarget と共通の到達判定）");
+  e3.stop();
+}
+
 console.log(fail === 0 ? "\n✅ エンジン単体テスト 全PASS" : `\n❌ ${fail}件 FAIL`);
 process.exit(fail === 0 ? 0 : 1);

@@ -57,6 +57,11 @@ export const DEFS = {
   // ★ラベルは b6a のカード縮小に合わせ6文字以内（棚のフォント下限12px・stage3-addendum §3）。意味は long/desc が担う
   dpad: { ...COL.ctrlpad, w: 206, label: "じゅうじキー", long: "じゅうじキーで うごかす", desc: "これを おくと、あそぶ とき がめんの したに じゅうじキーが でて、この キャラを じぶんで うごかせるよ。", shape: "body", cat: "そうさ" },
   tapMove: { ...COL.ctrlpad, w: 206, label: "タップいどう", long: "タップした ところへ すすむ", desc: "がめんを タップした ところへ、この キャラが すすんで いくよ。ついたら とまる。", shape: "body", cat: "そうさ" },
+  // ゲームこうぼう段階3 区切り②（うごき・青）。w は既存値を再利用（geometry.paths を増やさない）
+  chase: { ...COL.motion, w: 206, label: "おいかける", long: "おいかける", desc: "えらんだ あいてに、1ぱくごとに 1マスずつ ちかづくよ。おにごっこに つかおう。", shape: "body", pill: "target", cat: "うごき" },
+  fall: { ...COL.motion, w: 206, label: "ふってくる", long: "ふってくる", desc: "うえから でてきて、したへ おちて いくよ。したまで いくと また うえから でてくる。おちものゲームに。", shape: "body", cat: "うごき" },
+  // ゲームこうぼう段階3 区切り②（きっかけ・橙）。挙動は bumpTarget と共通（相手に重なったら発火）だが「たどりつく」用途の別カード（指示書§1-1）
+  goal: { ...COL.trigger, w: 210, label: "ゴール", long: "ゴールに ついたら", desc: "ここに たどりついたら クリア！ めいろの ゴールに つかおう。あいてを えらんでね。", shape: "hat", pill: "target", cat: "きっかけ" },
 };
 
 // たな（パレット）の並び順＝カテゴリ順（設計§5の表の順）
@@ -71,11 +76,11 @@ export const PALORDER = [
 // ゲームこうぼうのパレット構成（palette-ui-overhaul §4: ゲームで使う頻度順＝
 // きっかけ→（そうさ=stage3で挿入）→かず→せいぎょ→うごき→みため→おと。うごき内はゲーム用カードを先頭に）
 export const GAMELAB_PALORDER = [
-  "hat", "tap", "bump", "bumpTarget",
+  "hat", "tap", "bump", "bumpTarget", "goal",
   "dpad", "tapMove",
   "scoreUp", "scoreDown",
   "wait", "repeat", "forever",
-  "moveRand", "bounce", "move", "moveL", "moveU", "moveD", "spin", "jump", "home",
+  "moveRand", "bounce", "chase", "fall", "move", "moveL", "moveU", "moveD", "spin", "jump", "home",
   "grow", "shrink", "hide", "show",
   "sound",
 ];

@@ -320,6 +320,41 @@
     "desc": "がめんを タップした ところへ、この キャラが すすんで いくよ。ついたら とまる。",
     "shape": "body",
     "cat": "そうさ"
+   },
+   "chase": {
+    "fill": "#3E93E8",
+    "edge": "#1F6DBE",
+    "dark": "#124E8C",
+    "w": 206,
+    "label": "おいかける",
+    "long": "おいかける",
+    "desc": "えらんだ あいてに、1ぱくごとに 1マスずつ ちかづくよ。おにごっこに つかおう。",
+    "shape": "body",
+    "pill": "target",
+    "cat": "うごき"
+   },
+   "fall": {
+    "fill": "#3E93E8",
+    "edge": "#1F6DBE",
+    "dark": "#124E8C",
+    "w": 206,
+    "label": "ふってくる",
+    "long": "ふってくる",
+    "desc": "うえから でてきて、したへ おちて いくよ。したまで いくと また うえから でてくる。おちものゲームに。",
+    "shape": "body",
+    "cat": "うごき"
+   },
+   "goal": {
+    "fill": "#F2A227",
+    "edge": "#C77E0C",
+    "dark": "#8F5606",
+    "w": 210,
+    "label": "ゴール",
+    "long": "ゴールに ついたら",
+    "desc": "ここに たどりついたら クリア！ めいろの ゴールに つかおう。あいてを えらんでね。",
+    "shape": "hat",
+    "pill": "target",
+    "cat": "きっかけ"
    }
   },
   "palorder": [
@@ -669,6 +704,24 @@
     "blockH2": null,
     "chipY": 9,
     "labelY": 13
+   },
+   "chase": {
+    "blockH": 48,
+    "blockH2": null,
+    "chipY": 9,
+    "labelY": 13
+   },
+   "fall": {
+    "blockH": 48,
+    "blockH2": null,
+    "chipY": 9,
+    "labelY": 13
+   },
+   "goal": {
+    "blockH": 56,
+    "blockH2": null,
+    "chipY": 14,
+    "labelY": 26
    }
   },
   "nestedStackH": 180

@@ -797,9 +797,9 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     return best;
   };
   const overlapsAnyBlock = (fx, fy, group) => {
-    const gw = cardW(group[0]), gh = stackH(group); // §2-2: 幅は内容ぴったり（StudioBlock の描画と同一・targetName未渡し=現状の表示に一致）
+    const gw = cardW(group[0], targetName), gh = stackH(group); // §2-2: 幅は内容ぴったり（StudioBlock の描画と同一・相手名で一致）
     for (const n of nodesRef.current) {
-      const nw = cardW(n.b), nh = n.h || blockH(n.b);
+      const nw = cardW(n.b, targetName), nh = n.h || blockH(n.b);
       if (fx < n.x + nw && fx + gw > n.x && fy < n.y + nh && fy + gh > n.y) return true;
     }
     return false;
@@ -1152,7 +1152,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     pointerIdRef.current = pointerId;
     takeSnapshot();
     const b = makeBlock(type);
-    beginDrag(e, [b], true, { x: cardW(b) / 2, y: 20 }); // §2-2: つかみ位置も内容ぴったり幅の中央
+    beginDrag(e, [b], true, { x: cardW(b, targetName) / 2, y: 20 }); // §2-2: つかみ位置も内容ぴったり幅の中央
   };
   // グローバル onMove から呼ばれる（palette-drag-touch-fix §3-1・3-2）:
   //   ながおし成立前 = 最初の明確な移動の「向き」で分ける（横優勢=即ドラッグ／縦優勢=スクロールに譲る）。
@@ -1173,7 +1173,8 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   };
 
   // 相手キャラ名の解決（bumpTarget のピル表示／stage2）。any=だれか
-  const targetName = cid => { const c = charsRef.current.find(x => x.cid === cid); return c ? kindName(c.kind) : cid; };
+  // 相手ピルの表示名（stage3-step2 §2）: cid→キャラの表示名。消えた相手は「だれか」に落とす（内部IDを出さない）
+  const targetName = cid => { const c = charsRef.current.find(x => x.cid === cid); return c ? kindName(c.kind) : "だれか"; };
 
   /* ==== ピル（数値ステッパー／おと切替／相手指定） ==== */
   const onPill = useCallback((e, b) => {
@@ -1470,7 +1471,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const { nodes } = layoutAll();
   const drag = dragRef.current;
   const ghost = drag && drag.slot ? {
-    w: cardW(drag.group[0]), h: drag.groupH - 4, x: drag.slot.x, y: drag.slot.y, // §2-2: ゴーストも内容ぴったり幅
+    w: cardW(drag.group[0], targetName), h: drag.groupH - 4, x: drag.slot.x, y: drag.slot.y, // §2-2: ゴーストも内容ぴったり幅
   } : null;
   const sel = selRef.current;
   const selC = curChar();
@@ -1579,7 +1580,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
             }} />
             {nodes.map((n, order) => (
               <StudioBlock key={n.b.id} b={n.b} mouth={n.mouth || 0} x={n.x} y={n.y} z={10 + order}
-                land={landId === n.b.id} onPill={onPill} />
+                land={landId === n.b.id} onPill={onPill} targetName={targetName} />
             ))}
             {copyBalloon && (
               <button className="copy-balloon" style={{ left: copyBalloon.x, top: Math.max(6, copyBalloon.y - 46) }}
@@ -1587,7 +1588,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
             )}
             <div className="studio-fly" ref={flyRef} style={{ display: "none" }}>
               {flyGroup && flyGroup.map(f => (
-                <StudioBlock key={"fly" + f.b.id} b={f.b} mouth={f.mouth} x={f.x} y={f.y} z={1} inFly />
+                <StudioBlock key={"fly" + f.b.id} b={f.b} mouth={f.mouth} x={f.x} y={f.y} z={1} inFly targetName={targetName} />
               ))}
             </div>
           </div>
