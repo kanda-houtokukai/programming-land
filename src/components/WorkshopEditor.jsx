@@ -84,7 +84,7 @@ const STUDIO_CSS = `
   .studio-wrap { flex: 1; display: flex; min-height: 0; }
 
   /* --- 左: こうぐだな（palette-ui-overhaul §1-§4: つねに2列・スクロールは棚の中だけ・studio/gamelab共通構造） --- */
-  .studio-pal { width: 24%; flex-shrink: 0; background: linear-gradient(180deg, #8a5a33, #6f4526);
+  .studio-pal { width: 21%; flex-shrink: 0; background: linear-gradient(180deg, #8a5a33, #6f4526);
     border-right: 4px solid #543317; padding: 8px 8px 2px; position: relative; z-index: 5;
     transition: background .15s; touch-action: pan-y; display: flex; flex-direction: column; min-width: 0; }
   .studio-pal .shelf-title { color: #f7e6c8; font-size: 12px; font-weight: 900; text-align: center;
@@ -404,7 +404,7 @@ const GAMELAB_CSS = `
 `;
 
 /* ==== こうぐだな2列（palette-ui-overhaul §1-§2） ==== */
-const PAL_S = 0.76; // 棚のブロック縮尺（§2・実機モック確定値）
+const PAL_S = 0.67; // 棚のブロック縮尺（palette-shrink-toast-fix §1: 0.76→0.67。こうぐだな幅21%と同率で下げ形を保つ＝W0=colW/PAL_S 一定）
 // palette-ui-tuning（b5x 実機FB反映・基準モック brushup/palette-mock3.html）
 const PAL_GAP_RATIO = 0.92; // §1: カード幅=floor(full×0.92)・余ったぶんを両端と列間へ均等配分（モック確定値）
 const CANVAS_S = 0.86;      // §2-1: 作業エリアのブロック縮尺。見た目だけ縮め、当たり判定は論理座標のまま（G.SNAP=78 等を凍結）
