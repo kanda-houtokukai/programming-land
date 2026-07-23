@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-23（**v2.3-b6c 段階3 区切り①の手直し=そうさの手触り修正＋全画面1画面化＝deploy済み・⚠️実機確認待ち**。b6a まで実機OK（b6b は b6c に内包）。次=①b6c の実機確認→合格で②段階3 区切り②（goal＋chase＋fall）。段階3=`brushup/gamelab-implementation-stage3.md`＋`brushup/gamelab-stage3-addendum.md`＋手直し `brushup/stage3-op-feel-fullscreen.md`）
+最終更新: 2026-07-23（**v2.3-b6d 段階3 区切り②=goal／chase／fall＋相手ピル名前表示＝deploy済み・⚠️実機確認待ち**。b6c まで実機OK。次=①b6d の実機確認→合格で②区切り③（こうぐだな29種再構成＝bump削除＋バッジ＋みほん3本）。段階3=`brushup/gamelab-implementation-stage3.md`＋区切り②指示書 `brushup/stage3-step2-goal-chase-fall.md`）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -12,7 +12,7 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**b5x〜b6a=実機OK → 段階3 着手**。段階3=新カード7枚（`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`・基準モック=`brushup/palette-29-structure.html`・`brushup/dpad-play-mock.html`）。**区切り①（dpad＋tapMove＋そうさカテゴリ＋短縮ラベル）=完了（b6b）→ 区切り①手直し（そうさ手触り＋全画面1画面化）=完了（b6c・deploy済み・⚠️実機確認待ち）**／次は②区切り②（goal＋chase＋fall）→③こうぐだな29種再構成＋みほん3本→【3-B】④jumpable→⑤clone＋よこスクロール。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
+- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**b5x〜b6a=実機OK → 段階3 着手**。段階3=新カード7枚（`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`・基準モック=`brushup/palette-29-structure.html`・`brushup/dpad-play-mock.html`）。**区切り①（dpad＋tapMove＋そうさ）=完了（b6b）→ 手直し（手触り＋全画面）=完了（b6c・実機OK）→ 区切り②（goal＋chase＋fall＋相手ピル修正）=完了（b6d・deploy済み・⚠️実機確認待ち）**／次は③区切り③（こうぐだな29種再構成=bump削除＋枚数バッジ＋みほん3本）→【3-B】④jumpable→⑤clone＋よこスクロール。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
 - **v2.3-b5x（2026-07-22・こうぐだな＆エディタUI刷新=2列・ながおし・せつめい＝実機OK・神田さん実機確認合格／deploy済み aa66929）**: 指示書=`brushup/palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`＝実装前にブラウザで全挙動を確認済み）。**[DECISION] §7=神田さん判断で「studioの見た目も2列に揃える」**（操作と見た目はセット・棚描画1系統化。studioの茶の世界観・色はそのまま）。区切り①=f69462b・②=1046625・③=b978d8b（deploy=aa66929）
   - **①データ層**: DEFS全23種に short（=label流用）/long/desc（§6の表を一字一句）。ベースライン再取得＝変更はlabel/long/descのみ＋段階2カード3種の焼き込み（既存パス91本は1バイト不変・**トレース732イベント不変**を機械確認）
   - **②2列＋%レイアウト**: `.palscroll` 新設（scrollbar-gutter:stable・5pxバー・スクロールは棚の中だけ）・カード幅=floor((clientWidth−8)/2)・カテゴリ見出しタップ開閉（初期: みため/おと閉）・棚=みじかい名前のみ/ピルなし/縮尺0.76/fitFont自動最大化（上限16px・webフォント確定後再計測）・こうぐだな24%/作業・プレビュー半分ずつ・GAMELAB_PALORDERを頻度順へ（studio PALORDERは現行順・色分岐維持）
@@ -55,7 +55,14 @@
   - **§2 全画面1画面化（★gamelab のみ・studio 完全無変化）**: §2-2 `.studio-root.big.gl .gamecfg` 非表示。**§2-3【方式=flex・報告】**新しい固定px値を足さず `.big.gl` の studio-right を縦flex＝じゅうじキー `flex:0 0 auto`（自然高さ）／プレビュー `flex:1 1 0`（残りを埋める・max-width:100%で3:2維持）。じゅうじキーの有無で予備が自動配分（実測 有:theater586h+dpad148／無:742h）。**★`.gl` スコープ限定＝studio の全画面は従来 `calc((100dvh-110px)*1.5)` のまま**（実測: studio big flex-grow0・width1086px＝完全無変化）
   - ★教訓: **テンプレートリテラル（STUDIO_CSS）で参照する定数は、その宣言より前に置く**（TDZ で `Cannot access 'X' before initialization`→React が描画されず画面真っ黒。node の verify は通るため、ブラウザ実機確認でしか気づけない）
   - 検証: verify 8本全PASS（DEFS25・traces732・paths98 不変＝ベースライン1バイト不変）・ビルドOK・本番 b6c（`index-CZxrI6xP.js`）配信確認・コンソールエラーゼロ・実測(1194px)=①op=0.1s linear/非op=0.34s ease②gamelab big=dpad全可視/theater3:2/gamecfg非表示・studio big=従来サイズ不変
-  - ⚠️次: 神田さんの iPad 実機確認（§4ゲート: ①連続移動がなめらか②速さ適切〔合わなければ `OP_MS` だけ再調整・目安 速→130/遅→70〕③全画面でじゅうじキー全部見える・プレビューはみ出さない④全画面にせってい出ない⑤みぎへ 等1拍移動が b6b と同じ⑥studio 完全無変化）。合格で区切り②（goal＋chase＋fall）へ
+  - ⚠️次: 神田さんの iPad 実機確認 → **合格 → 区切り②（b6d）へ**
+- **v2.3-b6d（2026-07-23・段階3 区切り②=goal／chase／fall＋相手ピル名前表示＝⚠️実機確認待ち／deploy済み d2abced）**: 指示書=`brushup/stage3-step2-goal-chase-fall.md`（正本）。新カード3枚は gamelab 専用。指示書配置=437c714・実装=e5b06a7（deploy=d2abced）
+  - **新カード3枚**: `chase`「おいかける」（うごき青・ピル=あいて・w206再利用）=指定相手へ1拍1マス寄る（差の大きい軸／any・消えた指定は最も近い見えるキャラ／同マスで停止＝重なって暴れない）。`fall`「ふってくる」（うごき青・w206）=1拍1マス下・下端で上端へ戻る。`goal`「ゴール」（きっかけ橙・ピル=あいて・w210再利用）=挙動は `bumpTarget` と共通（相手に重なったら発火）だが**別カード**（[DECISION] 指示書§1-1: 「ぶつかったら→クリア」は子に不自然・「たどりつく」用途を desc で差別化）。エンジン=TRIGGERS に goal 追加・`fireBumpTarget`→`fireTargetTrigger(kind)` 一般化・hasListeners に goal
+  - **[DECISION] fall の横ランダム化（§1-3報告）**: 上端リスポーン時に x をランダム化。理由=同じ列に落ち続けると主人公が真下で待つだけでゲームにならない（基準モックも random spawn）＝落ちものキャッチが成立
+  - **§2 相手ピルの内部ID表示バグ修正**: `WorkshopEditor`→`StudioBlock`(nodes/fly)＋`cardW` に `targetName` を伝達。**bumpTarget/goal/chase の3枚まとめて名前表示**に（実測: だれか→タップ→「きのこちゃん」）。消えた相手は「だれか」に落とす（内部ID を出さない）
+  - **★ベースライン再取得（§4・25→28種）**: `--update`。diff機械確認＝blocks.defs に goal/chase/fall の3種＋geometry.measures 同3種のみ追加。**traces732イベント・geometry.paths98本・widths・studio palorder は byte不変**（studio エンジン無傷）
+  - 検証: エンジン単体テストに chase(寄る方向・到達・同マス停止)/fall(下へ・下端で上端へ)/goal(到達発火) 追加＝全PASS・verify 8本全PASS（DEFS28）・ビルドOK・本番 b6d（`index-D-X04Vmw.js`）配信確認・コンソールエラーゼロ・ブラウザ実測(1194px)=28枚・新カード配置/色正しい・font 全て≥12px(ゴール16/おいかける14/ふってくる14)・相手ピル名前表示・ふってくるで主人公が下へ移動
+  - ⚠️次: 神田さんの iPad 実機確認（§6ゲート: ①おいかける で鬼が寄る②ふってくる が降り続け下端で上へ③ゴール が相手選べて到達で発火④相手ピルに名前が出る⑤3枚が正しいカテゴリ・色・文字読める⑥みぎへ/じゅうじキーの手触りが b6c と同じ⑦studio 完全無変化。⚠️「ぶつかったら」と「ゴール」が同じ挙動の2枚に見えて混乱しないかも確認＝混乱するなら goal を落とす〔§1-1〕）。合格で区切り③へ
   - 検証: **verify 8本全PASS**（区切り①②③の各後で実行・毎回 732イベント不変）・**ブラウザ実測（dev）**=①studio/gamelab とも 2列で余白（gamelab 23枚・studio 18枚）②`.asm-scaled` scale 0.86・作業エリアのカードが内容ぴったり幅（screen幅=論理×0.86）③見出し全6/5個 34px・開閉トグル動作・押下色④**合成ポインタで実ドラッグ接続を検証＝gamelab「みぎへ」を既存スタックに接続成功／studio「はた▶」→「みぎへ」接続成功**＝縮尺変更後も磁石・接続が効く⑤コンソールエラーゼロ・本番URLで b5y バンドル配信確認
   - ⚠️次: 神田さんの実機確認（§5 ゲート iPad横+PC・studio/gamelab 両方）: ①こうぐだなが2列のまま余白で詰まって見えない②作業エリアのカードが小さく「はた ▶」「みぎへ」「おと」に右の空白がない③**ブロックの接続（磁石）が従来どおり効く**（縮尺の影響なし＝当たり判定の「反応する距離」が体感で狭すぎないか）④見出しが押しやすい／見た目は b5x と変わらない⑤ながおし・ドラッグ・スクロールは b5x のまま。合格で**段階3**へ
 - **v2.3-b5w（2026-07-21・ゲームこうぼう段階2=ゲーム完成＋エディタ見た目作り直し＝実機OK・神田さん実機確認合格／deploy済み b5854ec）**: 指示書=`brushup/gamelab-implementation-stage2.md`（正本）・見た目基準=`gamelab-editor-mock.html`。スキーマ変更なし（gameConfig の枠は段階1予約分に中身を入れただけ）。中間①=21b614a・②=84e00e3・③=476746e・④=783020e（deploy=b5854ec）
