@@ -57,6 +57,8 @@ export const DEFS = {
   // ★ラベルは b6a のカード縮小に合わせ6文字以内（棚のフォント下限12px・stage3-addendum §3）。意味は long/desc が担う
   dpad: { ...COL.ctrlpad, w: 206, label: "じゅうじキー", long: "じゅうじキーで うごかす", desc: "これを おくと、あそぶ とき がめんの したに じゅうじキーが でて、この キャラを じぶんで うごかせるよ。", shape: "body", cat: "そうさ" },
   tapMove: { ...COL.ctrlpad, w: 206, label: "タップいどう", long: "タップした ところへ すすむ", desc: "がめんを タップした ところへ、この キャラが すすんで いくよ。ついたら とまる。", shape: "body", cat: "そうさ" },
+  // 段階3 区切り④（3-B）。★desc に「したに おちる」を必ず書く＝名前だけでは重力が伝わらない（指示書§1）
+  jumpable: { ...COL.ctrlpad, w: 206, label: "とべるように", long: "ジャンプできるように", desc: "したに おちるように なって、じゅうじキーの ▲で ジャンプ できるよ。ゆかや ほかの キャラの うえに のれる。", shape: "body", cat: "そうさ" },
   // ゲームこうぼう段階3 区切り②（うごき・青）。w は既存値を再利用（geometry.paths を増やさない）
   chase: { ...COL.motion, w: 206, label: "おいかける", long: "おいかける", desc: "えらんだ あいてに、1ぱくごとに 1マスずつ ちかづくよ。おにごっこに つかおう。", shape: "body", pill: "target", cat: "うごき" },
   fall: { ...COL.motion, w: 206, label: "ふってくる", long: "ふってくる", desc: "うえから でてきて、したへ おちて いくよ。したまで いくと また うえから でてくる。おちものゲームに。", shape: "body", cat: "うごき" },
@@ -79,7 +81,7 @@ export const GAMELAB_PALORDER = [
   // stage3 §1: bump（相手指定なしぶつかり）は gamelab のこうぐだなから外し bumpTarget に一本化。
   // ★DEFS からは消さない・studio の PALORDER には残す・エンジンは引き続き bump を解釈（既存 gamelab 作品が壊れない）
   "hat", "tap", "bumpTarget", "goal",
-  "dpad", "tapMove",
+  "dpad", "tapMove", "jumpable",
   "scoreUp", "scoreDown",
   "wait", "repeat", "forever",
   "moveRand", "bounce", "chase", "fall", "move", "moveL", "moveU", "moveD", "spin", "jump", "home",

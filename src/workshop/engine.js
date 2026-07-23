@@ -21,6 +21,9 @@ export const TICK = 400;            // 1拍(ms)（§11・変更禁止）
 export const LCOLS = 12, LROWS = 8; // 論理ステージ（固定・全端末で同じ広さ）
 export const SIZE_STEPS = [0.5, 0.75, 1, 1.5, 2]; // おおきさ5段階（§5）
 export const SIZE_INIT = 2;         // 初期=1倍（index）
+// 段階3 区切り④: ジャンプで上がるマス数（1ステップ1マス・上がりきったら重力で落ちる）。
+// ★12×8 の盤で「2マス上の足場に届く」高さ。OP_MS=100 なら上り300ms＋下り300msで軽快。実機の手触りで調整する値
+export const JUMP_CELLS = 3;
 
 const TRIGGERS = ["hat", "tap", "bump", "bumpTarget", "goal"]; // 同拍競合の処理順もこの順（bumpTarget=stage2・goal=stage3・ともに相手指定・到達で発火）
 const CONTAINERS = ["repeat", "forever"];
@@ -69,6 +72,7 @@ export function createEngine(charDefs, cb = {}) {
     ch.x = ch.init.x; ch.y = ch.init.y; ch.sizeIdx = SIZE_INIT; ch.visible = true;
     ch.dir = null; // はねかえるの向きも初期化（stage2・▶のたび初期向きから）
     ch.operable = false; ch.tapMovable = false; ch.tapTarget = null; // 段階3 そうさ: ▶のたび操作フラグを初期化
+    ch.jumpable = false; ch.jumpRise = 0;                            // 段階3 区切り④: 重力・ジャンプも初期化
     emitUpdate(ch, "reset");
   };
 
@@ -117,6 +121,13 @@ export function createEngine(charDefs, cb = {}) {
 
   /* ---- 1拍の消費 ---- */
   const markBeat = th => { for (const f of th.stack) if (f.type === "forever") f.beats++; };
+
+  // 段階3 区切り④: 足が着いているか。★このエンジンは y=0 が盤の下端（moveU=[0,+1]・fall は y-=1）＝
+  // 地面は y===0、真下のマスは y-1（指示書§1-2 の "LROWS-1"/"y+1" は上下が逆。意図＝盤の一番下・真下 で実装）
+  const isSupported = ch => {
+    if (ch.y <= 0) return true; // 地面（盤の一番下の行）
+    return chars.some(o => o !== ch && o.visible && o.x === ch.x && o.y === ch.y - 1); // 足場＝真下に別のキャラ
+  };
 
   // chase（stage3）の相手解決: 指定キャラ（見えている）を優先。any／消えた指定は、いちばん近い見える他キャラ
   const chaseTarget = (self, target) => {
@@ -207,6 +218,10 @@ export function createEngine(charDefs, cb = {}) {
     }
     if (b.type === "tapMove") { // 段階3: 背景タップした先へ進むキャラにする（UIは増えない）
       ch.tapMovable = true; emitFx(ch.key, { type: "tapmove" });
+      th.cur = { b, left: 0 }; return;
+    }
+    if (b.type === "jumpable") { // 段階3 区切り④: 重力がかかり、じゅうじキーの▲でジャンプできるようになる
+      ch.jumpable = true; emitFx(ch.key, { type: "jumpable" });
       th.cur = { b, left: 0 }; return;
     }
     if (b.type === "scoreUp" || b.type === "scoreDown") {
@@ -342,11 +357,43 @@ export function createEngine(charDefs, cb = {}) {
 
     /* ---- そうさ（段階3・拍とは別に UI から呼ぶ。押下中は短い間隔で・タップ移動は毎ステップ） ---- */
     // じゅうじキー: 操作可能キャラを1マス動かす（押しっぱなしで連続移動＝UIが~100msごとに呼ぶ）
+    // ★jumpable のキャラは たて方向を重力/ジャンプが持つので、たて入力（▲▼）では動かさない（よこは空中でも操舵できる）
     nudge(dx, dy) {
       if (!running) return false;
       let moved = false;
-      for (const ch of chars) if (ch.operable) moved = gridMove(ch, dx, dy) || moved;
+      for (const ch of chars) {
+        if (!ch.operable) continue;
+        if (dy !== 0 && ch.jumpable) continue;
+        moved = gridMove(ch, dx, dy) || moved;
+      }
       return moved;
+    },
+    // 段階3 区切り④: 重力とジャンプを1ステップ進める（UIが~100msごとに呼ぶ＝拍を待たない）
+    gravityStep() {
+      if (!running) return false;
+      let moved = false;
+      for (const ch of chars) {
+        if (!ch.jumpable) continue;
+        if (ch.jumpRise > 0) {                     // 上昇中: 1マス上へ
+          ch.jumpRise--;
+          if (ch.y < LROWS - 1) { ch.y += 1; emitUpdate(ch, "move"); moved = true; }
+          else ch.jumpRise = 0;                    // 天井で打ち切り
+          continue;
+        }
+        if (!isSupported(ch)) { ch.y -= 1; emitUpdate(ch, "move"); moved = true; } // 支えが無ければ落ちる
+      }
+      return moved;
+    },
+    // ▲: 地面か足場に接している操作可能キャラだけ跳ぶ（空中では跳べない・連打で二段にならない）
+    tryJump() {
+      if (!running) return false;
+      let did = false;
+      for (const ch of chars) {
+        if (!ch.jumpable || !ch.operable) continue;
+        if (ch.jumpRise > 0 || !isSupported(ch)) continue;
+        ch.jumpRise = JUMP_CELLS; did = true;
+      }
+      return did;
     },
     // 背景タップ: タップ移動キャラの目的地（グリッド）をセット
     bgTap(gx, gy) {

@@ -55,13 +55,16 @@ const iconChase = svgGlyph( // 足あと（おいかける）
 const iconFall = svgGlyph( // 下向き矢印＋しずく（ふってくる）
   `<path d="M13 3v13m0 0l-5-5m5 5l5-5" fill="none" stroke="#124E8C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>` +
   `<circle cx="6" cy="7" r="1.6" fill="#124E8C" opacity=".5"/><circle cx="20" cy="7" r="1.6" fill="#124E8C" opacity=".5"/>`);
+const iconJumpable = svgGlyph( // 地面から跳ね上がる矢印（とべるように＝重力＋ジャンプ）
+  `<path d="M3 22h20" stroke="#1B8478" stroke-width="2.4" stroke-linecap="round"/>` +
+  `<path d="M13 18V6m0 0l-4.5 4.5M13 6l4.5 4.5" fill="none" stroke="#2FB4A6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`);
 const iconGoal = svgGlyph( // ゴール旗
   `<path d="M7 3v20" stroke="#8F5606" stroke-width="2.2" stroke-linecap="round"/>` +
   `<path d="M8.5 4h11l-3 3.5 3 3.5h-11z" fill="#8F5606"/>`);
 
 const ICONS = {
   hat: iconHata, tap: iconTap, bump: iconButsukatta, bumpTarget: iconBumpTarget, goal: iconGoal,
-  dpad: iconDpad, tapMove: iconTapMove,
+  dpad: iconDpad, tapMove: iconTapMove, jumpable: iconJumpable,
   chase: iconChase, fall: iconFall,
   scoreUp: iconScoreUp, scoreDown: iconScoreDown,
   moveRand: iconMoveRand, bounce: iconBounce,

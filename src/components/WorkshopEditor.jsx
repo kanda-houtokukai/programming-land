@@ -1271,7 +1271,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         if (el) { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
         force();
       }
-      else if (fx.type === "operable" || fx.type === "tapmove") force(); // 段階3: じゅうじキーの表示/操作可能を反映
+      else if (fx.type === "operable" || fx.type === "tapmove" || fx.type === "jumpable") force(); // 段階3: じゅうじキーの表示/操作可能/重力を反映
     },
     onGlow: (id, on) => {
       const el = asmRef.current && asmRef.current.querySelector(`[data-id="${id}"]`);
@@ -1338,6 +1338,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     let moved = false;
     if (heldDirRef.current) moved = eng.nudge(heldDirRef.current[0], heldDirRef.current[1]) || moved;
     moved = eng.tapMoveStep() || moved;
+    moved = eng.gravityStep() || moved; // 段階3 区切り④: 重力・落下・ジャンプの上昇も拍を待たずここで進める
     if (moved) force();
     opTimerRef.current = setTimeout(opLoop, OP_MS);
   };
@@ -1644,7 +1645,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
             })()}
             {charsRef.current.map((c, i) => {
               const disp = dispOf(c);
-              const op = running && !!(disp.operable || disp.tapMovable); // 段階3 §1: そうさ由来の移動だけ「歩き」（等速・足踏み無し）
+              const op = running && !!(disp.operable || disp.tapMovable || disp.jumpable); // 段階3 §1: そうさ由来の移動（落下/ジャンプ含む）だけ「歩き」（等速・足踏み無し）
               return (
                 <CharSprite key={c.cid} ch={{ ...c, z: i }} disp={disp} cellPx={cellPx} base={actorBase}
                   selected={i === sel} running={running} instant={instantRef.current.has(c.cid)} op={op}
@@ -1672,7 +1673,14 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
               <div className="dpad">
                 {[["u", 0, 1, "▲"], ["l", -1, 0, "◀"], ["r", 1, 0, "▶"], ["d", 0, -1, "▼"]].map(([k, dx, dy, glyph]) => (
                   <button key={k} className={"dp-" + k} aria-label={k}
-                    onPointerDown={e => { e.preventDefault(); e.stopPropagation(); heldDirRef.current = [dx, dy]; if (engineRef.current && engineRef.current.nudge(dx, dy)) force(); }}
+                    onPointerDown={e => {
+                      e.preventDefault(); e.stopPropagation(); heldDirRef.current = [dx, dy];
+                      const eng = engineRef.current; if (!eng) return;
+                      // ▲: とべるように のキャラはジャンプ／持たないキャラは従来どおり うえへ移動（§1-3）
+                      let m = (dy === 1 && eng.tryJump());
+                      if (eng.nudge(dx, dy)) m = true;
+                      if (m) force();
+                    }}
                     onPointerUp={e => { e.preventDefault(); heldDirRef.current = null; }}
                     onPointerLeave={() => { heldDirRef.current = null; }}
                     onPointerCancel={() => { heldDirRef.current = null; }}>{glyph}</button>

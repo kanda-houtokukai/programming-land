@@ -321,6 +321,17 @@
     "shape": "body",
     "cat": "そうさ"
    },
+   "jumpable": {
+    "fill": "#2FB4A6",
+    "edge": "#1B8478",
+    "dark": "#0F5F55",
+    "w": 206,
+    "label": "とべるように",
+    "long": "ジャンプできるように",
+    "desc": "したに おちるように なって、じゅうじキーの ▲で ジャンプ できるよ。ゆかや ほかの キャラの うえに のれる。",
+    "shape": "body",
+    "cat": "そうさ"
+   },
    "chase": {
     "fill": "#3E93E8",
     "edge": "#1F6DBE",
@@ -700,6 +711,12 @@
     "labelY": 13
    },
    "tapMove": {
+    "blockH": 48,
+    "blockH2": null,
+    "chipY": 9,
+    "labelY": 13
+   },
+   "jumpable": {
     "blockH": 48,
     "blockH2": null,
     "chipY": 9,

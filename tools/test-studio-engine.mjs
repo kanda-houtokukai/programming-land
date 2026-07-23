@@ -5,7 +5,7 @@
    ① 端で残り歩数を捨てて次へ ② 入れ子くりかえしの実行回数 ③ ずっとの停止
    ④ 並行2スタックの拍整合 ⑤ ぶつかりの再発火条件（重なり継続中は再発火せず・離れて再接触で発火） */
 
-import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../src/workshop/engine.js";
+import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT, JUMP_CELLS } from "../src/workshop/engine.js";
 
 let fail = 0;
 const ok = (cond, msg) => { console.log(`${cond ? "✓" : "✗ FAIL"} ${msg}`); if (!cond) fail++; };
@@ -300,6 +300,42 @@ ok(SIZE_STEPS.join() === "0.5,0.75,1,1.5,2" && SIZE_STEPS[SIZE_INIT] === 1, "定
   e3.start(); r3.tickTo(e3, 4);
   ok(r3.ev.some(e => e.type === "sound"), "goal: 指定ゴール(flag)に到達して発火（bumpTarget と共通の到達判定）");
   e3.stop();
+}
+
+/* ---- 段階3 区切り④: jumpable（重力・着地・足場・ジャンプ）★y=0 が盤の下端 ---- */
+{
+  // 空中から地面(y=0)まで落ちて止まる
+  const r = record();
+  const e = createEngine([
+    { key: "p", x: 3, y: 5, stacks: [hatStack(mk("jumpable"))] },
+  ], r.cb);
+  e.start(); r.tickTo(e, 1); // 1拍で jumpable 実行＝重力ON
+  for (let i = 0; i < 10; i++) e.gravityStep();
+  ok(e.getChar("p").y === 0, `jumpable: 空中(y5)から地面(y0)まで落ちて止まる（実測 y=${e.getChar("p").y}）`);
+
+  // ジャンプ: 地面に接しているso跳べる → JUMP_CELLS 分あがる
+  e.getChar("p").operable = true; // じゅうじキー相当（▲の対象）
+  ok(e.tryJump() === true, "jumpable: 地面に接しているとき ▲で跳べる");
+  for (let i = 0; i < JUMP_CELLS; i++) e.gravityStep();
+  ok(e.getChar("p").y === JUMP_CELLS, `jumpable: ${JUMP_CELLS}マス上がる（実測 y=${e.getChar("p").y}）`);
+  ok(e.tryJump() === false, "jumpable: 空中では跳べない（連打で二段にならない）");
+  for (let i = 0; i < 10; i++) e.gravityStep();
+  ok(e.getChar("p").y === 0, `jumpable: 上がりきったら重力で地面へ戻る（実測 y=${e.getChar("p").y}）`);
+  e.stop();
+
+  // 足場: 別キャラの上（真下に居る＝y-1）で止まり、足場が消えたら落ち始める
+  const r2 = record();
+  const e2 = createEngine([
+    { key: "p", x: 4, y: 6, stacks: [hatStack(mk("jumpable"))] },
+    { key: "yuka", x: 4, y: 2, stacks: [] }, // 足場（動かない）
+  ], r2.cb);
+  e2.start(); r2.tickTo(e2, 1);
+  for (let i = 0; i < 10; i++) e2.gravityStep();
+  ok(e2.getChar("p").y === 3, `jumpable: 足場(y2)の上 y3 で止まる（実測 y=${e2.getChar("p").y}）`);
+  e2.getChar("yuka").visible = false; // 足場が消える
+  for (let i = 0; i < 10; i++) e2.gravityStep();
+  ok(e2.getChar("p").y === 0, `jumpable: 足場が消えたら また落ちて地面へ（実測 y=${e2.getChar("p").y}）`);
+  e2.stop();
 }
 
 console.log(fail === 0 ? "\n✅ エンジン単体テスト 全PASS" : `\n❌ ${fail}件 FAIL`);
