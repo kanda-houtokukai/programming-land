@@ -81,7 +81,7 @@ const STUDIO_CSS = `
     box-shadow: inset 0 1.5px 0 rgba(255,255,255,.18), 0 2px 0 rgba(0,0,0,.3); cursor: pointer; white-space: nowrap; }
   .studio-root header button:active { transform: translateY(1px); box-shadow: inset 0 1.5px 0 rgba(255,255,255,.18); }
   .studio-root header button:disabled { opacity: .35; cursor: default; }
-  .studio-wrap { flex: 1; display: flex; min-height: 0; }
+  .studio-wrap { flex: 1; display: flex; min-height: 0; position: relative; } /* palette-shrink-toast-fix §2: トーストの基準（ヘッダーの下）。全画面(.big)でも残る */
 
   /* --- 左: こうぐだな（palette-ui-overhaul §1-§4: つねに2列・スクロールは棚の中だけ・studio/gamelab共通構造） --- */
   .studio-pal { width: 21%; flex-shrink: 0; background: linear-gradient(180deg, #8a5a33, #6f4526);
@@ -338,10 +338,12 @@ const STUDIO_CSS = `
   .studio-root header .savebtn { background: #58a839; }
   /* 上演専用（§4）: 全画面固定＝ひろげるボタンも出さない（編集UIはbigのCSSで消灯済み） */
   .studio-root.showonly .bigbtn { display: none; }
-  .studio-toast { position: absolute; left: 50%; top: 64px; transform: translateX(-50%); z-index: 300;
+  .studio-toast { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); z-index: 300;
     background: rgba(36,26,44,.92); color: #ffe9b8; font-size: 13px; font-weight: 900;
     border-radius: 999px; padding: 9px 22px; pointer-events: none; white-space: nowrap;
-    box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+    /* palette-shrink-toast-fix §2: 基準が .studio-wrap なのでヘッダー下12px。
+       ヘッダーと同系色（RGB 36,26,44）に溶けないよう白いリングで分離 */
+    box-shadow: 0 0 0 2px rgba(255,255,255,.55), 0 6px 18px rgba(0,0,0,.4); }
 
   /* --- 狭い画面: 案内のみ（判定はCSS幅のみ・向き検出JS禁止） --- */
   .studio-narrow { display: none; position: absolute; inset: 0; z-index: 400; background: #2e2237;
@@ -1700,6 +1702,9 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
             ▶=うごかす ■=カット!
           </div>
         </div>
+        {/* palette-shrink-toast-fix §2: トーストは .studio-wrap の中（基準をヘッダー下に）。
+            ★.studio-asm ではなく .studio-wrap 基準＝全画面(.big)でも消えない（§2-3） */}
+        {toast && <div className="studio-toast">{toast}</div>}
       </div>
 
       {/* ほぞんモーダル（作品名ひらがな8文字・既存の名前入力の作法=maxLength+IME確定後slice） */}
@@ -1759,7 +1764,6 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
           <div className="dg">そのまま ひっぱると おけるよ</div>
         </div>
       ); })()}
-      {toast && <div className="studio-toast">{toast}</div>}
       <div className="studio-narrow">
         この あそびは<br />タブレットか パソコンで<br />あそんでね
       </div>
