@@ -27,7 +27,7 @@ const CFG = {
   LONGPRESS: 500,      // 長押しコピー(ms)（指示書§3-3）
   DRAG_START: 6,       // ドラッグ開始のしきい値(px)（プロトタイプ準拠）
   PAL_LONGPRESS: 150,  // こうぐだな ながおし成立(ms)（palette-ui-overhaul §5・確定値）
-  PAL_PRE_MOVE: 7,     // ながおし成立前の許容移動(px)＝超えたらスクロールに譲る（§5）
+  PAL_DIR_LOCK: 8,     // こうぐだな: この距離を超えた最初の移動で向きを確定＝横優勢は即ドラッグ／縦優勢はスクロールに譲る（palette-drag-touch-fix §3-1。旧 PAL_PRE_MOVE の静止門を置換）
   ACTOR_K: 2.2,        // キャラ表示幅 = cellPx×これ（プロトタイプ実測値）
   JUMP_K: 1.6,         // ジャンプ高さ = cellPx×これ（§11）
   MOVE_MS: 340,        // 1マス移動のtransition(ms)（プロトタイプ .34s）
@@ -1013,13 +1013,19 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       scheduleDraft();
       force();
     };
+    // palette-drag-touch-fix §3-3: ドラッグ成立中だけ touchmove を非パッシブで受けて preventDefault し、
+    // Safari が touch-action:pan-y でジェスチャを縦スクロールに横取り（→pointercancel で無言消失）するのを止める。
+    // ★ドラッグ中のみ（dragRef.current がある時だけ）。常時 preventDefault すると棚の縦スクロールが指で死ぬ（§3-3）。
+    const onTouchMoveGuard = e => { if (dragRef.current && !dragRef.current.committing) e.preventDefault(); };
     document.addEventListener("pointermove", onMove);
     document.addEventListener("pointerup", onUp);
     document.addEventListener("pointercancel", onCancel);
+    document.addEventListener("touchmove", onTouchMoveGuard, { passive: false });
     return () => {
       document.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerup", onUp);
       document.removeEventListener("pointercancel", onCancel);
+      document.removeEventListener("touchmove", onTouchMoveGuard);
     };
   }, []); // ハンドラはすべてrefを参照＝依存なしで安定
 
@@ -1100,29 +1106,41 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       try { pal.el.setPointerCapture(pal.pointerId); } catch (_) { /* 未対応環境は無視 */ }
     }, CFG.PAL_LONGPRESS);
   };
-  // グローバル onMove から呼ばれる: ながおし前=スクロール譲り／後=ドラッグ確定
-  const resolvePalPending = e => {
-    const pal = palPendingRef.current;
-    if (!pal || pal.pointerId !== e.pointerId || dragRef.current) return;
-    const dx = e.clientX - pal.x0, dy = e.clientY - pal.y0;
-    if (!pal.armed) { // ながおし成立前に動いた → 中止（pan-y でブラウザがスクロール）
-      if (Math.abs(dx) > CFG.PAL_PRE_MOVE || Math.abs(dy) > CFG.PAL_PRE_MOVE) clearPalPending();
-      return;
-    }
-    if (Math.abs(dx) <= CFG.DRAG_START && Math.abs(dy) <= CFG.DRAG_START) return; // ながおし中（まだ動かない）
-    e.preventDefault(); // ドラッグ開始: ふきだしを消してゴーストが指に追従
-    const { type, el } = pal;
-    clearPalPending();
+  // ドラッグ開始（palette-drag-touch-fix §3-1）: プルッ拒否 → スナップショット → beginDrag。
+  // ながおし成立の有無によらず、ここに来たら「ドラッグ意思あり」として扱う。
+  const startPalDrag = (e, pal) => {
+    const { type, el, pointerId } = pal;
     if (isTrigger(type) && hasTrigger(type)) {
       // きっかけは1キャラにつき各1本＝プルッと拒否（ドラッグ確定時に判定＝b5v作法）
+      clearPalPending();
       if (el) { el.classList.remove("no"); void el.offsetWidth; el.classList.add("no"); setTimeout(() => el.classList.remove("no"), 300); }
       sndNo();
       return;
     }
-    pointerIdRef.current = e.pointerId;
+    e.preventDefault(); // ふきだしを消してゴーストが指に追従
+    try { el.setPointerCapture(pointerId); } catch (_) { /* 未対応環境は無視 */ }
+    clearPalPending();
+    pointerIdRef.current = pointerId;
     takeSnapshot();
     const b = makeBlock(type);
     beginDrag(e, [b], true, { x: cardW(b) / 2, y: 20 }); // §2-2: つかみ位置も内容ぴったり幅の中央
+  };
+  // グローバル onMove から呼ばれる（palette-drag-touch-fix §3-1・3-2）:
+  //   ながおし成立前 = 最初の明確な移動の「向き」で分ける（横優勢=即ドラッグ／縦優勢=スクロールに譲る）。
+  //   静止したままなら 150ms でながおし成立→ふきだし（§3-2）。成立後は少し動かせばドラッグ。
+  const resolvePalPending = e => {
+    const pal = palPendingRef.current;
+    if (!pal || pal.pointerId !== e.pointerId || dragRef.current) return;
+    const dx = e.clientX - pal.x0, dy = e.clientY - pal.y0;
+    const adx = Math.abs(dx), ady = Math.abs(dy);
+    if (!pal.armed) {
+      if (Math.max(adx, ady) <= CFG.PAL_DIR_LOCK) return; // まだ小さい動き＝判定保留（静止なら150msでふきだし）
+      if (adx > ady) startPalDrag(e, pal);                // 横優勢＝ドラッグ意思（pan-y は横スクロールしない＝Safari に横取りされない）
+      else clearPalPending();                             // 縦優勢＝ブラウザの縦スクロールに譲る
+      return;
+    }
+    if (adx <= CFG.DRAG_START && ady <= CFG.DRAG_START) return; // ながおし中（ふきだし表示・まだ動かない）
+    startPalDrag(e, pal); // 成立後は向きを問わずドラッグ（もう意思確認済み）
   };
 
   // 相手キャラ名の解決（bumpTarget のピル表示／stage2）。any=だれか
