@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-24（**v2.3-b6f 段階3 区切り④=jumpable「とべるように」（重力・ジャンプ）＝deploy済み・⚠️実機確認待ち**。b6d まで実機OK・b6e は実機確認待ち。次=①b6e/b6f の実機確認→合格で②区切り⑤ clone（ぶんしんを だす）＋ジャンプ/ぶんしんのみほん。段階3=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
+最終更新: 2026-07-24（**v2.3-b6f 段階3 区切り④=jumpable「とべるように」（重力・ジャンプ）＝deploy済み・⚠️実機確認待ち**。b6d まで実機OK・b6e は実機確認待ち。**次=開店フェーズ**（`brushup/gamelab-opening-design.md`）便①素材差し替え→便②マップ開店→便③教育接続→便④ガイド＋BGM。**区切り⑤ clone は開店フェーズの後**。実機確認は `brushup/cards-reference.md`（機能一覧）到達後にまとめて実施の方針＝各便は簡易確認で先行。段階3カード追加分=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -8,11 +8,33 @@
 
 ## 現在地サマリ（毎セッション冒頭にここだけ読む）
 
+### 次にやること（★ここが最優先・古い「⑤ clone」から更新 2026-07-24）
+
+**次＝ゲームこうぼう 開店フェーズ**。正本＝`brushup/gamelab-opening-design.md`（全項目 神田さん承認済み）。便で分けて進める:
+
+```
+便① 素材差し替え（アイコン11枚・内観・建物PNG配置） … 指示書 brushup/gamelab-opening-step1.md
+便② マップ開店（看板→建物・名前・導線）
+便③ 教育接続（XP・コイン・マイルストーン）
+便④ ガイド＋BGM
+※ 区切り⑤ clone（ぶんしんを だす）は開店フェーズの後に回す
+```
+
+- **実機確認の方針**: b6e/b6f は神田さん簡易確認で合格。通しの実機確認は `brushup/cards-reference.md`（機能一覧）が揃ってからまとめて実施＝各便は簡易確認で先へ進む。
+- 便①の関連文書（すべて brushup/）: 設計正本 `gamelab-opening-design.md`／保護者ガイド原稿 `gamelab-parent-guide.md`（便④で使う）／アセット生成プロンプト `gamelab-asset-prompts.md`（BGM 2本が未生成）／便①指示書 `gamelab-opening-step1.md`。
+
+### 開店フェーズ 確定事項（2026-07-24・神田さん承認＝設計書 §確定事項の要約）
+
+1. **マップの置き場所** = じゅんびちゅう**看板①（69.5, 34.13）を建物に差し替え**。看板②は残す（`tall:true`／縦余白 上0下0／左右反転不要）
+2. **名前** = `short:"ゲーム"` ／ `place:"ゲームこうぼう"`（スタジオ＝「つくる」と区別）
+3. **開放条件** = **なし**（`areaLocked` に手を入れない・スタジオと同じ無制限）
+4. **教育接続** = XP **10**（新規保存の初回のみ）／マイルストーン5種（`first`・`works5`・`works10`・`firstOperable`・`firstClear`）／**保存先は `gamelab.milestones`（スタジオの `studio.milestones` と分離＝混ざると達成が相互汚染）**
+
 ### 今どこか
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**b5x〜b6a=実機OK → 段階3 着手**。段階3=新カード7枚（`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`・基準モック=`brushup/palette-29-structure.html`・`brushup/dpad-play-mock.html`）。**区切り①（dpad＋tapMove）=b6b→手直し=b6c(実機OK)→区切り②（goal＋chase＋fall＋相手ピル）=b6d(実機OK)→区切り③（カード一覧生成＋bump削除＋みほん3本）=完了（b6e・⚠️実機確認待ち）→**【3-B】区切り④（jumpable とべるように）=完了（b6f・deploy済み・⚠️実機確認待ち）**／次は⑤clone（ぶんしんを だす）＋ジャンプ/ぶんしんのみほん（区切り⑤でまとめて）。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
+- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**b5x〜b6a=実機OK → 段階3 着手**。段階3=新カード7枚（`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`・基準モック=`brushup/palette-29-structure.html`・`brushup/dpad-play-mock.html`）。**区切り①（dpad＋tapMove）=b6b→手直し=b6c(実機OK)→区切り②（goal＋chase＋fall＋相手ピル）=b6d(実機OK)→区切り③（カード一覧生成＋bump削除＋みほん3本）=完了（b6e・⚠️実機確認待ち）→**【3-B】区切り④（jumpable とべるように）=完了（b6f・deploy済み・⚠️実機確認待ち）**。段階3のカード追加は6/7枚完了（残り clone）。**次は開店フェーズ（上の「次にやること」参照）＝区切り⑤ clone は開店フェーズの後**。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
 - **v2.3-b5x（2026-07-22・こうぐだな＆エディタUI刷新=2列・ながおし・せつめい＝実機OK・神田さん実機確認合格／deploy済み aa66929）**: 指示書=`brushup/palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`＝実装前にブラウザで全挙動を確認済み）。**[DECISION] §7=神田さん判断で「studioの見た目も2列に揃える」**（操作と見た目はセット・棚描画1系統化。studioの茶の世界観・色はそのまま）。区切り①=f69462b・②=1046625・③=b978d8b（deploy=aa66929）
   - **①データ層**: DEFS全23種に short（=label流用）/long/desc（§6の表を一字一句）。ベースライン再取得＝変更はlabel/long/descのみ＋段階2カード3種の焼き込み（既存パス91本は1バイト不変・**トレース732イベント不変**を機械確認）
   - **②2列＋%レイアウト**: `.palscroll` 新設（scrollbar-gutter:stable・5pxバー・スクロールは棚の中だけ）・カード幅=floor((clientWidth−8)/2)・カテゴリ見出しタップ開閉（初期: みため/おと閉）・棚=みじかい名前のみ/ピルなし/縮尺0.76/fitFont自動最大化（上限16px・webフォント確定後再計測）・こうぐだな24%/作業・プレビュー半分ずつ・GAMELAB_PALORDERを頻度順へ（studio PALORDERは現行順・色分岐維持）
