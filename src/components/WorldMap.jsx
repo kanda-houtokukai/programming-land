@@ -23,10 +23,11 @@ import iconHarbor from "../assets/icon_harbor.png";
 import titleLogo from "../assets/title_logo.webp";
 // つくるスタジオ（段階3・★studio-assets/ 配下＝直下ではない）
 import buildingStudio from "../assets/studio-assets/studio-building.png";
+import buildingGamelab from "../assets/studio-assets/gamelab-building.png";
 import signJunbichu from "../assets/studio-assets/sign-junbichu.png";
 
-// 8エリアの%座標（1600×900の背景に対して）。ブラウザで背景に照らして微調整する。
-// 拡張用の空き地（今回は何も置かない・将来の新エリア用）: 中央上(46,30)・北(58,16)・右中(70,36)
+// 各エリアの%座標（1600×900の背景に対して）。ブラウザで背景に照らして微調整する。
+// 拡張用の空き地3つ: 北(58,16)=つくるスタジオ済／右中(70,36)=ゲームこうぼう済／中央上(46,30)=看板②で予告中（未使用）
 // 座標=各エリアが乗る「空き地の円」の中心（%）。ブラウザにグリッドを重ねて実測して合わせた。
 // tall=縦長の建物イラスト（円に収めるため表示サイズを別扱い）
 // 名前は3階層で役割分担（メモ02 名前の一貫性）:
@@ -53,14 +54,16 @@ export const AREAS = [
   // つくるスタジオ（段階3・北の空き地）。座標は studio-map-placement.md の確定値（神田さん実機調整済み）。
   // 建物はほぼ正方形だが tall:true（82%）表示で承認済み。既存エリアの後ろに追加＝既存のふわふわ位相を変えない
   { key: "studio", short: "つくる", place: "つくるスタジオ", img: buildingStudio, tall: true, left: 59.5, top: 12.4 },
+  // ゲームこうぼう（開店フェーズ 便②・右中の空き地）。じゅんびちゅう看板①(69.5, 34.13)を建物へ差し替え＝座標はその確定値をそのまま継承。
+  // studio と同じく建物はほぼ正方形だが tall:true（82%）。★末尾に追加＝既存エリアのふわふわ位相を変えない
+  { key: "gamelab", short: "ゲーム", place: "ゲームこうぼう", img: buildingGamelab, tall: true, left: 69.5, top: 34.13 },
 ];
 
 // じゅんびちゅう看板（段階3で1枚目・FB5便⑤で2枚目追加）。★非対話の飾り＝AREASに入れない（buttonにしない）。
-// 1枚目の座標は studio-map-placement.md の確定値・2枚目（中央上の空き地≒46,30）は初期値＝実機で微調整。
-// 文字は画像に描かずアプリのフォントで板の中央に重畳。flip=imgだけCSSで左右反転（新規画像は作らない・文字は正立のまま）。
-// 2枚が同位相で揺れないよう delay/dur を別値に（初期値）
+// 開店フェーズ 便②で1枚目(69.5, 34.13)を ゲームこうぼうの建物へ差し替え＝残り1枚。★2枚目は残す（「まだ増える」予告の維持）。
+// 座標は初期値＝実機で微調整。文字は画像に描かずアプリのフォントで板の中央に重畳。
+// flip=imgだけCSSで左右反転（新規画像は作らない・文字は正立のまま）
 const SIGNS = [
-  { left: 69.5, top: 34.13, textTop: 40, flip: false, delay: "1.27s", dur: "3.3s" },
   { left: 47.3, top: 29.25, textTop: 40, flip: true, delay: "2.1s", dur: "3.6s" }, // 中央上・左右反転（FB6便①: 46,30 から1.5pt 2時方向へ・初期値）
 ];
 
