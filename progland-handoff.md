@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-24（**v2.3-b6f 段階3 区切り④=jumpable「とべるように」（重力・ジャンプ）＝deploy済み・⚠️実機確認待ち**。b6d まで実機OK・b6e は実機確認待ち。**次=開店フェーズ**（`brushup/gamelab-opening-design.md`）便①素材差し替え→便②マップ開店→便③教育接続→便④ガイド＋BGM。**区切り⑤ clone は開店フェーズの後**。実機確認は `brushup/cards-reference.md`（機能一覧）到達後にまとめて実施の方針＝各便は簡易確認で先行。段階3カード追加分=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
+最終更新: 2026-07-24（**v2.3-b6g 開店フェーズ 便①=素材差し替え（アイコン11枚PNG化＋こうぼう内観）＝deploy済み・⚠️実機確認待ち**。段階3 区切り①〜④（b6b〜b6f）も実機確認待ち。**次=開店フェーズ 便②マップ開店**（`brushup/gamelab-opening-design.md`）→便③教育接続→便④ガイド＋BGM。**区切り⑤ clone は開店フェーズの後**。実機確認は `brushup/cards-reference.md`（機能一覧）到達後にまとめて実施の方針＝各便は簡易確認で先行。段階3カード追加分=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
 
 > 過去の版ごとの詳細ログ（v2.3-b4d 以前）・過去フェーズの教訓の詳細は `progland-handoff-archive.md` へ（読むのは必要なときだけ）。
 
@@ -13,8 +13,8 @@
 **次＝ゲームこうぼう 開店フェーズ**。正本＝`brushup/gamelab-opening-design.md`（全項目 神田さん承認済み）。便で分けて進める:
 
 ```
-便① 素材差し替え（アイコン11枚・内観・建物PNG配置） … 指示書 brushup/gamelab-opening-step1.md
-便② マップ開店（看板→建物・名前・導線）
+便① 素材差し替え（アイコン11枚PNG化・内観・建物PNG配置）… ✅完了 v2.3-b6g（deploy済み・⚠️実機確認待ち）
+便② マップ開店（看板①→建物・名前・導線）… ★次はここ
 便③ 教育接続（XP・コイン・マイルストーン）
 便④ ガイド＋BGM
 ※ 区切り⑤ clone（ぶんしんを だす）は開店フェーズの後に回す
@@ -103,7 +103,14 @@
   - **★ベースライン再取得（28→29種）**: diff機械確認＝`blocks.defs` に `jumpable` 1つ＋`geometry.measures` 同1つのみ追加。**traces732イベント・paths98本・widths・studio palorder は byte不変**
   - 検証: verify 8本全PASS（DEFS29・みほん6本・カード一覧28種）・本番 b6f（`index-DF1xy6tM.js`）配信確認・コンソールエラーゼロ・ブラウザ実測=そうさ3枚目「とべるように」font13.03px（≥12）・**実ブラウザビルドでエンジンを直接駆動して確認**（落下 y3→0で停止／◀で横移動／接地でジャンプ→3マス上昇→重力で復帰／空中ジャンプ不可／▲は縦移動しない）
   - ★教訓（プレビュー環境）: **プレビューペインが非表示だと `setTimeout` の拍ループが抑制され、キャラが動かないように見える**（b5k/b5l の rAF 停止と同型・実機フォアグラウンドでは起きない）。エンジンを手動 tick して切り分けること
-  - ⚠️次: 神田さんの iPad 実機確認（§5ゲート: ①落ちて地面で止まる②別キャラの上に乗れる③▲でジャンプ・空中では跳べない④落ちる/跳ぶがなめらか⑤うごきの「ジャンプ」（その場演出）と混同しないか〔混同するなら名前を練り直す〕⑥既存みほん6本が不変⑦studio 完全無変化）。合格で区切り⑤（clone）へ
+  - ⚠️次: 神田さんの iPad 実機確認（§5ゲート: ①落ちて地面で止まる②別キャラの上に乗れる③▲でジャンプ・空中では跳べない④落ちる/跳ぶがなめらか⑤うごきの「ジャンプ」（その場演出）と混同しないか〔混同するなら名前を練り直す〕⑥既存みほん6本が不変⑦studio 完全無変化）。**合格後は開店フェーズ（上の「次にやること」参照）。区切り⑤ clone は開店フェーズの後**
+- **v2.3-b6g（2026-07-24・開店フェーズ 便①=素材差し替え〔暫定SVGアイコン11枚をPNG化＋こうぼう内観を専用画像へ〕＝⚠️実機確認待ち／deploy済み 168348c）**: 指示書=`brushup/gamelab-opening-step1.md`（正本）・設計正本=`brushup/gamelab-opening-design.md`。開店フェーズ文書4本配置＋台帳更新=9d7d209・実装=874a5e4（deploy=168348c）
+  - **§2-1 アイコン11枚PNG化**: `src/data/studio-blocks.js` の暫定 `svgGlyph`（iconMoveRand/Bounce/ScoreUp/ScoreDown/BumpTarget/Dpad/TapMove/Goal/Chase/Fall/Jumpable）を `card_icon_19〜29` の PNG import に置換（既存18枚と同じ import 方式に統一）。`svgGlyph` ヘルパー＋関連コメントを全廃（未使用コード掃除）。**ICONS の型↔アイコン結び付き・DEFS の中身/並び/ラベル/色は不変＝アイコンの絵だけが変わる**
+  - **§2-2 内観差し替え**: gamelab `src/gamelab/mode.jsx` の `homeBg` を studio-interior 流用→`gamelab-interior.webp`（1600×900）へ。「段階1はスタジオ流用」コメントも実態に更新。**★studio 側 `src/studio/mode.jsx` の homeBg は不変**（studio-interior のまま）
+  - **建物PNG**: `gamelab-building.png` を `src/assets/studio-assets/` に配置＝**便②用で未配線**（未参照のため build で docs/assets に出ない＝Vite が未使用アセットを除外）。マップ（`WorldMap.jsx`）は未着手
+  - **★実測照合（verify では拾えないため必須・全PASS）**: dev で全11型のラベル↔アイコンを実測＝ランダム→19/はねかえる→20/スコア＋→21/スコア－→22/ぶつかったら→23/じゅうじキー→**24_dpad**/タップいどう→25/ゴール→26/おいかける→**27_oikakeru**/ふってくる→28/とべるように→**29_toberu**＝**入れ替わりゼロ**。studio=18枚（01〜18）・gamelab カード(19〜29)混入なし・data-URIグリフ残存ゼロ・studio homeBg=studio-interior のまま
+  - 検証: **verify 8本全PASS（`--update` なし＝DEFS29・トレース732イベント・パス98本 byte不変**＝画像差し替えのみで DEFS 不変を機械確認）・ビルドOK（js gzip 208KB・アイコンは別ハッシュアセット出力）・本番 b6g（`index-DcmuNQai.js`）＋新アセット（`card_icon_24_dpad`・`gamelab-interior`）を 200 で配信確認・コンソールエラーゼロ・ブラウザ実測でこうぐだなに11枚が既存質感で表示
+  - ⚠️次: 神田さんの iPad 実機確認（§4実機ゲート・studio/gamelab 両方）: ①こうぐだな11枚が既存18枚と同じ質感②アイコンとカードの対応が正しい（じゅうじキーのカードに十字キーの絵 等）③こうぼうのカセットだな背景が工房内観に変わっている④studio の内装と18枚は不変。通し実機は `cards-reference.md` 到達後にまとめて（各便は簡易確認で先行）。合格後 便②マップ開店へ
   - 検証: **verify 8本全PASS**（区切り①②③の各後で実行・毎回 732イベント不変）・**ブラウザ実測（dev）**=①studio/gamelab とも 2列で余白（gamelab 23枚・studio 18枚）②`.asm-scaled` scale 0.86・作業エリアのカードが内容ぴったり幅（screen幅=論理×0.86）③見出し全6/5個 34px・開閉トグル動作・押下色④**合成ポインタで実ドラッグ接続を検証＝gamelab「みぎへ」を既存スタックに接続成功／studio「はた▶」→「みぎへ」接続成功**＝縮尺変更後も磁石・接続が効く⑤コンソールエラーゼロ・本番URLで b5y バンドル配信確認
   - ⚠️次: 神田さんの実機確認（§5 ゲート iPad横+PC・studio/gamelab 両方）: ①こうぐだなが2列のまま余白で詰まって見えない②作業エリアのカードが小さく「はた ▶」「みぎへ」「おと」に右の空白がない③**ブロックの接続（磁石）が従来どおり効く**（縮尺の影響なし＝当たり判定の「反応する距離」が体感で狭すぎないか）④見出しが押しやすい／見た目は b5x と変わらない⑤ながおし・ドラッグ・スクロールは b5x のまま。合格で**段階3**へ
 - **v2.3-b5w（2026-07-21・ゲームこうぼう段階2=ゲーム完成＋エディタ見た目作り直し＝実機OK・神田さん実機確認合格／deploy済み b5854ec）**: 指示書=`brushup/gamelab-implementation-stage2.md`（正本）・見た目基準=`gamelab-editor-mock.html`。スキーマ変更なし（gameConfig の枠は段階1予約分に中身を入れただけ）。中間①=21b614a・②=84e00e3・③=476746e・④=783020e（deploy=b5854ec）
