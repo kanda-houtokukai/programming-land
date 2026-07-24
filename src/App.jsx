@@ -26,6 +26,7 @@ import PartnerSelect from "./components/PartnerSelect.jsx";
 import CharacterSelect from "./components/CharacterSelect.jsx";
 import Dex from "./components/Dex.jsx";
 import Studio from "./components/Studio.jsx";
+import Gamelab from "./components/Gamelab.jsx";
 import EvolutionOverlay from "./components/EvolutionOverlay.jsx";
 import { stageForLevel, monsterName } from "./data/monsters.js";
 import { grantLegacyCoins, activeMon } from "./growth.js";
@@ -37,6 +38,7 @@ const TRACK = {
   home: "home", powers: "powers", puzzle: "puzzle", quiz: "quiz",
   art: "art", typing: "typing", shop: "shop", dex: "myhome",
   battle: "battle", studio: "studio", records: null, parenthub: null, // b5t: battle/studio 曲を接続
+  gamelab: null, // 便④で接続
   select: null, create: null,
 };
 function trackFor(screen, home, save) {
@@ -144,11 +146,13 @@ export default function App() {
     return s;
   });
 
-  // つくるスタジオから戻ったとき（段階3）: スタジオは App を経由せず storage へ直接書く（XP/コイン/works）ため、
-  // App の state を storage の最新で置き換える。update() の「prev vs next 比較」を1回通すことで、
-  // バッジ・実績解放（かんとくベレー）・相棒レベルアップ/進化/たまごの既存検知が“1回だけ”走る。
+  // こうぼう（つくるスタジオ／ゲームこうぼう）から戻ったとき: どちらも App を経由せず storage へ直接書く
+  // （XP/コイン/works）ため、App の state を storage の最新で置き換える。update() の「prev vs next 比較」を
+  // 1回通すことで、バッジ・実績解放（かんとくベレー）・相棒レベルアップ/進化/たまごの既存検知が“1回だけ”走る。
   // XP/コインの加算そのものは works.js が保存時に済ませており、ここで起きるのは検知と演出だけ＝二重付与なし。
-  const exitStudio = () => {
+  // ★便②で studio 専用の exitStudio から改名して共用（中身は元から studio 固有の処理を持たない）。
+  // ⚠️ こうぼう側の教育接続は便③（いまは grantForNewSave が null＝読み直しても何も増えないのが正しい状態）
+  const exitWorkshop = () => {
     const fresh = loadProfile(currentId);
     if (fresh) update(() => fresh);
     setScreen("home");
@@ -238,8 +242,10 @@ export default function App() {
       {save && screen === "typing" && <Typing save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
       {save && screen === "battle" && battleUnlocked(save) && <Battle save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
       {save && screen === "shop" && <Shop save={save} update={update} go={setScreen} onSound={onSound} openHome={openHome} />}
-      {/* つくるスタジオ（段階3・正規導線）: 全画面固定レイヤーで開く。もどると exitStudio が storage を再読込 */}
-      {save && screen === "studio" && <Studio onExit={exitStudio} />}
+      {/* つくるスタジオ（段階3・正規導線）: 全画面固定レイヤーで開く。もどると exitWorkshop が storage を再読込 */}
+      {save && screen === "studio" && <Studio onExit={exitWorkshop} />}
+      {/* ゲームこうぼう（開店フェーズ 便②・正規導線）: スタジオと同形。#gamelab-dev（main.jsx）はそのまま残す */}
+      {save && screen === "gamelab" && <Gamelab onExit={exitWorkshop} />}
       {/* きろく=子ども向けの日記（机から）。保護者向けは parenthub（マップ最下部→ゲート奥）に分離（段階③） */}
       {save && screen === "records" && (
         <Records save={save} go={setScreen} onSound={onSound} onBack={funcBack} openHome={openHome} />

@@ -7,7 +7,8 @@ import WorkshopHome from "./WorkshopHome.jsx";
 import WorkshopEditor from "./WorkshopEditor.jsx";
 import { GAMELAB_MODE } from "../gamelab/mode.jsx";
 
-/* onExit（段階3・正規導線でAppから渡す予定）: 段階1は #gamelab-dev のみ＝未指定（hash運用） */
+/* onExit（開店フェーズ 便②・正規導線）: App から渡される「マップへ戻る」（exitWorkshop＝studio と共用）。
+   #gamelab-dev（開発用バックドア）から入ったときは未指定＝従来どおり hash 運用 */
 export default function Gamelab({ onExit }) {
   const [view, setView] = useState("home");
   const [target, setTarget] = useState(null); // { open, key }
