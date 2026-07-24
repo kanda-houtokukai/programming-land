@@ -10,7 +10,7 @@ import {
   ensureGamelab, saveWork, stashDraft, deleteWork, nextWorkName,
   WORKS_MAX, NAME_MAX, MILESTONE_NAMES,
 } from "./works.js";
-import bgInterior from "../assets/studio-assets/studio-interior.webp"; // 段階1は内装をスタジオ流用（色替え検討は段階3）
+import bgInterior from "../assets/studio-assets/gamelab-interior.webp"; // 開店フェーズ 便①でこうぼう専用内観へ差し替え済み（段階1のスタジオ流用を解消）
 
 // ヘッダーのマーク（歯車＋ゲームパッド意匠の簡易版・段階1。本アイコンは段階3で差し替え検討）
 const MARK = (
