@@ -28,7 +28,9 @@ const CFG = {
   DRAG_START: 6,       // ドラッグ開始のしきい値(px)（プロトタイプ準拠）
   PAL_LONGPRESS: 150,  // こうぐだな ながおし成立(ms)（palette-ui-overhaul §5・確定値）
   PAL_DIR_LOCK: 8,     // こうぐだな: この距離を超えた最初の移動で向きを確定＝横優勢は即ドラッグ／縦優勢はスクロールに譲る（palette-drag-touch-fix §3-1。旧 PAL_PRE_MOVE の静止門を置換）
-  ACTOR_K: 2.2,        // キャラ表示幅 = cellPx×これ（プロトタイプ実測値）
+  ACTOR_K: 2.2,        // キャラ表示幅 = cellPx×これ（プロトタイプ実測値・★studio はこの値のまま＝実機OK済みの見た目を変えない）
+  ACTOR_K_GAME: 1.8,   // ★ゲームこうぼうだけ小さくする（FB便A §5・実機の手触りで調整する値。大きすぎ→1.6／小さすぎ→2.0 が目安）
+                       //   2.2 は画面幅の18.3%を占めて操作範囲が狭く、隣のマスのキャラとも絵が重なって「触れているように見えた」
   JUMP_K: 1.6,         // ジャンプ高さ = cellPx×これ（§11）
   MOVE_MS: 340,        // 1マス移動のtransition(ms)（プロトタイプ .34s）
   COPY_OFFSET: 26,     // コピーが「隣に出現」するずらし(px)
@@ -1482,7 +1484,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const sel = selRef.current;
   const selC = curChar();
   const bgImg = (BGS.find(b => b.id === bgRef.current) || BGS[0]).img;
-  const actorBase = cellPx * CFG.ACTOR_K;
+  const actorBase = cellPx * (mode.isGame ? CFG.ACTOR_K_GAME : CFG.ACTOR_K); // FB便A §5: こうぼうだけ小さく（studio は不変）
   const hist = histRef.current;
 
   return (

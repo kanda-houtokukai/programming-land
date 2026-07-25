@@ -83,7 +83,10 @@ export const GAMELAB_PALORDER = [
   "hat", "tap", "bumpTarget", "goal",
   "dpad", "tapMove", "jumpable",
   "scoreUp", "scoreDown",
-  "wait", "repeat", "forever",
+  // FB便A §4: せいぎょは くりかえし→ずっと→まつ の順（2列に流すので くりかえし｜ずっと が横並び・
+  // その下に まつ）。容器2枚（背が高い）を同じ行に、背の低い まつ を次の行に置くと無駄な高さが出ない。
+  // ★studio の PALORDER は触らない（回帰ハーネスが基準の先頭からの部分列であることを要求＝並べ替えるとFAIL）
+  "repeat", "forever", "wait",
   "moveRand", "bounce", "chase", "fall", "move", "moveL", "moveU", "moveD", "spin", "jump", "home",
   "grow", "shrink", "hide", "show",
   "sound",
