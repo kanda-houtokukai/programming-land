@@ -64,7 +64,14 @@ export default function StudioBlock({ b, mouth = 0, x, y, z, inFly, land, onPill
       className={"blk" + (inFly ? " noanim" : first.current ? " noanim" : "") + (land ? " land" : "")}
       data-id={b.id}
       style={{ transform: `translate(${x}px, ${y}px)`, zIndex: z }}>
-      <svg width={w + 2} height={hh + G.TD + 4}
+      {/* ★要素の高さと viewBox の高さを一致させる（FB便A §2）。食い違っていると既定の
+          preserveAspectRatio="xMidYMid meet" が小さい方の倍率で全体を縮小し横中央へ寄せるため、
+          カードが 93〜97% に縮み、幅に比例して右へずれる（きっかけ 6.6px / ふつう 3.1px @w190）。
+          ★viewBox 側でなく height 側を合わせた: viewBox を縮めると きっかけの下ツメ（y=hh+TD=64・
+          stroke 2）が viewBox 下端に接して 1px 欠ける。height を伸ばせば上下の余白がそのまま残り、
+          倍率がちょうど 1.0 になる。描画されるパスは1本も変わらず、増えるのは DOM の箱だけ
+          （きっかけ +5px・ふつう +2px。svg は overflow:visible なので当たり判定も従来どおり） */}
+      <svg width={w + 2} height={hh + G.TD + (isHat ? 9 : 6)}
         viewBox={`-1 ${isHat ? -4 : -1} ${w + 2} ${hh + G.TD + (isHat ? 9 : 6)}`}>
         <path d={path} fill={d.fill} stroke={d.edge} strokeWidth="2" />
         <path d={gloss(w, isHat)} fill="none" stroke="rgba(255,255,255,.5)" strokeWidth="3.5" strokeLinecap="round" />

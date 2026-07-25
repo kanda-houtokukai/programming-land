@@ -159,7 +159,12 @@ const STUDIO_CSS = `
   .studio-root .blk .lbl { position: absolute; display: flex; align-items: center; gap: 7px;
     color: #fff; font-weight: 900; font-size: 14px; text-shadow: 0 1.5px 0 rgba(0,0,0,.28);
     pointer-events: none; white-space: nowrap; }
+  /* ★box-sizing: border-box（FB便A §1）: 既定の content-box だと min-width:32 に padding 11×2 が
+     加算されて実寸54pxになり、cardW() の見積もり（max(32, 文字幅+22)=42px）を12px超えてはみ出す。
+     border-box なら min-width が実寸になり見積もりと一致する（＝余白が大きい問題も同時に解消）。
+     長いピル（だれか 等）は文字幅が32を超えるため変化しない。⚠️cardW() の式は正しい・変えない */
   .studio-root .pill { pointer-events: auto; background: rgba(255,255,255,.94); border-radius: 999px;
+    box-sizing: border-box;
     padding: 1px 11px; font-size: 14px; font-weight: 900; box-shadow: inset 0 -2px 0 rgba(0,0,0,.14);
     cursor: pointer; min-width: 32px; text-align: center; }
   .studio-root .pill:active { transform: scale(.94); }
