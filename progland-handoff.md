@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-25（**v2.3-b6j 開店フェーズ 便④-A=保護者ガイド接続＝deploy済み・⚠️実機確認待ち**。便②（b6h）・便③（b6i）は**実機OK**。段階3 区切り①〜④（b6b〜b6f）・便①（b6g）は実機確認待ち。**次=便④-B（BGM）＝音源2本の生成待ちで着手できない**ため、先に別便を回してよい（`brushup/gamelab-opening-design.md`）。**区切り⑤ clone は開店フェーズの後**。実機確認は `brushup/cards-reference.md`（機能一覧）到達後にまとめて実施の方針＝各便は簡易確認で先行。段階3カード追加分=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
+最終更新: 2026-07-25（**v2.3-b6k 実機FB便A=不具合3件〔ピルのはみ出し・きっかけカードの接続ずれ・落ちものの判定漏れ〕＋棚の並び＋キャラの大きさ＝deploy済み・⚠️実機確認待ち**。便②（b6h）・便③（b6i）は**実機OK**。便④-A（b6j）・段階3 区切り①〜④（b6b〜b6f）・便①（b6g）は実機確認待ち。**次=b6k の実機確認**→ 便④-B（BGM）は**音源2本の生成待ちで着手できない**ため、先に別便（ショップ連動・みほんの作り直し・カードのアニメーション＝Chat が設計中）を回してよい。**区切り⑤ clone は開店フェーズの後**。実機確認は `brushup/cards-reference.md`（機能一覧）到達後にまとめて実施の方針＝各便は簡易確認で先行。段階3カード追加分=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
 
 > 過去の版ごとの詳細ログは月別アーカイブへ（読むのは必要なときだけ）: **v2.3-b4e〜b5w** = `progland-archive-2026-07.md` ／ **v2.3-b4d 以前**（＋過去フェーズの教訓の詳細）= `progland-handoff-archive.md`。
 
@@ -35,8 +35,16 @@
 便② マップ開店（看板①→建物・名前・導線）… ✅完了 v2.3-b6h（**実機OK**）
 便③ 教育接続（XP・コイン・マイルストーン）… ✅完了 v2.3-b6i（**実機OK**）
 便④-A 保護者ガイド … ✅完了 v2.3-b6j（deploy済み・⚠️実機確認待ち）
-便④-B BGM … ★次はここ。ただし⚠️音源2本が未生成＝着手できない
+便④-B BGM … ⚠️音源2本が未生成＝着手できない（下の段取り参照）
 ※ 区切り⑤ clone（ぶんしんを だす）は開店フェーズの後に回す
+```
+
+開店フェーズと並行して**実機FBの手当て**が走っている:
+
+```
+実機FB便A（不具合3件＋棚の並び＋キャラの大きさ）… ✅完了 v2.3-b6k（deploy済み・⚠️実機確認待ち）
+  指示書=brushup/feedback-a-fixes.md
+実機FB便B?（ショップ連動・みほんの作り直し・カードのアニメーション）… Chat が設計中・未着手
 ```
 
 - **実機確認の方針**: b6e/b6f は神田さん簡易確認で合格。通しの実機確認は `brushup/cards-reference.md`（機能一覧）が揃ってからまとめて実施＝各便は簡易確認で先へ進む。
@@ -45,25 +53,15 @@
 - 開店フェーズの関連文書（すべて brushup/）: 設計正本 `gamelab-opening-design.md`／保護者ガイド原稿 `gamelab-parent-guide.md`（便④で使う）／アセット生成プロンプト `gamelab-asset-prompts.md`（BGM 2本が未生成）／便①指示書 `gamelab-opening-step1.md`／便②指示書 `gamelab-opening-step2.md`／便③指示書 `gamelab-opening-step3.md`／便④-A指示書 `gamelab-opening-step4a.md`。
 - ★**アセットの余白規約**（便②§0で確定・次に絵を足すとき必ず読む）: 256×256 の透過PNGで **`min(pad)=0`＝絵がキャンバスのどこか1辺に接している**こと。縦横比が正方形でない絵は、比が決める側の軸だけが0になる（「上下も左右も0」は成立しない）。守らないと `objectFit:contain` の枠に対して絵が小さくなり、マップ上で既存より小さく見える（便①で約7%の不具合が実際に発生）。詳細=`brushup/studio-map-placement.md`。
 
-### 開店フェーズ 確定事項（2026-07-24・神田さん承認＝設計書 §確定事項の要約）
+### 開店フェーズ 確定事項（2026-07-24・神田さん承認）
 
-1. **マップの置き場所** = じゅんびちゅう**看板①（69.5, 34.13）を建物に差し替え**。看板②は残す（`tall:true`／縦余白 上0下0／左右反転不要）
-2. **名前** = `short:"ゲーム"` ／ `place:"ゲームこうぼう"`（スタジオ＝「つくる」と区別）
-3. **開放条件** = **なし**（`areaLocked` に手を入れない・スタジオと同じ無制限）
-4. **教育接続** = XP **10**（新規保存の初回のみ）／マイルストーン5種（`first`・`works5`・`works10`・`firstOperable`・`firstClear`）／**保存先は `gamelab.milestones`（スタジオの `studio.milestones` と分離＝混ざると達成が相互汚染）**
+**4項目すべて実装済み＝決定はコードが現物**（①②③=b6h／④=b6i）。原文は `progland-archive-2026-07.md` の「開店フェーズ 確定事項」へ移した（維持規則の3つ目の分岐＝固定部の見直し・2026-07-25）。設計正本は `brushup/gamelab-opening-design.md`。
 
 ### 今どこか
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
 - **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**b5x〜b6a=実機OK → 段階3 着手**。段階3=新カード7枚（`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`・基準モック=`brushup/palette-29-structure.html`・`brushup/dpad-play-mock.html`）。**区切り①（dpad＋tapMove）=b6b→手直し=b6c(実機OK)→区切り②（goal＋chase＋fall＋相手ピル）=b6d(実機OK)→区切り③（カード一覧生成＋bump削除＋みほん3本）=完了（b6e・⚠️実機確認待ち）→**【3-B】区切り④（jumpable とべるように）=完了（b6f・deploy済み・⚠️実機確認待ち）**。段階3のカード追加は6/7枚完了（残り clone）。**次は開店フェーズ（上の「次にやること」参照）＝区切り⑤ clone は開店フェーズの後**。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
-- **v2.3-b6a（2026-07-23・こうぐだな縮小＋おいたよ!トーストの見切れ修正＝実機OK・神田さん実機確認合格／deploy済み f15b4ba）**: 指示書=`brushup/palette-shrink-toast-fix.md`（正本）。微調整の便。studio/gamelab 共通。§0台帳記帳=c41d21a・§1縮小=2279497・§2トースト=a8b811e（deploy=f15b4ba）
-  - **§1 こうぐだな縮小**: `.studio-pal` 幅 24%→**21%**・`PAL_S` 0.76→**0.67**（`PAL_GAP_RATIO`=0.92 据え置き）。**同率で下げて形を保つ**（幅は colW、高さは PAL_S で決まる）。形の不変は **W0=colW/PAL_S** で機械確認＝実測 W0=**162.7**（1194px）／before 167.1＝差 **2.6%（3%以内）**。実測: studio/gamelab 両方 2列維持・colW 109・18/23種維持・指ドラッグ配置も従来どおり
-  - **★§1 フォントの申し送り**: 6文字ラベルが Chromium 実測 **11.70px**（指示書の 12px 下限をわずかに下回る）。原因は colW=109 が指示書の iPad 実測値 111 より2px小さいため＝Chromium/Safari のレイアウト差（枠/スクロールバー/サブピクセル約4px）。指示書の colW=111/12px は iPad 実測由来なので**実機では12px見込み**。神田さん決定値（21%/0.67）は変えず、**実機ゲート#3（小1の読みやすさ）で最終確認**とした。もし実機で小さすぎれば こうぐだな幅を+1%する余地あり（W0 は範囲内を維持できる）
-  - **§2 トースト見切れ修正**: `.studio-wrap` に `position:relative`＝トーストの基準を画面上端からヘッダー下へ。トーストを `.studio-root` 直下から **`.studio-wrap` の中**へ移動（`top` 64px→12px）＝ヘッダー高が将来変わっても壊れない。**★`.studio-asm` 基準にしない**（全画面 `.big` で asm=`display:none` だがトーストは残すべき→wrap は big でも残る。実測: big で wrap 1194×754 表示・asm none）。ヘッダーと同系色（RGB 36,26,44）に溶けないよう**白いリング** box-shadow を追加。実測（1194px）: toast top92／header下端80＝**12px下・重なりなし**・親=studio-wrap
-  - 検証: **verify 8本全PASS**（`--update` なし＝**732イベント・パス98本・DEFS23種 byte不変**＝§3凍結を維持）・ビルドOK・本番URLで b6a バンドル（`index-CC8XCtWl.js`）配信確認・コンソールエラーゼロ
-  - ⚠️申し送り（次便＝ゲームのせってい再設計）: こうぐだな 24%→21% で余った3%が作業/プレビューへ分配され、プレビュー（aspect 3/2）は幅増で**高さ約+12px**。右カラムは iPad で既に約40pxはみ出し（はいゆうひかえしつが下で切れる）＝**この変更で約12px悪化**。せってい再設計（A-4）で縦予算にこの12pxを織り込むこと。本便では未対処（指示書§6）
-  - ✅実機確認合格（2026-07-23・神田さん・iPad Pro 11 よこ）: §4ゲート6項目すべてOK（小さくすっきり・形不変・文字読める〔11.70px 実機で問題なし〕・指ドラッグOK・トースト重ならない・全画面でもトースト出る）。次=段階3
 - **v2.3-b6b（2026-07-23・ゲームこうぼう段階3 区切り①=dpad＋tapMove＋そうさカテゴリ新設＋短縮ラベル＝⚠️実機確認待ち／deploy済み cfcf36e）**: 指示書=`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`（正本）。studio/gamelab 共有部品に追加だが **gamelab のみに出す**。指示書配置=ea67118/97597b6・区切り①=8dfe146（deploy=cfcf36e）
   - **そうさカテゴリ新設（ティール #2FB4A6・edge #1B8478）**: `COL.ctrlpad` 追加。DEFS に `dpad`「じゅうじキー」/`tapMove`「タップいどう」（body・ピルなし・cat そうさ・ラベル6文字＝b6a のカード縮小に合わせ short・意味は long/desc が担う）。`w=206` は既存値を再利用（ベースライン増分を DEFS だけに抑える）。`GAMELAB_PALORDER` の きっかけ↔かず 間（b5x 予約位置）へ挿入。studio `PALORDER`(18種)は不変
   - **エンジン（拍を待たない操作・§1）**: `dpad` 実行→`ch.operable=true`（1回で有効化・以後ずっと）／`tapMove` 実行→`ch.tapMovable=true`。`nudge(dx,dy)`=操作可能キャラを1マス／`bgTap(gx,gy)`=タップ移動の目的地／`tapMoveStep()`=目的地へ1マス／`gridMove` で盤内クランプ／`resetChar` で ▶ ごとに操作フラグ初期化／`onFx` operable・tapmove で通知／`hasOperable()`
@@ -147,6 +145,19 @@
   - ブラウザ実測: こうぼうのカセットだな画面に**「おうちの方へ」ボタンが出現**→開くと **`skill`＋body4段落＋`tip` が全文一致**（機械照合）・**末尾の「とじる」までスクロールで到達**（scrollH 820/clientH 685・横はみ出しなし）・**studio 側は `STUDIO_GUIDE` が全文一致で無変化**・アプリのコンソールエラーゼロ
   - ★教訓（プレビュー環境）: **この環境では Vite の HMR WebSocket が接続できない**（コンソールに `[vite] failed to connect to websocket`）。そのため**ファイルを編集してもページは古いモジュールを掴んだまま**で、`guide` が `null` に見える偽の失敗が起きた。**編集後は必ず `navigate` で読み直してから実測する**（`location.reload()` だけでは戻らないことがある）
   - ⚠️次: 神田さんの iPad 実機確認（§4実機ゲート4項目）: ①こうぼうのカセットだな画面に「おうちの方へ」が出る②開くと全文が読める（途中で切れない・崩れない）③スタジオのガイドは変わっていない④**文面が保護者に伝わる内容か（中身の最終判断）**。合格後 **便④-B（BGM）**＝先に Suno で2本（こうぼう用・バトルアリーナ用）の生成が要る
+- **v2.3-b6k（2026-07-25・実機FB便A=不具合3件＋棚の並び＋キャラの大きさ＝⚠️実機確認待ち／deploy済み fd7640d）**: 指示書=`brushup/feedback-a-fixes.md`（正本・**原因3件は Chat が特定済み**）。①②=1386c6b・③=1bee973・④⑤=7e253d4（deploy=fd7640d）
+  - **§1 ピルのはみ出し**: `.studio-root .pill` に **`box-sizing: border-box`**（1行）。既定の content-box だと `min-width:32` が内容だけに効き `padding 11×2` が加算されて実寸54pxになり、`cardW()` の見積もり（`max(32, 文字幅+22)`=42px）を**12px超えてはみ出していた**。⚠️`cardW()` の式は正しいので触っていない。**実測（同一DOMで前後比較）**: `×5` のピル **46.4→34.8px**・はみ出し **+0.3px→−13.6px（内側）**／長いピル「きのこちゃん」は **91.2→91.2 で不変**（指示書の予測どおり）
+  - **§2 きっかけカードの接続ずれ**: `<svg>` の **height と viewBox の高さの食い違い**が原因。既定の `preserveAspectRatio="xMidYMid meet"` が小さい方の倍率で全体を縮小し横中央へ寄せるため、**幅に比例して右へずれていた**。**★判断=height 側を viewBox に合わせた**（理由: viewBox を縮める案だと きっかけの下ツメ `y=hh+TD=64`・stroke 2 が viewBox 下端に接して1px欠ける。height を伸ばせば上下の余白がそのまま残り倍率がちょうど 1.0 になる。**描画パスは1本も変わらず、増えるのは DOM の箱だけ**＝きっかけ+5px・ふつう+2px。`svg` は `overflow:visible` なので当たり判定も従来どおり）
+  - **★§2 実測（同一DOMで前後比較・4枚）**: 左端 修正前 239.5〜**243.8**（最大4.3pxのばらつき）→ 修正後 **全4枚 237.5 で完全一致**。ずれが最大だったのは `ゴール きのこちゃん`（きっかけ・幅広）で **6.3px**＝指示書の予測 6.6px とほぼ一致
+  - **§2-3 副作用（想定内・正しい状態への復帰）**: カード幅が **きっかけ +7.4%／ふつう +3.3%** 大きくなった（指示書の「3〜7%」と一致）。**きっかけとふつうの相対サイズが揃った**のが本質。こうぐだなは別描画（`PAL_S`）なので b6a で実機調整した棚の大きさは**不変**。大きすぎるなら `CANVAS_S`（0.86）1つで調整できる（本便では変えない）
+  - **§3 落ちものキャッチの判定漏れ（★エンジン）**: ぶつかり判定が**拍（400ms）の中だけ**だったため、じゅうじキー（`OP_MS`=100ms）で相手のマスに入っても次の拍までに相手が落ちて離れると**素通り**していた。判定を **`settleOverlaps()` 1関数に集約**し、`tick` と `nudge` / `tapMoveStep` / `gravityStep` の**移動後**から同じものを呼ぶ（⚠️実装を2つに分けない・`prevOverlap` も1系統のまま＝二重発火しない）。**判定順序（bump→bumpTarget→goal）は組み替えていない**
+  - **★§3 の検証（修正前後を同じ台本で走らせて実証）**: `engine.js` は自己完結（import 0本）なので `git show HEAD:src/workshop/engine.js` を別ファイルに出し、**修正前と修正後の両方を node で駆動**。主人公(はた→じゅうじキー)＋リンゴ(はた→ふってくる／ぶつかったら→スコア＋1)で「拍の間にリンゴのマスへ入る」台本＝**修正前: 重なったのにスコア発火 0／修正後: 1**。症状の再現と修正の両方を機械確認
+  - **★§3 ベースライン（最も慎重を要した点）**: `tools/studio-baseline.json` の **SHA-256 が修正前と完全一致**（`43b61933…869e`）＝**トレース732イベント・パス98本・DEFS29種が1バイト不変**。studio のみほん4本は操作ループ（dpad/tapMove/jumpable＝gamelab専用）を通らないため無影響という指示書の見立てどおり。`--update` は実行していない
+  - **§4 こうぐだなの並び（gamelab のみ）**: `GAMELAB_PALORDER` の せいぎょ を **くりかえし→ずっと→まつ** に。**実測: くりかえし(top551,left46)｜ずっと(top551,left132) が横並び・まつ(top645,left46) がその下**。⚠️**studio の `PALORDER` は無変更**（回帰ハーネスが「基準の先頭からの部分列」を要求＝並べ替えると FAIL する）。**実測: studio の棚は まつ｜くりかえし／ずっと のまま不変**
+  - ★`brushup/cards-reference.md` は DEFS 由来の**自動生成物**なので `npm run cards` で再生成（差分は せいぎょ 3行の並びのみ）。再生成しないと `gen-cards.mjs --check` が FAIL する
+  - **§5 キャラの大きさ（gamelab のみ）**: `CFG.ACTOR_K_GAME = 1.8` を新設し `mode.isGame` で分岐。**実測: gamelab の実効K=1.800／studio の実効K=2.200（不変）**。★1.8 は Chat の見立て＝**実機の手触りで調整する値**である旨をコメントに明記（大きすぎ→1.6／小さすぎ→2.0 が目安）
+  - 検証: **verify 9本全PASS（`--update` なし）**・本番 b6k（`index-DSiNIkiQ.js`）配信＋版表示 v2.3-b6k・`box-sizing:border-box` が本番バンドルに含まれることを確認・アプリのコンソールエラーゼロ
+  - ⚠️次: 神田さんの iPad 実機確認（§7実機ゲート7項目）: ①ピルがはみ出さない②きっかけの下のカードの左端が揃う③落ちものキャッチでリンゴが取れる④せいぎょが くりかえし｜ずっと／まつ⑤**キャラの大きさの最終判断**⑥**作業エリアのカードが大きくなりすぎていないか（§2-3の副作用）**⑦studio が完全無変化
 - 検証体制: `npm run verify` ＝ パズル162面（★3最短＋難易度カーブ）＋クイズ360問（正解一意＋難易度タグ照合＋ループ回数表記禁止）＋ローマ字128件。FAILだと `npm run deploy` で公開されない
 
 ### 未完了タスク（backlog・roadmap.md §2 と同期）
