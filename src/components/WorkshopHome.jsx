@@ -234,7 +234,7 @@ export default function WorkshopHome({ mode, onOpen, onExitApp }) {
                 ))}
               </div>
             </div>
-            {/* おうちの方へ（原稿は mode.guide・こうぼうは段階3まで null=非表示） */}
+            {/* おうちの方へ（原稿は mode.guide。studio=STUDIO_GUIDE／gamelab=GAMELAB_GUIDE〔便④-Aで接続〕。null のモードでは非表示） */}
             {guide && <ParentGuide guide={guide} />}
           </div>
         </div>

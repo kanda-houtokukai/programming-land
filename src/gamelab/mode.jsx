@@ -6,6 +6,7 @@
 import { DEFS, GAMELAB_PALORDER, SOUNDS } from "../data/studio-blocks.js";
 import { BGS } from "../data/studio-bgs.js";
 import { SAMPLES } from "../data/gamelab-samples.js";
+import { GAMELAB_GUIDE } from "../data/parent-guide.js";
 import {
   ensureGamelab, saveWork, stashDraft, deleteWork, nextWorkName,
   WORKS_MAX, NAME_MAX, MILESTONE_NAMES,
@@ -33,7 +34,7 @@ export const GAMELAB_MODE = {
   works: { saveWork, stashDraft, deleteWork, nextWorkName, WORKS_MAX, NAME_MAX, MILESTONE_NAMES },
 
   samples: SAMPLES,
-  guide: null, // 段階3で保護者ガイド全文（段階1は非表示＝Home 側の {guide && …} ガード）
+  guide: GAMELAB_GUIDE, // 開店フェーズ 便④-A で接続（原稿=brushup/gamelab-parent-guide.md・Home 側の {guide && …} ガードで表示）
   homeBg: bgInterior,
 
   texts: {
