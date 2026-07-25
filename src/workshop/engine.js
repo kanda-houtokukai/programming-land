@@ -295,6 +295,27 @@ export function createEngine(charDefs, cb = {}) {
 
   // 相手指定の到達トリガ（stage2 bumpTarget／stage3 goal＝共通実装）: self が kind を持ち、
   // 指定相手（"any" or 相手key）と重なったら発火。goal も「指定キャラに重なったら」で bumpTarget と同じ（指示書§1-1）
+  /* ぶつかり判定の唯一の実装（FB便A §3）。新規に重なったペアだけ双方で発火し prevOverlap を更新する。
+     ★拍（tick）からも操作ループ（nudge / tapMoveStep / gravityStep）からもここだけを呼ぶ。
+       別々に書くと prevOverlap が2系統になり発火が重複する。
+     ★由来: 判定が拍（400ms）の中だけだったため、じゅうじキー（100ms）で動いて重なっても
+       次の拍までに相手が離れると素通りしていた（落ちものキャッチでリンゴが取れない）。
+     ★判定順序（bump → bumpTarget → goal）は従来のまま・組み替えない */
+  const settleOverlaps = () => {
+    const now = overlapNow();
+    for (const pk of now) {
+      if (!prevOverlap.has(pk)) {
+        const [ak, bk] = pk.split("|");
+        const a = byKey.get(ak), b = byKey.get(bk);
+        startThread(a, "bump");
+        startThread(b, "bump");
+        fireTargetTrigger(a, b, "bumpTarget"); fireTargetTrigger(b, a, "bumpTarget"); // stage2: 相手指定ぶつかり
+        fireTargetTrigger(a, b, "goal"); fireTargetTrigger(b, a, "goal");             // stage3: ゴール到達（共通実装）
+      }
+    }
+    prevOverlap = now;
+  };
+
   const fireTargetTrigger = (self, other, kind) => {
     const t = self.triggers[kind];
     if (!t) return;
@@ -327,18 +348,7 @@ export function createEngine(charDefs, cb = {}) {
       for (const th of snapshot) stepThread(th);
       threads = threads.filter(t => !t.done);
       // ぶつかり判定（この拍の移動がすべて済んでから・新規に重なったペアだけ双方で発火）
-      const now = overlapNow();
-      for (const pk of now) {
-        if (!prevOverlap.has(pk)) {
-          const [ak, bk] = pk.split("|");
-          const a = byKey.get(ak), b = byKey.get(bk);
-          startThread(a, "bump");
-          startThread(b, "bump");
-          fireTargetTrigger(a, b, "bumpTarget"); fireTargetTrigger(b, a, "bumpTarget"); // stage2: 相手指定ぶつかり
-          fireTargetTrigger(a, b, "goal"); fireTargetTrigger(b, a, "goal");             // stage3: ゴール到達（共通実装）
-        }
-      }
-      prevOverlap = now;
+      settleOverlaps();
       // 自然終了: スレッドが尽きて、待ち受け（タップ/ぶつかり）も無いとき（位置は維持）
       if (!threads.length && !hasListeners()) {
         running = false;
@@ -366,6 +376,7 @@ export function createEngine(charDefs, cb = {}) {
         if (dy !== 0 && ch.jumpable) continue;
         moved = gridMove(ch, dx, dy) || moved;
       }
+      if (moved) settleOverlaps(); // FB便A §3: 拍を待たずに重なりを見る（すれ違いで取り逃さない）
       return moved;
     },
     // 段階3 区切り④: 重力とジャンプを1ステップ進める（UIが~100msごとに呼ぶ＝拍を待たない）
@@ -382,6 +393,7 @@ export function createEngine(charDefs, cb = {}) {
         }
         if (!isSupported(ch)) { ch.y -= 1; emitUpdate(ch, "move"); moved = true; } // 支えが無ければ落ちる
       }
+      if (moved) settleOverlaps(); // FB便A §3: 重力・ジャンプで重なった瞬間も判定する
       return moved;
     },
     // ▲: 地面か足場に接している操作可能キャラだけ跳ぶ（空中では跳べない・連打で二段にならない）
@@ -412,6 +424,7 @@ export function createEngine(charDefs, cb = {}) {
         const [dx, dy] = Math.abs(ddx) >= Math.abs(ddy) ? [Math.sign(ddx), 0] : [0, Math.sign(ddy)]; // 差の大きい軸へ1マス
         moved = gridMove(ch, dx, dy) || moved;
       }
+      if (moved) settleOverlaps(); // FB便A §3: タップいどうで重なった瞬間も判定する
       return moved;
     },
     hasOperable: () => chars.some(c => c.operable), // UI: じゅうじキーを出すか（操作可能キャラが1体でもいれば）
