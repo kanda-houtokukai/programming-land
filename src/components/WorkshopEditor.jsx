@@ -12,6 +12,7 @@ import { isTrigger, isContainer, makeBlock, cloneBlocks } from "../data/studio-b
 import { G, ANIM, pathBody, pathHat, pathC, gloss, chipY, labelY, blockH, stackH, containerDepth } from "../workshop/geometry.js";
 import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../workshop/engine.js";
 import { lastProfile, saveProfile } from "../storage.js";
+import { availableBgs } from "../data/studio-bgs.js";
 import { playJingle } from "../bgm.js";
 import { buildCast, kindImg, kindName, kindValid } from "../workshop/cast.js";
 import iconCoin from "../assets/icon_stat_coin.png";
@@ -37,6 +38,7 @@ const CFG = {
   TOAST_MS: 3500,      // かきかけトーストの表示時間(ms)
 };
 // 背景5種は src/data/studio-bgs.js（BGS）に移動（段階2 §0-1・Home/サムネと共有）
+// availableBgs = 選択欄に出す ぶたい（おみせで買えたものだけ＋救済・FB便B §1）
 
 /* ============ サウンド（プロトタイプのWebAudio簡易音・Suno差し替えは段階3） ============ */
 let AC = null;
@@ -1752,7 +1754,10 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
           <div className="bgrow">
             <div className="rowtitle">ぶたい（はいけい）</div>
             <div className="thumbs">
-              {BGS.map(b => (
+              {/* FB便B §1: おみせで買えた ぶたい だけ出す（売り物の無い そうげん/アリーナ/スタジオ は常時）。
+                  ★救済(§1-3)= この作品を開いたときの ぶたい は未所持でも必ず残す＝切り替えても戻れる。
+                  絞るのはこの選択欄だけで、保存済み作品の表示・サムネ・みほんは従来どおり */}
+              {availableBgs(BGS, profileRef.current, initRef.current.bg).map(b => (
                 <button key={b.id} className={"bgthumb" + (b.id === bgRef.current ? " on" : "")}
                   onClick={() => { ac(); if (b.id !== bgRef.current) { takeSnapshot(); bgRef.current = b.id; afterEdit(); sndTick(); } }}>
                   <img src={b.img} alt="" draggable="false" />

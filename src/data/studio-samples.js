@@ -80,3 +80,16 @@ export const SAMPLES = [
 ];
 
 export const sampleById = id => SAMPLES.find(s => s.id === id) || null;
+
+/* みほんの説明文（FB便B §2・棚で名前の下に出す表示専用のことば）。
+   ★SAMPLES の中に置かない。 tools/test-studio-regression.mjs が SAMPLES を丸ごと凍結して
+   完全一致で照合しているため、キーを1つ足すだけで回帰が FAIL する（＝みほんの中身が変わった、と正しく検出される）。
+   desc は上演にも保存にも一切影響しない表示専用の情報なので、凍結対象の外に置き、
+   モード注入時（studio/mode.jsx）に合流させて gamelab と同じ `s.desc` の形で UI に届ける。
+   ⚠️ ここを SAMPLES に取り込みたくなったら、先にベースラインの扱いを決めること。 */
+export const SAMPLE_DESCS = {
+  dance: "▶を おすと、2ひきが ちがう リズムで おどりだすよ。",
+  chase: "さきに いった こを、あとから きのこが おいかけるよ。",
+  tap: "キャラを タップすると、大きくなったり きえたり するよ。",
+  hide: "あるいて きのこに ぶつかると、ドッキリ！ きのこが きえるよ。",
+};

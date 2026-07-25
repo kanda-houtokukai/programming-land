@@ -79,6 +79,10 @@ const CSS = `
   .film-frame::after { bottom: 4px; }
   .film-name { color: #f5eddf; font-size: 12px; font-weight: 900; text-align: center; margin-top: 5px;
     max-width: 142px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* みほんの説明（FB便B §2）: サムネはどれも「背景の上にキャラが立っている絵」で見分けが付かないため、
+     遊び方を1行そえる。★切らずに折り返す（§2-5）。棚が伸びないよう名前より一段小さく・行間も詰める */
+  .film-desc { color: #e6d9c2; font-size: 10.5px; font-weight: 700; text-align: center; line-height: 1.35;
+    max-width: 142px; margin-top: 2px; white-space: normal; }
   .sh-hint { color: #ffe9b8; font-size: 12px; font-weight: 900; margin: -2px 0 6px; }
   .sh-menu, .sh-confirm { position: absolute; inset: 0; z-index: 350; background: rgba(30,20,40,.55);
     display: flex; align-items: center; justify-content: center; }
@@ -230,6 +234,7 @@ export default function WorkshopHome({ mode, onOpen, onExitApp }) {
                   <button key={s.id} className="film" onClick={() => openSample(s)}>
                     <div className="film-frame"><StudioThumb bg={s.bg} chars={s.chars} width={HOME_CFG.THUMB_W} profile={prof} /></div>
                     <div className="film-name">{s.name}</div>
+                    {s.desc && <div className="film-desc">{s.desc}</div>}
                   </button>
                 ))}
               </div>

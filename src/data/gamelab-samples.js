@@ -7,6 +7,7 @@
 export const SAMPLES = [
   {
     id: "collect", name: "あつめゲーム", bg: "sougen",
+    desc: "キャラを タップして あつめよう！ 10てんで クリア！",
     gameConfig: { scoreShow: true, clear: { type: "score", param: 10 }, gameOver: null },
     chars: [
       { kind: { type: "enemy", id: "slime" }, x: 2, y: 3,
@@ -27,6 +28,7 @@ export const SAMPLES = [
     // よけゲーム（設計§5: 敵「ずっと→ランダムにうごく」・ばくだんタッチ=敵・クリア=じかん30秒）。
     // 主人公は「タップされたら→ランダムにうごく」で逃げ回る（タップ移動の代替・stage2 §A-5）
     id: "dodge", name: "よけゲーム", bg: "canyon",
+    desc: "タップで にげまわって、てきに さわらず 30びょう しのごう！",
     gameConfig: { scoreShow: false, clear: { type: "time", param: 30 }, gameOver: { targetId: "c2" } },
     chars: [
       { kind: { type: "player" }, x: 2, y: 3,
@@ -41,6 +43,7 @@ export const SAMPLES = [
     // キャッチ（設計§5: 主人公タップ移動＋相手指定ぶつかりで+1・スコアクリア）。
     // スライム(c2)だけが点になる=bumpTarget の実演。きのこ(c3)は はねかえる で往復するダミー
     id: "catch", name: "キャッチ", bg: "arena",
+    desc: "タップで うごいて、にげる スライムだけを 5ひき つかまえよう！",
     gameConfig: { scoreShow: true, clear: { type: "score", param: 5 }, gameOver: null },
     chars: [
       { kind: { type: "player" }, x: 5, y: 3,
@@ -62,6 +65,7 @@ export const SAMPLES = [
   {
     // おちものキャッチ: 主人公=じゅうじキーで動かす・リンゴ=ずっと→ふってくる・ぶつかったら[リンゴ]→スコア＋・クリア=じかん30秒
     id: "dropcatch", name: "おちものキャッチ", bg: "sougen",
+    desc: "じゅうじキーで うごいて、おちてくる リンゴを キャッチ！",
     gameConfig: { scoreShow: true, clear: { type: "time", param: 30 }, gameOver: null },
     chars: [
       { kind: { type: "player" }, x: 5, y: 0,
@@ -76,6 +80,7 @@ export const SAMPLES = [
   {
     // おにごっこ: 主人公=じゅうじキー・鬼=ずっと→おいかける[主人公]＋ばくだん指定・クリア=じかん（逃げ切り）
     id: "oni", name: "おにごっこ", bg: "canyon",
+    desc: "おにに つかまらないように、30びょう にげきろう！",
     gameConfig: { scoreShow: false, clear: { type: "time", param: 30 }, gameOver: { targetId: "c2" } },
     chars: [
       { kind: { type: "player" }, x: 2, y: 3,
@@ -88,6 +93,7 @@ export const SAMPLES = [
     // ゴールまで いこう（正本のめいろを差し替え・stage3-step3 §3-3）: 主人公=じゅうじキー・ゴール[旗]→スコア＋5でクリア・いわ=ばくだんをよける
     // ★クリア score は 5刻み制約のため param=5。ゴール到達で +5＝1回着けばクリア（「1点」の意図を制約内で表現）
     id: "goalrun", name: "ゴールまで いこう", bg: "jungle",
+    desc: "いわを よけて、ゴールの はたに たどりつこう！",
     gameConfig: { scoreShow: true, clear: { type: "score", param: 5 }, gameOver: { targetId: "c3" } },
     chars: [
       { kind: { type: "player" }, x: 1, y: 3,

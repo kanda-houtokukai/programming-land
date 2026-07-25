@@ -5,7 +5,7 @@
 // ゲームこうぼう（段階1〜）は同じ形の GAMELAB_MODE を作って共通部品に渡す。
 import { DEFS, PALORDER, SOUNDS } from "../data/studio-blocks.js";
 import { BGS } from "../data/studio-bgs.js";
-import { SAMPLES } from "../data/studio-samples.js";
+import { SAMPLES, SAMPLE_DESCS } from "../data/studio-samples.js";
 import { STUDIO_GUIDE } from "../data/parent-guide.js";
 import {
   ensureStudio, saveWork, stashDraft, deleteWork, nextWorkName,
@@ -39,7 +39,9 @@ export const STUDIO_MODE = {
   works: { saveWork, stashDraft, deleteWork, nextWorkName, WORKS_MAX, NAME_MAX, MILESTONE_NAMES },
 
   // Home（棚UI）用
-  samples: SAMPLES,
+  // FB便B §2: 説明文はここで合流させる（SAMPLES 本体は回帰ハーネスが凍結しているため中に入れない）。
+  // UI から見える形は gamelab と同じ s.desc
+  samples: SAMPLES.map(s => ({ ...s, desc: SAMPLE_DESCS[s.id] })),
   guide: STUDIO_GUIDE,
   homeBg: bgInterior,
 
