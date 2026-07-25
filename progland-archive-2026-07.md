@@ -3,7 +3,7 @@
 > ⚠ **これは過去の記録です。現在の計画・仕様ではありません。**
 > 現状は `progland-handoff.md`（台帳）・`roadmap.md`（現在地）・`feature-spec.md`（仕様）が正。
 
-- **収録**: `progland-handoff.md`「今どこか」から切り出した **v2.3-b4e（2026-07-12）〜 v2.3-b6a（2026-07-23）の49版**（新しい順）。原文のまま・1文字も削っていない。
+- **収録**: `progland-handoff.md`「今どこか」から切り出した **v2.3-b4e（2026-07-12）〜 v2.3-b6b（2026-07-23）の50版**（新しい順）。原文のまま・1文字も削っていない。
 - **通常のセッションではこのファイルを読まない。** 台帳（`progland-handoff.md`）だけ読めばよい。過去の経緯を追う必要が出たときだけ参照する。
 - **これより古い版**（v2.3-b4d 以前）は `progland-handoff-archive.md` にある（2026-07-15 の分割時に作成）。両者で b4d／b4e が連続する。
 - ここに載る `⚠️実機確認待ち` `⚠️次` は**当時のもの**。その後の版に置き換わって出荷済みであり、いま待っている作業ではない。生きている宿題は台帳の「未完了タスク」が正。
@@ -20,8 +20,33 @@
 
 ---
 
-## 版ごとの詳細ログ（v2.3-b6a 〜 v2.3-b4e・新しい順）
+## ゲームこうぼう 段階A〜段階3 の記録（台帳「今どこか」から移設）
 
+- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**b5x〜b6a=実機OK → 段階3 着手**。段階3=新カード7枚（`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`・基準モック=`brushup/palette-29-structure.html`・`brushup/dpad-play-mock.html`）。**区切り①（dpad＋tapMove）=b6b→手直し=b6c(実機OK)→区切り②（goal＋chase＋fall＋相手ピル）=b6d(実機OK)→区切り③（カード一覧生成＋bump削除＋みほん3本）=完了（b6e・⚠️実機確認待ち）→**【3-B】区切り④（jumpable とべるように）=完了（b6f・deploy済み・⚠️実機確認待ち）**。段階3のカード追加は6/7枚完了（残り clone）。**次は開店フェーズ（上の「次にやること」参照）＝区切り⑤ clone は開店フェーズの後**。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
+
+---
+
+## 完了フェーズ（P2/P3/P4/P6）の指示書（台帳「ファイルの地図」から移設）
+
+| `worldmap-指示.md` | P2追補: 島マップ1枚絵化の指示（親: 実装指示書） |
+| `worldmap-難易度別-指示.md` | P2追補2: 難易度別マップ背景（昼/夕/夜）の指示 |
+| `icon差し替え-指示.md` | P3追補: 絵文字→オリジナル画像差し替えの指示 |
+| `icon_typing差し替え-指示.md` | P4追補: タイピングアイコン差し替えの指示 |
+| `p6-battle-shop-設計.md`／`p6-実装指示書.md` | P6の設計正本と実装手順（フェーズ1/2/3・停止ポイント） |
+| `バトル演出-指示.md`／`画像対応.md` | P6追補: 演出フルセットの指示（フェーズ1.5）／敵9体・アイコンのファイル対応表 |
+
+---
+
+## 版ごとの詳細ログ（v2.3-b6b 〜 v2.3-b4e・新しい順）
+
+- **v2.3-b6b（2026-07-23・ゲームこうぼう段階3 区切り①=dpad＋tapMove＋そうさカテゴリ新設＋短縮ラベル＝⚠️実機確認待ち／deploy済み cfcf36e）**: 指示書=`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`（正本）。studio/gamelab 共有部品に追加だが **gamelab のみに出す**。指示書配置=ea67118/97597b6・区切り①=8dfe146（deploy=cfcf36e）
+  - **そうさカテゴリ新設（ティール #2FB4A6・edge #1B8478）**: `COL.ctrlpad` 追加。DEFS に `dpad`「じゅうじキー」/`tapMove`「タップいどう」（body・ピルなし・cat そうさ・ラベル6文字＝b6a のカード縮小に合わせ short・意味は long/desc が担う）。`w=206` は既存値を再利用（ベースライン増分を DEFS だけに抑える）。`GAMELAB_PALORDER` の きっかけ↔かず 間（b5x 予約位置）へ挿入。studio `PALORDER`(18種)は不変
+  - **エンジン（拍を待たない操作・§1）**: `dpad` 実行→`ch.operable=true`（1回で有効化・以後ずっと）／`tapMove` 実行→`ch.tapMovable=true`。`nudge(dx,dy)`=操作可能キャラを1マス／`bgTap(gx,gy)`=タップ移動の目的地／`tapMoveStep()`=目的地へ1マス／`gridMove` で盤内クランプ／`resetChar` で ▶ ごとに操作フラグ初期化／`onFx` operable・tapmove で通知／`hasOperable()`
+  - **UI**: `opLoop`（~100ms=`OP_MS`）で押下中の連続移動＋タップ移動を拍(400ms)と別に進める。じゅうじキー(▲◀▶▼)を **`.studio-right`（全画面 `.big` でも残る・addendum §5）** のステージ下に固定＝mode.isGame＋上演中＋操作可能キャラがいる時だけ表示。背景タップ（キャラ以外）で `bgTap`＝タップ移動（キャラtapと分離・§1 A-2）
+  - **★ベースライン再取得（段階3で初）**: `--update` 実施。**diff を機械確認＝blocks.defs に dpad/tapMove の2種＋geometry.measures に同2種のみ追加。traces 732イベント・geometry.paths 98本・widths・studio palorder は byte 不変**（studio エンジン挙動無傷）。以後の段階3区切りも同様に「新カード追加＝defs/measures だけ増える・traces732不変」を確認する
+  - **★§3-4 フォント報告**: gamelab 全25枚を1194pxで実測。新カード じゅうじキー/タップいどう=**11.7px**＝既存6文字（ぶつかったら・もとのばしょ）と同値＝b6a で神田さん実機OK水準（新規の悪化なし）。⚠️既存 `tap`「タップされたら」(7文字)=**10.03px** が最小＝b6a既存・本便スコープ外（studio 共有カードのため短縮は別便判断）。神田さんへ要報告
+  - 検証: **verify 8本全PASS**（DEFS25種）・ビルドOK・本番 b6b バンドル（`index-DXoLMWyU.js`）配信確認・コンソールエラーゼロ・ブラウザ実測（1194px）=そうさ配置(きっかけ↔かず)／じゅうじキー各方向1マス正確・操作可能キャラのみ移動・盤内クランプ／タップ移動は背景タップ先へ200ms以内に動き到達で停止／じゅうじキーは `.studio-right` 内（全画面生存）／**studio は そうさ無し・18種で無影響**
+  - ⚠️次: 神田さんの iPad 実機確認 → **FB2件で b6c に手直し**（下記）
 - **v2.3-b6a（2026-07-23・こうぐだな縮小＋おいたよ!トーストの見切れ修正＝実機OK・神田さん実機確認合格／deploy済み f15b4ba）**: 指示書=`brushup/palette-shrink-toast-fix.md`（正本）。微調整の便。studio/gamelab 共通。§0台帳記帳=c41d21a・§1縮小=2279497・§2トースト=a8b811e（deploy=f15b4ba）
   - **§1 こうぐだな縮小**: `.studio-pal` 幅 24%→**21%**・`PAL_S` 0.76→**0.67**（`PAL_GAP_RATIO`=0.92 据え置き）。**同率で下げて形を保つ**（幅は colW、高さは PAL_S で決まる）。形の不変は **W0=colW/PAL_S** で機械確認＝実測 W0=**162.7**（1194px）／before 167.1＝差 **2.6%（3%以内）**。実測: studio/gamelab 両方 2列維持・colW 109・18/23種維持・指ドラッグ配置も従来どおり
   - **★§1 フォントの申し送り**: 6文字ラベルが Chromium 実測 **11.70px**（指示書の 12px 下限をわずかに下回る）。原因は colW=109 が指示書の iPad 実測値 111 より2px小さいため＝Chromium/Safari のレイアウト差（枠/スクロールバー/サブピクセル約4px）。指示書の colW=111/12px は iPad 実測由来なので**実機では12px見込み**。神田さん決定値（21%/0.67）は変えず、**実機ゲート#3（小1の読みやすさ）で最終確認**とした。もし実機で小さすぎれば こうぐだな幅を+1%する余地あり（W0 は範囲内を維持できる）

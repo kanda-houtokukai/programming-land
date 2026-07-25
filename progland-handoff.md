@@ -1,8 +1,8 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-25（**v2.3-b6k 実機FB便A=不具合3件〔ピルのはみ出し・きっかけカードの接続ずれ・落ちものの判定漏れ〕＋棚の並び＋キャラの大きさ＝deploy済み・⚠️実機確認待ち**。便②（b6h）・便③（b6i）は**実機OK**。便④-A（b6j）・段階3 区切り①〜④（b6b〜b6f）・便①（b6g）は実機確認待ち。**次=b6k の実機確認**→ 便④-B（BGM）は**音源2本の生成待ちで着手できない**ため、先に別便（ショップ連動・みほんの作り直し・カードのアニメーション＝Chat が設計中）を回してよい。**区切り⑤ clone は開店フェーズの後**。実機確認は `brushup/cards-reference.md`（機能一覧）到達後にまとめて実施の方針＝各便は簡易確認で先行。段階3カード追加分=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
+最終更新: 2026-07-25（**v2.3-b6m 実機FB便B=ぶたいのショップ連動＋みほんの棚に説明文＝deploy済み・⚠️実機確認待ち**。便②(b6h)・便③(b6i)・**FB便A(b6k)** は**実機OK**。便④-A（b6j）・段階3 区切り①〜④（b6c〜b6f）・便①（b6g）は実機確認待ち。**次=b6m の実機確認**→ 残りは **便④-B（BGM・音源2本の生成待ちで着手できない）** と **みほんのカバー絵（絵の生成待ち）／カードのアニメーション（Chat が設計中）**。**区切り⑤ clone は開店フェーズの後**。実機確認は `brushup/cards-reference.md`（機能一覧）到達後にまとめて実施の方針＝各便は簡易確認で先行。段階3カード追加分=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
 
-> 過去の版ごとの詳細ログは月別アーカイブへ（読むのは必要なときだけ）: **v2.3-b4e〜b5w** = `progland-archive-2026-07.md` ／ **v2.3-b4d 以前**（＋過去フェーズの教訓の詳細）= `progland-handoff-archive.md`。
+> 過去の版ごとの詳細ログは月別アーカイブへ（読むのは必要なときだけ）: **v2.3-b4e〜b6b** = `progland-archive-2026-07.md`（版のログのほか、台帳から移した完了項目もここ） ／ **v2.3-b4d 以前**（＋過去フェーズの教訓の詳細）= `progland-handoff-archive.md`。
 
 > ### ★台帳の維持規則（2026-07-24 制定／2026-07-25 改訂・全セッション厳守）
 > **「今どこか」の版エントリは直近10版まで。** 11版目を足すときは、**最も古い1版を `progland-archive-YYYY-MM.md` へ移してから**追記する（原文のまま・要約しない。アーカイブは月ごとに分ける）。
@@ -26,7 +26,7 @@
 
 ## 現在地サマリ（毎セッション冒頭にここだけ読む）
 
-### 次にやること（★ここが最優先・便④-A完了で更新 2026-07-25）
+### 次にやること（★ここが最優先・FB便B完了で更新 2026-07-25）
 
 **次＝ゲームこうぼう 開店フェーズ**。正本＝`brushup/gamelab-opening-design.md`（全項目 神田さん承認済み）。便で分けて進める:
 
@@ -42,9 +42,11 @@
 開店フェーズと並行して**実機FBの手当て**が走っている:
 
 ```
-実機FB便A（不具合3件＋棚の並び＋キャラの大きさ）… ✅完了 v2.3-b6k（deploy済み・⚠️実機確認待ち）
+実機FB便A（不具合3件＋棚の並び＋キャラの大きさ）… ✅完了 v2.3-b6k（**実機OK**）
   指示書=brushup/feedback-a-fixes.md
-実機FB便B?（ショップ連動・みほんの作り直し・カードのアニメーション）… Chat が設計中・未着手
+実機FB便B（ぶたいのショップ連動＋みほんの棚に説明文）… ✅完了 v2.3-b6m（deploy済み・⚠️実機確認待ち）
+  指示書=brushup/feedback-b-shop-samples.md ／ ★版は b6l を飛ばした（l と 1 が紛らわしい）
+残り: みほんのカバー絵（絵の生成待ち）／カードのアニメーション（Chat が設計中）
 ```
 
 - **実機確認の方針**: b6e/b6f は神田さん簡易確認で合格。通しの実機確認は `brushup/cards-reference.md`（機能一覧）が揃ってからまとめて実施＝各便は簡易確認で先へ進む。
@@ -61,15 +63,7 @@
 
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
-- **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**b5x〜b6a=実機OK → 段階3 着手**。段階3=新カード7枚（`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`・基準モック=`brushup/palette-29-structure.html`・`brushup/dpad-play-mock.html`）。**区切り①（dpad＋tapMove）=b6b→手直し=b6c(実機OK)→区切り②（goal＋chase＋fall＋相手ピル）=b6d(実機OK)→区切り③（カード一覧生成＋bump削除＋みほん3本）=完了（b6e・⚠️実機確認待ち）→**【3-B】区切り④（jumpable とべるように）=完了（b6f・deploy済み・⚠️実機確認待ち）**。段階3のカード追加は6/7枚完了（残り clone）。**次は開店フェーズ（上の「次にやること」参照）＝区切り⑤ clone は開店フェーズの後**。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
-- **v2.3-b6b（2026-07-23・ゲームこうぼう段階3 区切り①=dpad＋tapMove＋そうさカテゴリ新設＋短縮ラベル＝⚠️実機確認待ち／deploy済み cfcf36e）**: 指示書=`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`（正本）。studio/gamelab 共有部品に追加だが **gamelab のみに出す**。指示書配置=ea67118/97597b6・区切り①=8dfe146（deploy=cfcf36e）
-  - **そうさカテゴリ新設（ティール #2FB4A6・edge #1B8478）**: `COL.ctrlpad` 追加。DEFS に `dpad`「じゅうじキー」/`tapMove`「タップいどう」（body・ピルなし・cat そうさ・ラベル6文字＝b6a のカード縮小に合わせ short・意味は long/desc が担う）。`w=206` は既存値を再利用（ベースライン増分を DEFS だけに抑える）。`GAMELAB_PALORDER` の きっかけ↔かず 間（b5x 予約位置）へ挿入。studio `PALORDER`(18種)は不変
-  - **エンジン（拍を待たない操作・§1）**: `dpad` 実行→`ch.operable=true`（1回で有効化・以後ずっと）／`tapMove` 実行→`ch.tapMovable=true`。`nudge(dx,dy)`=操作可能キャラを1マス／`bgTap(gx,gy)`=タップ移動の目的地／`tapMoveStep()`=目的地へ1マス／`gridMove` で盤内クランプ／`resetChar` で ▶ ごとに操作フラグ初期化／`onFx` operable・tapmove で通知／`hasOperable()`
-  - **UI**: `opLoop`（~100ms=`OP_MS`）で押下中の連続移動＋タップ移動を拍(400ms)と別に進める。じゅうじキー(▲◀▶▼)を **`.studio-right`（全画面 `.big` でも残る・addendum §5）** のステージ下に固定＝mode.isGame＋上演中＋操作可能キャラがいる時だけ表示。背景タップ（キャラ以外）で `bgTap`＝タップ移動（キャラtapと分離・§1 A-2）
-  - **★ベースライン再取得（段階3で初）**: `--update` 実施。**diff を機械確認＝blocks.defs に dpad/tapMove の2種＋geometry.measures に同2種のみ追加。traces 732イベント・geometry.paths 98本・widths・studio palorder は byte 不変**（studio エンジン挙動無傷）。以後の段階3区切りも同様に「新カード追加＝defs/measures だけ増える・traces732不変」を確認する
-  - **★§3-4 フォント報告**: gamelab 全25枚を1194pxで実測。新カード じゅうじキー/タップいどう=**11.7px**＝既存6文字（ぶつかったら・もとのばしょ）と同値＝b6a で神田さん実機OK水準（新規の悪化なし）。⚠️既存 `tap`「タップされたら」(7文字)=**10.03px** が最小＝b6a既存・本便スコープ外（studio 共有カードのため短縮は別便判断）。神田さんへ要報告
-  - 検証: **verify 8本全PASS**（DEFS25種）・ビルドOK・本番 b6b バンドル（`index-DXoLMWyU.js`）配信確認・コンソールエラーゼロ・ブラウザ実測（1194px）=そうさ配置(きっかけ↔かず)／じゅうじキー各方向1マス正確・操作可能キャラのみ移動・盤内クランプ／タップ移動は背景タップ先へ200ms以内に動き到達で停止／じゅうじキーは `.studio-right` 内（全画面生存）／**studio は そうさ無し・18種で無影響**
-  - ⚠️次: 神田さんの iPad 実機確認 → **FB2件で b6c に手直し**（下記）
+- **新モード「ゲームこうぼう」段階A〜段階3**: 設計正本=`brushup/gamelab-design.md`。**段階A〜段階3は完了**（残りは区切り⑤ clone のみ・開店フェーズの後）。段階ごとの記録と指示書の一覧は `progland-archive-2026-07.md` へ移した（維持規則の3つ目の分岐・2026-07-25）。
 - **v2.3-b6c（2026-07-23・段階3 区切り①手直し=そうさの手触り修正＋全画面1画面化＝⚠️実機確認待ち／deploy済み 6e4ed0c）**: 指示書=`brushup/stage3-op-feel-fullscreen.md`（正本）。実機FB=①連続移動が小刻みにカクカク揺れる②全画面で十字キー等が収まらない。表示・CSS・操作ループのみ（DEFS不変）。指示書配置=dfd00a6・①+②=3bf30c5（deploy=6e4ed0c）
   - **§1 連続移動の手触り**: `.actor` に `op` クラス（操作可能/タップ移動キャラの時だけ）。`.actor.op` の transition を `OP_MS(100ms)`・`linear` に＝移動間隔と一致し途中中断が起きず等速に滑る（原因A）＋`.actor.op .sp-in.stepA{animation:none}` で連続移動中は足踏み演出を再発火させない（原因B＝揺れ）。**★1拍ごとの移動（みぎへ 等・非opキャラ・studio共有）は `.actor` のまま=340ms ease+stepA 不変**（実測: 非op=0.34s cubic-bezier／op=0.1s linear）。`OP_MS=100` 維持（§1-3・モック50msからあえて外す判断＝実装は340msイージング前提で瞬間移動のモックと別物・小1の指で行き過ぎ防止・1.2秒で横断）。**★`OP_MS` 宣言を STUDIO_CSS の前へ移動**（`.actor.op` が `${OP_MS}` 参照＝後ろだと TDZ でモジュール読込失敗→画面真っ黒。node verify では捕捉不可＝ブラウザ確認で発見）
   - **§2 全画面1画面化（★gamelab のみ・studio 完全無変化）**: §2-2 `.studio-root.big.gl .gamecfg` 非表示。**§2-3【方式=flex・報告】**新しい固定px値を足さず `.big.gl` の studio-right を縦flex＝じゅうじキー `flex:0 0 auto`（自然高さ）／プレビュー `flex:1 1 0`（残りを埋める・max-width:100%で3:2維持）。じゅうじキーの有無で予備が自動配分（実測 有:theater586h+dpad148／無:742h）。**★`.gl` スコープ限定＝studio の全画面は従来 `calc((100dvh-110px)*1.5)` のまま**（実測: studio big flex-grow0・width1086px＝完全無変化）
@@ -158,6 +152,19 @@
   - **§5 キャラの大きさ（gamelab のみ）**: `CFG.ACTOR_K_GAME = 1.8` を新設し `mode.isGame` で分岐。**実測: gamelab の実効K=1.800／studio の実効K=2.200（不変）**。★1.8 は Chat の見立て＝**実機の手触りで調整する値**である旨をコメントに明記（大きすぎ→1.6／小さすぎ→2.0 が目安）
   - 検証: **verify 9本全PASS（`--update` なし）**・本番 b6k（`index-DSiNIkiQ.js`）配信＋版表示 v2.3-b6k・`box-sizing:border-box` が本番バンドルに含まれることを確認・アプリのコンソールエラーゼロ
   - ⚠️次: 神田さんの iPad 実機確認（§7実機ゲート7項目）: ①ピルがはみ出さない②きっかけの下のカードの左端が揃う③落ちものキャッチでリンゴが取れる④せいぎょが くりかえし｜ずっと／まつ⑤**キャラの大きさの最終判断**⑥**作業エリアのカードが大きくなりすぎていないか（§2-3の副作用）**⑦studio が完全無変化
+  - ✅実機確認合格（2026-07-25・神田さん）
+- **v2.3-b6m（2026-07-25・実機FB便B=ぶたいのショップ連動＋みほんの棚に説明文＝⚠️実機確認待ち／deploy済み dca1948）**: 指示書=`brushup/feedback-b-shop-samples.md`（正本）。★**版は b6l を飛ばした**（`l` と `1` が紛らわしい）。指示書配置=c5f1408・実装=f7b09a5（deploy=dca1948）
+  - **§1-1 対応表の確認（着手前・現物と一致）**: ぶたい5種のうち**おみせで売っているのは2種だけ**＝`jungle`→`bg_jungle`(100)／`canyon`→`bg_canyon`(100)（`COSMETICS`・`data/battle.js`）。`sougen`/`arena`/`studio` は**商品が存在しない**。所持判定は `save.cosmetics.owned.includes(商品id)`（`Shop.jsx`/`DressupShelf.jsx` と同じ作法）。★`bg_*` を `owned` へ入れる経路は**ショップ購入の1本だけ**（実績解放が push するのは着せ替えidで別物）。⚠️`DEFAULT_BG_CHOICES` の `bgdef_easy`「そうげんの ぶたい」は**バトルのもちもの用で商品ではない**＝表の「無し」と矛盾しない
+  - **§1-2 実装**: `data/studio-bgs.js` に **`availableBgs(bgs, profile, keepId)`** を新設し、**選択欄だけ**これで絞る（`WorkshopEditor` の `.bgrow`）。`BG_SHOP_ITEM` に載っていない id は常時開放。`bgs` は `mode.bgs` から渡す＝モード注入の形を崩さない。studio/gamelab 両方に効く（`BGS` 共有）
+  - **★§1-3 救済（keepId の設計判断）**: `keepId` には **「その作品を開いたときの ぶたい」（`initRef.current.bg`）** を渡す。**現在の選択（`bgRef.current`）で絞ってはいけない**＝未所持の背景から別の背景へ切り替えた瞬間に元の選択肢が消えて**戻れなくなる**ため。保存済み作品の表示・`StudioThumb`・カセットだな・みほんは**すべて従来どおり**（絞るのは選択欄だけ）
+  - **★§1 実測（6パターン・実モジュールを直接呼んで確認）**: 未所持=`sougen,arena,studio`／**jungle作品を開くと `sougen,jungle,arena,studio`**（だいちは出ない）／**canyon作品を開くと `sougen,canyon,arena,studio`**／`bg_jungle` 購入後=`sougen,jungle,arena,studio`／両方購入後=**5種すべて**／`profile` が null でも落ちず3種。**実UI**でも gamelab「ゴールまで いこう」(bg=jungle)・studio「ドッキリかくれんぼ」(bg=canyon) を**未所持で開いて、その背景のまま表示され選択欄にも出る**ことを確認（ステージ画像=`bg_battle_jungle.webp` / `bg_battle_canyon.webp`）
+  - **§2 みほんの説明文**: 各みほんに `desc` を持たせ、棚で名前の下に**折り返して**表示（`.film-desc` 新設・10.5px/行間1.35）。名前は従来どおり1行省略のまま
+  - **★§2 で回帰が一度 FAIL した（原因と回避を記録）**: `tools/test-studio-regression.mjs` が **`SAMPLES` を丸ごと凍結して完全一致で照合**しているため、studio のみほんに `desc` を1キー足しただけで `[0].desc: baseline=undefined → now=…` で FAIL した。**`--update` はせず**、studio 側は `SAMPLES` の外＝**`SAMPLE_DESCS`（id→文）**に分け、`studio/mode.jsx` の `samples:` で合流（`SAMPLES.map(s => ({...s, desc: SAMPLE_DESCS[s.id]}))`）＝**UI から見える形は gamelab と同じ `s.desc`**。⚠️gamelab 側は凍結対象でないので `SAMPLES` 内に直接持たせている（左右で置き場所が違う理由はコードのコメントに明記）。結果 **ベースラインは SHA-256 一致（`43b61933…869e`）＝1バイト不変**
+  - **§2 文案（報告・gamelab 6本）**: あつめゲーム=「キャラを タップして あつめよう！ 10てんで クリア！」／よけゲーム=「タップで にげまわって、てきに さわらず 30びょう しのごう！」／キャッチ=「タップで うごいて、にげる スライムだけを 5ひき つかまえよう！」／おちものキャッチ・おにごっこ・ゴールまで いこう=**指示書の案をそのまま採用**。★段階1・2の3本は中身を読んで書いた（`catch` は `bumpTarget` でスライムだけが点＝きのこはダミー、という要点を「スライムだけを」に込めた）
+  - **§2-4 文案（studio 4本）**: ダンスパーティー=「▶を おすと、2ひきが ちがう リズムで おどりだすよ。」／おいかけっこ=「さきに いった こを、あとから きのこが おいかけるよ。」／タップでへんしん=「キャラを タップすると、大きくなったり きえたり するよ。」／ドッキリかくれんぼ=「あるいて きのこに ぶつかると、ドッキリ！ きのこが きえるよ。」＝「遊ぶ」でなく**何が起きる作品か**で書いた
+  - **§2-5 棚の高さ（実測・iPad Pro 11 よこ 1194×834）**: みほんカード 132→**177px（+45px）**・列 554→**599px**。**`.sh-scroll` は clientH 755／scrollH 755＝はみ出し 0**（説明なしでも 755）＝**縦に伸びすぎていない**（156px の余裕あり）。799×876 でも はみ出し 0
+  - 検証: **verify 9本全PASS（`--update` なし＝ベースライン SHA-256 一致）**・**`verify-gamelab.mjs` のみほん6本検証も PASS**・本番 b6m（`index-E50fwehf.js`）配信＋版表示 v2.3-b6m・ガイド文とみほん説明文が本番バンドルに含まれることを文字列照合・アプリのコンソールエラーゼロ
+  - ⚠️次: 神田さんの iPad 実機確認（§4実機ゲート6項目）: ①未購入だとジャングル・だいちが選択欄に出ない②買うと出る③**前に作った作品の背景が変わっていない**④みほんの棚で名前の下に説明が出て何のゲームか分かる⑤棚が縦に伸びすぎていない⑥studio でも同じように効く
 - 検証体制: `npm run verify` ＝ パズル162面（★3最短＋難易度カーブ）＋クイズ360問（正解一意＋難易度タグ照合＋ループ回数表記禁止）＋ローマ字128件。FAILだと `npm run deploy` で公開されない
 
 ### 未完了タスク（backlog・roadmap.md §2 と同期）
@@ -183,10 +190,7 @@
 | ファイル | 役割 |
 |---|---|
 | `progland-実装指示書.md` | **指示書の正本（第2版・2026-07-04改訂）**。第1版はgit履歴。承認なしに編集しない |
-| `worldmap-指示.md` | P2追補: 島マップ1枚絵化の指示（親: 実装指示書） |
-| `worldmap-難易度別-指示.md` | P2追補2: 難易度別マップ背景（昼/夕/夜）の指示 |
-| `icon差し替え-指示.md` | P3追補: 絵文字→オリジナル画像差し替えの指示 |
-| `icon_typing差し替え-指示.md` | P4追補: タイピングアイコン差し替えの指示 |
+| （P2/P3/P4/P6 の完了フェーズの指示書6本） | 一覧は `progland-archive-2026-07.md` へ移設（2026-07-25） |
 | `src/data/howto.js` | 各モード・島・カテゴリの「あそびかた」説明文 |
 | `src/components/HowTo.jsx` | あそびかた折りたたみ部品（A4で既定閉じ＋「おしてね」誘導） |
 | `src/components/blocks.jsx` | 積み木ブロック風の命令ブロック（パレット＋命令枠共通・くりかえしC字形・A5でパレットhighlight追加） |
@@ -197,8 +201,6 @@
 | `tools/gen-staged.mjs` | **段階設計セルの正本ジェネレータ（A6）**: 島3normal/hard・島4全・島5全の8セルを再生成（導入面＋回数キャップ＋parランプ）。⚠️`generate.mjs --write`全再生成は段階設計を失うので使わない |
 | `src/data/badges.js` | バッジ26個の定義と自動判定（P5）。追加はここに `check(save)` を足す。既存IDは消さない（獲得済みは和集合で保持） |
 | `tools/test-roundtrip.mjs` | 書き出し/読み込みの往復試験（localStorageシム）。セーブ項目を増やしたら必ずここに検証を足して実行 |
-| `p6-battle-shop-設計.md`／`p6-実装指示書.md` | P6の設計正本と実装手順（フェーズ1/2/3・停止ポイント） |
-| `バトル演出-指示.md`／`画像対応.md` | P6追補: 演出フルセットの指示（フェーズ1.5）／敵9体・アイコンのファイル対応表 |
 | `src/data/battle.js` | バトル設定の集約（敵9体・HP・かいしん率・XP・コイン/アイテム定義）。数値調整はここだけ |
 | `src/components/Battle.jsx` | バトル画面（選択→シーン演出→勝敗）。演出はCSS keyframe＋段階制御 |
 | `src/components/ParentGuide.jsx` ＋ `src/data/parent-guide.js` | 「おうちの方へ」モーダル（A7で全モード展開: パズル島1〜6・クイズ5カテゴリ・タイピング・おえかき）。**`src/data/parent-guide.js` が唯一の正本**（Chat原稿は取り込み済みで削除。キー名は原稿flow/stage1-3→実装yomitori/kotoba等に変換済み） |
