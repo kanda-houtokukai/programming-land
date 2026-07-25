@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-25（**v2.3-b6i 開店フェーズ 便③=教育接続（XP10・コイン5種・きろく）＝deploy済み・⚠️実機確認待ち**。**これでこうぼうの作品が XP・コイン・きろくにつながった**（便②の `exitWorkshop` 経路が本便で初めて意味を持つ）。便②（b6h）は**実機OK**。段階3 区切り①〜④（b6b〜b6f）・便①（b6g）は実機確認待ち。**次=便④ ガイド＋BGM**（`brushup/gamelab-opening-design.md`）。**区切り⑤ clone は開店フェーズの後**。実機確認は `brushup/cards-reference.md`（機能一覧）到達後にまとめて実施の方針＝各便は簡易確認で先行。段階3カード追加分=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
+最終更新: 2026-07-25（**v2.3-b6j 開店フェーズ 便④-A=保護者ガイド接続＝deploy済み・⚠️実機確認待ち**。便②（b6h）・便③（b6i）は**実機OK**。段階3 区切り①〜④（b6b〜b6f）・便①（b6g）は実機確認待ち。**次=便④-B（BGM）＝音源2本の生成待ちで着手できない**ため、先に別便を回してよい（`brushup/gamelab-opening-design.md`）。**区切り⑤ clone は開店フェーズの後**。実機確認は `brushup/cards-reference.md`（機能一覧）到達後にまとめて実施の方針＝各便は簡易確認で先行。段階3カード追加分=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
 
 > 過去の版ごとの詳細ログは月別アーカイブへ（読むのは必要なときだけ）: **v2.3-b4e〜b5w** = `progland-archive-2026-07.md` ／ **v2.3-b4d 以前**（＋過去フェーズの教訓の詳細）= `progland-handoff-archive.md`。
 
@@ -26,22 +26,23 @@
 
 ## 現在地サマリ（毎セッション冒頭にここだけ読む）
 
-### 次にやること（★ここが最優先・便③完了で更新 2026-07-25）
+### 次にやること（★ここが最優先・便④-A完了で更新 2026-07-25）
 
 **次＝ゲームこうぼう 開店フェーズ**。正本＝`brushup/gamelab-opening-design.md`（全項目 神田さん承認済み）。便で分けて進める:
 
 ```
 便① 素材差し替え（アイコン11枚PNG化・内観・建物PNG配置）… ✅完了 v2.3-b6g（deploy済み・⚠️実機確認待ち）
 便② マップ開店（看板①→建物・名前・導線）… ✅完了 v2.3-b6h（**実機OK**）
-便③ 教育接続（XP・コイン・マイルストーン）… ✅完了 v2.3-b6i（deploy済み・⚠️実機確認待ち）
-便④ ガイド＋BGM … ★次はここ
+便③ 教育接続（XP・コイン・マイルストーン）… ✅完了 v2.3-b6i（**実機OK**）
+便④-A 保護者ガイド … ✅完了 v2.3-b6j（deploy済み・⚠️実機確認待ち）
+便④-B BGM … ★次はここ。ただし⚠️音源2本が未生成＝着手できない
 ※ 区切り⑤ clone（ぶんしんを だす）は開店フェーズの後に回す
 ```
 
 - **実機確認の方針**: b6e/b6f は神田さん簡易確認で合格。通しの実機確認は `brushup/cards-reference.md`（機能一覧）が揃ってからまとめて実施＝各便は簡易確認で先へ進む。
-- **便④で足すもの**: ①ガイド＝`gamelab/mode.jsx` の `guide` が `null`（保護者ガイド原稿は `brushup/gamelab-parent-guide.md` に用意済み）②BGM＝`App.jsx` の `TRACK` に `gamelab: null, // 便④で接続` の行を用意済み＝`bgm.js` の `SRC` に曲を1行足して、この `null` を曲キーに変えるだけ。**BGM 2本は `gamelab-asset-prompts.md` のプロンプトで未生成**（先に生成が要る）。
+- **便④-B（BGM）の段取り**: ⚠️**神田さんが Suno で2本生成するまで着手できない**（こうぼう用 `game workshop`／バトルアリーナ用 `battle arena`＝以前からの保留分。プロンプト=`brushup/gamelab-asset-prompts.md` §D・Custom mode・Instrumental オン）→ Chat が **-19.0 LUFS 正規化 → AAC .m4a 96kbps** に加工 → Code が `src/assets/bgm/` に置き、`bgm.js` の `SRC` と `App.jsx` の `TRACK` に接続。**`TRACK` には便②で `gamelab: null, // 便④で接続` の1行を用意済み＝そこを曲キーに差し替えるだけ**（既存11本と同じ手順）。
 - ★**node で読めないファイル**（便③§0で確定・付与や成長まわりを触るとき必ず読む）: `growth.js` は `data/monsters.js`→`.png` の連鎖で **node から import できない**。これを import しているファイル（`studio/works.js`・**便③以降は `gamelab/works.js` も**）は**ブラウザ専用**で、`tools/` の verify から読ませてはいけない。node から試験したいロジックは共通核 `workshop/store.js` や `data/studio-blocks-defs.js` 側に置く（便③の `workUsesAnyType` はそうした）。
-- 開店フェーズの関連文書（すべて brushup/）: 設計正本 `gamelab-opening-design.md`／保護者ガイド原稿 `gamelab-parent-guide.md`（便④で使う）／アセット生成プロンプト `gamelab-asset-prompts.md`（BGM 2本が未生成）／便①指示書 `gamelab-opening-step1.md`／便②指示書 `gamelab-opening-step2.md`／便③指示書 `gamelab-opening-step3.md`。
+- 開店フェーズの関連文書（すべて brushup/）: 設計正本 `gamelab-opening-design.md`／保護者ガイド原稿 `gamelab-parent-guide.md`（便④で使う）／アセット生成プロンプト `gamelab-asset-prompts.md`（BGM 2本が未生成）／便①指示書 `gamelab-opening-step1.md`／便②指示書 `gamelab-opening-step2.md`／便③指示書 `gamelab-opening-step3.md`／便④-A指示書 `gamelab-opening-step4a.md`。
 - ★**アセットの余白規約**（便②§0で確定・次に絵を足すとき必ず読む）: 256×256 の透過PNGで **`min(pad)=0`＝絵がキャンバスのどこか1辺に接している**こと。縦横比が正方形でない絵は、比が決める側の軸だけが0になる（「上下も左右も0」は成立しない）。守らないと `objectFit:contain` の枠に対して絵が小さくなり、マップ上で既存より小さく見える（便①で約7%の不具合が実際に発生）。詳細=`brushup/studio-map-placement.md`。
 
 ### 開店フェーズ 確定事項（2026-07-24・神田さん承認＝設計書 §確定事項の要約）
@@ -56,14 +57,6 @@
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
 - **新モード「ゲームこうぼう」設計確定（2026-07-19・帯B着工）**: 正本=`brushup/gamelab-design.md`。スタジオとエンジン共有・勝ち負けあり（スコア=変数・柱⑤初実装）。段階A=完了（b5s）・段階1=完了（b5u）・こうぐだな共通修正=完了（b5v）・段階2=完了（b5w）・**b5x〜b6a=実機OK → 段階3 着手**。段階3=新カード7枚（`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`・基準モック=`brushup/palette-29-structure.html`・`brushup/dpad-play-mock.html`）。**区切り①（dpad＋tapMove）=b6b→手直し=b6c(実機OK)→区切り②（goal＋chase＋fall＋相手ピル）=b6d(実機OK)→区切り③（カード一覧生成＋bump削除＋みほん3本）=完了（b6e・⚠️実機確認待ち）→**【3-B】区切り④（jumpable とべるように）=完了（b6f・deploy済み・⚠️実機確認待ち）**。段階3のカード追加は6/7枚完了（残り clone）。**次は開店フェーズ（上の「次にやること」参照）＝区切り⑤ clone は開店フェーズの後**。指示書=段階A `stageA.md`・段階1 `stage1.md`・段階2 `stage2.md`・UI刷新 `palette-ui-overhaul.md`（正本・操作基準=`palette-mock2.html`）・段階3 `gamelab-implementation-stage3.md`（すべて brushup/）。
-- **v2.3-b5z（2026-07-23・こうぐだなの指ドラッグが無言で消える不具合の修正＝実機OK・神田さん実機確認合格／deploy済み 1b45019）**: 指示書=`brushup/palette-drag-touch-fix.md`（正本）。不具合の単独便。**§0 由来: b5x のながおし操作と一緒に入ったもの＝b5y は無罪**。指示書配置=ea67118・修正=4b16c96（deploy=1b45019）。studio/gamelab 共通（共有部品）
-  - **不具合**（神田さん iPad 実機・2026-07-23）: 棚のカードを指で作業エリアへドラッグしても何も置かれず無言で消える／断続的／きっかけ（最上段）は成功しやすく下のカテゴリはほぼ来ない／マウスは100%成功／studio・gamelab 両方
-  - **§3-1/3-2 方向判定**: 取り出しを「時間ベースの静止門（旧 `PAL_PRE_MOVE=7` を150ms保持）」から**方向ロック**へ。最初の明確な移動（`CFG.PAL_DIR_LOCK=8`px超）が**横優勢なら即ドラッグ**（pan-y は横スクロールしない＝Safari に横取りされない）／**縦優勢ならスクロールに譲る**。静止したままなら従来どおり150msで ながおし成立→せつめいふきだし（教育導線=維持）。`resolvePalPending` を方向判定に書換＋ドラッグ開始を `startPalDrag` に抽出
-  - **§3-3 touchmove抑止**: ドラッグ成立中だけ（`dragRef.current`）document の `touchmove` を非パッシブ `preventDefault`＝Safari が touch-action:pan-y でジェスチャを縦スクロールに横取り（→`pointercancel`→`onCancel`→`dropLastSnapshot` で無言消失）するのを止める。**ドラッグ中のみ＝棚の縦スクロールは従来どおり**（常時抑止は過去失敗）
-  - **★§3-4 しきい値判断（報告）**: 旧 `PAL_PRE_MOVE`（静止門）を廃し `PAL_DIR_LOCK=8`（方向判定）に置換。方向判定を入れると静止門自体が不要（横=衝突せず即ドラッグ／縦=譲る）。**`pointerType` 分岐は不要と判断**＝同一しきい値で指/マウス両方成立（マウスは touch-action 非適用で従来どおり成功・横移動で即ドラッグ化）
-  - ★重要な限界（正直に記録）: **この開発環境では実機タッチ再現ができなかった**（Xcode/シミュレータ未導入で `simctl` 不可・iPad 手元になし・Chromium プレビューは `maxTouchPoints:0` でタッチ入力なし＝touch-action のスクロール横取り→pointercancel を発火させられない）。代わりに **§1 の推定5点すべてを現行コードで裏取り**（`touch-action:pan-y` 存在・無言消失は `pointercancel`→`onCancel` の1経路のみ・`pointerType`/`touchstart`/`touchmove` 0箇所・`PAL_PRE_MOVE=7`/`PAL_LONGPRESS=150`）＝矛盾なし。合成ポインタ（mouse）で**新経路の実挙動を検証**（20msで横移動→即ドラッグ→配置成功／静止150ms→lift＋ふきだし表示／縦移動→ドラッグせず誤配置なし）。**真の確認は神田さんの iPad 実機（§5ゲート）**
-  - 検証: **verify 8本全PASS**（`--update` なし＝**732イベント・パス98本・DEFS23種 byte不変**＝§4凍結を維持）・ビルドOK・本番URLで b5z バンドル（`index-DxKGwzeJ.js`）配信確認・コンソールエラーゼロ
-  - ✅実機確認合格（2026-07-23・神田さん・iPad Pro 11 よこ）: §5ゲート5項目すべてOK（全カテゴリ指ドラッグ・縦スクロール・ふきだし・磁石・マウス退行なし）。b5y+b5z をまとめて実機OK。実機FB=「こうぐだな/カードをもう少し小さく（特にずっと/くりかえし）・形は変えずサイズだけ」「おいたよ!トーストが上部で見切れる」→ `brushup/palette-shrink-toast-fix.md`（→b6a）で対応
 - **v2.3-b6a（2026-07-23・こうぐだな縮小＋おいたよ!トーストの見切れ修正＝実機OK・神田さん実機確認合格／deploy済み f15b4ba）**: 指示書=`brushup/palette-shrink-toast-fix.md`（正本）。微調整の便。studio/gamelab 共通。§0台帳記帳=c41d21a・§1縮小=2279497・§2トースト=a8b811e（deploy=f15b4ba）
   - **§1 こうぐだな縮小**: `.studio-pal` 幅 24%→**21%**・`PAL_S` 0.76→**0.67**（`PAL_GAP_RATIO`=0.92 据え置き）。**同率で下げて形を保つ**（幅は colW、高さは PAL_S で決まる）。形の不変は **W0=colW/PAL_S** で機械確認＝実測 W0=**162.7**（1194px）／before 167.1＝差 **2.6%（3%以内）**。実測: studio/gamelab 両方 2列維持・colW 109・18/23種維持・指ドラッグ配置も従来どおり
   - **★§1 フォントの申し送り**: 6文字ラベルが Chromium 実測 **11.70px**（指示書の 12px 下限をわずかに下回る）。原因は colW=109 が指示書の iPad 実測値 111 より2px小さいため＝Chromium/Safari のレイアウト差（枠/スクロールバー/サブピクセル約4px）。指示書の colW=111/12px は iPad 実測由来なので**実機では12px見込み**。神田さん決定値（21%/0.67）は変えず、**実機ゲート#3（小1の読みやすさ）で最終確認**とした。もし実機で小さすぎれば こうぐだな幅を+1%する余地あり（W0 は範囲内を維持できる）
@@ -143,6 +136,17 @@
   - **§3 exitWorkshop 経路（実UI）**: こうぼうで保存→◀マップへ→**ヘッダーのコインが 0→45 に更新**（App state が storage の最新で置き換わった）・相棒 **Lv1→Lv3**・さらに **「⚔️ バトルが あそべるように なったよ！」のトーストが発火**してマップのバトルが解錠。便②で通した経路が本便で初めて意味を持つことを確認
   - ★申し送り（文言の最終判断）: マイルストーン表示名は `firstOperable`=**「はじめて うごかせる ゲーム」**／`firstClear`=**「はじめての かちまけ」**とした（ピル表示・13px。studio の「はじめての いれこ」等と同じ長さ感に揃えた）。小1に伝わるかは実機ゲートで判断
   - ⚠️次: 神田さんの iPad 実機確認（§6実機ゲート7項目）: ①保存で「かんせい!」にXPとコインが出る②2回目以降の同じ作品ではXPが出ない③じゅうじキー/タップいどうを使った作品で `firstOperable`④クリア条件をスコア/じかんにした作品で `firstClear`⑤マップへ戻るとレベルアップ演出やバッジが出る⑥スタジオの達成がこうぼうに影響しない（逆も）⑦スタジオの付与が b6h と変わっていない。合格後 **便④ ガイド＋BGM**
+  - ✅実機確認合格（2026-07-25・神田さん）
+- **v2.3-b6j（2026-07-25・開店フェーズ 便④-A=保護者ガイド `GAMELAB_GUIDE` の接続＝⚠️実機確認待ち／deploy済み 2c7f92d）**: 指示書=`brushup/gamelab-opening-step4a.md`（正本）・原稿=`brushup/gamelab-parent-guide.md`・設計正本=`gamelab-opening-design.md` §E。§1台帳規則=34f5b5b／指示書配置＋規則の追補=53ab762・§2実装=c38e4e5（deploy=2c7f92d）
+  - **★便④を A/B に分割**（神田さん判断）: **A=ガイド（本便）／B=BGM**（音源2本が未生成のため切り離した）
+  - **§1 台帳の維持規則を改訂**（下の維持規則ブロックが現物）: ①**3つ目の分岐**を追加＝「10版以下なのに超過 → 固定部（未完了タスク・生きている注意事項・ファイルの地図・決定事項）が育っている。完了項目を消すかアーカイブへ移す」②**しきい値 3.2万→3.5万**（実測内訳 版19,653＋固定部12,847＝32,500 で、規則どおりでも超えて警告が出続けていた＝誤警報は無視か原文圧縮を招く）③**文字数の測り方を明記**。`CLAUDE.md` にも同内容を反映
+  - **★③の原因（実測で特定）**: 前便の 59,681 は `wc -c` を使ったのではなく、**この環境の locale が `C` のため素の `wc -m` がバイト数を返していた**（`wc -c` と同値）。よって規則には **`LC_ALL=ja_JP.UTF-8 wc -m progland-handoff.md`** とコマンドごと書き、「素の `wc -m` を使わない」を⚠️で添えた（同じ穴に落ちるのを防ぐため）
+  - **§2 `GAMELAB_GUIDE`**: `data/parent-guide.js` へ原稿ブロックを追加（**原稿と1文字も違わないことを機械照合**）。`gamelab/mode.jsx` の `guide: null` → `GAMELAB_GUIDE`。**表示側（`ParentGuide.jsx`）は無変更**＝`{guide && …}` ガードで項目が現れるという指示書の見込みどおり。`WorkshopHome.jsx` は該当行のコメントのみ更新
+  - **★報告（表示側は変えていない）**: `ParentGuide.jsx` は **`guide.title` をどこにも描画していない**（`.title` 参照が0件）。ダイアログの見出しは固定文言「おうちの方へ」で、本文は `skill`→`body`→`tip` の順。**`STUDIO_GUIDE` を含む既存17件すべてで `title` は同様に画面に出ていない**＝本便で生じた退行ではなく従来からの仕様。指示書§2-3 の `title` 文言（「この こうぼうで そだつ ちから」）は原稿どおり入れてあるが、**実機ゲートでは確認できない**（出す/消すの判断が要るなら別便）
+  - 検証: **verify 9本全PASS（`--update` なし＝`tools/studio-baseline.json` の git 差分ゼロ＝DEFS29・トレース732イベント・パス98本 1バイト不変**）・本番 b6j（`index-DtrQFEZm.js`）配信＋版表示 v2.3-b6j を確認・**本番バンドルにガイド全文が含まれることを文字列照合**（`STUDIO_GUIDE` も同時に存在＝共存を確認）
+  - ブラウザ実測: こうぼうのカセットだな画面に**「おうちの方へ」ボタンが出現**→開くと **`skill`＋body4段落＋`tip` が全文一致**（機械照合）・**末尾の「とじる」までスクロールで到達**（scrollH 820/clientH 685・横はみ出しなし）・**studio 側は `STUDIO_GUIDE` が全文一致で無変化**・アプリのコンソールエラーゼロ
+  - ★教訓（プレビュー環境）: **この環境では Vite の HMR WebSocket が接続できない**（コンソールに `[vite] failed to connect to websocket`）。そのため**ファイルを編集してもページは古いモジュールを掴んだまま**で、`guide` が `null` に見える偽の失敗が起きた。**編集後は必ず `navigate` で読み直してから実測する**（`location.reload()` だけでは戻らないことがある）
+  - ⚠️次: 神田さんの iPad 実機確認（§4実機ゲート4項目）: ①こうぼうのカセットだな画面に「おうちの方へ」が出る②開くと全文が読める（途中で切れない・崩れない）③スタジオのガイドは変わっていない④**文面が保護者に伝わる内容か（中身の最終判断）**。合格後 **便④-B（BGM）**＝先に Suno で2本（こうぼう用・バトルアリーナ用）の生成が要る
 - 検証体制: `npm run verify` ＝ パズル162面（★3最短＋難易度カーブ）＋クイズ360問（正解一意＋難易度タグ照合＋ループ回数表記禁止）＋ローマ字128件。FAILだと `npm run deploy` で公開されない
 
 ### 未完了タスク（backlog・roadmap.md §2 と同期）
