@@ -65,6 +65,7 @@ p.gamelab = {
     gameConfig: { scoreShow: false, clear: { type: "score", param: 5 }, gameOver: null },
     chars: [{ kind: { type: "enemy", id: "mushroom" }, x: 4, y: 1,
       stacks: [{ x: 20, y: 20, blocks: [{ id: 9, type: "tap" }, { id: 10, type: "scoreDown", n: 2 }] }] }] },
+  milestones: { first: true, firstOperable: true }, // b6i: こうぼうのコイン節目（★studio.milestones と別の場所＝相互汚染しない）
 };
 saveProfile(p);
 
@@ -201,14 +202,31 @@ ok(JSON.stringify(q.studio) === JSON.stringify(p.studio), "b5e/b5g つくるス�
     "b5g b5e世代セーブ（milestonesなし）に milestones:{} が補完され works は保持される");
 }
 // b5u ゲームこうぼう段階1: gameConfig 込みの完全往復＋gamelab の無い旧セーブはデフォルト補完（stage1 §2/§10）
-ok(JSON.stringify(q.gamelab) === JSON.stringify(p.gamelab), "b5u ゲームこうぼう（works+draft・gameConfig 込みで完全往復）");
+ok(JSON.stringify(q.gamelab) === JSON.stringify(p.gamelab), "b5u/b6i ゲームこうぼう（works+draft+milestones・gameConfig 込みで完全往復）");
 {
   const rawG = JSON.parse(localStorage.getItem(`progland:v2:profile:${q.id}`));
   delete rawG.gamelab;
   localStorage.setItem(`progland:v2:profile:${q.id}`, JSON.stringify(rawG));
   const mG = loadFresh(q.id);
-  ok(mG.gamelab && Array.isArray(mG.gamelab.works) && mG.gamelab.works.length === 0 && mG.gamelab.draft === null,
-    "b5u gamelab の無い旧セーブに {works:[], draft:null} が補完される（デフォルト値マージ・移行コード不要）");
+  ok(mG.gamelab && Array.isArray(mG.gamelab.works) && mG.gamelab.works.length === 0 && mG.gamelab.draft === null
+    && mG.gamelab.milestones && typeof mG.gamelab.milestones === "object" && Object.keys(mG.gamelab.milestones).length === 0,
+    "b5u/b6i gamelab の無い旧セーブに {works:[], draft:null, milestones:{}} が補完される（デフォルト値マージ・移行コード不要）");
+  // b6i: b5u〜b6h世代（gamelab はあるが milestones が無い）にも milestones:{} が補完される（b5g の studio と同型）
+  const rawG2 = JSON.parse(localStorage.getItem(`progland:v2:profile:${q.id}`));
+  rawG2.gamelab = { works: [{ id: "g1", name: "ゲーム1", savedAt: "2026-07-25", remixOf: null, bg: "sougen", chars: [] }], draft: null };
+  localStorage.setItem(`progland:v2:profile:${q.id}`, JSON.stringify(rawG2));
+  const mG2 = loadFresh(q.id);
+  ok(mG2.gamelab.works.length === 1 && mG2.gamelab.milestones && Object.keys(mG2.gamelab.milestones).length === 0,
+    "b6i b5u世代セーブ（milestonesなし）に milestones:{} が補完され works は保持される");
+  // b6i: studio と gamelab の milestones が独立していること（同じ id を書いても混ざらない）
+  const rawG3 = JSON.parse(localStorage.getItem(`progland:v2:profile:${q.id}`));
+  rawG3.studio = { works: [], draft: null, milestones: { first: true, works5: true } };
+  rawG3.gamelab = { works: [], draft: null, milestones: {} };
+  localStorage.setItem(`progland:v2:profile:${q.id}`, JSON.stringify(rawG3));
+  const mG3 = loadFresh(q.id);
+  ok(mG3.studio.milestones.first === true && mG3.studio.milestones.works5 === true
+    && Object.keys(mG3.gamelab.milestones).length === 0,
+    "b6i studio の達成が gamelab.milestones に漏れない（保存先が分かれている）");
 }
 
 console.log(fail === 0 ? "\n✅ ラウンドトリップ 全項目一致（P5完了条件クリア）" : `\n❌ ${fail}件 不一致`);

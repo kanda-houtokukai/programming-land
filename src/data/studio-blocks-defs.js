@@ -152,3 +152,10 @@ export function containerNestDepth(list) {
 export function workHasNestedContainer(work) {
   return (work.chars || []).some(c => (c.stacks || []).some(st => containerNestDepth(st.blocks) >= 2));
 }
+// 1作品に指定した型のブロックが1枚でも使われているか（容器の中まで見る）。
+// 開店フェーズ 便③ の firstOperable（dpad / tapMove）判定に使う。node安全＝この関数も verify から試験できる
+export function workUsesAnyType(work, types) {
+  const want = new Set(types);
+  const scan = list => (list || []).some(b => want.has(b.type) || scan(b.children));
+  return (work.chars || []).some(c => (c.stacks || []).some(st => scan(st.blocks)));
+}
