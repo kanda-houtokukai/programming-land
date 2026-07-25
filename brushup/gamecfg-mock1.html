@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ゲームのせってい 再設計モック（現行 / 案1 / 案2）</title>
+<style>
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{margin:0; background:#e7ebf1; color:#33404f;
+    font-family:'M PLUS Rounded 1c','Hiragino Maru Gothic ProN','Yu Gothic',sans-serif;
+    -webkit-user-select:none; user-select:none;}
+
+  /* ===== つまみバー ===== */
+  .bar{position:sticky; top:0; z-index:50; background:#241a2c; color:#f5eddf; padding:8px 12px;}
+  .bar .line{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .bar .line+.line{margin-top:6px;}
+  .bar b{font-size:12px; letter-spacing:.06em; opacity:.8;}
+  .tab{font-family:inherit; font-weight:900; font-size:13px; color:#f5eddf; background:#4a3a58;
+    border:none; border-radius:999px; padding:8px 16px; cursor:pointer;}
+  .tab.on{background:#58a839;}
+  .rd{font-size:11px; opacity:.8; line-height:1.7;}
+  input[type=range]{width:180px;}
+
+  /* ===== 右カラム再現 ===== */
+  .stagewrap{padding:16px; display:flex; justify-content:center;}
+  .right{background:#f3f6fa; border-left:1px solid #dbe2ea; padding:10px 12px 16px;
+    box-shadow:0 4px 18px rgba(0,0,0,.10);}
+  .fakeprev{background:#1c1424; border:4px solid #241a2c; border-radius:15px; height:110px;
+    display:flex; align-items:center; justify-content:center; color:#6b5f78; font-size:12px; font-weight:900;
+    box-shadow:inset 0 0 0 3px #fff;}
+  .card{background:#fff; border:1px solid #dbe2ea; border-radius:13px; padding:11px 12px;
+    margin-top:12px; box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .rowtitle{color:#5b6675; font-size:11px; font-weight:900; letter-spacing:.08em; margin-bottom:4px;}
+
+  /* ============ 現行（そのまま再現） ============ */
+  .cur .gc-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .cur .gc-row+.gc-row{margin-top:7px;}
+  .cur .gc-toggle,.cur .gc-seg{font-family:inherit; font-weight:900; font-size:12px;
+    background:#eef2f7; color:#33404f; border:1px solid #dbe2ea; border-radius:999px;
+    padding:7px 13px; cursor:pointer;}
+  .cur .gc-toggle.on,.cur .gc-seg.on{background:#58a839; color:#fff; border-color:#58a839;}
+  .cur .gc-cap{color:#33404f; font-size:12px; font-weight:900;}
+  .cur .gc-goal{display:inline-flex; align-items:center; gap:7px; color:#33404f; background:#f1f4f8;
+    border-radius:999px; padding:4px 10px; font-size:12px; font-weight:900;}
+  .cur .gc-num{color:#b8860b; font-size:14px;}
+  .cur .gc-step{width:26px; height:26px; border-radius:50%; border:none; background:#4a7fc9; color:#fff;
+    font-weight:900; font-size:15px; cursor:pointer;}
+  .cur .gc-bombs{display:inline-flex; gap:6px;}
+  .cur .gc-bomb{width:38px; height:38px; border-radius:10px; padding:2px; border:2px solid #dbe2ea;
+    background:#eef2f7; font-size:20px; cursor:pointer;}
+  .cur .gc-bomb.on{border-color:#e0704f; background:rgba(224,112,79,.18);}
+
+  /* ============ 共通部品（案1・案2） ============ */
+  .q{font-size:14px; font-weight:900; color:#33404f; display:flex; align-items:center; gap:6px;}
+  .q .ic{font-size:17px;}
+  /* 本物のスイッチ */
+  .sw{display:flex; align-items:center; gap:10px; min-height:44px; cursor:pointer;}
+  .sw .track{width:64px; height:34px; border-radius:999px; background:#c9d3de; position:relative;
+    transition:background .18s; flex:0 0 auto;}
+  .sw .thumb{position:absolute; top:3px; left:3px; width:28px; height:28px; border-radius:50%;
+    background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:left .18s;}
+  .sw.on .track{background:#58a839;}
+  .sw.on .thumb{left:33px;}
+  .sw .state{font-size:13px; font-weight:900; color:#8b98a8; min-width:34px;}
+  .sw.on .state{color:#3f7d28;}
+  /* 大きめ選択タブ（3択） */
+  .picks{display:flex; gap:8px; margin-top:8px;}
+  .pick{flex:1 1 0; min-height:62px; border-radius:12px; border:2px solid #dbe2ea; background:#f7f9fc;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    font-family:inherit; font-weight:900; font-size:12px; color:#5b6675; cursor:pointer; position:relative;}
+  .pick .pi{font-size:22px; line-height:1;}
+  .pick.on{border-color:#58a839; background:#eaf6e4; color:#2f6b1f;}
+  .pick.on::after{content:"✓"; position:absolute; top:-8px; right:-6px; width:22px; height:22px;
+    border-radius:50%; background:#58a839; color:#fff; font-size:13px; display:flex;
+    align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,.25);}
+  /* 入れ子（従属を示す） */
+  .nest{margin-top:10px; margin-left:10px; padding:10px 12px; border-left:4px solid #cfe0c4;
+    background:#f6faf3; border-radius:0 10px 10px 0;}
+  .sent{font-size:15px; font-weight:900; color:#33404f; display:flex; align-items:center;
+    gap:8px; flex-wrap:wrap; line-height:1.5;}
+  .stepper{display:inline-flex; align-items:center; gap:8px; background:#fff; border:1px solid #dbe2ea;
+    border-radius:999px; padding:3px 5px;}
+  .stepper button{width:38px; height:38px; border-radius:50%; border:none; background:#4a7fc9; color:#fff;
+    font-family:inherit; font-weight:900; font-size:19px; cursor:pointer;}
+  .stepper .val{min-width:56px; text-align:center; font-size:19px; font-weight:900; color:#b8860b;}
+  /* キャラ選択 */
+  .who{margin-top:9px;}
+  .who .lbl{font-size:12px; font-weight:900; color:#5b6675; margin-bottom:6px;}
+  .chars{display:flex; gap:10px; flex-wrap:wrap;}
+  .ch{width:52px; height:52px; border-radius:12px; border:2px solid #dbe2ea; background:#f7f9fc;
+    font-size:26px; cursor:pointer; position:relative; display:flex; align-items:center; justify-content:center;}
+  .ch.on{border-color:#e0704f; background:#fdeee9;}
+  .ch.on::after{content:"💣"; position:absolute; right:-7px; top:-9px; font-size:17px;}
+  .hint{font-size:11px; color:#8b98a8; margin-top:7px; line-height:1.5;}
+
+  /* ============ 案2 タイル ============ */
+  .tiles{display:flex; gap:8px;}
+  .tile{flex:1 1 0; border-radius:13px; border:2px solid #dbe2ea; background:#fff; padding:9px 6px;
+    display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer;
+    font-family:inherit; min-height:88px; justify-content:center;}
+  .tile .ti{font-size:27px; line-height:1;}
+  .tile .tn{font-size:11px; font-weight:900; color:#8b98a8; letter-spacing:.04em;}
+  .tile .tv{font-size:13px; font-weight:900; color:#33404f; text-align:center; line-height:1.3;}
+  .tile.open{border-color:#4a7fc9; background:#f2f7fd;}
+  .tile.off .ti{filter:grayscale(1); opacity:.4;}
+  .tile.off .tv{color:#9aa5b1;}
+  .panel{margin-top:10px; padding:11px 12px; background:#f7f9fc; border:1px solid #dbe2ea;
+    border-radius:12px;}
+  .panel .ph{font-size:13px; font-weight:900; color:#33404f; margin-bottom:8px;}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="line">
+    <b>くらべる:</b>
+    <button class="tab" id="tCur">現行</button>
+    <button class="tab on" id="t1">案1 ルールカード</button>
+    <button class="tab" id="t2">案2 めじるしタイル</button>
+  </div>
+  <div class="line">
+    <b>右カラムの幅</b>
+    <input type="range" id="sW" min="300" max="560" step="10" value="450">
+    <span class="rd" id="rd">—</span>
+  </div>
+</div>
+
+<div class="stagewrap">
+  <div class="right" id="right">
+    <div class="fakeprev">（ここに ゲームの がめん）</div>
+    <div id="slot"></div>
+    <div class="card">
+      <div class="rowtitle">ぶたい（はいけい）</div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;height:44px;border-radius:9px;background:#dbe6f2;"></div>
+        <div style="flex:1;height:44px;border-radius:9px;background:#dfeedd;"></div>
+        <div style="flex:1;height:44px;border-radius:9px;background:#f2e4d6;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====== 状態（実装の gameConfig と同じ構造） ====== */
+const CHARS=[{cid:"c1",e:"🧒"},{cid:"c2",e:"🐲"},{cid:"c3",e:"🔥"},{cid:"c4",e:"🍄"}];
+let g={ scoreShow:true, clear:{type:"score",param:10}, gameOver:{targetId:"c2"} };
+let view="p1", openTile=null;
+
+const $=id=>document.getElementById(id);
+const slot=$("slot"), right=$("right");
+
+/* ====== 現行の再現 ====== */
+function viewCur(){
+  const t=g.clear.type;
+  let goal="";
+  if(t==="score") goal=`<div class="gc-row"><span class="gc-goal">
+      <button class="gc-step" data-a="dec">−</button><span class="gc-num">⭐${g.clear.param}</span> たまったら
+      <button class="gc-step" data-a="inc">＋</button></span></div>`;
+  if(t==="time") goal=`<div class="gc-row"><span class="gc-goal">
+      <button class="gc-step" data-a="dec">−</button><span class="gc-num">⏱${g.clear.param}びょう</span> まで
+      <button class="gc-step" data-a="inc">＋</button></span></div>`;
+  return `<div class="card cur">
+    <div class="rowtitle">ゲームの せってい</div>
+    <div class="gc-row"><button class="gc-toggle${g.scoreShow?" on":""}" data-a="score">スコアを だす ${g.scoreShow?"◯":"✕"}</button></div>
+    <div class="gc-row"><span class="gc-cap">クリア:</span>
+      <button class="gc-seg${t==="score"?" on":""}" data-a="ct" data-v="score">スコア</button>
+      <button class="gc-seg${t==="time"?" on":""}" data-a="ct" data-v="time">じかん</button>
+      <button class="gc-seg${t==="none"?" on":""}" data-a="ct" data-v="none">なし</button></div>
+    ${goal}
+    <div class="gc-row"><button class="gc-toggle${g.gameOver?" on":""}" data-a="bomb">ばくだんタッチ ${g.gameOver?"◯":"✕"}</button>
+      ${g.gameOver?`<span class="gc-bombs">${CHARS.map(c=>
+        `<button class="gc-bomb${g.gameOver.targetId===c.cid?" on":""}" data-a="who" data-v="${c.cid}">${c.e}</button>`).join("")}</span>`:""}
+    </div></div>`;
+}
+
+/* ====== 案1: ルールカード ====== */
+function view1(){
+  const t=g.clear.type;
+  let nest="";
+  if(t==="score") nest=`<div class="nest"><div class="sent">⭐を
+      <span class="stepper"><button data-a="dec">−</button><span class="val">${g.clear.param}</span><button data-a="inc">＋</button></span>
+      こ あつめたら クリア！</div></div>`;
+  if(t==="time") nest=`<div class="nest"><div class="sent">⏱
+      <span class="stepper"><button data-a="dec">−</button><span class="val">${g.clear.param}</span><button data-a="inc">＋</button></span>
+      びょう にげきったら クリア！</div></div>`;
+  if(t==="none") nest=`<div class="nest"><div class="sent">🎈 クリアは なし。すきなだけ あそべる！</div></div>`;
+
+  return `
+  <div class="card">
+    <div class="rowtitle">ゲームの ルール</div>
+    <div class="q"><span class="ic">🏁</span>どうなったら クリア？</div>
+    <div class="picks">
+      <button class="pick${t==="score"?" on":""}" data-a="ct" data-v="score"><span class="pi">⭐</span>スコア</button>
+      <button class="pick${t==="time"?" on":""}" data-a="ct" data-v="time"><span class="pi">⏱</span>じかん</button>
+      <button class="pick${t==="none"?" on":""}" data-a="ct" data-v="none"><span class="pi">🎈</span>なし</button>
+    </div>
+    ${nest}
+  </div>
+
+  <div class="card">
+    <div class="q"><span class="ic">💣</span>さわったら おしまい</div>
+    <div class="sw${g.gameOver?" on":""}" data-a="bomb" style="margin-top:4px;">
+      <span class="track"><span class="thumb"></span></span><span class="state">${g.gameOver?"オン":"オフ"}</span></div>
+    ${g.gameOver?`<div class="who"><div class="lbl">だれが ばくだん？</div>
+      <div class="chars">${CHARS.map(c=>
+        `<button class="ch${g.gameOver.targetId===c.cid?" on":""}" data-a="who" data-v="${c.cid}">${c.e}</button>`).join("")}</div></div>`
+      :`<div class="hint">オンに すると、さわったら まけに なる キャラを えらべるよ</div>`}
+  </div>
+
+  <div class="card">
+    <div class="q"><span class="ic">🔢</span>スコアを がめんに だす</div>
+    <div class="sw${g.scoreShow?" on":""}" data-a="score" style="margin-top:4px;">
+      <span class="track"><span class="thumb"></span></span><span class="state">${g.scoreShow?"オン":"オフ"}</span></div>
+  </div>`;
+}
+
+/* ====== 案2: めじるしタイル ====== */
+function view2(){
+  const t=g.clear.type;
+  const clearIcon = t==="score"?"⭐":t==="time"?"⏱":"🎈";
+  const clearVal  = t==="score"?`${g.clear.param}こで<br>クリア`
+                  : t==="time" ?`${g.clear.param}びょう<br>にげきる`
+                  : `クリア<br>なし`;
+  const bombOn=!!g.gameOver;
+  const bombChar=bombOn?(CHARS.find(c=>c.cid===g.gameOver.targetId)||{}).e:"";
+
+  let panel="";
+  if(openTile==="clear"){
+    let nest="";
+    if(t==="score") nest=`<div class="sent">⭐を <span class="stepper"><button data-a="dec">−</button><span class="val">${g.clear.param}</span><button data-a="inc">＋</button></span> こ あつめたら クリア！</div>`;
+    if(t==="time")  nest=`<div class="sent">⏱ <span class="stepper"><button data-a="dec">−</button><span class="val">${g.clear.param}</span><button data-a="inc">＋</button></span> びょう にげきったら クリア！</div>`;
+    if(t==="none")  nest=`<div class="sent">🎈 クリアは なし。すきなだけ あそべる！</div>`;
+    panel=`<div class="panel"><div class="ph">どうなったら クリア？</div>
+      <div class="picks" style="margin-top:0">
+        <button class="pick${t==="score"?" on":""}" data-a="ct" data-v="score"><span class="pi">⭐</span>スコア</button>
+        <button class="pick${t==="time"?" on":""}" data-a="ct" data-v="time"><span class="pi">⏱</span>じかん</button>
+        <button class="pick${t==="none"?" on":""}" data-a="ct" data-v="none"><span class="pi">🎈</span>なし</button>
+      </div><div style="margin-top:10px">${nest}</div></div>`;
+  }
+  if(openTile==="bomb"){
+    panel=`<div class="panel"><div class="ph">さわったら おしまいに する？</div>
+      <div class="sw${bombOn?" on":""}" data-a="bomb"><span class="track"><span class="thumb"></span></span><span class="state">${bombOn?"オン":"オフ"}</span></div>
+      ${bombOn?`<div class="who"><div class="lbl">だれが ばくだん？</div><div class="chars">${CHARS.map(c=>
+        `<button class="ch${g.gameOver.targetId===c.cid?" on":""}" data-a="who" data-v="${c.cid}">${c.e}</button>`).join("")}</div></div>`
+        :`<div class="hint">オンに すると、さわったら まけに なる キャラを えらべるよ</div>`}</div>`;
+  }
+  if(openTile==="score"){
+    panel=`<div class="panel"><div class="ph">スコアを がめんに だす？</div>
+      <div class="sw${g.scoreShow?" on":""}" data-a="score"><span class="track"><span class="thumb"></span></span><span class="state">${g.scoreShow?"オン":"オフ"}</span></div></div>`;
+  }
+
+  return `<div class="card">
+    <div class="rowtitle">ゲームの ルール（タップで かえられるよ）</div>
+    <div class="tiles">
+      <button class="tile${openTile==="clear"?" open":""}" data-a="tile" data-v="clear">
+        <span class="ti">${clearIcon}</span><span class="tn">クリア</span><span class="tv">${clearVal}</span></button>
+      <button class="tile${openTile==="bomb"?" open":""}${bombOn?"":" off"}" data-a="tile" data-v="bomb">
+        <span class="ti">💣</span><span class="tn">ばくだん</span><span class="tv">${bombOn?bombChar:"なし"}</span></button>
+      <button class="tile${openTile==="score"?" open":""}${g.scoreShow?"":" off"}" data-a="tile" data-v="score">
+        <span class="ti">🔢</span><span class="tn">スコア</span><span class="tv">${g.scoreShow?"だす":"ださない"}</span></button>
+    </div>
+    ${panel}
+  </div>`;
+}
+
+/* ====== 描画・操作 ====== */
+function render(){
+  slot.innerHTML = view==="cur"?viewCur() : view==="p1"?view1() : view2();
+  const w=+$("sW").value;
+  right.style.width=w+"px";
+  requestAnimationFrame(()=>{
+    const card=slot.querySelector(".card");
+    const h=slot.getBoundingClientRect().height;
+    $("rd").innerHTML=`右カラム ${w}px ／ せってい部の たかさ <b style="color:#ffe9b8">${Math.round(h)}px</b>`
+      +`<br>がめん ${window.innerWidth}×${window.innerHeight}`;
+  });
+}
+slot.addEventListener("click",e=>{
+  const b=e.target.closest("[data-a]"); if(!b) return;
+  const a=b.dataset.a, v=b.dataset.v;
+  if(a==="score") g.scoreShow=!g.scoreShow;
+  if(a==="ct"){ g.clear.type=v; g.clear.param = v==="score"?10:v==="time"?30:0; }
+  if(a==="dec") g.clear.param=Math.max(g.clear.type==="score"?5:10, g.clear.param-(g.clear.type==="score"?5:10));
+  if(a==="inc") g.clear.param=Math.min(g.clear.type==="score"?99:180, g.clear.param+(g.clear.type==="score"?5:10));
+  if(a==="bomb") g.gameOver = g.gameOver?null:{targetId:"c2"};
+  if(a==="who") g.gameOver={targetId:v};
+  if(a==="tile") openTile = (openTile===v?null:v);
+  render();
+});
+$("tCur").onclick=()=>{view="cur"; sel(); render();};
+$("t1").onclick  =()=>{view="p1";  sel(); render();};
+$("t2").onclick  =()=>{view="p2";  sel(); render();};
+function sel(){ $("tCur").classList.toggle("on",view==="cur");
+  $("t1").classList.toggle("on",view==="p1"); $("t2").classList.toggle("on",view==="p2"); }
+$("sW").oninput=render;
+window.addEventListener("resize",render);
+render();
+</script>
+</body>
+</html>
