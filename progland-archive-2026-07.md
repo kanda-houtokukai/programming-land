@@ -3,7 +3,7 @@
 > ⚠ **これは過去の記録です。現在の計画・仕様ではありません。**
 > 現状は `progland-handoff.md`（台帳）・`roadmap.md`（現在地）・`feature-spec.md`（仕様）が正。
 
-- **収録**: `progland-handoff.md`「今どこか」から切り出した **v2.3-b4e（2026-07-12）〜 v2.3-b6c（2026-07-23）の51版**（新しい順）。原文のまま・1文字も削っていない。
+- **収録**: `progland-handoff.md`「今どこか」から切り出した **v2.3-b4e（2026-07-12）〜 v2.3-b6e（2026-07-24）の53版**（新しい順）。原文のまま・1文字も削っていない。
 - **通常のセッションではこのファイルを読まない。** 台帳（`progland-handoff.md`）だけ読めばよい。過去の経緯を追う必要が出たときだけ参照する。
 - **これより古い版**（v2.3-b4d 以前）は `progland-handoff-archive.md` にある（2026-07-15 の分割時に作成）。両者で b4d／b4e が連続する。
 - ここに載る `⚠️実機確認待ち` `⚠️次` は**当時のもの**。その後の版に置き換わって出荷済みであり、いま待っている作業ではない。生きている宿題は台帳の「未完了タスク」が正。
@@ -45,8 +45,23 @@
 
 ---
 
-## 版ごとの詳細ログ（v2.3-b6c 〜 v2.3-b4e・新しい順）
+## 版ごとの詳細ログ（v2.3-b6e 〜 v2.3-b4e・新しい順）
 
+- **v2.3-b6d（2026-07-23・段階3 区切り②=goal／chase／fall＋相手ピル名前表示＝⚠️実機確認待ち／deploy済み d2abced）**: 指示書=`brushup/stage3-step2-goal-chase-fall.md`（正本）。新カード3枚は gamelab 専用。指示書配置=437c714・実装=e5b06a7（deploy=d2abced）
+  - **新カード3枚**: `chase`「おいかける」（うごき青・ピル=あいて・w206再利用）=指定相手へ1拍1マス寄る（差の大きい軸／any・消えた指定は最も近い見えるキャラ／同マスで停止＝重なって暴れない）。`fall`「ふってくる」（うごき青・w206）=1拍1マス下・下端で上端へ戻る。`goal`「ゴール」（きっかけ橙・ピル=あいて・w210再利用）=挙動は `bumpTarget` と共通（相手に重なったら発火）だが**別カード**（[DECISION] 指示書§1-1: 「ぶつかったら→クリア」は子に不自然・「たどりつく」用途を desc で差別化）。エンジン=TRIGGERS に goal 追加・`fireBumpTarget`→`fireTargetTrigger(kind)` 一般化・hasListeners に goal
+  - **[DECISION] fall の横ランダム化（§1-3報告）**: 上端リスポーン時に x をランダム化。理由=同じ列に落ち続けると主人公が真下で待つだけでゲームにならない（基準モックも random spawn）＝落ちものキャッチが成立
+  - **§2 相手ピルの内部ID表示バグ修正**: `WorkshopEditor`→`StudioBlock`(nodes/fly)＋`cardW` に `targetName` を伝達。**bumpTarget/goal/chase の3枚まとめて名前表示**に（実測: だれか→タップ→「きのこちゃん」）。消えた相手は「だれか」に落とす（内部ID を出さない）
+  - **★ベースライン再取得（§4・25→28種）**: `--update`。diff機械確認＝blocks.defs に goal/chase/fall の3種＋geometry.measures 同3種のみ追加。**traces732イベント・geometry.paths98本・widths・studio palorder は byte不変**（studio エンジン無傷）
+  - 検証: エンジン単体テストに chase(寄る方向・到達・同マス停止)/fall(下へ・下端で上端へ)/goal(到達発火) 追加＝全PASS・verify 8本全PASS（DEFS28）・ビルドOK・本番 b6d（`index-D-X04Vmw.js`）配信確認・コンソールエラーゼロ・ブラウザ実測(1194px)=28枚・新カード配置/色正しい・font 全て≥12px(ゴール16/おいかける14/ふってくる14)・相手ピル名前表示・ふってくるで主人公が下へ移動
+  - ⚠️次: 神田さんの iPad 実機確認 → **合格 → 区切り③（b6e）へ**
+- **v2.3-b6e（2026-07-24・段階3 区切り③=カード一覧の自動生成／bump を gamelab から削除／みほん3本＝⚠️実機確認待ち／deploy済み 8e4d62a）**: 指示書=`brushup/stage3-step3-cards-samples.md`（正本）。指示書配置＋§0=38aa166・②③=4a6f26c（deploy=8e4d62a）
+  - **§0 カード一覧の自動生成**: `tools/gen-cards.mjs`（`npm run cards`）が `DEFS`/`PALORDER`/`GAMELAB_PALORDER` から `brushup/cards-reference.md` を生成（手書きせず実装から・docs/ には出さない）。**★§0-3: 照合を verify に統合**（`gen-cards.mjs --check`＝出力を完全決定的にし安定・高速に動作確認＝一覧が古いまま deploy されない）
+  - **§1 bump を gamelab のこうぐだなから削除（28→27種）**: `GAMELAB_PALORDER` から `bump` を外し「ぶつかったら」は `bumpTarget` 1枚に一本化。**DEFS には残す・studio `PALORDER` 18種は不変・エンジンは引き続き bump 解釈**（既存 gamelab 作品が壊れない）
+  - **★§2 枚数バッジ=入れない判断**: `palette-ui-overhaul.md` にバッジ仕様なし＝b5x のバッジ無し見出しが実機OK済み。追加は実機OK済みの見た目を変えるため見送り（神田さん希望なら後便で容易に追加可）
+  - **§3 みほん3本追加（既存3本は残す・計6本）**: おちものキャッチ（主人公=じゅうじキー＋ぶつかったら[リンゴ]→スコア＋／リンゴ=ずっと→ふってくる／じかん30）・おにごっこ（主人公=じゅうじキー／鬼=ずっと→おいかける[主人公]＋ばくだん／じかん30逃げ切り）・ゴールまで いこう（★正本のめいろを差し替え=§3-3: 現状ばくだんは1体しか指定できず壁1つ＝迷路にならないため。主人公=じゅうじキー＋ゴール[旗]→スコア＋5／いわ=ばくだん／クリア=スコア5。★score は5刻み制約で param=5・ゴール到達で+5=1回で達成）。verify-gamelab に §3-4 検証追加（カードが GAMELAB_PALORDER 実在・クリア=スコアなら scoreUp あり・本数6）
+  - **§4 ベースライン不変**: bump は DEFS に残るため `--update` 不要＝`traces`732/`paths`98/`defs`28/studio `palorder`18 すべて byte 不変（確認済み）
+  - 検証: verify 8本全PASS（みほん6本・カード一覧照合27/18）・ビルドOK・本番 b6e（`index-DIIyzi1J.js`）配信確認・コンソールエラーゼロ・ブラウザ実測(1194px)=gamelab 27種／「ぶつかったら」1枚／studio 18種で bump あり・gamelabカード無し／6みほん表示・ゴールまで いこう ロードOK（ゴール[きのこちゃん]→スコア＋5・名前表示）
+  - ⚠️次: 神田さんの iPad 実機確認（§6ゲート: ①gamelab「ぶつかったら」1枚②studio 18種完全無変化③みほん3本が遊べる〔おちものキャッチ/おにごっこ/ゴールまで いこう〕④見出しの押しやすさ不変⑤`brushup/cards-reference.md` の内容が実物と合う。⚠️「ぶつかったら」と「ゴール」が混乱しないか＝§1-1）
 - **v2.3-b6c（2026-07-23・段階3 区切り①手直し=そうさの手触り修正＋全画面1画面化＝⚠️実機確認待ち／deploy済み 6e4ed0c）**: 指示書=`brushup/stage3-op-feel-fullscreen.md`（正本）。実機FB=①連続移動が小刻みにカクカク揺れる②全画面で十字キー等が収まらない。表示・CSS・操作ループのみ（DEFS不変）。指示書配置=dfd00a6・①+②=3bf30c5（deploy=6e4ed0c）
   - **§1 連続移動の手触り**: `.actor` に `op` クラス（操作可能/タップ移動キャラの時だけ）。`.actor.op` の transition を `OP_MS(100ms)`・`linear` に＝移動間隔と一致し途中中断が起きず等速に滑る（原因A）＋`.actor.op .sp-in.stepA{animation:none}` で連続移動中は足踏み演出を再発火させない（原因B＝揺れ）。**★1拍ごとの移動（みぎへ 等・非opキャラ・studio共有）は `.actor` のまま=340ms ease+stepA 不変**（実測: 非op=0.34s cubic-bezier／op=0.1s linear）。`OP_MS=100` 維持（§1-3・モック50msからあえて外す判断＝実装は340msイージング前提で瞬間移動のモックと別物・小1の指で行き過ぎ防止・1.2秒で横断）。**★`OP_MS` 宣言を STUDIO_CSS の前へ移動**（`.actor.op` が `${OP_MS}` 参照＝後ろだと TDZ でモジュール読込失敗→画面真っ黒。node verify では捕捉不可＝ブラウザ確認で発見）
   - **§2 全画面1画面化（★gamelab のみ・studio 完全無変化）**: §2-2 `.studio-root.big.gl .gamecfg` 非表示。**§2-3【方式=flex・報告】**新しい固定px値を足さず `.big.gl` の studio-right を縦flex＝じゅうじキー `flex:0 0 auto`（自然高さ）／プレビュー `flex:1 1 0`（残りを埋める・max-width:100%で3:2維持）。じゅうじキーの有無で予備が自動配分（実測 有:theater586h+dpad148／無:742h）。**★`.gl` スコープ限定＝studio の全画面は従来 `calc((100dvh-110px)*1.5)` のまま**（実測: studio big flex-grow0・width1086px＝完全無変化）
