@@ -3,7 +3,7 @@
 > ⚠ **これは過去の記録です。現在の計画・仕様ではありません。**
 > 現状は `progland-handoff.md`（台帳）・`roadmap.md`（現在地）・`feature-spec.md`（仕様）が正。
 
-- **収録**: `progland-handoff.md`「今どこか」から切り出した **v2.3-b4e（2026-07-12）〜 v2.3-b6b（2026-07-23）の50版**（新しい順）。原文のまま・1文字も削っていない。
+- **収録**: `progland-handoff.md`「今どこか」から切り出した **v2.3-b4e（2026-07-12）〜 v2.3-b6c（2026-07-23）の51版**（新しい順）。原文のまま・1文字も削っていない。
 - **通常のセッションではこのファイルを読まない。** 台帳（`progland-handoff.md`）だけ読めばよい。過去の経緯を追う必要が出たときだけ参照する。
 - **これより古い版**（v2.3-b4d 以前）は `progland-handoff-archive.md` にある（2026-07-15 の分割時に作成）。両者で b4d／b4e が連続する。
 - ここに載る `⚠️実機確認待ち` `⚠️次` は**当時のもの**。その後の版に置き換わって出荷済みであり、いま待っている作業ではない。生きている宿題は台帳の「未完了タスク」が正。
@@ -37,8 +37,22 @@
 
 ---
 
-## 版ごとの詳細ログ（v2.3-b6b 〜 v2.3-b4e・新しい順）
+## 引退した未完了タスク（台帳「未完了タスク」から移設・2026-07-25・原文のまま）
 
+> 引退の理由: 対象がすべて後続版に置き換わって実機OK済み（クイズ=b5系で612問に拡張／相棒・たまご=b5系で15体／バトル入口背景=b5b で作り直し／b6i の教育接続で相棒レベルアップとバトル解錠まで実機確認済み）。
+
+1. **実機で継続確認**（大きな刷新が続いたため・各版の⚠️次を参照。**b5w 以前の版の⚠️次は `progland-archive-2026-07.md`**）: **クイズ改修b4u（関所B）**・相棒/たまごサイクル（孵化テンポ `EGG_HATCH_XP=40`・b4s卵欄）・結果シーケンスのタメ（SEQ定数）・バトル入口背景・タイピングのタップ入力・なかまわけ新形式（b4t）ほか b4系一式
+
+---
+
+## 版ごとの詳細ログ（v2.3-b6c 〜 v2.3-b4e・新しい順）
+
+- **v2.3-b6c（2026-07-23・段階3 区切り①手直し=そうさの手触り修正＋全画面1画面化＝⚠️実機確認待ち／deploy済み 6e4ed0c）**: 指示書=`brushup/stage3-op-feel-fullscreen.md`（正本）。実機FB=①連続移動が小刻みにカクカク揺れる②全画面で十字キー等が収まらない。表示・CSS・操作ループのみ（DEFS不変）。指示書配置=dfd00a6・①+②=3bf30c5（deploy=6e4ed0c）
+  - **§1 連続移動の手触り**: `.actor` に `op` クラス（操作可能/タップ移動キャラの時だけ）。`.actor.op` の transition を `OP_MS(100ms)`・`linear` に＝移動間隔と一致し途中中断が起きず等速に滑る（原因A）＋`.actor.op .sp-in.stepA{animation:none}` で連続移動中は足踏み演出を再発火させない（原因B＝揺れ）。**★1拍ごとの移動（みぎへ 等・非opキャラ・studio共有）は `.actor` のまま=340ms ease+stepA 不変**（実測: 非op=0.34s cubic-bezier／op=0.1s linear）。`OP_MS=100` 維持（§1-3・モック50msからあえて外す判断＝実装は340msイージング前提で瞬間移動のモックと別物・小1の指で行き過ぎ防止・1.2秒で横断）。**★`OP_MS` 宣言を STUDIO_CSS の前へ移動**（`.actor.op` が `${OP_MS}` 参照＝後ろだと TDZ でモジュール読込失敗→画面真っ黒。node verify では捕捉不可＝ブラウザ確認で発見）
+  - **§2 全画面1画面化（★gamelab のみ・studio 完全無変化）**: §2-2 `.studio-root.big.gl .gamecfg` 非表示。**§2-3【方式=flex・報告】**新しい固定px値を足さず `.big.gl` の studio-right を縦flex＝じゅうじキー `flex:0 0 auto`（自然高さ）／プレビュー `flex:1 1 0`（残りを埋める・max-width:100%で3:2維持）。じゅうじキーの有無で予備が自動配分（実測 有:theater586h+dpad148／無:742h）。**★`.gl` スコープ限定＝studio の全画面は従来 `calc((100dvh-110px)*1.5)` のまま**（実測: studio big flex-grow0・width1086px＝完全無変化）
+  - ★教訓: **テンプレートリテラル（STUDIO_CSS）で参照する定数は、その宣言より前に置く**（TDZ で `Cannot access 'X' before initialization`→React が描画されず画面真っ黒。node の verify は通るため、ブラウザ実機確認でしか気づけない）
+  - 検証: verify 8本全PASS（DEFS25・traces732・paths98 不変＝ベースライン1バイト不変）・ビルドOK・本番 b6c（`index-CZxrI6xP.js`）配信確認・コンソールエラーゼロ・実測(1194px)=①op=0.1s linear/非op=0.34s ease②gamelab big=dpad全可視/theater3:2/gamecfg非表示・studio big=従来サイズ不変
+  - ⚠️次: 神田さんの iPad 実機確認 → **合格 → 区切り②（b6d）へ**
 - **v2.3-b6b（2026-07-23・ゲームこうぼう段階3 区切り①=dpad＋tapMove＋そうさカテゴリ新設＋短縮ラベル＝⚠️実機確認待ち／deploy済み cfcf36e）**: 指示書=`brushup/gamelab-implementation-stage3.md`＋差分メモ `brushup/gamelab-stage3-addendum.md`（正本）。studio/gamelab 共有部品に追加だが **gamelab のみに出す**。指示書配置=ea67118/97597b6・区切り①=8dfe146（deploy=cfcf36e）
   - **そうさカテゴリ新設（ティール #2FB4A6・edge #1B8478）**: `COL.ctrlpad` 追加。DEFS に `dpad`「じゅうじキー」/`tapMove`「タップいどう」（body・ピルなし・cat そうさ・ラベル6文字＝b6a のカード縮小に合わせ short・意味は long/desc が担う）。`w=206` は既存値を再利用（ベースライン増分を DEFS だけに抑える）。`GAMELAB_PALORDER` の きっかけ↔かず 間（b5x 予約位置）へ挿入。studio `PALORDER`(18種)は不変
   - **エンジン（拍を待たない操作・§1）**: `dpad` 実行→`ch.operable=true`（1回で有効化・以後ずっと）／`tapMove` 実行→`ch.tapMovable=true`。`nudge(dx,dy)`=操作可能キャラを1マス／`bgTap(gx,gy)`=タップ移動の目的地／`tapMoveStep()`=目的地へ1マス／`gridMove` で盤内クランプ／`resetChar` で ▶ ごとに操作フラグ初期化／`onFx` operable・tapmove で通知／`hasOperable()`

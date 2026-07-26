@@ -1,6 +1,6 @@
 # プログラミングランド v2 — 台帳（handoff）
 
-最終更新: 2026-07-25（**v2.3-b6m 実機FB便B=ぶたいのショップ連動＋みほんの棚に説明文＝deploy済み・⚠️実機確認待ち**。便②(b6h)・便③(b6i)・**FB便A(b6k)** は**実機OK**。便④-A（b6j）・段階3 区切り①〜④（b6c〜b6f）・便①（b6g）は実機確認待ち。**次=b6m の実機確認**→ 残りは **便④-B（BGM・音源2本の生成待ちで着手できない）** と **みほんのカバー絵（絵の生成待ち）／カードのアニメーション（Chat が設計中）**。**区切り⑤ clone は開店フェーズの後**。実機確認は `brushup/cards-reference.md`（機能一覧）到達後にまとめて実施の方針＝各便は簡易確認で先行。段階3カード追加分=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
+最終更新: 2026-07-25（**v2.3-b6n みほんのカバー絵10枚＝deploy済み・⚠️実機確認待ち**。便②(b6h)・便③(b6i)・FB便A(b6k)・**FB便B(b6m)** は**実機OK**。便④-A（b6j）・段階3 区切り①〜④（b6d〜b6f）・便①（b6g）は実機確認待ち。**次=b6n の実機確認**→ 残りは **便④-B（BGM・音源2本の生成待ちで着手できない）** と **カードのアニメーション（Chat が設計中）**。**区切り⑤ clone は開店フェーズの後**。実機確認は `brushup/cards-reference.md`（機能一覧）到達後にまとめて実施の方針＝各便は簡易確認で先行。段階3カード追加分=`brushup/gamelab-implementation-stage3.md`＋区切り④指示書 `brushup/stage3-step4-jumpable.md`＋カード一覧 `brushup/cards-reference.md`）
 
 > 過去の版ごとの詳細ログは月別アーカイブへ（読むのは必要なときだけ）: **v2.3-b4e〜b6b** = `progland-archive-2026-07.md`（版のログのほか、台帳から移した完了項目もここ） ／ **v2.3-b4d 以前**（＋過去フェーズの教訓の詳細）= `progland-handoff-archive.md`。
 
@@ -26,7 +26,7 @@
 
 ## 現在地サマリ（毎セッション冒頭にここだけ読む）
 
-### 次にやること（★ここが最優先・FB便B完了で更新 2026-07-25）
+### 次にやること（★ここが最優先・カバー絵完了で更新 2026-07-25）
 
 **次＝ゲームこうぼう 開店フェーズ**。正本＝`brushup/gamelab-opening-design.md`（全項目 神田さん承認済み）。便で分けて進める:
 
@@ -44,9 +44,11 @@
 ```
 実機FB便A（不具合3件＋棚の並び＋キャラの大きさ）… ✅完了 v2.3-b6k（**実機OK**）
   指示書=brushup/feedback-a-fixes.md
-実機FB便B（ぶたいのショップ連動＋みほんの棚に説明文）… ✅完了 v2.3-b6m（deploy済み・⚠️実機確認待ち）
+実機FB便B（ぶたいのショップ連動＋みほんの棚に説明文）… ✅完了 v2.3-b6m（**実機OK**）
   指示書=brushup/feedback-b-shop-samples.md ／ ★版は b6l を飛ばした（l と 1 が紛らわしい）
-残り: みほんのカバー絵（絵の生成待ち）／カードのアニメーション（Chat が設計中）
+みほんのカバー絵10枚 … ✅完了 v2.3-b6n（deploy済み・⚠️実機確認待ち）
+  指示書=brushup/sample-covers.md ／ 生成プロンプト=brushup/sample-cover-prompts.md
+残り: カードのアニメーション（Chat が設計中）
 ```
 
 - **実機確認の方針**: b6e/b6f は神田さん簡易確認で合格。通しの実機確認は `brushup/cards-reference.md`（機能一覧）が揃ってからまとめて実施＝各便は簡易確認で先へ進む。
@@ -64,12 +66,6 @@
 - **公開URL: https://kanda-houtokukai.github.io/programming-land/**（リポジトリ kanda-houtokukai/programming-land）
 - **設計書の版**: `feature-spec.md`・`roadmap.md` とも **b5h 時点へ追随済み**（2026-07-18・feature-spec に §10 つくるスタジオを新設＋§1/§2/§7-2/§9 を追随・roadmap を b5h 現在地へ全置換）
 - **新モード「ゲームこうぼう」段階A〜段階3**: 設計正本=`brushup/gamelab-design.md`。**段階A〜段階3は完了**（残りは区切り⑤ clone のみ・開店フェーズの後）。段階ごとの記録と指示書の一覧は `progland-archive-2026-07.md` へ移した（維持規則の3つ目の分岐・2026-07-25）。
-- **v2.3-b6c（2026-07-23・段階3 区切り①手直し=そうさの手触り修正＋全画面1画面化＝⚠️実機確認待ち／deploy済み 6e4ed0c）**: 指示書=`brushup/stage3-op-feel-fullscreen.md`（正本）。実機FB=①連続移動が小刻みにカクカク揺れる②全画面で十字キー等が収まらない。表示・CSS・操作ループのみ（DEFS不変）。指示書配置=dfd00a6・①+②=3bf30c5（deploy=6e4ed0c）
-  - **§1 連続移動の手触り**: `.actor` に `op` クラス（操作可能/タップ移動キャラの時だけ）。`.actor.op` の transition を `OP_MS(100ms)`・`linear` に＝移動間隔と一致し途中中断が起きず等速に滑る（原因A）＋`.actor.op .sp-in.stepA{animation:none}` で連続移動中は足踏み演出を再発火させない（原因B＝揺れ）。**★1拍ごとの移動（みぎへ 等・非opキャラ・studio共有）は `.actor` のまま=340ms ease+stepA 不変**（実測: 非op=0.34s cubic-bezier／op=0.1s linear）。`OP_MS=100` 維持（§1-3・モック50msからあえて外す判断＝実装は340msイージング前提で瞬間移動のモックと別物・小1の指で行き過ぎ防止・1.2秒で横断）。**★`OP_MS` 宣言を STUDIO_CSS の前へ移動**（`.actor.op` が `${OP_MS}` 参照＝後ろだと TDZ でモジュール読込失敗→画面真っ黒。node verify では捕捉不可＝ブラウザ確認で発見）
-  - **§2 全画面1画面化（★gamelab のみ・studio 完全無変化）**: §2-2 `.studio-root.big.gl .gamecfg` 非表示。**§2-3【方式=flex・報告】**新しい固定px値を足さず `.big.gl` の studio-right を縦flex＝じゅうじキー `flex:0 0 auto`（自然高さ）／プレビュー `flex:1 1 0`（残りを埋める・max-width:100%で3:2維持）。じゅうじキーの有無で予備が自動配分（実測 有:theater586h+dpad148／無:742h）。**★`.gl` スコープ限定＝studio の全画面は従来 `calc((100dvh-110px)*1.5)` のまま**（実測: studio big flex-grow0・width1086px＝完全無変化）
-  - ★教訓: **テンプレートリテラル（STUDIO_CSS）で参照する定数は、その宣言より前に置く**（TDZ で `Cannot access 'X' before initialization`→React が描画されず画面真っ黒。node の verify は通るため、ブラウザ実機確認でしか気づけない）
-  - 検証: verify 8本全PASS（DEFS25・traces732・paths98 不変＝ベースライン1バイト不変）・ビルドOK・本番 b6c（`index-CZxrI6xP.js`）配信確認・コンソールエラーゼロ・実測(1194px)=①op=0.1s linear/非op=0.34s ease②gamelab big=dpad全可視/theater3:2/gamecfg非表示・studio big=従来サイズ不変
-  - ⚠️次: 神田さんの iPad 実機確認 → **合格 → 区切り②（b6d）へ**
 - **v2.3-b6d（2026-07-23・段階3 区切り②=goal／chase／fall＋相手ピル名前表示＝⚠️実機確認待ち／deploy済み d2abced）**: 指示書=`brushup/stage3-step2-goal-chase-fall.md`（正本）。新カード3枚は gamelab 専用。指示書配置=437c714・実装=e5b06a7（deploy=d2abced）
   - **新カード3枚**: `chase`「おいかける」（うごき青・ピル=あいて・w206再利用）=指定相手へ1拍1マス寄る（差の大きい軸／any・消えた指定は最も近い見えるキャラ／同マスで停止＝重なって暴れない）。`fall`「ふってくる」（うごき青・w206）=1拍1マス下・下端で上端へ戻る。`goal`「ゴール」（きっかけ橙・ピル=あいて・w210再利用）=挙動は `bumpTarget` と共通（相手に重なったら発火）だが**別カード**（[DECISION] 指示書§1-1: 「ぶつかったら→クリア」は子に不自然・「たどりつく」用途を desc で差別化）。エンジン=TRIGGERS に goal 追加・`fireBumpTarget`→`fireTargetTrigger(kind)` 一般化・hasListeners に goal
   - **[DECISION] fall の横ランダム化（§1-3報告）**: 上端リスポーン時に x をランダム化。理由=同じ列に落ち続けると主人公が真下で待つだけでゲームにならない（基準モックも random spawn）＝落ちものキャッチが成立
@@ -165,11 +161,23 @@
   - **§2-5 棚の高さ（実測・iPad Pro 11 よこ 1194×834）**: みほんカード 132→**177px（+45px）**・列 554→**599px**。**`.sh-scroll` は clientH 755／scrollH 755＝はみ出し 0**（説明なしでも 755）＝**縦に伸びすぎていない**（156px の余裕あり）。799×876 でも はみ出し 0
   - 検証: **verify 9本全PASS（`--update` なし＝ベースライン SHA-256 一致）**・**`verify-gamelab.mjs` のみほん6本検証も PASS**・本番 b6m（`index-E50fwehf.js`）配信＋版表示 v2.3-b6m・ガイド文とみほん説明文が本番バンドルに含まれることを文字列照合・アプリのコンソールエラーゼロ
   - ⚠️次: 神田さんの iPad 実機確認（§4実機ゲート6項目）: ①未購入だとジャングル・だいちが選択欄に出ない②買うと出る③**前に作った作品の背景が変わっていない**④みほんの棚で名前の下に説明が出て何のゲームか分かる⑤棚が縦に伸びすぎていない⑥studio でも同じように効く
+  - ✅実機確認合格（2026-07-25・神田さん）
+- **v2.3-b6n（2026-07-25・みほんのカバー絵10枚を棚に出す＝⚠️実機確認待ち／deploy済み 144029d）**: 指示書=`brushup/sample-covers.md`（正本）・生成プロンプト=`brushup/sample-cover-prompts.md`。画像＋文書=26e860c・実装=f816e9b（deploy=144029d）
+  - **絵**: 10枚とも **768×512（3:2＝棚の128×85枠の6倍）・WebP・合計343.7KB**（Chat の申告と実測が一致）。`src/assets/studio-assets/` へ配置し、**配置前後で SHA-256 一致＝1バイトも変えていない**ことを確認
+  - **§3-1 みほんだけ差し替え**: みほんの棚は `cover`／**自分の作品（フィルムだな・カセットだな）は従来の `StudioThumb` のまま**。`cover` が無いみほんは従来のサムネへ落ちる（フォールバック・枠はどちらも 3:2 で同じ）
+  - **★§3-2 で指示書に1点だけ従えなかった（報告）**: 指示書は「gamelab 側は `desc` と同じ場所（＝`gamelab-samples.js` の中）でよい」としていたが、**同ファイルは `tools/verify-gamelab.mjs` が node から読む純データ**で、`.webp` を import した瞬間 **`Unknown file extension ".webp"`** で verify が動かなくなる（実際に node で再現して確認）。**文字列の `desc` は node 安全だったが `cover` は事情が違う**＝`growth.js` と同型の罠
+  - **→ 採った形**: `src/data/sample-covers.js`（UI 側の新ファイル）に10枚の import と id→画像の表を置き、**studio/gamelab 両方の `mode.jsx` で合流**。**UI から見える形は指示書どおり `s.cover` の1つ**。これで studio の `SAMPLES` は凍結のまま（回帰PASS）・`gamelab-samples.js` は node 安全のまま（verify-gamelab PASS）
+  - **★表を studio と gamelab で2つに分けた（`STUDIO_SAMPLE_COVERS` / `GAMELAB_SAMPLE_COVERS`）**: 1つの表にすると、将来 id が衝突したときに**別モードのカバー絵が黙って出る**。絵と名前の取り違えは verify で検出できない種類の事故なので、構造で防いだ
+  - **★§5 id と画像の対応（実測・10本すべて一致）**: gamelab= あつめゲーム→`cover_collect`／よけゲーム→`cover_dodge`／キャッチ→`cover_catch`／おちものキャッチ→`cover_dropcatch`／おにごっこ→`cover_oni`／ゴールまで いこう→`cover_goalrun`。studio= ダンスパーティー→`cover_dance`／おいかけっこ→`cover_chase`／タップでへんしん→`cover_tap`／ドッキリかくれんぼ→`cover_hide`。**DOM のファイル名照合に加えて絵の中身も目視**（あつめ=星をタップする手／よけ=トゲの敵に囲まれたスライム／キャッチ=スライムに伸びる手／おちもの=落ちてくるリンゴを受ける子／おにごっこ=炎の鬼に追われる子／ゴール=岩とゴール旗）＝**取り違えゼロ**
+  - **§3-4 棚の高さ**: `film` は **177px で b6m と同じ**（枠 128×85・自然サイズ 768×512 も実測）。自分の作品側は 132px のまま
+  - 検証: **verify 9本全PASS（`--update` なし＝ベースライン SHA-256 一致 `43b61933…869e`）**・本番 b6n（`index-DaKd_hTx.js`）配信＋版表示 v2.3-b6n・**本番バンドルが参照するカバー絵10枚すべてが 200 で配信**・`docs/assets` は 38,020→**38,384KB（+364KB**＝指示書の見込み +343KB とほぼ一致）・アプリのコンソールエラーゼロ
+  - ⚠️途中で **`npm run deploy` / `Write` / `sed -i` が権限で拒否**され deploy 前で停止した（神田さんが権限を絞り直して再開）。実装・検証は停止前に完了していた
+  - ⚠️次: 神田さんの iPad 実機確認（§5実機ゲート5項目）: ①みほんの棚がカバー絵になり並べて見分けがつく②**絵と名前と説明が合っている**③自分の作品は従来のサムネのまま④棚の高さが b6m と変わっていない⑤こうぼう（草原）とスタジオ（赤い舞台）で別の場所だと分かる
 - 検証体制: `npm run verify` ＝ パズル162面（★3最短＋難易度カーブ）＋クイズ360問（正解一意＋難易度タグ照合＋ループ回数表記禁止）＋ローマ字128件。FAILだと `npm run deploy` で公開されない
 
 ### 未完了タスク（backlog・roadmap.md §2 と同期）
 
-1. **実機で継続確認**（大きな刷新が続いたため・各版の⚠️次を参照。**b5w 以前の版の⚠️次は `progland-archive-2026-07.md`**）: **クイズ改修b4u（関所B）**・相棒/たまごサイクル（孵化テンポ `EGG_HATCH_XP=40`・b4s卵欄）・結果シーケンスのタメ（SEQ定数）・バトル入口背景・タイピングのタップ入力・なかまわけ新形式（b4t）ほか b4系一式
+1. ~~**実機で継続確認**（b4系一式）~~ … **引退（2026-07-25）**。対象がすべて後続版に置き換わって実機OK済み（クイズは b5系で612問に拡張／相棒・たまごは b5系で15体／バトル入口背景は b5b で作り直し／b6i の教育接続で相棒レベルアップとバトル解錠まで実機確認済み）。原文は `progland-archive-2026-07.md` の「引退した未完了タスク」へ移した
 2. **メモ06-A Phase2 ナッジ**（タワーのレベル選択の後押し）… 保留（タワーの手応えが実機で落ち着いてから）
 3. **クイズ深さ化** … 後回し（必要な帯だけ）
 4. **App側進化演出との二重**（結果シーケンスの進化が山場になったので、二重がクドければ「バトル中はApp側を抑制」）… 実機判断
