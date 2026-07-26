@@ -6,6 +6,8 @@
 import { DEFS, GAMELAB_PALORDER, SOUNDS } from "../data/studio-blocks.js";
 import { BGS } from "../data/studio-bgs.js";
 import { SAMPLES } from "../data/gamelab-samples.js";
+// カバー絵は UI 側の別ファイル（gamelab-samples.js は verify-gamelab が node で読む純データ＝画像を入れられない）
+import { GAMELAB_SAMPLE_COVERS } from "../data/sample-covers.js";
 import { GAMELAB_GUIDE } from "../data/parent-guide.js";
 import {
   ensureGamelab, saveWork, stashDraft, deleteWork, nextWorkName,
@@ -33,7 +35,7 @@ export const GAMELAB_MODE = {
   space: { key: "gamelab", peek: p => (p && p.gamelab) || null, ensure: ensureGamelab },
   works: { saveWork, stashDraft, deleteWork, nextWorkName, WORKS_MAX, NAME_MAX, MILESTONE_NAMES },
 
-  samples: SAMPLES,
+  samples: SAMPLES.map(s => ({ ...s, cover: GAMELAB_SAMPLE_COVERS[s.id] })), // desc は SAMPLES 内・cover はここで合流
   guide: GAMELAB_GUIDE, // 開店フェーズ 便④-A で接続（原稿=brushup/gamelab-parent-guide.md・Home 側の {guide && …} ガードで表示）
   homeBg: bgInterior,
 

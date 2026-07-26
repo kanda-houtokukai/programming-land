@@ -77,6 +77,9 @@ const CSS = `
     border-radius: 2px; }
   .film-frame::before { top: 4px; }
   .film-frame::after { bottom: 4px; }
+  /* みほんのカバー絵（sample-covers.md §3-3）: StudioThumb と同じ 3:2 の枠にそのまま収まる。
+     絵は 768×512 でちょうど 3:2 なので object-fit:cover でも歪まない（枠の装飾は film-frame が担う） */
+  .film-cover { display: block; object-fit: cover; border-radius: 2px; flex-shrink: 0; }
   .film-name { color: #f5eddf; font-size: 12px; font-weight: 900; text-align: center; margin-top: 5px;
     max-width: 142px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   /* みほんの説明（FB便B §2）: サムネはどれも「背景の上にキャラが立っている絵」で見分けが付かないため、
@@ -232,7 +235,17 @@ export default function WorkshopHome({ mode, onOpen, onExitApp }) {
               <div className="sh-shelf">
                 {SAMPLES.map(s => (
                   <button key={s.id} className="film" onClick={() => openSample(s)}>
-                    <div className="film-frame"><StudioThumb bg={s.bg} chars={s.chars} width={HOME_CFG.THUMB_W} profile={prof} /></div>
+                    {/* sample-covers.md §3-1: みほんは専用のカバー絵にする（StudioThumb だと どれも
+                        「背景の上にキャラが立っている絵」になり並べても見分けが付かないため）。
+                        ★自分の作品（上のフィルムだな）は従来の StudioThumb のまま＝棚の見た目で
+                        「みほん＝作り込まれた見本 ／ 自分の作品＝自分が作ったもの」を伝える。
+                        cover が無いみほんは従来のサムネへ落ちる（フォールバック・枠はどちらも 3:2 で同じ） */}
+                    <div className="film-frame">
+                      {s.cover
+                        ? <img className="film-cover" src={s.cover} alt="" draggable="false"
+                            style={{ width: HOME_CFG.THUMB_W, height: Math.round(HOME_CFG.THUMB_W * 2 / 3) }} />
+                        : <StudioThumb bg={s.bg} chars={s.chars} width={HOME_CFG.THUMB_W} profile={prof} />}
+                    </div>
                     <div className="film-name">{s.name}</div>
                     {s.desc && <div className="film-desc">{s.desc}</div>}
                   </button>

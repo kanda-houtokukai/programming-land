@@ -6,6 +6,7 @@
 import { DEFS, PALORDER, SOUNDS } from "../data/studio-blocks.js";
 import { BGS } from "../data/studio-bgs.js";
 import { SAMPLES, SAMPLE_DESCS } from "../data/studio-samples.js";
+import { STUDIO_SAMPLE_COVERS } from "../data/sample-covers.js";
 import { STUDIO_GUIDE } from "../data/parent-guide.js";
 import {
   ensureStudio, saveWork, stashDraft, deleteWork, nextWorkName,
@@ -41,7 +42,7 @@ export const STUDIO_MODE = {
   // Home（棚UI）用
   // FB便B §2: 説明文はここで合流させる（SAMPLES 本体は回帰ハーネスが凍結しているため中に入れない）。
   // UI から見える形は gamelab と同じ s.desc
-  samples: SAMPLES.map(s => ({ ...s, desc: SAMPLE_DESCS[s.id] })),
+  samples: SAMPLES.map(s => ({ ...s, desc: SAMPLE_DESCS[s.id], cover: STUDIO_SAMPLE_COVERS[s.id] })),
   guide: STUDIO_GUIDE,
   homeBg: bgInterior,
 
