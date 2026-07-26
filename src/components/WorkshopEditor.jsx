@@ -515,8 +515,11 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   if (!initRef.current) {
     const profile = lastProfile();
     // シーン読み込み共通: kind検証・位置クランプ・ブロックIDは全振り直し（cloneBlocks＝コピーとして開く）
+    // ★cid があればそれを使う（監査 B-1・2026-07-26）。無ければ従来どおり配列順で c1..cN。
+    //   ⚠️ 無い場合の挙動は1バイトも変えないこと（みほんには cid が無く、other.key が cid 由来＝
+    //      エンジンの凍結トレース732イベントに直結する）。
     const loadScene = src => src.chars.filter(c => kindValid(c.kind)).slice(0, CFG.MAX_CHARS).map((c, i) => ({
-      cid: "c" + (i + 1), kind: c.kind,
+      cid: c.cid || ("c" + (i + 1)), kind: c.kind,
       x: Math.max(0, Math.min(LCOLS - 1, c.x | 0)), y: Math.max(0, Math.min(LROWS - 1, c.y | 0)),
       stacks: (c.stacks || []).map(s => ({ x: s.x || 20, y: s.y || 20, blocks: cloneBlocks(s.blocks || []) })),
     }));
@@ -545,7 +548,31 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       }
     }
     if (!chars || !chars.length) chars = [{ cid: "c1", kind: { type: "player" }, x: 5, y: 3, stacks: [] }];
-    initRef.current = { profile, chars, bg, sel, toast: showOnly ? null : toast, origin, name, gameConfig, cidSeq: chars.length, cast: buildCast(profile) };
+
+    /* ★古い保存作品の救済（監査 B-1・§2-2(4)）: cid を持たない世代の作品は、キャラを消して保存した時点で
+       target が実在しない cid を指している可能性がある。b6d の targetName 救済でピルは「だれか」と出るのに
+       エンジンは一度も発火しない＝「表示は正常なのに動かない」という最悪の形になっていた。
+       表示と挙動を一致させる側へ落とす:
+         bumpTarget / goal … 解決できない target → "any"（ピルの「だれか」と挙動が一致する）
+         gameOver.targetId … 解決できない → gameOver=null（ばくだんを切る。"any" にすると
+                             「誰に触っても負け」という別物のゲームになるため切る側に倒す）
+       ★chase は b6d で「最も近いキャラを追う」救済がエンジン側に入っているので触らない。
+       ★この救済は読み込み時のメモリ上だけ。保存済みデータは書き換えない（次に保存すれば cid つきで直る）。 */
+    {
+      const live = new Set(chars.map(c => c.cid));
+      const fixBlocks = list => { for (const b of list || []) {
+        if ((b.type === "bumpTarget" || b.type === "goal") && b.target && b.target !== "any" && !live.has(b.target)) b.target = "any";
+        if (b.children) fixBlocks(b.children);
+      } };
+      for (const c of chars) for (const st of c.stacks) fixBlocks(st.blocks);
+      if (gameConfig && gameConfig.gameOver && !live.has(gameConfig.gameOver.targetId)) gameConfig = { ...gameConfig, gameOver: null };
+    }
+    // ★新しいキャラに振る番号は「既存の最大値+1」から（監査 B-1・§2-2(3)）。
+    //   chars.length を起点にすると、途中を消した作品（c1,c3 など）で既存と衝突して事態が悪化する。
+    //   cid を持たないデータでは loadScene が c1..cN を振るので max = chars.length ＝従来と同じ値になる。
+    const cidNum = cid => { const m = /^c(\d+)$/.exec(cid || ""); return m ? +m[1] : 0; };
+    const cidSeq = chars.reduce((mx, c) => Math.max(mx, cidNum(c.cid)), 0);
+    initRef.current = { profile, chars, bg, sel, toast: showOnly ? null : toast, origin, name, gameConfig, cidSeq, cast: buildCast(profile) };
   }
   const profileRef = useRef(initRef.current.profile);
   const charsRef = useRef(initRef.current.chars);
@@ -711,7 +738,9 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     const prof = profileRef.current;
     if (!prof) { setSaveOpen(false); setToast("セーブデータが ないよ。さいしょの がめんで なまえを つくってね"); return; }
     const sc = serializeScene(); // JSON往復のディープクローン＝以後の編集と共有しない
-    const scene = { bg: sc.bg, chars: sc.chars.map(c => ({ kind: c.kind, x: c.x, y: c.y, stacks: c.stacks })),
+    // ★cid を保存に含める（監査 B-1 の根治）。捨てると読み込みで配列順に振り直され、
+    //   キャラを消した作品で bumpTarget / goal / gameOver の相手がすり替わる
+    const scene = { bg: sc.bg, chars: sc.chars.map(c => ({ cid: c.cid, kind: c.kind, x: c.x, y: c.y, stacks: c.stacks })),
       ...(mode.isGame ? { gameConfig: gameConfigRef.current } : {}) }; // ゲームはせっていごと保存（stage1 §7f）
     const r = saveWork(prof, scene, saveName, originRef.current);
     if (!r.ok) { setSaveOpen(false); setToast("たなが いっぱい! どれか けしてから"); sndNo(); return; }

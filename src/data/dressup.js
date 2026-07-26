@@ -106,16 +106,23 @@ export const SHOP_DRESSUP = DRESSUP_ITEMS.filter(d => d.acquire.type === "shop")
 // 判定は App.update のバッジ判定と同じタイミングで呼ぶ。条件の実体はここに集約。
 import { STAGES } from "./stages.js";
 import { BADGES } from "./badges.js";
-import { DEFS as STUDIO_DEFS, usedBlockTypesInWorks } from "./studio-blocks-defs.js";
+import { PALORDER as STUDIO_PALORDER, usedBlockTypesInWorks } from "./studio-blocks-defs.js";
 const ACHIEVEMENT_CHECKS = {
   // はかせぼうし: 全パズル制覇（全162面クリア＝★1以上）
   all_puzzles_clear: save => STAGES.every(st => (save.puzzle.stars[st.id] || 0) > 0),
   // おうかん: 大きな節目＝バッジを全部あつめる
   all_badges: save => BADGES.every(b => save.badges.includes(b.id)),
-  // かんとくベレー: 保存済み works 全体で18種のカードをすべて使った＝学習範囲一巡の証（段階3・設計§8）
+  // かんとくベレー: 保存済み works 全体で studio の棚のカードをすべて使った＝学習範囲一巡の証（段階3・設計§8）
+  // ★判定は DEFS 全種ではなく studio の PALORDER（棚に出る種類）で行う（監査 A-1・2026-07-26 修正）。
+  //   DEFS は段階1以降 gamelab 専用カードを含んで 29種に増えたが、その11種
+  //   （scoreUp/scoreDown/moveRand/bounce/bumpTarget/dpad/tapMove/jumpable/chase/fall/goal）は
+  //   studio の棚に出ないので studio の作品には置けない＝どうやっても達成できない条件になっていた。
+  //   ラベルと flavor の「18」が元の仕様なので、ラベルではなく判定をそちらへ合わせる。
+  //   ⚠️ studio の PALORDER に種類を足したら、上のラベル/flavor の数字も必ず直すこと
+  //      （ズレは tools/verify-studio.mjs が FAIL させる）。
   studio_all_cards: save => {
     const used = usedBlockTypesInWorks((save.studio && save.studio.works) || []);
-    return Object.keys(STUDIO_DEFS).every(t => used.has(t));
+    return STUDIO_PALORDER.every(t => used.has(t));
   },
 };
 // 未所持で条件を満たした achievement アイテムの配列を返す（付与は呼び出し側で）

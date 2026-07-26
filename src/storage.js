@@ -4,7 +4,7 @@
      progland:v2:profile:<id>  … 各プロファイルの記録本体
    将来の項目追加でクラッシュしないよう、読み込みは常にデフォルト値マージで行う */
 
-export const SCHEMA_VERSION = 8; // 8 = b6i: gamelab.milestones（開店フェーズ 便③の教育接続）。7 = b5u: gamelab（works/draft）／6 = b5k: settings.musicVol／5 = b5g: studio.milestones／4 = b5e: studio／3 = b4j: partner 相棒ごとレベル
+export const SCHEMA_VERSION = 9; // 9 = b6p: 作品の chars に cid を保存（監査 B-1・相手指定のすり替わり根治）。8 = b6i: gamelab.milestones（開店フェーズ 便③の教育接続）／7 = b5u: gamelab（works/draft）／6 = b5k: settings.musicVol／5 = b5g: studio.milestones／4 = b5e: studio／3 = b4j: partner 相棒ごとレベル
 export const MAX_PROFILES = 4;
 const META_KEY = "progland:v2:meta";
 const profileKey = id => `progland:v2:profile:${id}`;

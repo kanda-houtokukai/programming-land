@@ -229,5 +229,62 @@ ok(JSON.stringify(q.gamelab) === JSON.stringify(p.gamelab), "b5u/b6i ゲーム�
     "b6i studio の達成が gamelab.milestones に漏れない（保存先が分かれている）");
 }
 
+/* ===== b6p 監査 B-1: 作品の chars に cid を保存する（相手指定のすり替わり根治） =====
+   由来: 保存で cid を捨て、読み込みで配列順に振り直していたため、途中のキャラを消して保存すると
+   bumpTarget / goal / gameOver.targetId が別のキャラを指す（＝ピルは「だれか」と出るのに一度も発火しない）。
+   ★ここでは storage の往復と、エディタの読み込み規則（cid があれば使う／無ければ c1..cN）を
+     同じ式で再現して検証する（WorkshopEditor.jsx は node から読めないため式を写している）。 */
+{
+  const loadCids = chars => chars.map((c, i) => c.cid || ("c" + (i + 1)));
+
+  // ① cid つきの作品が往復で保たれる
+  const rawC = JSON.parse(localStorage.getItem(`progland:v2:profile:${q.id}`));
+  const work = { id: "g9", name: "ゲーム9", savedAt: "2026-07-26", remixOf: null, bg: "sougen",
+    gameConfig: { scoreShow: true, clear: { type: "score", param: 5 }, gameOver: { targetId: "c3" } },
+    chars: [
+      { cid: "c1", kind: { type: "player" }, x: 1, y: 1,
+        stacks: [{ x: 0, y: 0, blocks: [{ id: 1, type: "goal", target: "c3" }, { id: 2, type: "scoreUp", n: 5 }] }] },
+      { cid: "c3", kind: { type: "enemy", id: "slime" }, x: 5, y: 5, stacks: [] },
+    ] };
+  rawC.gamelab = { works: [work], draft: null, milestones: {} };
+  localStorage.setItem(`progland:v2:profile:${q.id}`, JSON.stringify(rawC));
+  const mC = loadFresh(q.id);
+  const w1 = mC.gamelab.works[0];
+  ok(JSON.stringify(w1) === JSON.stringify(work), "b6p cid つきの作品が往復で完全一致（cid が消えない）");
+  ok(loadCids(w1.chars).join() === "c1,c3", "b6p 読み込みで cid がそのまま使われる（c1,c3＝振り直さない）");
+  ok(w1.chars[0].stacks[0].blocks[0].target === "c3" && w1.gameConfig.gameOver.targetId === "c3",
+    "b6p ★途中のキャラを消した作品でも goal / gameOver の相手が保たれる（この不具合の再発検知）");
+
+  // ② cid を持たない旧作品は従来どおり c1..cN（★みほんとトレースに直結＝挙動を変えない）
+  const oldChars = [{ kind: { type: "player" }, x: 1, y: 1, stacks: [] },
+                    { kind: { type: "enemy", id: "slime" }, x: 2, y: 2, stacks: [] },
+                    { kind: { type: "enemy", id: "mushroom" }, x: 3, y: 3, stacks: [] }];
+  ok(loadCids(oldChars).join() === "c1,c2,c3", "b6p cid を持たない旧作品は従来どおり c1..cN が振られる");
+
+  // ③ 新しいキャラの番号は「既存の最大値+1」（chars.length 起点だと c3 と衝突する）
+  const cidNum = cid => { const m = /^c(\d+)$/.exec(cid || ""); return m ? +m[1] : 0; };
+  const seq = w1.chars.reduce((mx, c) => Math.max(mx, cidNum(c.cid)), 0);
+  ok(seq === 3 && "c" + (seq + 1) === "c4", "b6p 次の cid は既存の最大値+1（c1,c3 の次は c4＝衝突しない）");
+  ok(oldChars.reduce((mx, c, i) => Math.max(mx, cidNum(c.cid || ("c" + (i + 1)))), 0) === oldChars.length,
+    "b6p cid の無いデータでは 最大値 = chars.length ＝従来の cidSeq と同じ値になる");
+
+  // ④ 解決できない target の救済（§2-2(4)）: bumpTarget/goal → "any" ／ gameOver → null
+  const live = new Set(["c1", "c2"]);
+  const blocks = [{ type: "bumpTarget", target: "c9" }, { type: "goal", target: "c9" },
+                  { type: "bumpTarget", target: "c2" }, { type: "chase", target: "c9" },
+                  { type: "forever", children: [{ type: "goal", target: "c9" }] }];
+  const fix = list => { for (const b of list || []) {
+    if ((b.type === "bumpTarget" || b.type === "goal") && b.target && b.target !== "any" && !live.has(b.target)) b.target = "any";
+    if (b.children) fix(b.children);
+  } };
+  fix(blocks);
+  ok(blocks[0].target === "any" && blocks[1].target === "any", "b6p 解決できない bumpTarget / goal は any に落ちる");
+  ok(blocks[2].target === "c2", "b6p 解決できる target は変えない");
+  ok(blocks[3].target === "c9", "b6p chase は触らない（b6d のエンジン側の救済に任せる）");
+  ok(blocks[4].children[0].target === "any", "b6p 容器の中の goal も救済される");
+  const gc = { gameOver: { targetId: "c9" } };
+  ok((live.has(gc.gameOver.targetId) ? gc.gameOver : null) === null, "b6p 解決できない gameOver は null に落ちる（ばくだんを切る）");
+}
+
 console.log(fail === 0 ? "\n✅ ラウンドトリップ 全項目一致（P5完了条件クリア）" : `\n❌ ${fail}件 不一致`);
 process.exit(fail === 0 ? 0 : 1);

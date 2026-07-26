@@ -4,8 +4,11 @@
    参照する正本: studio-blocks-defs.js（node安全なブロック定義）＋ engine.js（スモーク実行）。
    実行: node tools/verify-studio.mjs */
 
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import { SAMPLES } from "../src/data/studio-samples.js";
-import { DEFS, SOUNDS, STUDIO_BG_IDS, isTrigger, isContainer } from "../src/data/studio-blocks-defs.js";
+import { DEFS, PALORDER, SOUNDS, STUDIO_BG_IDS, isTrigger, isContainer } from "../src/data/studio-blocks-defs.js";
 import { createEngine, LCOLS, LROWS } from "../src/workshop/engine.js";
 
 let fail = 0;
@@ -96,8 +99,42 @@ for (const s of SAMPLES) {
 }
 if (SAMPLES.length !== 4) ng(`みほんは4本のはず（実際 ${SAMPLES.length}本）`);
 
+/* ===== かんとくベレーの解放条件とラベルの照合（監査 A-1 の再発防止・2026-07-26 追加） =====
+   経緯: 解放判定が DEFS 全種（29）を要求していたのに、studio の棚は PALORDER の18種しかなく、
+   差の11種は gamelab 専用で studio の作品に置けなかった＝どうやっても達成できない条件だった。
+   ラベルと flavor には「18」と書いてあり、そちらが元の仕様。**verify は全PASSしていて気づけなかった**。
+   ★src/data/dressup.js は画像を import するため node から読めない → テキストとして読んで照合する
+     （tools/gen-cards.mjs --check と同じ考え方）。 */
+{
+  const here = dirname(fileURLToPath(import.meta.url));
+  const src = readFileSync(join(here, "../src/data/dressup.js"), "utf8");
+  const want = PALORDER.length;
+
+  // ① 判定が studio の棚（PALORDER）基準であること（DEFS 全種に戻したら FAIL）
+  if (!/studio_all_cards:[\s\S]{0,600}?STUDIO_PALORDER\.every/.test(src)) {
+    ng("かんとくベレー: 解放判定が studio の PALORDER 基準になっていない"
+      + "（DEFS 全種で判定すると gamelab 専用カードを要求して永久に達成できない・監査 A-1）");
+  }
+
+  // ② ラベル／flavor の数字が棚の種類数と一致すること（棚に足したら文言も直す）
+  const label = /condition: "studio_all_cards",[\s\S]{0,200}?label: "([^"]*)"/.exec(src);
+  const flavor = /condition: "studio_all_cards",[\s\S]{0,400}?flavor: "([^"]*)"/.exec(src);
+  if (!label || !flavor) {
+    ng("かんとくベレー: dressup.js の label / flavor を読み取れない（照合の形が変わった可能性）");
+  } else {
+    for (const [name, text] of [["label", label[1]], ["flavor", flavor[1]]]) {
+      const n = /(\d+)/.exec(text);
+      if (!n) ng(`かんとくベレー: ${name} に種類数の数字が無い（"${text}"）`);
+      else if (+n[1] !== want) {
+        ng(`かんとくベレー: ${name} の数字 ${n[1]} が studio の棚の種類数 ${want} と食い違う`
+          + `（PALORDER に足したら dressup.js の文言も直すこと）`);
+      }
+    }
+  }
+}
+
 if (fail === 0) {
-  console.log(`つくるスタジオ みほん${SAMPLES.length}本 PASS（型/範囲/深さ/ずっと末尾/きっかけ1本/上限/エンジン40拍スモーク）`);
+  console.log(`つくるスタジオ みほん${SAMPLES.length}本 PASS（型/範囲/深さ/ずっと末尾/きっかけ1本/上限/エンジン40拍スモーク）＋かんとくベレーの条件とラベル ${PALORDER.length}種 照合PASS`);
   process.exit(0);
 } else {
   console.log(`\n❌ みほん検証 ${fail}件 FAIL`);
