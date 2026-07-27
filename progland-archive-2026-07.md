@@ -3,7 +3,7 @@
 > ⚠ **これは過去の記録です。現在の計画・仕様ではありません。**
 > 現状は `progland-handoff.md`（台帳）・`roadmap.md`（現在地）・`feature-spec.md`（仕様）が正。
 
-- **収録**: `progland-handoff.md`「今どこか」から切り出した **v2.3-b4e（2026-07-12）〜 v2.3-b6g（2026-07-24）の55版**（新しい順）。原文のまま・1文字も削っていない。
+- **収録**: `progland-handoff.md`「今どこか」から切り出した **v2.3-b4e（2026-07-12）〜 v2.3-b6h（2026-07-25）の56版**（新しい順）。原文のまま・1文字も削っていない。
 - **通常のセッションではこのファイルを読まない。** 台帳（`progland-handoff.md`）だけ読めばよい。過去の経緯を追う必要が出たときだけ参照する。
 - **これより古い版**（v2.3-b4d 以前）は `progland-handoff-archive.md` にある（2026-07-15 の分割時に作成）。両者で b4d／b4e が連続する。
 - ここに載る `⚠️実機確認待ち` `⚠️次` は**当時のもの**。その後の版に置き換わって出荷済みであり、いま待っている作業ではない。生きている宿題は台帳の「未完了タスク」が正。
@@ -70,8 +70,18 @@
 
 ---
 
-## 版ごとの詳細ログ（v2.3-b6g 〜 v2.3-b4e・新しい順）
+## 版ごとの詳細ログ（v2.3-b6h 〜 v2.3-b4e・新しい順）
 
+- **v2.3-b6h（2026-07-25・開店フェーズ 便②=マップ開店〔看板①→建物・画面登録・退出配線〕＋便①アセット12枚の余白修正＝⚠️実機確認待ち／deploy済み 24e3739）**: 指示書=`brushup/gamelab-opening-step2.md`（正本）・設計正本=`brushup/gamelab-opening-design.md` §A。指示書配置=80ad5bd・アセット修正=b182824・§1マップ=b30dea3・§2配線=04510f1・版上げ=5f264c0（deploy=24e3739）
+  - **★§0 で Chat の想定との食い違いを1件検出（着手を止めて報告→神田さん判断で修正）**: 指示書は「建物PNGの縦余白は加工済み・確認だけでよい」としていたが、**現物は上下9pxの透明余白あり**＝マップ上で既存4棟より **約7.0%小さく表示**される状態だった（`studio-map-placement.md` 記録の既知不具合と同型）。神田さんが作り直した12枚（建物1＋`card_icon_19〜29`）で差し替え。**規約の実体は「min(pad)=0＝絵がキャンバスの端に接する」**（既存18枚を実測。正方形でない絵は縦横比が決める側の軸だけが0になる＝「上下も左右も0」は成立しない）。差し替え後、全12枚 256×256・min(pad)=0 を機械確認
+  - **§1 マップ（`WorldMap.jsx`）**: `SIGNS` 1枚目(69.5, 34.13)を削除し、同座標へ `AREAS` 末尾に `{key:"gamelab", short:"ゲーム", place:"ゲームこうぼう", tall:true}` を追加。**末尾追加＝既存エリアのふわふわ位相を変えない**（floatDelay/Dur が index 依存）。**看板②(47.3, 29.25)は残す**（「まだ増える」予告の維持）。`flip` は使わない＝光源を実測して左光源と確認（gamelab **+13.5**／既存 quiz +5.8・home +22.6・typing +41.2・studio +1.5＝全て正の値で一致）
+  - **§2 導線（`App.jsx`）**: `Gamelab` を import＋`screen==="gamelab"` の1行を studio の直後に追加。**★`exitStudio`→`exitWorkshop` に改名して studio/gamelab で共用**（判断の根拠: 中身は `loadProfile`→`update`→`setScreen("home")` の3行のみで **studio 固有の処理をひとつも持たない**）。`TRACK` に `gamelab: null, // 便④で接続` を追加（`TRACK[screen] ?? null` なのでキー無しと**挙動は完全に同一**＝記録目的の1行）。**`#gamelab-dev` は残す**（`main.jsx` 不変・神田さんの検証用）
+  - 受け皿は便①までに揃っていた: `Gamelab.jsx` は既に `onExit` を受ける形（Studio.jsx と同形）・`WorkshopHome` が `onExitApp` の有無で「◀ マップへ」／「◀ アプリへ」を自動で切替・`WorldMap` の `go(area.key)` は `setScreen` そのもの＝**追加は実質2行**で通った
+  - 検証: **verify 8本全PASS（`--update` なし＝`tools/studio-baseline.json` が git 差分ゼロ＝DEFS29・トレース732イベント・パス98本 1バイト不変**＝マップと画面登録のみで DEFS に触れていないことを機械確認）・**`gamelab-building-NYUkkDdc.png` が `docs/assets` に出現＝配線された証拠**（便①では未参照で出ていなかった）・本番 b6h（`index-4GvXsIJE.js`）＋建物PNG を 200 で配信確認・コンソールエラーゼロ
+  - ブラウザ実測（dev 1280px）: マップに11エリア（末尾=ゲームこうぼう）・**看板は1枚**・建物の img ボックス 87.3×87.3＝**既存 tall 4棟と同値**（余白0なので絵も同じ高さを占める）・ラベル「ゲーム」・ポップアップ「ゲームこうぼう へ いく」・▶いく！→**カセットだな(0/30)が開く**・ヘッダーが**「◀ マップへ」**（＝`onExit` が渡っている証拠）→押すとマップへ復帰・`#gamelab-dev` は従来どおり「◀ アプリへ」で不変
+  - ★台帳の副次修正: b5y ブロックの末尾2行（検証・⚠️次）が b6g の後に迷子になっていた（2026-07-24 のスリム化時に発生・HEAD `f833db5` で確認）ので、**原文のまま** b5y ブロックへ戻した
+  - ⚠️次: 神田さんの iPad 実機確認（§4実機ゲート7項目）: ①建物が出て看板が1枚に減っている②**大きさが既存の建物と揃っている**③ラベル「ゲーム」・タップで「ゲームこうぼう へ いく」④入れる／戻れる⑤スタジオの「つくる」と紛らわしくないか（**名前の最終判断**）⑥座標の微調整要否（重なり・草地）⑦studio・他エリアが不変。合格後 **便③ 教育接続**（`exitWorkshop` 経路が効くことをそこで確認する）
+  - ✅実機確認合格（2026-07-25・神田さん）
 - **v2.3-b6g（2026-07-24・開店フェーズ 便①=素材差し替え〔暫定SVGアイコン11枚をPNG化＋こうぼう内観を専用画像へ〕＝⚠️実機確認待ち／deploy済み 168348c）**: 指示書=`brushup/gamelab-opening-step1.md`（正本）・設計正本=`brushup/gamelab-opening-design.md`。開店フェーズ文書4本配置＋台帳更新=9d7d209・実装=874a5e4（deploy=168348c）
   - **§2-1 アイコン11枚PNG化**: `src/data/studio-blocks.js` の暫定 `svgGlyph`（iconMoveRand/Bounce/ScoreUp/ScoreDown/BumpTarget/Dpad/TapMove/Goal/Chase/Fall/Jumpable）を `card_icon_19〜29` の PNG import に置換（既存18枚と同じ import 方式に統一）。`svgGlyph` ヘルパー＋関連コメントを全廃（未使用コード掃除）。**ICONS の型↔アイコン結び付き・DEFS の中身/並び/ラベル/色は不変＝アイコンの絵だけが変わる**
   - **§2-2 内観差し替え**: gamelab `src/gamelab/mode.jsx` の `homeBg` を studio-interior 流用→`gamelab-interior.webp`（1600×900）へ。「段階1はスタジオ流用」コメントも実態に更新。**★studio 側 `src/studio/mode.jsx` の homeBg は不変**（studio-interior のまま）
