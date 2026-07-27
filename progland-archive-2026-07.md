@@ -3,7 +3,7 @@
 > ⚠ **これは過去の記録です。現在の計画・仕様ではありません。**
 > 現状は `progland-handoff.md`（台帳）・`roadmap.md`（現在地）・`feature-spec.md`（仕様）が正。
 
-- **収録**: `progland-handoff.md`「今どこか」から切り出した **v2.3-b4e（2026-07-12）〜 v2.3-b6h（2026-07-25）の56版**（新しい順）。原文のまま・1文字も削っていない。
+- **収録**: `progland-handoff.md`「今どこか」から切り出した **v2.3-b4e（2026-07-12）〜 v2.3-b6i（2026-07-25）の57版**（新しい順）。原文のまま・1文字も削っていない。
 - **通常のセッションではこのファイルを読まない。** 台帳（`progland-handoff.md`）だけ読めばよい。過去の経緯を追う必要が出たときだけ参照する。
 - **これより古い版**（v2.3-b4d 以前）は `progland-handoff-archive.md` にある（2026-07-15 の分割時に作成）。両者で b4d／b4e が連続する。
 - ここに載る `⚠️実機確認待ち` `⚠️次` は**当時のもの**。その後の版に置き換わって出荷済みであり、いま待っている作業ではない。生きている宿題は台帳の「未完了タスク」が正。
@@ -70,8 +70,23 @@
 
 ---
 
-## 版ごとの詳細ログ（v2.3-b6h 〜 v2.3-b4e・新しい順）
+## 版ごとの詳細ログ（v2.3-b6i 〜 v2.3-b4e・新しい順）
 
+- **v2.3-b6i（2026-07-25・開店フェーズ 便③=教育接続〔XP10・コイン5種・きろく〕＝⚠️実機確認待ち／deploy済み 821fa63）**: 指示書=`brushup/gamelab-opening-step3.md`（正本）・設計正本=`brushup/gamelab-opening-design.md` §D。§4手当て＝7984894・§1実装=f042913・版上げ=8ce0a4a相当（deploy=821fa63）
+  - **★§0 の制約（Chat が事前に警告・確認して回避）**: `growth.js` は `data/monsters.js`→`mon_mori_1.png` の連鎖で **node から読めない**（`Unknown file extension ".png"`・実測で確認）。よって `gamelab/works.js` に素直に import すると、node で走る verify が壊れうる。**verify チェーン9本の import を推移的に全走査した結果、`gamelab/works.js` を読むツールは直接・間接とも0件**（各ツールの根から辿れる src は最大5ファイル）。→ 指示書 §0-1-3 に従い **studio と同じ形（素直に import）を採用**（§0-2 の注入形は不要）。`verify-gamelab.mjs` は実際に単体でも PASS することを実行して確認。★ただし works.js は**ブラウザ専用になった**ので、冒頭コメントを studio/works.js と同じ趣旨へ更新（次に node から触ろうとする人向け）
+  - **§1-1 XP**: `growth.js` に `XP.gamelabSave() = 10` を追加（**studio と同額**＝モードで差を付けると「得な方だけやる」誘因になるため）。**新規作品の初回保存のみ**
+  - **§1-2 コイン**: `COIN.gamelab = { first:15, works5:20, works10:30, firstOperable:15, firstClear:15 }`。**後半2つが こうぼう固有**（studio の firstNest/firstCast3 では「人が操作するものを作った」「勝ち負けを設計した」を拾えない）。判定=`firstOperable` は **`workUsesAnyType(work, ["dpad","tapMove"])`**（`studio-blocks-defs.js` に新設・**容器の中まで再帰的に探す**・node安全）／`firstClear` は `work.gameConfig?.clear?.type !== "none"` を**全段オプショナルで**辿る（`gameConfig` は store.js の presence ガード付きで載るため無い作品がある）
+  - **§1-3 保存先の分離**: `gamelab.milestones`（`studio.milestones` と別）。`storage.js` の既定に `milestones: {}` を追加＋**`SCHEMA_VERSION` 7→8**（b5g で studio.milestones を足したときと同型）。既存セーブは2階層デフォルトマージで自動補完＝**移行コード不要**。付与側にも `gamelab.milestones || (= {})` の自己修復あり
+  - **§1-4/1-5**: きろく=`profile.log[今日].gamelab` を新規保存のみカウント／空作品ガード=`sceneNonEmpty` が偽なら XP・コイン・きろくすべて対象外（studio と同じ）
+  - **検証の追加（`tools/test-roundtrip.mjs`）**: ①milestones 込みの完全往復 ②gamelab の無い旧セーブに `{works:[],draft:null,milestones:{}}` が補完される ③**b5u〜b6h 世代（gamelab はあるが milestones なし）にも補完される** ④**studio の達成が gamelab.milestones に漏れない** の4本。CLAUDE.md の「セーブ項目を増やしたら往復試験に足す」に従った
+  - 検証: **verify 9本全PASS（`--update` なし＝`tools/studio-baseline.json` の git 差分ゼロ＝DEFS29・トレース732イベント・パス98本 1バイト不変**＝付与ロジックのみで DEFS に触れていないことを機械確認）・本番 b6i（`index-DRwRA-32.js`）配信＋版表示 v2.3-b6i を確認・コンソールエラーゼロ
+  - **ブラウザ実測（付与ロジックを実モジュールで直接駆動・6ケース）**: ①1本目（そうさ無し・クリア`none`）→ `{xp:10, coins:15, hit:["first"]}`＝**`clear:"none"` では firstClear が出ない**②同じ作品の上書き→**`null`**（付与なし）③dpad＋クリアscore→`{xp:10, coins:30, hit:["firstOperable","firstClear"]}`④3本目 tapMove＋time→`{xp:10, coins:0, hit:[]}`（再付与なし）⑤**`gameConfig` 無しの scene でも落ちない**⑥空作品（きっかけのみ）→`null`。`workUsesAnyType` は単体8ケース（容器2段の中の dpad・chars/stacks undefined 等）で期待どおり
+  - **★§6 相互汚染の実測**: studio で5本保存（`studio.milestones={first,works5}`）した profile で **こうぼう1本目→`first` が出た**（`gamelab.milestones={first}`／studio 側は不変）。`log` も `{studio:5, gamelab:1}` で分離
+  - **§2 かんせい!演出（実UI）**: みほん「おちものキャッチ」を保存→**「かんせい!」に けいけんち +10／🪙+45／ピル3枚**（はじめての ゲーム・はじめて うごかせる ゲーム・はじめての かちまけ）。2本目「おにごっこ」は **XPのみでピル・コインなし**＝初回だけ賑やかになる設計どおり
+  - **§3 exitWorkshop 経路（実UI）**: こうぼうで保存→◀マップへ→**ヘッダーのコインが 0→45 に更新**（App state が storage の最新で置き換わった）・相棒 **Lv1→Lv3**・さらに **「⚔️ バトルが あそべるように なったよ！」のトーストが発火**してマップのバトルが解錠。便②で通した経路が本便で初めて意味を持つことを確認
+  - ★申し送り（文言の最終判断）: マイルストーン表示名は `firstOperable`=**「はじめて うごかせる ゲーム」**／`firstClear`=**「はじめての かちまけ」**とした（ピル表示・13px。studio の「はじめての いれこ」等と同じ長さ感に揃えた）。小1に伝わるかは実機ゲートで判断
+  - ⚠️次: 神田さんの iPad 実機確認（§6実機ゲート7項目）: ①保存で「かんせい!」にXPとコインが出る②2回目以降の同じ作品ではXPが出ない③じゅうじキー/タップいどうを使った作品で `firstOperable`④クリア条件をスコア/じかんにした作品で `firstClear`⑤マップへ戻るとレベルアップ演出やバッジが出る⑥スタジオの達成がこうぼうに影響しない（逆も）⑦スタジオの付与が b6h と変わっていない。合格後 **便④ ガイド＋BGM**
+  - ✅実機確認合格（2026-07-25・神田さん）
 - **v2.3-b6h（2026-07-25・開店フェーズ 便②=マップ開店〔看板①→建物・画面登録・退出配線〕＋便①アセット12枚の余白修正＝⚠️実機確認待ち／deploy済み 24e3739）**: 指示書=`brushup/gamelab-opening-step2.md`（正本）・設計正本=`brushup/gamelab-opening-design.md` §A。指示書配置=80ad5bd・アセット修正=b182824・§1マップ=b30dea3・§2配線=04510f1・版上げ=5f264c0（deploy=24e3739）
   - **★§0 で Chat の想定との食い違いを1件検出（着手を止めて報告→神田さん判断で修正）**: 指示書は「建物PNGの縦余白は加工済み・確認だけでよい」としていたが、**現物は上下9pxの透明余白あり**＝マップ上で既存4棟より **約7.0%小さく表示**される状態だった（`studio-map-placement.md` 記録の既知不具合と同型）。神田さんが作り直した12枚（建物1＋`card_icon_19〜29`）で差し替え。**規約の実体は「min(pad)=0＝絵がキャンバスの端に接する」**（既存18枚を実測。正方形でない絵は縦横比が決める側の軸だけが0になる＝「上下も左右も0」は成立しない）。差し替え後、全12枚 256×256・min(pad)=0 を機械確認
   - **§1 マップ（`WorldMap.jsx`）**: `SIGNS` 1枚目(69.5, 34.13)を削除し、同座標へ `AREAS` 末尾に `{key:"gamelab", short:"ゲーム", place:"ゲームこうぼう", tall:true}` を追加。**末尾追加＝既存エリアのふわふわ位相を変えない**（floatDelay/Dur が index 依存）。**看板②(47.3, 29.25)は残す**（「まだ増える」予告の維持）。`flip` は使わない＝光源を実測して左光源と確認（gamelab **+13.5**／既存 quiz +5.8・home +22.6・typing +41.2・studio +1.5＝全て正の値で一致）
