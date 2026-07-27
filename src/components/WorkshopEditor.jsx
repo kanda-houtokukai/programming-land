@@ -148,6 +148,23 @@ const STUDIO_CSS = `
     background-image: linear-gradient(to right, rgba(120,140,165,.16) 1px, transparent 1px),
                       linear-gradient(to bottom, rgba(120,140,165,.16) 1px, transparent 1px);
     background-size: ${100 / LCOLS}% ${100 / LROWS}%; }
+  /* 12/13 ぶつかったら・ゴール: 発火の瞬間だけ光る（きっかけが動いたことを見せる） */
+  .palDesc .anim .animchar.flash { filter: drop-shadow(0 0 7px #ffd85e) drop-shadow(0 0 3px #ffb51e) brightness(1.25); }
+  /* 9 じゅうじキーの絵（押されている向きが光る） */
+  .palDesc .anim .animpad { position: absolute; right: 6px; bottom: 6px; display: grid; gap: 1px;
+    grid-template-areas: ". u ." "l . r" ". d ."; }
+  .palDesc .anim .animpad span { width: 15px; height: 15px; display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: #7d8896; background: #e7ecf3; border-radius: 4px; }
+  .palDesc .anim .animpad span:nth-child(1) { grid-area: u; }
+  .palDesc .anim .animpad span:nth-child(2) { grid-area: l; }
+  .palDesc .anim .animpad span:nth-child(3) { grid-area: r; }
+  .palDesc .anim .animpad span:nth-child(4) { grid-area: d; }
+  .palDesc .anim .animpad span.on { background: #2FB4A6; color: #fff; }
+  /* 10 指の絵（タップした場所に出る） */
+  .palDesc .anim .animfinger { position: absolute; font-size: 15px; transform: translate(-50%, 50%); pointer-events: none; }
+  /* 2 くりかえし: 残り回数 */
+  .palDesc .anim .animcount { position: absolute; left: 6px; top: 5px; font-size: 10px; font-weight: 900;
+    color: #6b7684; background: rgba(255,255,255,.85); border-radius: 6px; padding: 1px 6px; }
   .studio-asm.hotdrop { box-shadow: inset 0 0 0 3px #9dc4f0; } /* ドラッグ中: 作業エリアが光る（§5） */
 
   /* --- 中央: 組み立てエリア（段階0のステージと同じ作法） --- */
@@ -491,16 +508,64 @@ const countBlocks = list => (list || []).reduce((a, b) => a + 1 + (b.children ? 
    台本はデータとして持つ（card-animation.md §4-1）。★本便は「みぎへ」1種類だけ（§3-4）。
    ここに無いカードはアニメ領域を出さない＝従来どおり long ＋ desc のみ。
    ⚠️ この表は UI 側の定数として持つ。gamelab-samples.js のような node から読まれるファイルには置かない。 */
-const PAL_ANIM_SCRIPTS = {
-  move: { beats: 5, chars: [{ key: "a", kind: { type: "enemy", id: "slime" }, x: 2, y: 3,
-    stacks: [{ blocks: [{ id: 1, type: "hat" }, { id: 2, type: "move", n: 4 }] }] }] },
-};
+const PAL_ANIM_SCRIPTS = (() => {
+  const S = (...blocks) => ({ blocks: blocks.map((b, i) => ({ id: i + 1, ...b })) });
+  const slime = { type: "enemy", id: "slime" }, mush = { type: "enemy", id: "mushroom" }, hero = { type: "player" };
+  return {
+    // 1 みぎへ: 4マス進んで止まる（1周=4拍＝1.6秒）
+    move: { beats: 5, chars: [{ key: "a", kind: slime, x: 2, y: 3, stacks: [S({ type: "hat" }, { type: "move", n: 4 })] }] },
+    // 2 くりかえし: 3回動いて止まる（残り回数を数字で添える＝§4-1）
+    repeat: { beats: 5, count: 3, chars: [{ key: "a", kind: slime, x: 2, y: 3,
+      stacks: [S({ type: "hat" }, { type: "repeat", n: 3, children: [{ id: 9, type: "move", n: 1 }] })] }] },
+    // 3 ずっと: 止まらずに回り続ける（くりかえしとの対比＝★loop しない＝リセットを挟まない）
+    forever: { beats: null, chars: [{ key: "a", kind: slime, x: 5, y: 3,
+      stacks: [S({ type: "hat" }, { type: "forever", children: [{ id: 9, type: "spin", n: 1 }] })] }] },
+    // 4 まつ: みぎへ → まつ → みぎへ（途中で一拍止まるのが分かるように）
+    wait: { beats: 6, chars: [{ key: "a", kind: slime, x: 2, y: 3,
+      stacks: [S({ type: "hat" }, { type: "move", n: 2 }, { type: "wait", n: 1 }, { type: "move", n: 2 })] }] },
+    // 5 はねかえる: 右端まで進んで跳ね返って左へ
+    bounce: { beats: null, chars: [{ key: "a", kind: slime, x: 8, y: 3,
+      stacks: [S({ type: "hat" }, { type: "forever", children: [{ id: 9, type: "bounce" }] })] }] },
+    // 6 ランダム: あちこちに不規則（毎回違う動き）
+    moveRand: { beats: null, chars: [{ key: "a", kind: slime, x: 5, y: 3,
+      stacks: [S({ type: "hat" }, { type: "forever", children: [{ id: 9, type: "moveRand" }] })] }] },
+    // 7 おいかける: 2体。追われる側はゆっくり（まつ を挟む）・追う側が寄っていく
+    chase: { beats: null, chars: [
+      { key: "a", kind: slime, x: 8, y: 4, stacks: [S({ type: "hat" }, { type: "forever", children: [
+        { id: 9, type: "move", n: 1 }, { id: 10, type: "wait", n: 2 }] })] },
+      { key: "b", kind: mush, x: 1, y: 2, stacks: [S({ type: "hat" }, { type: "forever", children: [{ id: 11, type: "chase", target: "a" }] })] }] },
+    // 8 ふってくる: 上から下へ落ち、下端から上へ戻る（ループが分かる）
+    fall: { beats: null, chars: [{ key: "a", kind: slime, x: 5, y: 7,
+      stacks: [S({ type: "hat" }, { type: "forever", children: [{ id: 9, type: "fall" }] })] }] },
+    // 9 じゅうじキー: 十字キーの絵が光り、その方向へ動く（入力は既存の公開API nudge をUIから呼ぶ）
+    dpad: { beats: null, overlay: "dpad", opMs: 460,
+      input: [[1, 0], [1, 0], [0, 1], [0, 1], [-1, 0], [-1, 0], [0, -1], [0, -1]],
+      chars: [{ key: "a", kind: hero, x: 5, y: 3, stacks: [S({ type: "hat" }, { type: "dpad" })] }] },
+    // 10 タップいどう: 指の絵が地面をタップ → キャラがそこへ向かう（bgTap + tapMoveStep）
+    tapMove: { beats: null, overlay: "finger", opMs: 320,
+      taps: [{ x: 9, y: 5 }, { x: 2, y: 2 }],
+      chars: [{ key: "a", kind: hero, x: 5, y: 3, stacks: [S({ type: "hat" }, { type: "tapMove" })] }] },
+    // 11 とべるように: 落ちて着地 → 跳ぶ → また落ちる（重力が伝わるように）
+    jumpable: { beats: null, opMs: 320, gravity: true, jumpEvery: 7,
+      chars: [{ key: "a", kind: hero, x: 5, y: 6, stacks: [S({ type: "hat" }, { type: "jumpable" })] }] },
+    // 12 ぶつかったら: 2体が近づいてぶつかり、片方が光る（発火が分かるように）
+    bumpTarget: { beats: 9, flashOn: "b", chars: [
+      { key: "a", kind: slime, x: 1, y: 3, stacks: [S({ type: "hat" }, { type: "move", n: 6 })] },
+      { key: "b", kind: mush, x: 7, y: 3, stacks: [S({ type: "bumpTarget", target: "a" }, { type: "spin", n: 1 })] }] },
+    // 13 ゴール: 片方は旗の見立て。たどりついて光る（12との違い＝相手が動かない目印）
+    goal: { beats: 9, flashOn: "a", chars: [
+      { key: "a", kind: hero, x: 1, y: 3, stacks: [
+        S({ type: "hat" }, { type: "move", n: 6 }), S({ type: "goal", target: "b" }, { type: "spin", n: 1 })] },
+      { key: "b", kind: mush, x: 7, y: 3, stacks: [] }] },
+  };
+})();
 
 function PalAnim({ type }) {
   const script = PAL_ANIM_SCRIPTS[type];
   const boxRef = useRef(null);
   const [cell, setCell] = useState(0);
   const [state, setState] = useState(() => script.chars.map(c => ({ x: c.x, y: c.y, sizeIdx: SIZE_INIT, visible: true })));
+  const [hud, setHud] = useState({ left: script.count || 0, key: null, tap: null, flash: false });
 
   // マス目に合わせた1マスの大きさ（幅・高さの小さい方＝12×8 が枠に収まる）
   useLayoutEffect(() => {
@@ -510,33 +575,103 @@ function PalAnim({ type }) {
   }, []);
 
   useEffect(() => {
-    let alive = true, timer = null, gap = null;
+    let alive = true, timer = null, gap = null, opTimer = null;
+    const sync = eng => { if (alive) setState(script.chars.map(c => { const s = eng.getChar(c.key); return s ? { x: s.x, y: s.y, sizeIdx: s.sizeIdx, visible: s.visible } : c; })); };
     const eng = createEngine(script.chars.map(c => ({ key: c.key, x: c.x, y: c.y, stacks: c.stacks })), {
-      onUpdate: () => { if (alive) setState(script.chars.map(c => { const s = eng.getChar(c.key); return s ? { x: s.x, y: s.y, sizeIdx: s.sizeIdx, visible: s.visible } : c; })); },
+      onUpdate: (ch, cause) => { sync(eng); if (cause === "move") replay(ch.key, ".sp-in", "stepA"); },
+      /* 12/13 の「片方が光る」: きっかけ（bumpTarget / goal）が発火するとその先の spin が回るので、
+         その onFx を合図に一瞬光らせる（★エンジンは改造しない・既存の通知を使うだけ） */
+      onFx: (key, fx) => {
+        if (!alive) return;
+        /* ★エディタ本体と同じ作法で演出クラスを付け替える（まわる/ジャンプは座標が変わらないので、
+           これが無いと「ずっと〔まわる〕」が止まって見える。実測で判明） */
+        if (fx.type === "spin") replay(key, ".sp-spin", "spinA", TICK * 2);
+        else if (fx.type === "hop") replay(key, ".sp-in", "hopA");
+        if (script.flashOn === key && fx.type === "spin") { setHud(h => ({ ...h, flash: true })); setTimeout(() => alive && setHud(h => ({ ...h, flash: false })), 600); }
+      },
     });
-    let beat = 0;
+    // 演出クラスの付け替え（WorkshopEditor の replayEl と同形・この枠の中だけを探す）
+    const replay = (key, sel, cls, dur) => {
+      const box = boxRef.current; if (!box) return;
+      const root = box.querySelector(`.actor[data-cid="${key}"]`); if (!root) return;
+      const el = root.querySelector(sel); if (!el) return;
+      el.classList.remove("hopA", "stepA", "bumpA", "spinA");
+      void el.offsetWidth;
+      if (dur) el.style.animationDuration = dur + "ms";
+      el.classList.add(cls);
+    };
+    let beat = 0, opN = 0, tapN = 0;
+    const restart = () => { eng.stop(); eng.start(); beat = 0; opN = 0; tapN = 0; setHud(h => ({ ...h, left: script.count || 0, key: null, tap: null, flash: false })); sync(eng); };
     const step = () => {
       if (!alive) return;
       eng.tick(); beat++;
-      if (beat >= script.beats) {           // 1周おわり: 軽い間を置いて頭から（§3-2）
+      if (script.count) setHud(h => ({ ...h, left: Math.max(0, script.count - beat) }));
+      if (script.beats && beat >= script.beats) {   // 1周おわり: 軽い間を置いて頭から（§3-2）
         clearInterval(timer); timer = null;
-        gap = setTimeout(() => { if (!alive) return; eng.stop(); eng.start(); beat = 0; timer = setInterval(step, TICK); }, PAL_ANIM_LOOP_GAP);
+        gap = setTimeout(() => { if (!alive) return; restart(); timer = setInterval(step, TICK); }, PAL_ANIM_LOOP_GAP);
       }
     };
-    eng.start();
+    /* そうさ系（じゅうじキー／タップいどう／とべるように）は拍と別の間隔で進む＝
+       エディタの opLoop と同じ考え方で、既存の公開API（nudge / bgTap / tapMoveStep / gravityStep / tryJump）だけを呼ぶ */
+    const opStep = () => {
+      if (!alive) return;
+      if (script.input) {
+        const [dx, dy] = script.input[opN % script.input.length];
+        eng.nudge(dx, dy); setHud(h => ({ ...h, key: dx > 0 ? "r" : dx < 0 ? "l" : dy > 0 ? "u" : "d" }));
+      }
+      if (script.taps) {
+        /* ★目的地に着いた（tapTarget が空いた）ら次をタップする。opN の周期で撃つと、
+           1拍目の tapMove カードが実行される前に bgTap して空振りする（実測で判明） */
+        const ch = eng.getChar(script.chars[0].key);
+        if (ch && ch.tapMovable && !ch.tapTarget) {
+          const t = script.taps[tapN % script.taps.length]; tapN++;
+          eng.bgTap(t.x, t.y); setHud(h => ({ ...h, tap: t }));
+        }
+        eng.tapMoveStep();
+      }
+      if (script.gravity) {
+        if (opN % script.jumpEvery === 0) eng.tryJump();
+        eng.gravityStep();
+      }
+      opN++;
+    };
+    eng.start(); sync(eng);
     timer = setInterval(step, TICK);
+    if (script.input || script.taps || script.gravity) opTimer = setInterval(opStep, script.opMs || 400);
     // ★指を離すと ふきだしごと外れる＝ここで必ず止める（§6「再生が残り続けるとメモリを食う」）
-    return () => { alive = false; clearInterval(timer); clearTimeout(gap); eng.stop(); };
+    return () => { alive = false; clearInterval(timer); clearInterval(opTimer); clearTimeout(gap); eng.stop(); };
   }, [type]);
 
   const base = cell * CFG.ACTOR_K_GAME; // 小さめ（こうぼうの実機OK値を流用）
   return (
     <div className="anim" ref={boxRef}>
       <div className="grid" />
-      {script.chars.map((c, i) => (
-        <CharSprite key={c.key} ch={{ cid: c.key, kind: c.kind, z: i }} disp={state[i]}
-          cellPx={cell} base={base} selected={false} running instant={false} op={false} profile={null} />
+      {/* ★cell が実測できるまで（1フレーム）は描かない。cell=0 のまま描くと CharSprite の
+          ax = 22 + disp.x*cellPx が枠の左上になり、そこから .actor の transition 340ms で
+          正しい位置へ動く＝「左斜め下から始点へ動いてからループが始まる」ように見えた。
+          1フレームぶんなので、描かなければ最初から正しい位置に現れる
+          （instant で transition を切る手もあるが、初回だけワープして見えるので描かない側にした）。 */}
+      {cell > 0 && script.chars.map((c, i) => (
+        <div key={c.key} className={"animchar" + (script.flashOn === c.key && hud.flash ? " flash" : "")}>
+          <CharSprite ch={{ cid: c.key, kind: c.kind, z: i }} disp={state[i]}
+            cellPx={cell} base={base} selected={false} running instant={false} op={!!(script.input || script.taps || script.gravity)} profile={null} />
+        </div>
       ))}
+      {/* 9 じゅうじキーの絵（押されている向きが光る） */}
+      {script.overlay === "dpad" && (
+        <div className="animpad">
+          <span className={hud.key === "u" ? "on" : ""}>▲</span>
+          <span className={hud.key === "l" ? "on" : ""}>◀</span>
+          <span className={hud.key === "r" ? "on" : ""}>▶</span>
+          <span className={hud.key === "d" ? "on" : ""}>▼</span>
+        </div>
+      )}
+      {/* 10 指の絵（タップした場所に出る） */}
+      {script.overlay === "finger" && hud.tap && cell > 0 && (
+        <div className="animfinger" style={{ left: 22 + hud.tap.x * cell, bottom: 12 + hud.tap.y * cell }}>👆</div>
+      )}
+      {/* 2 くりかえし: 残り回数（§4 の「回数の残りを数字で添える」） */}
+      {script.count > 0 && <div className="animcount">のこり {hud.left}</div>}
     </div>
   );
 }
