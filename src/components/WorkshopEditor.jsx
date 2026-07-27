@@ -72,6 +72,10 @@ export const SND = [
 // 段階3 そうさ: 操作の移動間隔(ms)。拍(400ms)を待たずに動かす＝実機の手触りで調整する値（stage3-op-feel §1-3。速すぎ→130/遅すぎ→70 が目安）。
 // ★STUDIO_CSS より前で宣言する（.actor.op の transition が ${OP_MS} を参照するため。後ろに置くと TDZ で描画が落ちる）
 const OP_MS = 100;
+/* ながおし中のループ再生（card-animation-inline §3-1）。★同じ理由で STUDIO_CSS より前に置く。
+   ふきだしの内側いっぱい（250 − padding 13×2 ＝ 約224px）に対し、12×8 のマス目の比率が近い高さ */
+const PAL_ANIM_H = 150;
+const PAL_ANIM_LOOP_GAP = 300; // 周と周の間の軽い間(ms)＝切れ目が分かる（§3-2）
 
 /* ============ CSS ============ */
 const STUDIO_CSS = `
@@ -135,27 +139,15 @@ const STUDIO_CSS = `
   .palDesc .dt { font-weight: 900; font-size: 12.5px; margin-bottom: 4px; }
   .palDesc .dd { font-size: 12px; line-height: 1.65; font-weight: 700; }
   .palDesc .dg { font-size: 10.5px; color: #8a94a0; margin-top: 6px; font-weight: 800; }
-  /* card-animation 便① §2-2: ★ふきだし本体は pointer-events:none のまま（ドラッグを吸わせない）。
-     ボタンだけ auto にする。b5z で直した「指ドラッグが無言で消える」の周辺なので、ここは崩さない。
-     位置はふきだしの最下段＝カードから最も遠い側（指はカードの上にあるので誤爆しにくい） */
-  .palDesc .tryBtn { pointer-events: auto; display: block; width: 100%; margin-top: 8px;
-    font-family: inherit; font-weight: 900; font-size: 12px; color: #fff; cursor: pointer;
-    background: #58a839; border: none; border-radius: 999px; padding: 8px 12px;
-    box-shadow: inset 0 -3px 0 rgba(0,0,0,.2), 0 2px 0 rgba(0,0,0,.15); }
-  .palDesc .tryBtn:active { transform: scale(.96); }
-  /* ためすパネル（案B・背景は出さない＝設計 §1）。便①はアニメ領域が空の枠 */
-  .tryPanel { position: absolute; inset: 0; z-index: 360; background: rgba(30,20,40,.55);
-    display: flex; align-items: center; justify-content: center; }
-  .tryPanel .box { background: #fffdf6; border-radius: 18px; padding: 14px 16px; box-sizing: border-box;
-    width: min(400px, calc(100% - 32px)); box-shadow: 0 10px 30px rgba(0,0,0,.4); text-align: center; }
-  .tryPanel .stage { height: 112px; border-radius: 12px; border: 2px dashed #cdc3ad; background: #fbf7ec;
-    display: flex; align-items: center; justify-content: center; color: #a99c82;
-    font-size: 11.5px; font-weight: 800; margin-bottom: 10px; }
-  .tryPanel .tt { color: #4a3520; font-size: 14px; font-weight: 900; margin-bottom: 4px; }
-  .tryPanel .td { color: #5b4a35; font-size: 12px; font-weight: 700; line-height: 1.65; }
-  .tryPanel .close { font-family: inherit; font-weight: 900; font-size: 14px; border: none; cursor: pointer;
-    border-radius: 999px; padding: 9px 22px; margin-top: 12px; color: #fff; background: #8a9a55;
-    box-shadow: inset 0 -3px 0 rgba(0,0,0,.2), 0 2px 0 rgba(0,0,0,.15); }
+  /* card-animation-inline §3: ながおし中のループ再生。ふきだしの long と desc の間に置く。
+     ★背景は出さない（設計 §1・神田さん確定）＝うっすらしたマス目だけを敷いて動いた量の目盛りにする。
+     ★ふきだし本体は pointer-events:none のまま（b6q のボタンを撤去したので全体が none に戻った） */
+  .palDesc .anim { position: relative; height: ${PAL_ANIM_H}px; margin: 6px 0 8px; border-radius: 10px;
+    overflow: hidden; background: #f3f6fa; border: 1px solid #e3e8ef; }
+  .palDesc .anim .grid { position: absolute; inset: 0;
+    background-image: linear-gradient(to right, rgba(120,140,165,.16) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(120,140,165,.16) 1px, transparent 1px);
+    background-size: ${100 / LCOLS}% ${100 / LROWS}%; }
   .studio-asm.hotdrop { box-shadow: inset 0 0 0 3px #9dc4f0; } /* ドラッグ中: 作業エリアが光る（§5） */
 
   /* --- 中央: 組み立てエリア（段階0のステージと同じ作法） --- */
@@ -492,6 +484,63 @@ function flattenGroup(group) {
 }
 const countBlocks = list => (list || []).reduce((a, b) => a + 1 + (b.children ? countBlocks(b.children) : 0), 0);
 
+/* ============ ながおし中のループ再生（card-animation-inline §3） ============
+   ★エンジンは改造しない（§3-3・凍結ベースラインに直結）。既存の createEngine に小さな台本を渡して
+     tick を回すだけ。start() が resetChar で初期位置へ戻すので、ループは stop()→start() で作れる
+     （node で実測して確認済み）。
+   台本はデータとして持つ（card-animation.md §4-1）。★本便は「みぎへ」1種類だけ（§3-4）。
+   ここに無いカードはアニメ領域を出さない＝従来どおり long ＋ desc のみ。
+   ⚠️ この表は UI 側の定数として持つ。gamelab-samples.js のような node から読まれるファイルには置かない。 */
+const PAL_ANIM_SCRIPTS = {
+  move: { beats: 5, chars: [{ key: "a", kind: { type: "enemy", id: "slime" }, x: 2, y: 3,
+    stacks: [{ blocks: [{ id: 1, type: "hat" }, { id: 2, type: "move", n: 4 }] }] }] },
+};
+
+function PalAnim({ type }) {
+  const script = PAL_ANIM_SCRIPTS[type];
+  const boxRef = useRef(null);
+  const [cell, setCell] = useState(0);
+  const [state, setState] = useState(() => script.chars.map(c => ({ x: c.x, y: c.y, sizeIdx: SIZE_INIT, visible: true })));
+
+  // マス目に合わせた1マスの大きさ（幅・高さの小さい方＝12×8 が枠に収まる）
+  useLayoutEffect(() => {
+    const el = boxRef.current; if (!el) return;
+    const r = el.getBoundingClientRect();
+    setCell(Math.max(4, Math.min(r.width / LCOLS, r.height / LROWS)));
+  }, []);
+
+  useEffect(() => {
+    let alive = true, timer = null, gap = null;
+    const eng = createEngine(script.chars.map(c => ({ key: c.key, x: c.x, y: c.y, stacks: c.stacks })), {
+      onUpdate: () => { if (alive) setState(script.chars.map(c => { const s = eng.getChar(c.key); return s ? { x: s.x, y: s.y, sizeIdx: s.sizeIdx, visible: s.visible } : c; })); },
+    });
+    let beat = 0;
+    const step = () => {
+      if (!alive) return;
+      eng.tick(); beat++;
+      if (beat >= script.beats) {           // 1周おわり: 軽い間を置いて頭から（§3-2）
+        clearInterval(timer); timer = null;
+        gap = setTimeout(() => { if (!alive) return; eng.stop(); eng.start(); beat = 0; timer = setInterval(step, TICK); }, PAL_ANIM_LOOP_GAP);
+      }
+    };
+    eng.start();
+    timer = setInterval(step, TICK);
+    // ★指を離すと ふきだしごと外れる＝ここで必ず止める（§6「再生が残り続けるとメモリを食う」）
+    return () => { alive = false; clearInterval(timer); clearTimeout(gap); eng.stop(); };
+  }, [type]);
+
+  const base = cell * CFG.ACTOR_K_GAME; // 小さめ（こうぼうの実機OK値を流用）
+  return (
+    <div className="anim" ref={boxRef}>
+      <div className="grid" />
+      {script.chars.map((c, i) => (
+        <CharSprite key={c.key} ch={{ cid: c.key, kind: c.kind, z: i }} disp={state[i]}
+          cellPx={cell} base={base} selected={false} running instant={false} op={false} profile={null} />
+      ))}
+    </div>
+  );
+}
+
 /* ============ キャラ1体のステージ描画 ============ */
 function CharSprite({ ch, disp, cellPx, base, selected, running, instant, op, profile, onRef }) {
   const w = base;
@@ -623,7 +672,6 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const palLPTimerRef = useRef(null);
   const palHintedRef = useRef(false); // 初回タップだけ「ながおしすると せつめいが でるよ」
   const [palDesc, setPalDesc] = useState(null); // { type, x, y }
-  const [tryCard, setTryCard] = useState(null); // ためすパネルで見せているカードの type（便①は中身が空）
   useLayoutEffect(() => {
     const meas = () => {
       const el = palScrollRef.current;
@@ -1071,7 +1119,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         // ドラッグに至らず指を離した: ふきだしは消える（§5「押している間だけ説明」）。
         // ながおし前のただのタップなら、初回だけヒントのトースト（§5・モックと同じ）
         const wasArmed = palPendingRef.current.armed;
-        clearPalPending(wasArmed); // ★成立して離した＝ふきだしを残す（「ためしてみる」を押せるように・便① 案A）
+        clearPalPending(); // 離したら消える（b5x の挙動・§2-2）。★wasArmed は下の初回トーストの判定に使う
         if (!wasArmed && !palHintedRef.current) { setToast("ながおしすると せつめいが でるよ"); palHintedRef.current = true; }
       }
       if (pointerIdRef.current !== null && e.pointerId !== pointerIdRef.current) return;
@@ -1106,18 +1154,11 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     // Safari が touch-action:pan-y でジェスチャを縦スクロールに横取り（→pointercancel で無言消失）するのを止める。
     // ★ドラッグ中のみ（dragRef.current がある時だけ）。常時 preventDefault すると棚の縦スクロールが指で死ぬ（§3-3）。
     const onTouchMoveGuard = e => { if (dragRef.current && !dragRef.current.committing) e.preventDefault(); };
-    /* 便① 案A: 残ったふきだしを消すきっかけ①②。
-       ふきだしの外を触ったら消す＝「外側タップ」。別カードを ながおし するときも、その pointerdown で先に消える
-       （新しいふきだしは 150ms 後に出る）。★ふきだしの中（＝ためしてみる ボタン）を触ったときは消さない。
-       ⚠️ここは「消す」だけ＝ドラッグ判定には一切関わらない（b5z の方向判定・touchmove 抑止は不変）。 */
-    const onDownDismiss = e => { if (!e.target.closest || !e.target.closest(".palDesc")) setPalDesc(null); };
-    document.addEventListener("pointerdown", onDownDismiss);
     document.addEventListener("pointermove", onMove);
     document.addEventListener("pointerup", onUp);
     document.addEventListener("pointercancel", onCancel);
     document.addEventListener("touchmove", onTouchMoveGuard, { passive: false });
     return () => {
-      document.removeEventListener("pointerdown", onDownDismiss);
       document.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerup", onUp);
       document.removeEventListener("pointercancel", onCancel);
@@ -1184,18 +1225,19 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     setPalDesc({
       type,
       x: Math.min(window.innerWidth - 262, Math.max(r.right + 10, palRight + 8)),
-      y: Math.max(8, Math.min(window.innerHeight - 170, r.top - 8)),
+      /* ★アニメ領域があるカードはふきだしが縦に伸びる（§3-1）。台本のあるカードだけ高さぶんを足して
+         クランプする＝アニメ無しのカードは従来どおりの位置を保つ（両方で見切れないこと） */
+      y: Math.max(8, Math.min(window.innerHeight - (PAL_ANIM_SCRIPTS[type] ? 170 + PAL_ANIM_H + 14 : 170), r.top - 8)),
     });
   };
-  /* keepDesc=true のときだけ ふきだしを残す（card-animation 便① 案A）。
-     ★残すのは「ながおしが成立したまま指を離した」場合だけ＝ふきだしの中の「ためしてみる」を押せるようにするため。
-       ふきだしは押している間だけ消えていたので、離すとボタンに到達する経路が存在しなかった。
-     ★ドラッグに入った場合は従来どおり即座に消す（三段導線の生命線）＝ startPalDrag は keepDesc を渡さない。 */
-  const clearPalPending = (keepDesc = false) => {
+  /* ★b5x の挙動（押している間だけ説明）に戻した（card-animation-inline §2-2）。
+     b6q では「ためしてみる」ボタンに指を届かせるためだけに離してもふきだしを残していたが、
+     案A（ながおし中にふきだしの中でループ再生）ではボタンが要らないので元に戻る。 */
+  const clearPalPending = () => {
     clearTimeout(palLPTimerRef.current);
     const pal = palPendingRef.current;
     if (pal && pal.el) pal.el.classList.remove("lift");
-    if (!keepDesc) setPalDesc(null);
+    setPalDesc(null);
     palPendingRef.current = null;
   };
   const onPalPointerDown = (e, type) => {
@@ -1581,8 +1623,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         <div className={"studio-pal" + (delHover ? " del" : "")} ref={palRef}>
           <div className="shelf-title">こうぐだな</div>
           <div className="delmsg">ここで はなすと<br />けせるよ</div>
-          {/* 便① 案A: 残ったふきだしを消すきっかけ③＝棚のスクロール（ふきだしは棚に追従しないので置き去りになる） */}
-          <div className="palscroll" ref={palScrollRef} onScroll={() => setPalDesc(null)}>
+          <div className="palscroll" ref={palScrollRef}>
             {(() => {
               const groups = [];
               for (const t of PALORDER) {
@@ -1915,23 +1956,10 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       {palDesc && (() => { const d = DEFS[palDesc.type]; return (
         <div className="palDesc" style={{ left: palDesc.x, top: palDesc.y }}>
           <div className="dt">{d.long || d.label}</div>
+          {/* card-animation-inline §3-1: long と desc の「間」。台本のあるカードにだけ出す（本便は みぎへ 1種類） */}
+          {PAL_ANIM_SCRIPTS[palDesc.type] && <PalAnim type={palDesc.type} />}
           <div className="dd">{d.desc}</div>
           <div className="dg">そのまま ひっぱると おけるよ</div>
-          {/* card-animation 便① §2-2: 最下段＝カードから最も遠い側。ボタンだけ pointer-events:auto。
-              便①では全29種に出す（中身が空なので害がない・§2-4。便③で12種に絞る） */}
-          <button type="button" className="tryBtn"
-            onClick={() => { setTryCard(palDesc.type); setPalDesc(null); }}>ためしてみる</button>
-        </div>
-      ); })()}
-      {/* ためすパネル（案B・背景は出さない＝設計 §1）。便①はアニメ領域が空の枠＝ドラッグ競合の切り分けが目的 */}
-      {tryCard && (() => { const d = DEFS[tryCard]; return (
-        <div className="tryPanel" onClick={() => setTryCard(null)}>
-          <div className="box" onClick={e => e.stopPropagation()}>
-            <div className="stage">（ここに うごきが でるよ）</div>
-            <div className="tt">{d.long || d.label}</div>
-            <div className="td">{d.desc}</div>
-            <button type="button" className="close" onClick={() => setTryCard(null)}>とじる</button>
-          </div>
         </div>
       ); })()}
       <div className="studio-narrow">
