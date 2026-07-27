@@ -135,6 +135,27 @@ const STUDIO_CSS = `
   .palDesc .dt { font-weight: 900; font-size: 12.5px; margin-bottom: 4px; }
   .palDesc .dd { font-size: 12px; line-height: 1.65; font-weight: 700; }
   .palDesc .dg { font-size: 10.5px; color: #8a94a0; margin-top: 6px; font-weight: 800; }
+  /* card-animation 便① §2-2: ★ふきだし本体は pointer-events:none のまま（ドラッグを吸わせない）。
+     ボタンだけ auto にする。b5z で直した「指ドラッグが無言で消える」の周辺なので、ここは崩さない。
+     位置はふきだしの最下段＝カードから最も遠い側（指はカードの上にあるので誤爆しにくい） */
+  .palDesc .tryBtn { pointer-events: auto; display: block; width: 100%; margin-top: 8px;
+    font-family: inherit; font-weight: 900; font-size: 12px; color: #fff; cursor: pointer;
+    background: #58a839; border: none; border-radius: 999px; padding: 8px 12px;
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,.2), 0 2px 0 rgba(0,0,0,.15); }
+  .palDesc .tryBtn:active { transform: scale(.96); }
+  /* ためすパネル（案B・背景は出さない＝設計 §1）。便①はアニメ領域が空の枠 */
+  .tryPanel { position: absolute; inset: 0; z-index: 360; background: rgba(30,20,40,.55);
+    display: flex; align-items: center; justify-content: center; }
+  .tryPanel .box { background: #fffdf6; border-radius: 18px; padding: 14px 16px; box-sizing: border-box;
+    width: min(400px, calc(100% - 32px)); box-shadow: 0 10px 30px rgba(0,0,0,.4); text-align: center; }
+  .tryPanel .stage { height: 112px; border-radius: 12px; border: 2px dashed #cdc3ad; background: #fbf7ec;
+    display: flex; align-items: center; justify-content: center; color: #a99c82;
+    font-size: 11.5px; font-weight: 800; margin-bottom: 10px; }
+  .tryPanel .tt { color: #4a3520; font-size: 14px; font-weight: 900; margin-bottom: 4px; }
+  .tryPanel .td { color: #5b4a35; font-size: 12px; font-weight: 700; line-height: 1.65; }
+  .tryPanel .close { font-family: inherit; font-weight: 900; font-size: 14px; border: none; cursor: pointer;
+    border-radius: 999px; padding: 9px 22px; margin-top: 12px; color: #fff; background: #8a9a55;
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,.2), 0 2px 0 rgba(0,0,0,.15); }
   .studio-asm.hotdrop { box-shadow: inset 0 0 0 3px #9dc4f0; } /* ドラッグ中: 作業エリアが光る（§5） */
 
   /* --- 中央: 組み立てエリア（段階0のステージと同じ作法） --- */
@@ -602,6 +623,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
   const palLPTimerRef = useRef(null);
   const palHintedRef = useRef(false); // 初回タップだけ「ながおしすると せつめいが でるよ」
   const [palDesc, setPalDesc] = useState(null); // { type, x, y }
+  const [tryCard, setTryCard] = useState(null); // ためすパネルで見せているカードの type（便①は中身が空）
   useLayoutEffect(() => {
     const meas = () => {
       const el = palScrollRef.current;
@@ -1049,7 +1071,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         // ドラッグに至らず指を離した: ふきだしは消える（§5「押している間だけ説明」）。
         // ながおし前のただのタップなら、初回だけヒントのトースト（§5・モックと同じ）
         const wasArmed = palPendingRef.current.armed;
-        clearPalPending();
+        clearPalPending(wasArmed); // ★成立して離した＝ふきだしを残す（「ためしてみる」を押せるように・便① 案A）
         if (!wasArmed && !palHintedRef.current) { setToast("ながおしすると せつめいが でるよ"); palHintedRef.current = true; }
       }
       if (pointerIdRef.current !== null && e.pointerId !== pointerIdRef.current) return;
@@ -1084,11 +1106,18 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     // Safari が touch-action:pan-y でジェスチャを縦スクロールに横取り（→pointercancel で無言消失）するのを止める。
     // ★ドラッグ中のみ（dragRef.current がある時だけ）。常時 preventDefault すると棚の縦スクロールが指で死ぬ（§3-3）。
     const onTouchMoveGuard = e => { if (dragRef.current && !dragRef.current.committing) e.preventDefault(); };
+    /* 便① 案A: 残ったふきだしを消すきっかけ①②。
+       ふきだしの外を触ったら消す＝「外側タップ」。別カードを ながおし するときも、その pointerdown で先に消える
+       （新しいふきだしは 150ms 後に出る）。★ふきだしの中（＝ためしてみる ボタン）を触ったときは消さない。
+       ⚠️ここは「消す」だけ＝ドラッグ判定には一切関わらない（b5z の方向判定・touchmove 抑止は不変）。 */
+    const onDownDismiss = e => { if (!e.target.closest || !e.target.closest(".palDesc")) setPalDesc(null); };
+    document.addEventListener("pointerdown", onDownDismiss);
     document.addEventListener("pointermove", onMove);
     document.addEventListener("pointerup", onUp);
     document.addEventListener("pointercancel", onCancel);
     document.addEventListener("touchmove", onTouchMoveGuard, { passive: false });
     return () => {
+      document.removeEventListener("pointerdown", onDownDismiss);
       document.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerup", onUp);
       document.removeEventListener("pointercancel", onCancel);
@@ -1145,17 +1174,28 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
      成立前に7px動いたら中止＝touch-action:pan-y でブラウザの縦スクロールに譲る。 */
   const showPalDesc = (type, el) => {
     const r = el.getBoundingClientRect();
+    /* ★ふきだしを「棚の外」に出す（card-animation 便① 案A）。
+       従来はカードの右10px＝2列の棚では左列を押すと右列のカードに重なっていた。
+       本体は pointer-events:none なので今までは無害だったが、便①で「ためしてみる」ボタン（auto）が
+       付き、しかも指を離してもふきだしが残るようになったため、重なると隣のカードが掴めなくなる。
+       棚の右端より右から始めることで、ボタンがどの棚カードにも重ならない。 */
+    const pal = el.closest(".studio-pal");
+    const palRight = pal ? pal.getBoundingClientRect().right : 0;
     setPalDesc({
       type,
-      x: Math.min(window.innerWidth - 262, r.right + 10),
-      y: Math.max(8, Math.min(window.innerHeight - 130, r.top - 8)),
+      x: Math.min(window.innerWidth - 262, Math.max(r.right + 10, palRight + 8)),
+      y: Math.max(8, Math.min(window.innerHeight - 170, r.top - 8)),
     });
   };
-  const clearPalPending = () => {
+  /* keepDesc=true のときだけ ふきだしを残す（card-animation 便① 案A）。
+     ★残すのは「ながおしが成立したまま指を離した」場合だけ＝ふきだしの中の「ためしてみる」を押せるようにするため。
+       ふきだしは押している間だけ消えていたので、離すとボタンに到達する経路が存在しなかった。
+     ★ドラッグに入った場合は従来どおり即座に消す（三段導線の生命線）＝ startPalDrag は keepDesc を渡さない。 */
+  const clearPalPending = (keepDesc = false) => {
     clearTimeout(palLPTimerRef.current);
     const pal = palPendingRef.current;
     if (pal && pal.el) pal.el.classList.remove("lift");
-    setPalDesc(null);
+    if (!keepDesc) setPalDesc(null);
     palPendingRef.current = null;
   };
   const onPalPointerDown = (e, type) => {
@@ -1541,7 +1581,8 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         <div className={"studio-pal" + (delHover ? " del" : "")} ref={palRef}>
           <div className="shelf-title">こうぐだな</div>
           <div className="delmsg">ここで はなすと<br />けせるよ</div>
-          <div className="palscroll" ref={palScrollRef}>
+          {/* 便① 案A: 残ったふきだしを消すきっかけ③＝棚のスクロール（ふきだしは棚に追従しないので置き去りになる） */}
+          <div className="palscroll" ref={palScrollRef} onScroll={() => setPalDesc(null)}>
             {(() => {
               const groups = [];
               for (const t of PALORDER) {
@@ -1876,6 +1917,21 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
           <div className="dt">{d.long || d.label}</div>
           <div className="dd">{d.desc}</div>
           <div className="dg">そのまま ひっぱると おけるよ</div>
+          {/* card-animation 便① §2-2: 最下段＝カードから最も遠い側。ボタンだけ pointer-events:auto。
+              便①では全29種に出す（中身が空なので害がない・§2-4。便③で12種に絞る） */}
+          <button type="button" className="tryBtn"
+            onClick={() => { setTryCard(palDesc.type); setPalDesc(null); }}>ためしてみる</button>
+        </div>
+      ); })()}
+      {/* ためすパネル（案B・背景は出さない＝設計 §1）。便①はアニメ領域が空の枠＝ドラッグ競合の切り分けが目的 */}
+      {tryCard && (() => { const d = DEFS[tryCard]; return (
+        <div className="tryPanel" onClick={() => setTryCard(null)}>
+          <div className="box" onClick={e => e.stopPropagation()}>
+            <div className="stage">（ここに うごきが でるよ）</div>
+            <div className="tt">{d.long || d.label}</div>
+            <div className="td">{d.desc}</div>
+            <button type="button" className="close" onClick={() => setTryCard(null)}>とじる</button>
+          </div>
         </div>
       ); })()}
       <div className="studio-narrow">
