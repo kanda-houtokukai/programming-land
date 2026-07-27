@@ -3,7 +3,7 @@
 > ⚠ **これは過去の記録です。現在の計画・仕様ではありません。**
 > 現状は `progland-handoff.md`（台帳）・`roadmap.md`（現在地）・`feature-spec.md`（仕様）が正。
 
-- **収録**: `progland-handoff.md`「今どこか」から切り出した **v2.3-b4e（2026-07-12）〜 v2.3-b6f（2026-07-24）の54版**（新しい順）。原文のまま・1文字も削っていない。
+- **収録**: `progland-handoff.md`「今どこか」から切り出した **v2.3-b4e（2026-07-12）〜 v2.3-b6g（2026-07-24）の55版**（新しい順）。原文のまま・1文字も削っていない。
 - **通常のセッションではこのファイルを読まない。** 台帳（`progland-handoff.md`）だけ読めばよい。過去の経緯を追う必要が出たときだけ参照する。
 - **これより古い版**（v2.3-b4d 以前）は `progland-handoff-archive.md` にある（2026-07-15 の分割時に作成）。両者で b4d／b4e が連続する。
 - ここに載る `⚠️実機確認待ち` `⚠️次` は**当時のもの**。その後の版に置き換わって出荷済みであり、いま待っている作業ではない。生きている宿題は台帳の「未完了タスク」が正。
@@ -45,8 +45,41 @@
 
 ---
 
-## 版ごとの詳細ログ（v2.3-b6f 〜 v2.3-b4e・新しい順）
+## 完了した便の一覧（台帳「次にやること」から移設・2026-07-26・原文のまま）
 
+```
+便① 素材差し替え（アイコン11枚PNG化・内観・建物PNG配置）… ✅完了 v2.3-b6g（deploy済み・⚠️実機確認待ち）
+便② マップ開店（看板①→建物・名前・導線）… ✅完了 v2.3-b6h（**実機OK**）
+便③ 教育接続（XP・コイン・マイルストーン）… ✅完了 v2.3-b6i（**実機OK**）
+便④-A 保護者ガイド … ✅完了 v2.3-b6j（deploy済み・⚠️実機確認待ち）
+便④-B BGM … ⚠️音源2本が未生成＝着手できない（下の段取り参照）
+※ 区切り⑤ clone（ぶんしんを だす）は開店フェーズの後に回す
+```
+
+開店フェーズと並行して**実機FBの手当て**が走っている:
+
+```
+実機FB便A（不具合3件＋棚の並び＋キャラの大きさ）… ✅完了 v2.3-b6k（**実機OK**）
+  指示書=brushup/feedback-a-fixes.md
+実機FB便B（ぶたいのショップ連動＋みほんの棚に説明文）… ✅完了 v2.3-b6m（**実機OK**）
+  指示書=brushup/feedback-b-shop-samples.md ／ ★版は b6l を飛ばした（l と 1 が紛らわしい）
+みほんのカバー絵10枚 … ✅完了 v2.3-b6n（deploy済み・⚠️実機確認待ち）
+  指示書=brushup/sample-covers.md ／ 生成プロンプト=brushup/sample-cover-prompts.md
+残り: カードのアニメーション（Chat が設計中）
+```
+
+---
+
+## 版ごとの詳細ログ（v2.3-b6g 〜 v2.3-b4e・新しい順）
+
+- **v2.3-b6g（2026-07-24・開店フェーズ 便①=素材差し替え〔暫定SVGアイコン11枚をPNG化＋こうぼう内観を専用画像へ〕＝⚠️実機確認待ち／deploy済み 168348c）**: 指示書=`brushup/gamelab-opening-step1.md`（正本）・設計正本=`brushup/gamelab-opening-design.md`。開店フェーズ文書4本配置＋台帳更新=9d7d209・実装=874a5e4（deploy=168348c）
+  - **§2-1 アイコン11枚PNG化**: `src/data/studio-blocks.js` の暫定 `svgGlyph`（iconMoveRand/Bounce/ScoreUp/ScoreDown/BumpTarget/Dpad/TapMove/Goal/Chase/Fall/Jumpable）を `card_icon_19〜29` の PNG import に置換（既存18枚と同じ import 方式に統一）。`svgGlyph` ヘルパー＋関連コメントを全廃（未使用コード掃除）。**ICONS の型↔アイコン結び付き・DEFS の中身/並び/ラベル/色は不変＝アイコンの絵だけが変わる**
+  - **§2-2 内観差し替え**: gamelab `src/gamelab/mode.jsx` の `homeBg` を studio-interior 流用→`gamelab-interior.webp`（1600×900）へ。「段階1はスタジオ流用」コメントも実態に更新。**★studio 側 `src/studio/mode.jsx` の homeBg は不変**（studio-interior のまま）
+  - **建物PNG**: `gamelab-building.png` を `src/assets/studio-assets/` に配置＝**便②用で未配線**（未参照のため build で docs/assets に出ない＝Vite が未使用アセットを除外）。マップ（`WorldMap.jsx`）は未着手
+  - **★実測照合（verify では拾えないため必須・全PASS）**: dev で全11型のラベル↔アイコンを実測＝ランダム→19/はねかえる→20/スコア＋→21/スコア－→22/ぶつかったら→23/じゅうじキー→**24_dpad**/タップいどう→25/ゴール→26/おいかける→**27_oikakeru**/ふってくる→28/とべるように→**29_toberu**＝**入れ替わりゼロ**。studio=18枚（01〜18）・gamelab カード(19〜29)混入なし・data-URIグリフ残存ゼロ・studio homeBg=studio-interior のまま
+  - 検証: **verify 8本全PASS（`--update` なし＝DEFS29・トレース732イベント・パス98本 byte不変**＝画像差し替えのみで DEFS 不変を機械確認）・ビルドOK（js gzip 208KB・アイコンは別ハッシュアセット出力）・本番 b6g（`index-DcmuNQai.js`）＋新アセット（`card_icon_24_dpad`・`gamelab-interior`）を 200 で配信確認・コンソールエラーゼロ・ブラウザ実測でこうぐだなに11枚が既存質感で表示
+  - ⚠️次: 神田さんの iPad 実機確認（§4実機ゲート・studio/gamelab 両方）: ①こうぐだな11枚が既存18枚と同じ質感②アイコンとカードの対応が正しい（じゅうじキーのカードに十字キーの絵 等）③こうぼうのカセットだな背景が工房内観に変わっている④studio の内装と18枚は不変。通し実機は `cards-reference.md` 到達後にまとめて（各便は簡易確認で先行）。合格後 便②マップ開店へ
+  - ⚠️**この便の12枚は余白規約に反していた（b6h の §0 で発覚・b6h で全枚修正済み）**。下の b6h 参照
 - **v2.3-b6f（2026-07-24・段階3 区切り④=`jumpable`「とべるように」（重力・着地・足場・ジャンプ）＝⚠️実機確認待ち／deploy済み b9aeb8b）**: 指示書=`brushup/stage3-step4-jumpable.md`（正本）。gamelab 専用・そうさカテゴリ3枚目・`w=206` 再利用。指示書配置=b18da73・実装=84c085d（deploy=b9aeb8b）
   - **[DECISION] §0-2 整数マスのまま実装**（小数座標を入れない）＝`ch.x/ch.y` を使う全箇所への波及と 732イベント凍結へのリスクを避ける。重力・ジャンプはすべて**操作ループ（`OP_MS=100`）で1ステップ1マス**＝拍を待たない
   - **エンジン**: `beginBlock("jumpable")`→`ch.jumpable=true`（`resetChar` で ▶ ごとに `jumpRise` ごと初期化）／`isSupported`＝地面 or 真下に別キャラ／`gravityStep()`＝上昇中は1マス上・支え無しなら1マス下／`tryJump()`＝接地かつ操作可能なキャラだけ `JUMP_CELLS=3` 上昇（空中・上昇中は不可＝二段にならない）／`nudge()` は jumpable キャラの**たて入力を無視**（縦は重力/ジャンプ担当・よこは空中でも操舵可）
