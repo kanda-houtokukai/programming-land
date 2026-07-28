@@ -514,6 +514,21 @@ const PAL_ANIM_SCRIPTS = (() => {
   return {
     // 1 みぎへ: 4マス進んで止まる（1周=4拍＝1.6秒）
     move: { beats: 5, chars: [{ key: "a", kind: slime, x: 2, y: 3, stacks: [S({ type: "hat" }, { type: "move", n: 4 })] }] },
+    /* 14〜19 うごきカテゴリの残り（card-animation-move6 §2）。
+       ★方針は「文で伝わりにくい12種だけ」だったが、うごきカテゴリの中で出るカードと出ないカードが
+         混在し、実機で「無い」と受け取られた。カテゴリ単位で揃えることを優先して6種を足した。
+         みため・おとは カテゴリまるごと無し＝混在しないので現状維持。 */
+    moveL: { beats: 5, chars: [{ key: "a", kind: slime, x: 9, y: 3, stacks: [S({ type: "hat" }, { type: "moveL", n: 4 })] }] },
+    // ⚠️ y=0 が盤の下端（DIRS.moveU=[0,+1]）＝うえへ は y が増える。下寄りから始める
+    moveU: { beats: 5, chars: [{ key: "a", kind: slime, x: 5, y: 1, stacks: [S({ type: "hat" }, { type: "moveU", n: 4 })] }] },
+    moveD: { beats: 5, chars: [{ key: "a", kind: slime, x: 5, y: 6, stacks: [S({ type: "hat" }, { type: "moveD", n: 4 })] }] },
+    // ⚠️ spin / jump は座標が変わらない＝演出クラス（spinA / hopA）で見せる（b6s の「ずっと」と同じ形）
+    spin: { beats: 3, chars: [{ key: "a", kind: slime, x: 5, y: 3, stacks: [S({ type: "hat" }, { type: "spin", n: 2 })] }] },
+    // ジャンプ=その場で跳ねる演出のみ（重力つきの とべるように との違いが出るよう位置は動かさない）
+    jump: { beats: 3, chars: [{ key: "a", kind: slime, x: 5, y: 3, stacks: [S({ type: "hat" }, { type: "jump", n: 2 })] }] },
+    // ⚠️ home は一度離れてから戻さないと何も起きない（初期位置にいるため）
+    home: { beats: 6, chars: [{ key: "a", kind: slime, x: 2, y: 3,
+      stacks: [S({ type: "hat" }, { type: "move", n: 3 }, { type: "home" })] }] },
     // 2 くりかえし: 3回動いて止まる（残り回数を数字で添える＝§4-1）
     repeat: { beats: 5, count: 3, chars: [{ key: "a", kind: slime, x: 2, y: 3,
       stacks: [S({ type: "hat" }, { type: "repeat", n: 3, children: [{ id: 9, type: "move", n: 1 }] })] }] },
