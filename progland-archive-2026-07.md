@@ -70,7 +70,20 @@
 
 ---
 
-## 版ごとの詳細ログ（v2.3-b6m 〜 v2.3-b4e・新しい順）
+## 版ごとの詳細ログ（v2.3-b6n 〜 v2.3-b4e・新しい順）
+
+- **v2.3-b6n（2026-07-25・みほんのカバー絵10枚を棚に出す＝⚠️実機確認待ち／deploy済み 144029d）**: 指示書=`brushup/sample-covers.md`（正本）・生成プロンプト=`brushup/sample-cover-prompts.md`。画像＋文書=26e860c・実装=f816e9b（deploy=144029d）
+  - **絵**: 10枚とも **768×512（3:2＝棚の128×85枠の6倍）・WebP・合計343.7KB**（Chat の申告と実測が一致）。`src/assets/studio-assets/` へ配置し、**配置前後で SHA-256 一致＝1バイトも変えていない**ことを確認
+  - **§3-1 みほんだけ差し替え**: みほんの棚は `cover`／**自分の作品（フィルムだな・カセットだな）は従来の `StudioThumb` のまま**。`cover` が無いみほんは従来のサムネへ落ちる（フォールバック・枠はどちらも 3:2 で同じ）
+  - **★§3-2 で指示書に1点だけ従えなかった（報告）**: 指示書は「gamelab 側は `desc` と同じ場所（＝`gamelab-samples.js` の中）でよい」としていたが、**同ファイルは `tools/verify-gamelab.mjs` が node から読む純データ**で、`.webp` を import した瞬間 **`Unknown file extension ".webp"`** で verify が動かなくなる（実際に node で再現して確認）。**文字列の `desc` は node 安全だったが `cover` は事情が違う**＝`growth.js` と同型の罠
+  - **→ 採った形**: `src/data/sample-covers.js`（UI 側の新ファイル）に10枚の import と id→画像の表を置き、**studio/gamelab 両方の `mode.jsx` で合流**。**UI から見える形は指示書どおり `s.cover` の1つ**。これで studio の `SAMPLES` は凍結のまま（回帰PASS）・`gamelab-samples.js` は node 安全のまま（verify-gamelab PASS）
+  - **★表を studio と gamelab で2つに分けた（`STUDIO_SAMPLE_COVERS` / `GAMELAB_SAMPLE_COVERS`）**: 1つの表にすると、将来 id が衝突したときに**別モードのカバー絵が黙って出る**。絵と名前の取り違えは verify で検出できない種類の事故なので、構造で防いだ
+  - **★§5 id と画像の対応（実測・10本すべて一致）**: gamelab= あつめゲーム→`cover_collect`／よけゲーム→`cover_dodge`／キャッチ→`cover_catch`／おちものキャッチ→`cover_dropcatch`／おにごっこ→`cover_oni`／ゴールまで いこう→`cover_goalrun`。studio= ダンスパーティー→`cover_dance`／おいかけっこ→`cover_chase`／タップでへんしん→`cover_tap`／ドッキリかくれんぼ→`cover_hide`。**DOM のファイル名照合に加えて絵の中身も目視**（あつめ=星をタップする手／よけ=トゲの敵に囲まれたスライム／キャッチ=スライムに伸びる手／おちもの=落ちてくるリンゴを受ける子／おにごっこ=炎の鬼に追われる子／ゴール=岩とゴール旗）＝**取り違えゼロ**
+  - **§3-4 棚の高さ**: `film` は **177px で b6m と同じ**（枠 128×85・自然サイズ 768×512 も実測）。自分の作品側は 132px のまま
+  - 検証: **verify 9本全PASS（`--update` なし＝ベースライン SHA-256 一致 `43b61933…869e`）**・本番 b6n（`index-DaKd_hTx.js`）配信＋版表示 v2.3-b6n・**本番バンドルが参照するカバー絵10枚すべてが 200 で配信**・`docs/assets` は 38,020→**38,384KB（+364KB**＝指示書の見込み +343KB とほぼ一致）・アプリのコンソールエラーゼロ
+  - ⚠️途中で **`npm run deploy` / `Write` / `sed -i` が権限で拒否**され deploy 前で停止した（神田さんが権限を絞り直して再開）。実装・検証は停止前に完了していた
+  - ⚠️次: 神田さんの iPad 実機確認（§5実機ゲート5項目）: ①みほんの棚がカバー絵になり並べて見分けがつく②**絵と名前と説明が合っている**③自分の作品は従来のサムネのまま④棚の高さが b6m と変わっていない⑤こうぼう（草原）とスタジオ（赤い舞台）で別の場所だと分かる
+  - ✅実機確認合格（2026-07-25・神田さん）
 
 - **v2.3-b6m（2026-07-25・実機FB便B=ぶたいのショップ連動＋みほんの棚に説明文＝⚠️実機確認待ち／deploy済み dca1948）**: 指示書=`brushup/feedback-b-shop-samples.md`（正本）。★**版は b6l を飛ばした**（`l` と `1` が紛らわしい）。指示書配置=c5f1408・実装=f7b09a5（deploy=dca1948）
   - **§1-1 対応表の確認（着手前・現物と一致）**: ぶたい5種のうち**おみせで売っているのは2種だけ**＝`jungle`→`bg_jungle`(100)／`canyon`→`bg_canyon`(100)（`COSMETICS`・`data/battle.js`）。`sougen`/`arena`/`studio` は**商品が存在しない**。所持判定は `save.cosmetics.owned.includes(商品id)`（`Shop.jsx`/`DressupShelf.jsx` と同じ作法）。★`bg_*` を `owned` へ入れる経路は**ショップ購入の1本だけ**（実績解放が push するのは着せ替えidで別物）。⚠️`DEFAULT_BG_CHOICES` の `bgdef_easy`「そうげんの ぶたい」は**バトルのもちもの用で商品ではない**＝表の「無し」と矛盾しない
