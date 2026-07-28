@@ -133,6 +133,10 @@ const STUDIO_CSS = `
     white-space: nowrap; pointer-events: none; text-shadow: 0 1px 1px rgba(0,0,0,.12); }
   /* ながおし（palette-ui-overhaul §5）: 成立でカードが少し大きくなり、ふきだしで ながい名前＋せつめい */
   .studio-pal .pal.lift { transform: scale(1.14); z-index: 5; filter: drop-shadow(0 6px 12px rgba(0,0,0,.28)); }
+  /* ★アニメがあるときだけ幅を固定する（実機FB【1】）。max-width だけだと中身の文字数で幅が決まり、
+     desc が短いカード（うえへ/したへ/まわる/ジャンプ＝9〜13字。他は27〜50字）でふきだしが細くなり、
+     width:100% のアニメ枠＝マス目も一緒に細くなっていた。アニメ無しは従来どおり max-width のまま */
+  .palDesc.hasanim { width: 250px; }
   .palDesc { position: fixed; z-index: 260; max-width: 250px; background: #fffdf6; color: #33414f;
     border-radius: 13px; padding: 10px 13px; box-shadow: 0 10px 26px rgba(0,0,0,.3); border: 2px solid #e5dcc6;
     pointer-events: none; }
@@ -552,17 +556,31 @@ const PAL_ANIM_SCRIPTS = (() => {
     // 8 ふってくる: 上から下へ落ち、下端から上へ戻る（ループが分かる）
     fall: { beats: null, chars: [{ key: "a", kind: slime, x: 5, y: 7,
       stacks: [S({ type: "hat" }, { type: "forever", children: [{ id: 9, type: "fall" }] })] }] },
-    // 9 じゅうじキー: 十字キーの絵が光り、その方向へ動く（入力は既存の公開API nudge をUIから呼ぶ）
+    /* 9 じゅうじキー: 十字キーの絵が光り、その方向へ動く（入力は既存の公開API nudge をUIから呼ぶ）
+       ★末尾の forever〔まつ〕は「エンジンを生かし続ける」ため（実機FB【2】の調査で判明）。
+         きっかけが尽きて待ち受けも無いとエンジンは自然終了し（running=false）、
+         nudge / tapMoveStep / gravityStep が以降いっさい効かなくなる。node で再現して確認済み。 */
     dpad: { beats: null, overlay: "dpad", opMs: 460,
       input: [[1, 0], [1, 0], [0, 1], [0, 1], [-1, 0], [-1, 0], [0, -1], [0, -1]],
-      chars: [{ key: "a", kind: hero, x: 5, y: 3, stacks: [S({ type: "hat" }, { type: "dpad" })] }] },
+      chars: [{ key: "a", kind: hero, x: 5, y: 3, stacks: [S({ type: "hat" }, { type: "dpad" }, { type: "forever", children: [{ id: 9, type: "wait", n: 1 }] })] }] },
     // 10 タップいどう: 指の絵が地面をタップ → キャラがそこへ向かう（bgTap + tapMoveStep）
     tapMove: { beats: null, overlay: "finger", opMs: 320,
       taps: [{ x: 9, y: 5 }, { x: 2, y: 2 }],
-      chars: [{ key: "a", kind: hero, x: 5, y: 3, stacks: [S({ type: "hat" }, { type: "tapMove" })] }] },
+      chars: [{ key: "a", kind: hero, x: 5, y: 3, stacks: [S({ type: "hat" }, { type: "tapMove" }, { type: "forever", children: [{ id: 9, type: "wait", n: 1 }] })] }] },
     // 11 とべるように: 落ちて着地 → 跳ぶ → また落ちる（重力が伝わるように）
-    jumpable: { beats: null, opMs: 320, gravity: true, jumpEvery: 7,
-      chars: [{ key: "a", kind: hero, x: 5, y: 6, stacks: [S({ type: "hat" }, { type: "jumpable" })] }] },
+    /* ★実機FB【2】: jumpEvery 7（=約2.2秒に1度）だと「落ちる→着地→長い待ち→跳ぶ」でほぼ止まって見えた。
+       3 に詰めて着地から約1秒で跳ぶようにし、開始も中段 y:4 へ（最初の落下が長すぎない）＝
+       「落ちる → 着地 → 跳ぶ → また落ちる」が繰り返し見える */
+    /* ★実機FB【2】の調査で分かった2点（どちらも台本側で解決・エンジンは無改造）:
+       ① きっかけが尽きて待ち受けも無いとエンジンが自然終了し（running=false）、以降 gravityStep が
+          いっさい効かない → 末尾に forever〔まつ〕を置いて生かし続ける
+       ② `tryJump` は jumpable だけでなく **operable も要求**する（▲＝じゅうじキーで跳ぶ仕様）
+          → dpad も一緒に置く。実機の遊び方（じゅうじキーの▲で跳ぶ）とも一致する
+       jumpEvery は 7→3（約2.2秒に1度→約1秒に1度）、開始も中段 y:4 へ＝
+       「落ちる → 着地 → 跳ぶ → また落ちる」が繰り返し見える */
+    jumpable: { beats: null, opMs: 320, gravity: true, jumpEvery: 3,
+      chars: [{ key: "a", kind: hero, x: 5, y: 4,
+        stacks: [S({ type: "hat" }, { type: "jumpable" }, { type: "dpad" }, { type: "forever", children: [{ id: 9, type: "wait", n: 1 }] })] }] },
     // 12 ぶつかったら: 2体が近づいてぶつかり、片方が光る（発火が分かるように）
     bumpTarget: { beats: 9, flashOn: "b", chars: [
       { key: "a", kind: slime, x: 1, y: 3, stacks: [S({ type: "hat" }, { type: "move", n: 6 })] },
@@ -2104,7 +2122,7 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
       )}
       {/* ながおしの せつめいふきだし（palette-ui-overhaul §5・押している間だけ表示） */}
       {palDesc && (() => { const d = DEFS[palDesc.type]; return (
-        <div className="palDesc" style={{ left: palDesc.x, top: palDesc.y }}>
+        <div className={"palDesc" + (PAL_ANIM_SCRIPTS[palDesc.type] ? " hasanim" : "")} style={{ left: palDesc.x, top: palDesc.y }}>
           <div className="dt">{d.long || d.label}</div>
           {/* card-animation-inline §3-1: long と desc の「間」。台本のあるカードにだけ出す（本便は みぎへ 1種類） */}
           {PAL_ANIM_SCRIPTS[palDesc.type] && <PalAnim type={palDesc.type} />}
