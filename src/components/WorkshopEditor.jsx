@@ -12,7 +12,7 @@ import { isTrigger, isContainer, makeBlock, cloneBlocks } from "../data/studio-b
 import { G, ANIM, pathBody, pathHat, pathC, gloss, chipY, labelY, blockH, stackH, containerDepth } from "../workshop/geometry.js";
 import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../workshop/engine.js";
 import { lastProfile, saveProfile } from "../storage.js";
-import { availableBgs } from "../data/studio-bgs.js";
+import { availableBgs, floorStyle } from "../data/studio-bgs.js";
 import { playJingle } from "../bgm.js";
 import { buildCast, kindImg, kindName, kindValid } from "../workshop/cast.js";
 import iconCoin from "../assets/icon_stat_coin.png";
@@ -242,6 +242,17 @@ const STUDIO_CSS = `
   .theater { position: relative; width: 100%; aspect-ratio: 3 / 2; flex-shrink: 0; border-radius: 14px;
     border: 4px solid #241a2c; overflow: hidden; background: #1c1424; touch-action: none; }
   .theater .bgimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+  /* stage-floor.md §3: ゲームこうぼうの床（isGame のときだけ描画＝studio には出ない）。
+     ★色と模様は src/data/studio-bgs.js の floorStyle() が唯一の入口（§2-1）。ここには色を書かない */
+  .theater .bgfloor { position: absolute; inset: 0; pointer-events: none; }
+  /* うっすらマス目（§3-2・「ためしてみる」の .palDesc .anim と同じ考え方）。
+     ★白と黒を1pxずらして重ねる＝5種どの床の明るさでも線が沈まない（砂色でも深緑でも読める） */
+  .theater .bggrid { position: absolute; pointer-events: none;
+    background-image: linear-gradient(to right, rgba(255,255,255,.20) 0 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255,255,255,.20) 0 1px, transparent 1px),
+                      linear-gradient(to right, rgba(0,0,0,.13) 0 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(0,0,0,.13) 0 1px, transparent 1px);
+    background-position: 1px 1px, 1px 1px, 0 0, 0 0; }
   .theater::before, .theater::after { content: ""; position: absolute; top: 0; bottom: 0; width: 14px; z-index: 40;
     background: repeating-linear-gradient(90deg, #8e3040 0 6px, #6e2130 6px 12px);
     box-shadow: 0 0 12px rgba(0,0,0,.5); pointer-events: none; }
@@ -349,6 +360,8 @@ const STUDIO_CSS = `
   .bgrow .bgthumb { position: relative; border: 2.5px solid rgba(255,244,220,.25); border-radius: 8px; padding: 0;
     background: none; cursor: pointer; overflow: hidden; flex: 1; min-width: 0; }
   .bgrow .bgthumb img { display: block; width: 100%; aspect-ratio: 16/10; object-fit: cover; }
+  /* ゲームこうぼうのぶたい選択は絵でなく床（stage-floor.md §3-1）。枠は img と同じ比率に揃える */
+  .bgrow .bgthumb .bgfill { display: block; width: 100%; aspect-ratio: 16/10; }
   .bgrow .bgthumb .bgname { position: absolute; left: 0; right: 0; bottom: 0; font-family: inherit;
     background: rgba(36,26,44,.72); color: #f5eddf; font-size: 9px; font-weight: 700; text-align: center; padding: 1px 0; }
   .bgrow .bgthumb.on { border-color: #ffd447; box-shadow: 0 0 8px rgba(255,212,71,.5); }
@@ -1894,7 +1907,19 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
         {/* 右: ステージペイン（12×8を常に全体縮尺表示・3:2） */}
         <div className="studio-right">
           <div className="theater" ref={theaterRef} onPointerDown={onTheaterPointerDown}>
-            <img className="bgimg" src={bgImg} alt="" draggable="false" />
+            {/* ぶたい（stage-floor.md §2）: ゲームこうぼうだけフラットな床＋うっすらマス目。
+                studio は従来の絵のまま（書き割り＝見るもの／ゲームの背景＝どこに立てるかを答えるもの）。
+                ★マス目はキャラと同じ式（左22px・下12px・cellPx）で置く＝目盛りが実際のマスと一致する */}
+            {mode.isGame ? (
+              <>
+                <div className="bgfloor" style={floorStyle(bgRef.current)} />
+                <div className="bggrid" style={{ left: 22, bottom: 12,
+                  width: cellPx * LCOLS, height: cellPx * LROWS,
+                  backgroundSize: `${cellPx}px ${cellPx}px` }} />
+              </>
+            ) : (
+              <img className="bgimg" src={bgImg} alt="" draggable="false" />
+            )}
             {/* スコア/タイマーHUD（ゲームの器・stage1 §7d/stage2 §A-3）: 上演中/終了後だけ・▶直後の⭐0が合図 */}
             {mode.isGame && gameConfigRef.current && (running || postRunRef.current)
               && (gameConfigRef.current.scoreShow || gameConfigRef.current.clear.type === "time") && (
@@ -2039,7 +2064,11 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
               {availableBgs(BGS, profileRef.current, initRef.current.bg).map(b => (
                 <button key={b.id} className={"bgthumb" + (b.id === bgRef.current ? " on" : "")}
                   onClick={() => { ac(); if (b.id !== bgRef.current) { takeSnapshot(); bgRef.current = b.id; afterEdit(); sndTick(); } }}>
-                  <img src={b.img} alt="" draggable="false" />
+                  {/* stage-floor.md §3-1: 選んだ結果と違う絵が並ばないよう、ゲームこうぼうでは
+                      サムネも床にする（studio は従来の絵のまま）。見た目は floorStyle() に一本化 */}
+                  {mode.isGame
+                    ? <div className="bgfill" style={floorStyle(b.id)} />
+                    : <img src={b.img} alt="" draggable="false" />}
                   <span className="bgname">{b.name}</span>
                 </button>
               ))}

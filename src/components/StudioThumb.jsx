@@ -4,14 +4,17 @@
 // translate(22+x*c, -y*c)・キャラ幅=c×2.2）で配置し、全体を transform:scale で縮小する
 // ＝本物のステージの正確なミニチュアになる。
 import { LCOLS, LROWS } from "../workshop/engine.js";
-import { bgById } from "../data/studio-bgs.js";
+import { bgById, floorStyle } from "../data/studio-bgs.js";
 import { kindImg } from "../workshop/cast.js";
 import PlayerAvatar from "./PlayerAvatar.jsx";
 
 const ACTOR_K = 2.2;          // キャラ表示幅 = cellPx×これ（エディタCFGと同値・プロトタイプ実測値）
 const VW = 300, VH = 200;     // 仮想ステージの寸法（3:2・式の入力になるだけの内部値）
 
-export default function StudioThumb({ bg, chars, width = 128, profile }) {
+// isGame … ゲームこうぼうの作品サムネだけ「床」で描く（stage-floor.md §2-1）。
+// ★これが無いと、カセットだなに絵のサムネが並ぶのに開くと床＝選んだ結果と違う絵が並ぶ（§3-1が禁じた食い違い）。
+//   studio（isGame なし）は従来の絵のまま。見た目は floorStyle() に一本化＝3箇所でずれない。
+export default function StudioThumb({ bg, chars, width = 128, profile, isGame = false }) {
   const h = Math.round(width * VH / VW);
   const cellPx = Math.min((VW - 52) / LCOLS, (VH - 44) / LROWS); // ステージと同一式
   const base = cellPx * ACTOR_K;
@@ -19,10 +22,19 @@ export default function StudioThumb({ bg, chars, width = 128, profile }) {
   return (
     <div style={{ position: "relative", width, height: h, flexShrink: 0, overflow: "hidden",
       borderRadius: 6, background: "#1c1424" }}>
-      <img src={bgById(bg).img} alt="" draggable="false"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      {isGame
+        ? <div style={{ position: "absolute", inset: 0, ...floorStyle(bg) }} />
+        : <img src={bgById(bg).img} alt="" draggable="false"
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />}
       <div style={{ position: "absolute", left: 0, top: 0, width: VW, height: VH,
         transform: `scale(${scale})`, transformOrigin: "top left" }}>
+        {/* うっすらマス目（§3-2）: 本物のステージと同じ式で置くので縮小しても目盛りが合う */}
+        {isGame && (
+          <div style={{ position: "absolute", left: 22, bottom: 12,
+            width: cellPx * LCOLS, height: cellPx * LROWS, backgroundSize: `${cellPx}px ${cellPx}px`,
+            backgroundImage: "linear-gradient(to right, rgba(255,255,255,.20) 0 1px, transparent 1px),"
+                           + "linear-gradient(to bottom, rgba(255,255,255,.20) 0 1px, transparent 1px)" }} />
+        )}
         {(chars || []).map((c, i) => (
           <div key={i} style={{ position: "absolute", left: 0, bottom: 12, width: base,
             transform: `translate(${22 + c.x * cellPx}px, ${-c.y * cellPx}px)`, zIndex: 1 + i }}>

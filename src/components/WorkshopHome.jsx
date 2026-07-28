@@ -124,7 +124,7 @@ export default function WorkshopHome({ mode, onOpen, onExitApp }) {
   const [, force] = useReducer(x => x + 1, 0);
   // モード注入（段階A §3-4）: モード固有物はこの先の数行でだけ触る
   const { stashDraft, deleteWork, WORKS_MAX, NAME_MAX } = mode.works;
-  const { samples: SAMPLES, guide, homeBg, bgs: BGS, space } = mode;
+  const { samples: SAMPLES, guide, homeBg, bgs: BGS, space, isGame } = mode; // isGame: サムネを床で描くか（stage-floor.md §2-1）
   const TXT = mode.texts;
   const profRef = useRef(undefined);
   if (profRef.current === undefined) profRef.current = lastProfile();
@@ -206,7 +206,7 @@ export default function WorkshopHome({ mode, onOpen, onExitApp }) {
           <div className="sh-col">
             {draftAlive && (
               <button className="sh-draft" onClick={openDraft}>
-                <StudioThumb bg={draft.bg} chars={draft.chars} width={HOME_CFG.DRAFT_W} profile={prof} />
+                <StudioThumb bg={draft.bg} chars={draft.chars} width={HOME_CFG.DRAFT_W} profile={prof} isGame={isGame} />
                 <span>
                   <span className="t" style={{ display: "block" }}>かきかけの さくひんが あるよ</span>
                   <span className="s" style={{ display: "block" }}>タップで つづきから</span>
@@ -222,7 +222,7 @@ export default function WorkshopHome({ mode, onOpen, onExitApp }) {
                 <div className="sh-shelf">
                   {[...works].reverse().map(w => (
                     <button key={w.id} className="film" onClick={() => { sndTick(); setMenu(w); }}>
-                      <div className="film-frame"><StudioThumb bg={w.bg} chars={w.chars} width={HOME_CFG.THUMB_W} profile={prof} /></div>
+                      <div className="film-frame"><StudioThumb bg={w.bg} chars={w.chars} width={HOME_CFG.THUMB_W} profile={prof} isGame={isGame} /></div>
                       <div className="film-name">{w.name}</div>
                     </button>
                   ))}
@@ -244,7 +244,7 @@ export default function WorkshopHome({ mode, onOpen, onExitApp }) {
                       {s.cover
                         ? <img className="film-cover" src={s.cover} alt="" draggable="false"
                             style={{ width: HOME_CFG.THUMB_W, height: Math.round(HOME_CFG.THUMB_W * 2 / 3) }} />
-                        : <StudioThumb bg={s.bg} chars={s.chars} width={HOME_CFG.THUMB_W} profile={prof} />}
+                        : <StudioThumb bg={s.bg} chars={s.chars} width={HOME_CFG.THUMB_W} profile={prof} isGame={isGame} />}
                     </div>
                     <div className="film-name">{s.name}</div>
                     {s.desc && <div className="film-desc">{s.desc}</div>}
