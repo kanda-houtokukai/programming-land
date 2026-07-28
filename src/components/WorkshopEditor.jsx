@@ -11,6 +11,7 @@ import { useReducer, useRef, useState, useEffect, useLayoutEffect, useCallback }
 import { isTrigger, isContainer, makeBlock, cloneBlocks } from "../data/studio-blocks.js";
 import { G, ANIM, pathBody, pathHat, pathC, gloss, chipY, labelY, blockH, stackH, containerDepth } from "../workshop/geometry.js";
 import { createEngine, TICK, LCOLS, LROWS, SIZE_STEPS, SIZE_INIT } from "../workshop/engine.js";
+import { cellSize } from "../workshop/stagefit.js";
 import { lastProfile, saveProfile } from "../storage.js";
 import { availableBgs, floorStyle } from "../data/studio-bgs.js";
 import { playJingle } from "../bgm.js";
@@ -1528,9 +1529,11 @@ export default function WorkshopEditor({ mode, open = null, showOnly = false, on
     const t = theaterRef.current;
     if (!t) return;
     const w = t.clientWidth, h = t.clientHeight;
-    const c = Math.max(4, Math.min((w - 52) / LCOLS, (h - 44) / LROWS)); // プロトタイプ updateDims と同一式（下限は非表示時の負値ガード）
+    // 監査B-2（stage-floor.md §4）: 旧式 min((w-52)/12,(h-44)/8) はキャラの大きさを
+    // 勘定に入れておらず、上端の段と右端の列がぶたいの外へ切れていた。式の導出は stagefit.js。
+    const c = cellSize(w, h, mode.isGame ? CFG.ACTOR_K_GAME : CFG.ACTOR_K);
     if (Math.abs(c - cellPxRef.current) > 0.01) setCellPx(c);
-  }, []);
+  }, [mode.isGame]);
   useLayoutEffect(() => { updateDims(); }, [big, updateDims]);
   useEffect(() => {
     const onResize = () => updateDims();

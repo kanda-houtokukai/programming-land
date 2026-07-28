@@ -4,11 +4,14 @@
 // translate(22+x*c, -y*c)・キャラ幅=c×2.2）で配置し、全体を transform:scale で縮小する
 // ＝本物のステージの正確なミニチュアになる。
 import { LCOLS, LROWS } from "../workshop/engine.js";
+import { cellSize } from "../workshop/stagefit.js";
 import { bgById, floorStyle } from "../data/studio-bgs.js";
 import { kindImg } from "../workshop/cast.js";
 import PlayerAvatar from "./PlayerAvatar.jsx";
 
-const ACTOR_K = 2.2;          // キャラ表示幅 = cellPx×これ（エディタCFGと同値・プロトタイプ実測値）
+// キャラ表示幅 = cellPx×これ（エディタCFGと同値）。★モードで違う（studio 2.2 / gamelab 1.8）。
+// 以前は 2.2 固定で、ゲームこうぼうのサムネだけキャラが本物より大きく描かれていた（監査B-2の対応で是正）。
+const ACTOR_K = 2.2, ACTOR_K_GAME = 1.8;
 const VW = 300, VH = 200;     // 仮想ステージの寸法（3:2・式の入力になるだけの内部値）
 
 // isGame … ゲームこうぼうの作品サムネだけ「床」で描く（stage-floor.md §2-1）。
@@ -16,8 +19,9 @@ const VW = 300, VH = 200;     // 仮想ステージの寸法（3:2・式の入�
 //   studio（isGame なし）は従来の絵のまま。見た目は floorStyle() に一本化＝3箇所でずれない。
 export default function StudioThumb({ bg, chars, width = 128, profile, isGame = false }) {
   const h = Math.round(width * VH / VW);
-  const cellPx = Math.min((VW - 52) / LCOLS, (VH - 44) / LROWS); // ステージと同一式
-  const base = cellPx * ACTOR_K;
+  const k = isGame ? ACTOR_K_GAME : ACTOR_K;
+  const cellPx = cellSize(VW, VH, k); // ★ステージ本体と同じ関数（stagefit.js）＝正確なミニチュアを保つ
+  const base = cellPx * k;
   const scale = width / VW;
   return (
     <div style={{ position: "relative", width, height: h, flexShrink: 0, overflow: "hidden",
